@@ -2,7 +2,7 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=dingo_db',
+    'dsn' => 'mysql:host=mysql;dbname=dingo_db',
     'username' => 'dingo_db',
     'password' => '3e7%k%(3wOYO4c$a',
     'charset' => 'utf8mb4',
