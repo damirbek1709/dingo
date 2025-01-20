@@ -3,8 +3,8 @@
 return [
     'class' => 'yii\db\Connection',
     'dsn' => 'mysql:host=localhost;dbname=dingo_db',
-    'username' => 'dingo_db',
-    'password' => '3e7%k%(3wOYO4c$a',
+    'username' => 'dingo_user',
+    'password' => '9a(Q}ZjjwfJ[Rx+k',
     'charset' => 'utf8mb4',
     // Schema cache options (for production environment)
     // 'enableSchemaCache' => true,
