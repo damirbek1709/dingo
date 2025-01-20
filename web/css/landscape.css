@@ -1,0 +1,109 @@
+@media (min-width: 414px) and (max-width: 767px){
+    .best-seller-cover {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        grid-gap: 5px;
+    }
+
+    .main-list-1 .dropdown-menu:after{
+        display: none;
+    }
+
+
+    .nav-custom {
+        height: 55px;
+    }
+
+    
+
+    .admin-links {
+        display: none;
+    }
+
+    .example-cover, .inspiration-cover {
+        grid-gap: 15px;
+    }
+
+    .wrap>.container {
+        padding: 10px 15px 20px;
+    }
+
+    .navbar-inverse .navbar-toggle {
+        background-color: #1e1e6a;
+        border-color: #1e1e6a;
+        border-radius: 1px;
+    }
+
+    .navbar-brand {
+        padding: 0 15px;
+    }
+
+    .navbar-custom {
+        margin-top: 0;
+    }
+
+    .nav-custom .navbar-collapse {
+        margin: 30px 0 0;
+        background-color: #fff;
+        height: auto !important;
+        position: relative;
+        z-index: 2;
+        border-top: none;
+    }
+
+    .navbar-inverse .navbar-toggle:hover,
+    .navbar-inverse .navbar-toggle:focus {
+        background-color: #1e1e6a;
+    }
+
+    .main-banner {
+        margin-top: 0;
+    }
+
+    .nav-custom .sub-first {
+        margin-left: 0px;
+    }
+
+    .main-banner-2 {
+        height: 250px !important;
+    }
+
+    .main-slide-cover {
+        height: 250px !important;
+        background-position: center;
+    }
+
+    .footer-content {
+        display: none;
+        /* Initially hide all footer content */
+
+    }
+    .footer-menu{
+        grid-template-columns: 1fr;
+        margin-bottom: 30px;
+        grid-gap: 20px;
+    }
+    .product-index-cover{
+        grid-template-columns: 1fr 1fr;
+    }
+    .product-view{
+        grid-template-columns: 1fr 1fr;
+        grid-gap: 20px;
+    }
+    .prod-view-img{
+        background-color: transparent;
+    }
+
+    .product-index .best-seller-block:hover {
+        transform: unset!important;
+        padding: 15px 0;
+        background-color: #e5e5e5!important;
+    }
+    .product-index .best-seller-block:hover img {
+        transform: unset !important;
+        margin-top: 0;
+    }
+    .product-index .best-seller-block:hover .best-seller-desc, .product-index .best-seller-block:hover .best-seller-price {
+        transform: unset!important;
+    }
+}
