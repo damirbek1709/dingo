@@ -291,6 +291,7 @@ class ObjectController extends BaseController
                 'check_in' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'check_in'),
                 'check_out' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'check_out'),
                 'reception' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'reception'),
+                'description' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'description'),
                 'uploadImages' => UploadedFile::getInstancesByName('images'),
                 'email' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email'),
                 'user_id' => Yii::$app->user->id
@@ -326,6 +327,7 @@ class ObjectController extends BaseController
                 'check_in' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'check_in'),
                 'check_out' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'check_out'),
                 'reception' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'reception'),
+                'description' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'description'),
                 'uploadImages' => UploadedFile::getInstancesByName('images'),
                 'email' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email'),
                 'user_id' => Yii::$app->user->id
