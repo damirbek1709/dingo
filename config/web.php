@@ -18,14 +18,21 @@ $config = [
     'modules' => [
         'user' => [
             'class' => 'dektrium\user\Module',
-            'enableUnconfirmedLogin' => true,
             'confirmWithin' => 21600,
             'cost' => 12,
+            'enableRegistration' => true,
+            'enableConfirmation' => true,
+            'enableGeneratingPassword' => true,
+            'enablePasswordRecovery' => false,
+            'enableFlashMessages' => false,
             'admins' => ['admin'],
             'modelMap' => [
                 'User' => 'app\models\user\User',
                 'Token' => 'app\models\user\Token',
                 'RegistrationForm' => 'app\models\user\RegistrationForm',
+            ],
+            'controllerMap' => [
+                ''
             ],
         ],
 
@@ -73,7 +80,7 @@ $config = [
 
         'mailer' => [
             //'class' => \yii\symfonymailer\Mailer::class,
-            'class'=> Mailer::class,
+            'class' => Mailer::class,
             'transport' => [
                 'dsn' => 'smtp://no.reply@biovit.kg:Biovit@kg$!.com:465',
             ],

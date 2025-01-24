@@ -49,18 +49,13 @@ class UserController extends BaseController
         $model = Yii::createObject(RegistrationForm::className());
         $model->username = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
         $model->email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
-        $model->password = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'password');
-
-        $username = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
-        $user = User::find()->where(['email' => $username])->one();
+        $user = User::find()->where(['email' => $model->email])->one();
 
         if (!$user) {
             if ($model->register()) {
                 $response["success"] = true;
                 $response["message"] = "Пользователь создан";
-            } else {
-                $sendSMS = true;
-                if (in_array($user->username, ['damirbek2@gmail.com'])) {
+                if (in_array($user->email, ['damirbek@gmail.com'])) {
                     $dao = Yii::$app->db;
                     $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
                     $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
@@ -71,60 +66,25 @@ class UserController extends BaseController
                     $response['code'] = $token->code;
                 }
             }
-
-
+        } else {
+            $sendSMS = true;
+            $response["success"] = true;
+            $response["message"] = "Пользователь найден";
+            if (in_array($user->email, ['damirbek@gmail.com'])) {
+                $dao = Yii::$app->db;
+                $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
+                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
+                $sendSMS = false;
+            } else {
+                $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
+                $token->link('user', $user);
+                $response['code'] = $token->code;
+            }
         }
         return $response;
     }
 
-    // public function actionRegister()
-    // {
-    //     if (!Yii::$app->getModule('user')->enableRegistration) {
-    //         throw new NotFoundHttpException();
-    //     }
 
-    //     $response["success"] = false;
-    //     $username = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
-    //     $user = User::find()->where(['email' => $username])->one();
-    //     if (!$user) {
-    //         $model = new RegistrationForm();
-    //         $model->username = $username;
-    //         $model->email = $username;
-
-    //         if ($model->validate() && $model->register()) {
-    //             $response["success"] = true;
-    //             $response["message"] = 'Пользователь создан';
-    //         } else {
-    //             $response["errors"] = $model->errors;
-    //         }
-    //     } else {
-    //         $user->confirmed_at = null;
-    //         $user->save();
-    //         $sendSMS = true;
-
-    //         if (in_array($user->username, ['996553000665', '996707889512', '996551170990', '996505170990', '996555555555', '996333333333', '996777777777', '996999999999'])) {
-    //             $dao = Yii::$app->db;
-    //             $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
-    //             $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
-    //             $sendSMS = false;
-    //         } else {
-    //             $token = \Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
-    //             $token->link('user', $user);
-    //         }
-
-    //         $recipient = '+' . $user->username;
-
-    //         if ($sendSMS) {
-    //             // Yii::$app->nikita->setRecipient($recipient)
-    //             //     ->setText('Ваш код: ' . $token->code . ' is your code' . PHP_EOL . 'wYvKRPwmEXI')
-    //             //     ->send();
-    //         }
-    //         $response["success"] = true;
-    //         $response["message"] = 'Пользователь найден';
-    //     }
-
-    //     return $response;
-    // }
 
     public function actionCheckConfirmationCode()
     {
@@ -137,8 +97,10 @@ class UserController extends BaseController
         $response["success"] = false;
 
         $code = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'code');
+        $email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
+        $user = User::find()->where(['email' => $email])->one();
 
-        $token = Token::find()->where(['code' => $code, 'type' => Token::TYPE_CONFIRMATION])->one();
+        $token = Token::find()->where(['code' => $code, 'user_id' => $user->id, 'type' => Token::TYPE_CONFIRMATION])->one();
 
         if ($token === null || $token->isExpired || $token->user === null) {
             $response["success"] = false;
@@ -153,7 +115,7 @@ class UserController extends BaseController
             $response["message"] = 'Номер телефона подтверждён';
             $response["user"] = $user;
 
-            $this->saveFcm($user->id, Yii::$app->request->post());
+            //$this->saveFcm($user->id, Yii::$app->request->post());
         }
 
         return $response;
