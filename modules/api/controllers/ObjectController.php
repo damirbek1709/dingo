@@ -279,7 +279,7 @@ class ObjectController extends BaseController
         $user = Yii::$app->user->identity;
         if ($user) {
             $add_arr = [
-                'id' => $this->lastIncrement()+1,
+                'id' => (int) $this->lastIncrement() + 1,
                 'name' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'name'),
                 'type' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'type'),
                 'city' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'city'),
@@ -374,7 +374,7 @@ class ObjectController extends BaseController
         }
     }
 
-    
+
     /**
      * @throws NotFoundHttpException
      * @throws \Throwable

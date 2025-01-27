@@ -12,6 +12,7 @@ use app\models\ContactForm;
 use app\models\Freedom;
 use yii\httpclient\Client;
 use app\models\Product;
+use Resend\Client as Resend;
 
 class SiteController extends Controller
 {
@@ -109,9 +110,25 @@ class SiteController extends Controller
         return $this->render('page', ['id' => 5]);
     }
 
-    public function actionPrivacy()
+    public function actionSendEmail()
     {
-        return $this->render('page', ['id' => 6]);
+        $to = 'recipient@example.com';
+        $from = 'your_email@domain.com';
+        $subject = 'Test Email';
+        $htmlContent = '<p>This is a test email.</p>';
+        $textContent = 'This is a test email.';
+
+        $response = Yii::$app->mailer->compose()
+            ->setFrom('send@dingo.kg')
+            ->setTo('damirbek@gmail.com')
+            ->setSubject('Lorem ipsum dolor')
+            ->send();
+
+        if ($response) {
+            return 'Email sent successfully!';
+        } else {
+            return 'Failed to send email.';
+        }
     }
 
     public function actionClients()
@@ -119,20 +136,7 @@ class SiteController extends Controller
         return $this->render('page', ['id' => 8]);
     }
 
-    public function actionOffer()
-    {
-        return $this->render('page', ['id' => 9]);
-    }
 
-    public function actionProjects()
-    {
-        return $this->render('page', ['id' => 10]);
-    }
-
-    public function actionAtelier()
-    {
-        return $this->render('page', ['id' => 7]);
-    }
 
     /**
      * Login action.
@@ -289,5 +293,5 @@ class SiteController extends Controller
         ]);
     }
 
-    
+
 }

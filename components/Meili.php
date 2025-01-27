@@ -1,0 +1,67 @@
+<?php
+namespace app\components;
+
+use yii\base\Component;
+use MeiliSearch\Client;
+use GuzzleHttp\Client as GuzzleHttpClient;
+use yii\base\InvalidConfigException;
+
+class Meili extends Component
+{
+    public $host = 'http://127.0.0.1:7700';
+    public $masterKey = 'masterKey';
+    public $timeout = 2;
+    private $_client;
+
+    public function init()
+    {
+        parent::init();
+
+        if (empty($this->host)) {
+            throw new InvalidConfigException('Meilisearch host must be set.');
+        }
+    }
+
+    // public function connect($content = null)
+    // {
+    //     //$client = new Client('http://127.0.0.1:7700', 'uQGbv6nq-EZh2ke3HRMS6Wpu-dSLlo618BV6-Qal0jM');
+    //     $client = new Client('http://127.0.0.1:7700', 'masterKey', new GuzzleHttpClient(['timeout' => 2]));
+    //     return $client;
+    // }
+
+    public function connect($content = null)
+    {
+        try {
+            $client = new Client(
+                'http://host.docker.internal:7700',  // This should work on Mac
+                'masterKey',
+                new GuzzleHttpClient([
+                    'timeout' => 5,
+                    'verify' => false
+                ])
+            );
+            return $client;
+        } catch (\Exception $e) {
+            Yii::error("Meilisearch connection error: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function getClient()
+    {
+        if ($this->_client === null) {
+            $httpClient = new GuzzleHttpClient([
+                'timeout' => $this->timeout,
+                'connect_timeout' => 2,
+            ]);
+
+            $this->_client = new Client(
+                $this->host,
+                $this->masterKey,
+                $httpClient
+            );
+        }
+
+        return $this->_client;
+    }
+}

@@ -34,7 +34,11 @@
         "sjaakp/yii2-taggable": "*",
         "symfony/browser-kit": "^6.0",
         "symfony/mailer": "^7.2",
-        "resend/resend-php": "^0.15.1"
+        "resend/resend-php": "^0.15.1",
+        "meilisearch/meilisearch-php": "^1.12",
+        "guzzlehttp/guzzle": "^7.9",
+        "http-interop/http-factory-guzzle": "^1.0",
+        "yus-ham/yii2-resend": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
@@ -47,7 +51,8 @@
             "enabled": false
         },
         "allow-plugins": {
-            "yiisoft/yii2-composer": true
+            "yiisoft/yii2-composer": true,
+            "php-http/discovery": true
         }
     },
     "scripts": {

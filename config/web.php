@@ -1,6 +1,5 @@
 <?php
 
-use Symfony\Component\Mailer\Mailer;
 $params = require __DIR__ . '/params.php';
 $db = file_exists(__DIR__ . '/db-local.php') ?
     require(__DIR__ . '/db-local.php') : require(__DIR__ . '/db.php');
@@ -56,6 +55,7 @@ $config = [
                 ],
             ],
         ],
+
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'efRqaUcSjyACc0wrv4ogfjbZGizExLfh',
@@ -69,22 +69,17 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        // 'mailer' => [
-        //     'class' => 'Swift_SmtpTransport',
-        //     'host' => 'smtp.yandex.ru',
-        //     'username' => 'no.reply@biovit.kg',
-        //     'password' => 'Biovit@kg$!',
-        //     'port' => '465',
-        //     'encryption' => 'ssl',
-        // ],
-
         'mailer' => [
-            //'class' => \yii\symfonymailer\Mailer::class,
-            'class' => Mailer::class,
+            'class' => 'yusham\resend\Mailer',
+            'useFileTransport' => false,
+            //'viewPath' => '@app/mail',
             'transport' => [
-                'dsn' => 'smtp://no.reply@biovit.kg:Biovit@kg$!.com:465',
+                'apiKey' => 're_atcXWkEq_LaWuaA5QKX5GmHNpWyFbGKDx'
             ],
-            'useFileTransport' => false, // Set to true to save emails as files during development
+        ],
+
+        'meili' => [
+            'class' => 'app\components\Meili',
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
