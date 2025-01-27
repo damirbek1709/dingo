@@ -74,7 +74,8 @@ class ObjectController extends BaseController
             'ratings',
             'save-search-guest',
             'cities',
-            'rating-count-grades'
+            'rating-count-grades',
+            'list'
         ];
 
 
