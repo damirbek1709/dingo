@@ -12,10 +12,31 @@ use app\models\ContactForm;
 use app\models\Freedom;
 use yii\httpclient\Client;
 use app\models\Product;
-use Resend\Client as Resend;
-
+use app\components\ResendClient;
 class SiteController extends Controller
 {
+
+    private $resendClient;
+
+    public function __construct(
+        $id,
+        $module,
+        ResendClient $resendClient,
+        $config = []
+    ) {
+        parent::__construct($id, $module, $config);
+        $this->resendClient = $resendClient;
+    }
+
+    public function actionTest()
+    {
+        $this->resendClient->sendEmail(
+            'send@dingo.kg',
+            'damirbek@gmail.com',
+            'Test',
+            'Test message'
+        );
+    }
     /**
      * {@inheritdoc}
      */
@@ -112,23 +133,12 @@ class SiteController extends Controller
 
     public function actionSendEmail()
     {
-        $to = 'recipient@example.com';
-        $from = 'your_email@domain.com';
-        $subject = 'Test Email';
-        $htmlContent = '<p>This is a test email.</p>';
-        $textContent = 'This is a test email.';
-
-        $response = Yii::$app->mailer->compose()
-            ->setFrom('send@dingo.kg')
-            ->setTo('damirbek@gmail.com')
-            ->setSubject('Lorem ipsum dolor')
-            ->send();
-
-        if ($response) {
-            return 'Email sent successfully!';
-        } else {
-            return 'Failed to send email.';
-        }
+        $this->resendClient->sendEmail(
+            'send@dingo.kg',
+            'damirbek@gmail.com',
+            'Test',
+            'Test message'
+        );
     }
 
     public function actionClients()

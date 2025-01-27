@@ -69,13 +69,8 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => [
-            'class' => 'yusham\resend\Mailer',
-            'useFileTransport' => false,
-            //'viewPath' => '@app/mail',
-            'transport' => [
-                'apiKey' => 're_atcXWkEq_LaWuaA5QKX5GmHNpWyFbGKDx'
-            ],
+        'resendClient' => [
+            'class' => 'app\components\ResendClient',
         ],
 
         'meili' => [
