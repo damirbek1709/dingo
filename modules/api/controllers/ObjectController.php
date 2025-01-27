@@ -103,6 +103,7 @@ class ObjectController extends BaseController
             'actions' => [
                 'add' => ['POST'],
                 'edit' => ['POST'],
+                'list' => ['POST'],
                 'remove' => ['POST'],
                 'activate' => ['POST'],
                 'deactivate' => ['POST'],
@@ -344,6 +345,20 @@ class ObjectController extends BaseController
             $response['message'] = 'Unauthorized';
         }
         return $response;
+    }
+
+    public function actionList()
+    {
+        $filter_string = '';
+        $client = Yii::$app->meili->connect();
+        $res = $client->index('object')->search($this->keyword, [
+            'filter' => [
+                $filter_string
+            ],
+            //'sort' => $sort,
+            'limit' => 10000
+        ]);
+        return $res->getHits();
     }
 
 
