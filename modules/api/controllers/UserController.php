@@ -70,7 +70,7 @@ class UserController extends BaseController
             $sendSMS = true;
             $response["success"] = true;
             $response["message"] = "Пользователь найден";
-            if (in_array($user->email, ['damirbek@gmail.com'])) {
+            if (in_array($user->email, ['damirbek@gmail.com','adiletprosoft@gmail.com'])) {
                 $dao = Yii::$app->db;
                 $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
                 $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
