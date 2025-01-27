@@ -49,7 +49,7 @@ class Meili extends Component
 
         try {
             $client = new Client(
-                'http://meili.selva.kg',  // This should work on Mac
+                'https://meili.selva.kg',  // This should work on Mac
                 'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
                 new GuzzleHttpClient([
                     'timeout' => 5,
