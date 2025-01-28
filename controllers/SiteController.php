@@ -16,27 +16,7 @@ use app\components\ResendClient;
 class SiteController extends Controller
 {
 
-    private $resendClient;
-
-    public function __construct(
-        $id,
-        $module,
-        ResendClient $resendClient,
-        $config = []
-    ) {
-        parent::__construct($id, $module, $config);
-        $this->resendClient = $resendClient;
-    }
-
-    public function actionTest()
-    {
-        $this->resendClient->sendEmail(
-            'send@dingo.kg',
-            'damirbek@gmail.com',
-            'Test',
-            'Test message'
-        );
-    }
+    
     /**
      * {@inheritdoc}
      */
@@ -131,15 +111,7 @@ class SiteController extends Controller
         return $this->render('page', ['id' => 5]);
     }
 
-    public function actionSendEmail()
-    {
-        $this->resendClient->sendEmail(
-            'send@dingo.kg',
-            'damirbek@gmail.com',
-            'Test',
-            'Test message'
-        );
-    }
+    
 
     public function actionClients()
     {

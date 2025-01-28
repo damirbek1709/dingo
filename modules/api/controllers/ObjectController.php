@@ -26,36 +26,7 @@ class ObjectController extends BaseController
 
         unset($actions['view'], $actions['create'], $actions['update'], $actions['delete'], $actions['options']);
 
-        $actions['index'] = [
-            'class' => 'yii\rest\IndexAction',
-            'modelClass' => $this->modelClass,
-            'prepareDataProvider' => function () {
-
-                $result = [];
-
-                $paidServices = PaidService::find()->sorted()->all();
-
-                foreach ($paidServices as $service) {
-                    $searchModel = new PostSearch();
-                    $searchModel->status = Post::STATUS_ACTIVATED;
-
-                    $dataProvider = $searchModel->search(Yii::$app->request->queryParams, true, false, $service->id);
-
-                    $result[$service->title] = $dataProvider;
-                }
-
-                $searchModel = new PostSearch();
-                $searchModel->status = Post::STATUS_ACTIVATED;
-
-                $dataProvider = $searchModel->search(Yii::$app->request->queryParams, true, false, null);
-                $dataProvider->sort->defaultOrder = ['upped_at' => SORT_DESC];
-                $dataProvider->pagination->pageSize = 20;
-
-                $result['all'] = $dataProvider;
-
-                return $result;
-            },
-        ];
+        
 
         return $actions;
     }
@@ -76,6 +47,7 @@ class ObjectController extends BaseController
             'cities',
             'rating-count-grades',
             'list'
+            //'list'
         ];
 
 
@@ -86,6 +58,12 @@ class ObjectController extends BaseController
                     'allow' => true,
                     'actions' => ['add'],
                     'roles' => ['@'],
+                ],
+
+                [
+                    'allow' => true,
+                    'actions' => ['list'],
+                    'roles' => ['@','?'],
                 ],
                 [
                     'allow' => true,
@@ -104,7 +82,7 @@ class ObjectController extends BaseController
             'actions' => [
                 'add' => ['POST'],
                 'edit' => ['POST'],
-                'list' => ['POST'],
+                'list' => ['GET'],
                 'remove' => ['POST'],
                 'activate' => ['POST'],
                 'deactivate' => ['POST'],
@@ -332,6 +310,8 @@ class ObjectController extends BaseController
                 'check_out' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'check_out'),
                 'reception' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'reception'),
                 'description' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'description'),
+                'lat' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lat'),
+                'lon' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lon'),
                 'uploadImages' => UploadedFile::getInstancesByName('images'),
                 'email' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email'),
                 'user_id' => Yii::$app->user->id
@@ -348,11 +328,14 @@ class ObjectController extends BaseController
         return $response;
     }
 
+    
+
     public function actionList()
     {
         $filter_string = '';
+        $key_word = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'keyword') ? ArrayHelper::getValue(Yii::$app->request->bodyParams, 'keyword') : '';
         $client = Yii::$app->meili->connect();
-        $res = $client->index('object')->search($this->keyword, [
+        $res = $client->index('object')->search($key_word, [
             'filter' => [
                 $filter_string
             ],

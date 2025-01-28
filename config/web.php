@@ -69,9 +69,9 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'resendClient' => [
-            'class' => 'app\components\ResendClient',
-        ],
+        // 'resendClient' => [
+        //     'class' => 'app\components\ResendClient',
+        // ],
 
         'meili' => [
             'class' => 'app\components\Meili',
