@@ -15,7 +15,7 @@ class Token extends BaseToken
         if ($insert) {
             static::deleteAll(['user_id' => $this->user_id, 'type' => $this->type]);
             $this->setAttribute('created_at', time());
-            $this->setAttribute('code', rand(1000, 9999));
+            $this->setAttribute('code', rand(100000, 999999));
         }
 
         return $insert;

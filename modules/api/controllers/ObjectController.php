@@ -26,7 +26,7 @@ class ObjectController extends BaseController
 
         unset($actions['view'], $actions['create'], $actions['update'], $actions['delete'], $actions['options']);
 
-        
+
 
         return $actions;
     }
@@ -62,8 +62,8 @@ class ObjectController extends BaseController
 
                 [
                     'allow' => true,
-                    'actions' => ['list'],
-                    'roles' => ['@','?'],
+                    'actions' => ['list','view'],
+                    'roles' => ['@', '?'],
                 ],
                 [
                     'allow' => true,
@@ -104,20 +104,7 @@ class ObjectController extends BaseController
     /**
      * @return mixed
      */
-    public function actionView($id)
-    {
-        $model = $this->findModel($id);
-        $model->tags = $model->tags ? unserialize($model->tags) : null;
-        $model->views_count += 1;
-        if ($model->updateAttributes(['views_count'])) {
-            $client = Yii::$app->meili->connect();
-            $client->index('posts')->updateDocuments(['id' => $model->id ? $model->id : null, 'views_count' => $model->views_count]);
-            return $model;
-        }
-        //$model->addView();
-
-        return $model;
-    }
+    
 
     /**
      * List own posts.
@@ -328,7 +315,7 @@ class ObjectController extends BaseController
         return $response;
     }
 
-    
+
 
     public function actionList()
     {
@@ -343,6 +330,13 @@ class ObjectController extends BaseController
             'limit' => 10000
         ]);
         return $res->getHits();
+    }
+
+    public function actionView($id)
+    {
+        $client = Yii::$app->meili->connect();
+        $document = $client->index('object')->getDocument($id);
+        return $document;
     }
 
 

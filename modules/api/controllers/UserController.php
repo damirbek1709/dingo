@@ -73,7 +73,7 @@ class UserController extends BaseController
             if (in_array($user->email, ['damirbek@gmail.com','adiletprosoft@gmail.com'])) {
                 $dao = Yii::$app->db;
                 $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
-                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
+                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '000000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
                 $sendSMS = false;
             } else {
                 $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
