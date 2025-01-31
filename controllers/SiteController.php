@@ -16,7 +16,7 @@ use app\components\ResendClient;
 class SiteController extends Controller
 {
 
-    
+
     /**
      * {@inheritdoc}
      */
@@ -111,7 +111,7 @@ class SiteController extends Controller
         return $this->render('page', ['id' => 5]);
     }
 
-    
+
 
     public function actionClients()
     {
@@ -141,6 +141,8 @@ class SiteController extends Controller
             'model' => $model,
         ]);
     }
+
+
 
     public function actionFreedomCheck()
     {
@@ -204,6 +206,17 @@ class SiteController extends Controller
                 $dao->createCommand()->insert('test', ['title' => 'payment not found' . $date, 'desc' => json_encode($post)])->execute();
             }
         }
+    }
+
+    public function actionSendEmail()
+    {
+        Yii::$app->mailer->compose()
+            ->setFrom('you@yourdomain.com')
+            ->setTo('recipient@example.com')
+            ->setSubject('Test Email')
+            ->setHtmlBody('<h1>Hello from Resend!</h1><p>This is a test email.</p>')
+            ->setTextBody('Hello from Resend! This is a test email.')
+            ->send();
     }
 
     public function actionThankyou()
