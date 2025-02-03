@@ -94,6 +94,11 @@ return [
     'Oblast'=>'Область',
     'Oblasts'=>'Области',
 
+    'Create Object'=>'Добавить объект',
+    'Update Object'=>'Редактировать объект',
+    'Object'=>'Объект',
+    'Objects'=>'Объекты',
+
     'Create Room Category'=>'Добавить категорию номера',
     'Update Room Category'=>'Редактировать категорию номера',
     'Room Categories'=>'Категории номеров',
