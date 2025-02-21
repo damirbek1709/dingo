@@ -336,6 +336,7 @@ class ObjectController extends BaseController
 
     public function actionList()
     {
+        $filters = [];
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $queryWord = Yii::$app->request->get('query_word', '');
