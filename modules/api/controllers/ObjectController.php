@@ -356,7 +356,7 @@ class ObjectController extends BaseController
         $searchResults = $index->search($queryWord, [
             'filter' => implode(' AND ', $filters),
             'sort' => [$priceField . ':asc'],
-            'limit' => 1000
+            'limit' => 100
         ]);
 
         // Process results to add from_price
