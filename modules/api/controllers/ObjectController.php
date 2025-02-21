@@ -358,7 +358,7 @@ class ObjectController extends BaseController
                 $searchDates[] = $date->format('d-m-Y');
             }
 
-            
+
 
 
 
@@ -374,8 +374,8 @@ class ObjectController extends BaseController
         $priceField = 'rooms.tariff.prices.price_' . $guestAmount;
 
         $pageSize = 10; // Number of results per page
-            $page = Yii::$app->request->get('page', 1); // Get page from request
-            $offset = ($page - 1) * $pageSize;
+        $page = Yii::$app->request->get('page', 1); // Get page from request
+        $offset = ($page - 1) * $pageSize;
 
         $searchResults = $index->search($queryWord, [
             'filter' => $filters,
@@ -425,10 +425,10 @@ class ObjectController extends BaseController
         ]);
 
         $arr = [
-            'pageSize'=>$pagination->pageSize,
+            'pageSize' => $pagination->pageSize,
             'totalCount' => $pagination->totalCount,
-            'page'=>$page,
-            'data'=>$hits,
+            'page' => (int) $page,
+            'data' => $hits,
         ];
 
         return $arr;
