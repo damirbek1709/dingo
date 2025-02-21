@@ -383,30 +383,32 @@ class ObjectController extends BaseController
 
         // Process results to add from_price
         $hits = $searchResults->getHits();
-        $totalCount = $searchResults->getHitsCount(); 
+        $totalCount = $searchResults->getHitsCount();
 
         foreach ($hits as &$hit) {
             $minPrice = PHP_FLOAT_MAX;
-            foreach ($hit['rooms'] as $room) {
-                foreach ($room['tariff'] as $tariff) {
-                    foreach ($tariff['prices'] as $price) {
-                        $currentPrice = $price['price_' . $guestAmount];
+            if ($hit['rooms']) {
+                foreach ($hit['rooms'] as $room) {
+                    foreach ($room['tariff'] as $tariff) {
+                        foreach ($tariff['prices'] as $price) {
+                            $currentPrice = $price['price_' . $guestAmount];
 
-                        // If dates are provided, check for overlap
-                        if ($fromDate && $toDate) {
-                            if (
-                                $this->areDatesOverlapping(
-                                    $fromDate,
-                                    $toDate,
-                                    $price['from_date'],
-                                    $price['to_date']
-                                )
-                            ) {
+                            // If dates are provided, check for overlap
+                            if ($fromDate && $toDate) {
+                                if (
+                                    $this->areDatesOverlapping(
+                                        $fromDate,
+                                        $toDate,
+                                        $price['from_date'],
+                                        $price['to_date']
+                                    )
+                                ) {
+                                    $minPrice = min($minPrice, $currentPrice);
+                                }
+                            } else {
+                                // If no dates provided, consider all prices
                                 $minPrice = min($minPrice, $currentPrice);
                             }
-                        } else {
-                            // If no dates provided, consider all prices
-                            $minPrice = min($minPrice, $currentPrice);
                         }
                     }
                 }
@@ -418,7 +420,7 @@ class ObjectController extends BaseController
             'totalCount' => $totalCount,
             'pageSize' => $pageSize,
         ]);
-        
+
         $hits['pagination'] = [
             'pageCount' => $pagination->getPageCount(),
             'page' => $pagination->page + 1, // Yii2 pages are zero-based
