@@ -421,14 +421,13 @@ class ObjectController extends BaseController
             'pageSize' => $pageSize,
         ]);
 
-        $hits['pagination'] = [
-            'pageCount' => $pagination->getPageCount(),
-            'page' => $pagination->page + 1, // Yii2 pages are zero-based
-            'pageSize' => $pagination->pageSize,
+        $arr = [
+            'pageSize'=>$pagination->pageSize,
             'totalCount' => $pagination->totalCount,
+            'data'=>$hits,
         ];
 
-        return $hits;
+        return $arr;
 
     }
 
