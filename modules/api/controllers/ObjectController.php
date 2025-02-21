@@ -373,7 +373,7 @@ class ObjectController extends BaseController
         // Determine which price field to sort by based on guest amount
         $priceField = 'rooms.tariff.prices.price_' . $guestAmount;
 
-        $pageSize = 1; // Number of results per page
+        $pageSize = 10; // Number of results per page
         $page = (int)Yii::$app->request->get('page', 1); // Get page from request
         $offset = ($page - 1) * $pageSize;
 
@@ -386,7 +386,7 @@ class ObjectController extends BaseController
 
         // Process results to add from_price
         $hits = $searchResults->getHits();
-        $totalCount = $searchResults->getHitsCount();
+        $totalCount = count($hits);
 
         foreach ($hits as &$hit) {
             $minPrice = PHP_FLOAT_MAX;
