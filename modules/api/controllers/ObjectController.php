@@ -46,8 +46,8 @@ class ObjectController extends BaseController
             'save-search-guest',
             'cities',
             'rating-count-grades',
-            'list'
-            //'list'
+            'list',
+            'list2'
         ];
 
 
@@ -62,7 +62,7 @@ class ObjectController extends BaseController
 
                 [
                     'allow' => true,
-                    'actions' => ['list', 'view'],
+                    'actions' => ['list', 'view','list2'],
                     'roles' => ['@', '?'],
                 ],
                 [
@@ -83,6 +83,7 @@ class ObjectController extends BaseController
                 'add' => ['POST'],
                 'edit' => ['POST'],
                 'list' => ['GET'],
+                'list2' => ['GET'],
                 'remove' => ['POST'],
                 'activate' => ['POST'],
                 'deactivate' => ['POST'],
@@ -318,6 +319,17 @@ class ObjectController extends BaseController
         return $response;
     }
 
+    public function actionList2(){
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $searchResults = $index->search('', [
+            // 'filter' => implode(' AND ', $filters),
+            // 'sort' => [$priceField . ':asc'],
+            'limit' => 100
+        ]);
+        return $searchResults->getHits();
+    }
+
 
 
     public function actionList()
@@ -328,7 +340,7 @@ class ObjectController extends BaseController
         $fromDate = Yii::$app->request->get('from_date');
         $toDate = Yii::$app->request->get('to_date');
         $guestAmount = (int) Yii::$app->request->get('guest_amount', 1);
-        $filters = ['rooms.guest_amount >= ' . $guestAmount];
+        //$filters = ['rooms.guest_amount >= ' . $guestAmount];
 
         // Add date filtering only if both dates are provided
         if ($fromDate && $toDate) {
@@ -354,13 +366,15 @@ class ObjectController extends BaseController
         $priceField = 'rooms.tariff.prices.price_' . $guestAmount;
 
         $searchResults = $index->search($queryWord, [
-            'filter' => implode(' AND ', $filters),
+            'filter' => $filters,
             'sort' => [$priceField . ':asc'],
             'limit' => 100
         ]);
 
         // Process results to add from_price
         $hits = $searchResults->getHits();
+        return $hits;
+
         foreach ($hits as &$hit) {
             $minPrice = PHP_FLOAT_MAX;
             foreach ($hit['rooms'] as $room) {
