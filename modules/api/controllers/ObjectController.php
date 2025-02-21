@@ -373,7 +373,7 @@ class ObjectController extends BaseController
         // Determine which price field to sort by based on guest amount
         $priceField = 'rooms.tariff.prices.price_' . $guestAmount;
 
-        $pageSize = 10; // Number of results per page
+        $pageSize = 1; // Number of results per page
         $page = (int)Yii::$app->request->get('page', 1); // Get page from request
         $offset = ($page - 1) * $pageSize;
 
@@ -429,7 +429,6 @@ class ObjectController extends BaseController
             'totalCount' => $searchResults->getEstimatedTotalHits(),
             'page' => (int) $page,
             'data' => $hits,
-            'offset'=>$offset
         ];
 
         return $arr;
