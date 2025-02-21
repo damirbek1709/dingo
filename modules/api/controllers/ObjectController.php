@@ -426,7 +426,7 @@ class ObjectController extends BaseController
 
         $arr = [
             'pageSize' => $pagination->pageSize,
-            'totalCount' => $pagination->totalCount,
+            'totalCount' => $totalCount,
             'page' => (int) $page,
             'data' => $hits,
         ];
