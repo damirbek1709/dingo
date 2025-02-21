@@ -380,7 +380,7 @@ class ObjectController extends BaseController
         $searchResults = $index->search($queryWord, [
             'filter' => $filters,
             'sort' => [$priceField . ':asc'],
-            'limit' => $pageSize,
+            //'limit' => $pageSize,
             'offset' => $offset
         ]);
 
