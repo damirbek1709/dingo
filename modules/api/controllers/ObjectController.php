@@ -11,6 +11,7 @@ use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
 use DateTime;
 use DateInterval;
+use yii\data\Pagination;
 
 class ObjectController extends BaseController
 {
@@ -62,7 +63,7 @@ class ObjectController extends BaseController
 
                 [
                     'allow' => true,
-                    'actions' => ['list', 'view','list2'],
+                    'actions' => ['list', 'view', 'list2'],
                     'roles' => ['@', '?'],
                 ],
                 [
@@ -319,7 +320,8 @@ class ObjectController extends BaseController
         return $response;
     }
 
-    public function actionList2(){
+    public function actionList2()
+    {
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $searchResults = $index->search('', [
@@ -355,6 +357,13 @@ class ObjectController extends BaseController
                 $searchDates[] = $date->format('d-m-Y');
             }
 
+            $pageSize = 10; // Number of results per page
+            $page = Yii::$app->request->get('page', 1); // Get page from request
+            $offset = ($page - 1) * $pageSize;
+
+
+
+
             $filters[] = 'NOT rooms.not_available_dates IN [' .
                 implode(',', array_map(function ($date) {
                     return '"' . $date . '"';
@@ -368,12 +377,13 @@ class ObjectController extends BaseController
         $searchResults = $index->search($queryWord, [
             'filter' => $filters,
             'sort' => [$priceField . ':asc'],
-            'limit' => 100
+            'limit' => $pageSize,
+            'offset' => $offset
         ]);
 
         // Process results to add from_price
         $hits = $searchResults->getHits();
-        return $hits;
+        $totalCount = $searchResults->getHitsCount(); 
 
         foreach ($hits as &$hit) {
             $minPrice = PHP_FLOAT_MAX;
@@ -404,6 +414,18 @@ class ObjectController extends BaseController
             $hit['from_price'] = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
         }
 
+        $pagination = new Pagination([
+            'totalCount' => $totalCount,
+            'pageSize' => $pageSize,
+        ]);
+        
+        $hits['pagination'] = [
+            'pageCount' => $pagination->getPageCount(),
+            'page' => $pagination->page + 1, // Yii2 pages are zero-based
+            'pageSize' => $pagination->pageSize,
+            'totalCount' => $pagination->totalCount,
+        ];
+
         return $hits;
 
     }
@@ -414,11 +436,11 @@ class ObjectController extends BaseController
         $end1 = strtotime($end1);
         $start2 = strtotime($start2);
         $end2 = strtotime($end2);
-        
+
         return $start1 <= $end2 && $start2 <= $end1;
     }
 
-    
+
 
     public function actionView($id)
     {
