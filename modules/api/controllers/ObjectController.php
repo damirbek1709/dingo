@@ -380,7 +380,7 @@ class ObjectController extends BaseController
         $searchResults = $index->search($queryWord, [
             'filter' => $filters,
             'sort' => [$priceField . ':asc'],
-            //'limit' => $pageSize,
+            'limit' => $pageSize,
             'offset' => $offset
         ]);
 
@@ -426,7 +426,7 @@ class ObjectController extends BaseController
 
         $arr = [
             'pageSize' => $pagination->pageSize,
-            'totalCount' => $totalCount,
+            'totalCount' => $searchResults->getEstimatedTotalHits(),
             'page' => (int) $page,
             'data' => $hits,
             'offset'=>$offset
