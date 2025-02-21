@@ -2,49 +2,44 @@
 
 namespace app\controllers;
 
-use Yii;
-use app\models\Page;
-use app\models\PageSearch;
+use app\models\Comfort;
+use app\models\comfortSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use dektrium\user\filters\AccessRule;
-use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 
 /**
- * PageController implements the CRUD actions for Page model.
+ * ComfortController implements the CRUD actions for Comfort model.
  */
-class PageController extends Controller
+class ComfortController extends Controller
 {
     /**
-     * {@inheritdoc}
+     * @inheritDoc
      */
     public function behaviors()
     {
-        return [
-            'roleAccess' => [
-                'class' => AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['create','update','admin','delete'],
-                        'roles' => ['admin']
+        return array_merge(
+            parent::behaviors(),
+            [
+                'verbs' => [
+                    'class' => VerbFilter::className(),
+                    'actions' => [
+                        'delete' => ['POST'],
                     ],
                 ],
-            ],
-        ];
+            ]
+        );
     }
 
     /**
-     * Lists all Page models.
-     * @return mixed
+     * Lists all Comfort models.
+     *
+     * @return string
      */
-    public function actionAdmin()
+    public function actionIndex()
     {
-        $searchModel = new PageSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        $searchModel = new comfortSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -53,9 +48,9 @@ class PageController extends Controller
     }
 
     /**
-     * Displays a single Page model.
-     * @param integer $id
-     * @return mixed
+     * Displays a single Comfort model.
+     * @param int $id ID
+     * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionView($id)
@@ -66,16 +61,20 @@ class PageController extends Controller
     }
 
     /**
-     * Creates a new Page model.
+     * Creates a new Comfort model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return mixed
+     * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new Page();
+        $model = new Comfort();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['admin']);
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        } else {
+            $model->loadDefaultValues();
         }
 
         return $this->render('create', [
@@ -84,18 +83,18 @@ class PageController extends Controller
     }
 
     /**
-     * Updates an existing Page model.
+     * Updates an existing Comfort model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
+     * @param int $id ID
+     * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['admin']);
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('update', [
@@ -104,29 +103,29 @@ class PageController extends Controller
     }
 
     /**
-     * Deletes an existing Page model.
+     * Deletes an existing Comfort model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param integer $id
-     * @return mixed
+     * @param int $id ID
+     * @return \yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['admin']);
+        return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Page model based on its primary key value.
+     * Finds the Comfort model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Page the loaded model
+     * @param int $id ID
+     * @return Comfort the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Page::findOne($id)) !== null) {
+        if (($model = Comfort::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

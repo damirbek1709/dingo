@@ -3,6 +3,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\helpers\Url;
 use rico\yii2images\models\Image;
@@ -10,10 +11,11 @@ use rico\yii2images\models\Image;
 class Objects extends Model
 {
     public $id;
-    public $primaryKey = ['id'];
     public $user_id;
     public $type;
     public $name;
+    public $name_en;
+    public $name_ky;
     public $city;
     public $address;
     public $currency;
@@ -25,24 +27,66 @@ class Objects extends Model
     public $object;
     public $reception;
     public $description;
+    public $payment;
     public $lat;
     public $lon;
     public $email;
+    public $meal_terms;
+    public $terms;
+    public $early_check_in;
+    public $late_check_in;
+    public $internet_public = false;
+    public $animals_allowed = false;
+    public $meal_purchaise = false;
+    public $meal_type = false;
+    public $meal_cost = false;
     public $uploadImages;
     public $images;
     public $img;
+    public $primaryKey = 'id';
+
+    public $comfort_list;
+
+    const TERM_MEAL_BREAKFEST = 1;
+    const TERM_MEAL_THREE_TIMES = 2;
 
     public function rules()
     {
         return [
-            [['id', 'type', 'city', 'address', 'currency', 'features', 'phone', 'site', 
-              'check_in', 'check_out', 'reception', 'description', 'lat', 'lon', 'email','name','uploadImages','user_id','images','img'], 'safe'],
+            [
+                [
+                    'id',
+                    'type',
+                    'city',
+                    'address',
+                    'currency',
+                    'features',
+                    'phone',
+                    'site',
+                    'check_in',
+                    'check_out',
+                    'reception',
+                    'description',
+                    'lat',
+                    'lon',
+                    'email',
+                    'name',
+                    'uploadImages',
+                    'user_id',
+                    'images',
+                    'img',
+                    'name_en',
+                    'name_ky'
+                ],
+                'safe'
+            ],
             [['email'], 'email'], // Validate email format
             [['phone'], 'match', 'pattern' => '/^\+?[0-9 ]{7,15}$/'], // Phone validation
             [['lat', 'lon'], 'number'], // Latitude and longitude should be numeric
             [['description'], 'string', 'max' => 1000], // Limit description length
         ];
     }
+
 
     public function behaviors()
     {
@@ -72,6 +116,31 @@ class Objects extends Model
             'lon' => 'Longitude',
             'email' => 'Email',
         ];
+    }
+
+    public static function mealList()
+    {
+        return [
+            (int) self::TERM_MEAL_BREAKFEST => Yii::t('app', 'Завтрак'),
+            (int) self::TERM_MEAL_THREE_TIMES => Yii::t('app', 'Трехразовое питание'),
+        ];
+    }
+
+    public static function сomfortList()
+    {
+        $comfortItems = Comfort::find()->orderBy(['category_id' => SORT_ASC])->all();
+        $groupedComfort = [];
+
+        foreach ($comfortItems as $item) {
+            $groupedComfort[$item->category_id][] = $item;
+        }
+
+        return $groupedComfort;
+    }
+
+    public static function paymentList()
+    {
+        return ArrayHelper::map(PaymentType::find()->all(), 'id', 'id');
     }
 
     public function getImageById($id)

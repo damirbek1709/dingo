@@ -34,7 +34,7 @@ class ObjectController extends \yii\web\Controller
                     ],
                     [
                         'allow' => true,
-                        'actions' => ['create', 'update', 'admin', 'delete', 'index','remove-image'],
+                        'actions' => ['create', 'update', 'admin', 'delete', 'index', 'remove-image'],
                         'roles' => ['admin']
                     ],
                 ],
@@ -119,9 +119,9 @@ class ObjectController extends \yii\web\Controller
         // Convert the first result into a model
         $model = new Objects($searchResult[0]);
 
+
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            // Normally, update would be in a DB, but for Meilisearch, we update the index
             $model->images = UploadedFile::getInstances($model, 'images');
             if ($model->images) {
                 foreach ($model->images as $image) {
@@ -131,16 +131,8 @@ class ObjectController extends \yii\web\Controller
                     @unlink($path);
                 }
             }
-            $index->updateDocuments([$model->attributes]);
 
-            if ($model->img) {
-                $image_id = $model->img;
-                foreach ($this->getImages() as $image) {
-                    if ($image->id == $image_id) {
-                        $this->setMainImage($image);
-                    }
-                }
-            }
+            $index->updateDocuments([$model->attributes]);
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -171,6 +163,6 @@ class ObjectController extends \yii\web\Controller
         ]);
     }
 
-    
+
 
 }

@@ -15,6 +15,15 @@ $config = [
         '@npm' => '@vendor/npm-asset',
     ],
     'modules' => [
+        'admin' => [
+            'class' => 'app\modules\admin\Module',
+            'name' => 'Панель управления',
+        ],
+
+        'owner' => [
+            'class' => 'app\modules\owner\Module',
+            'name' => 'Панель управления',
+        ],
         'user' => [
             'class' => 'dektrium\user\Module',
             'confirmWithin' => 21600,
@@ -34,7 +43,7 @@ $config = [
                 ''
             ],
         ],
-
+        'rbac' => 'dektrium\rbac\RbacWebModule',
         'yii2images' => [
             'class' => 'rico\yii2images\Module',
             'imagesStorePath' => 'uploads/images/store',
@@ -51,7 +60,8 @@ $config = [
         'view' => [
             'theme' => [
                 'pathMap' => [
-                    '@dektrium/user/views' => '@app/views/user'
+                    '@dektrium/user/views' => '@app/views/user',
+                    '@dektrium/rbac/views' => '@app/views/user/rbac'
                 ],
             ],
         ],

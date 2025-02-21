@@ -49,7 +49,7 @@ class RoomCatController extends Controller
         ]);
     }
 
-    
+
 
     /**
      * Displays a single RoomCat model.
@@ -75,19 +75,22 @@ class RoomCatController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
+                $client = Yii::$app->meili->connect();
+                $index = $client->index('object');
+                
                 $model->images = UploadedFile::getInstances($model, 'images');
-            if ($model->images) {
-                foreach ($model->images as $image) {
-                    $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                    $image->saveAs($path);
-                    $model->attachImage($path, true);
-                    @unlink($path);
+                if ($model->images) {
+                    foreach ($model->images as $image) {
+                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
+                        $image->saveAs($path);
+                        $model->attachImage($path, true);
+                        @unlink($path);
+                    }
                 }
-            }
-            if ($model->img) {
-                $img = $this->getImageById($model->img);
-                $model->setMainImage($img);
-            }
+                if ($model->img) {
+                    $img = $this->getImageById($model->img);
+                    $model->setMainImage($img);
+                }
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {

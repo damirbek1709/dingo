@@ -62,7 +62,7 @@ class ObjectController extends BaseController
 
                 [
                     'allow' => true,
-                    'actions' => ['list','view'],
+                    'actions' => ['list', 'view'],
                     'roles' => ['@', '?'],
                 ],
                 [
@@ -104,7 +104,7 @@ class ObjectController extends BaseController
     /**
      * @return mixed
      */
-    
+
 
     /**
      * List own posts.
@@ -282,10 +282,13 @@ class ObjectController extends BaseController
         $response = ['result' => false];
 
         $user = Yii::$app->user->identity;
+        $id = (int) ArrayHelper::getValue(Yii::$app->request->bodyParams, 'id');
         if ($user) {
             $add_arr = [
-                'id' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'id'),
-                'name' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'name'),
+                'id' => $id,
+                'name' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'name_ky'),
+                'name_ky' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'name_en'),
+                'name_en' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'name'),
                 'type' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'type'),
                 'city' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'city'),
                 'address' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'address'),
@@ -319,18 +322,89 @@ class ObjectController extends BaseController
 
     public function actionList()
     {
-        $filter_string = '';
-        $key_word = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'keyword') ? ArrayHelper::getValue(Yii::$app->request->bodyParams, 'keyword') : '';
         $client = Yii::$app->meili->connect();
-        $res = $client->index('object')->search($key_word, [
-            'filter' => [
-                $filter_string
-            ],
-            //'sort' => $sort,
-            'limit' => 10000
+        $index = $client->index('object');
+        $queryWord = Yii::$app->request->get('query_word', '');
+        $fromDate = Yii::$app->request->get('from_date');
+        $toDate = Yii::$app->request->get('to_date');
+        $guestAmount = (int) Yii::$app->request->get('guest_amount', 1);
+        $filters = ['rooms.guest_amount >= ' . $guestAmount];
+
+        // Add date filtering only if both dates are provided
+        if ($fromDate && $toDate) {
+            $period = new \DatePeriod(
+                new \DateTime($fromDate),
+                new \DateInterval('P1D'),
+                (new \DateTime($toDate))
+            );
+
+            $searchDates = [];
+            foreach ($period as $date) {
+                $searchDates[] = $date->format('d-m-Y');
+            }
+
+            $filters[] = 'NOT rooms.not_available_dates IN [' .
+                implode(',', array_map(function ($date) {
+                    return '"' . $date . '"';
+                }, $searchDates)) .
+                ']';
+        }
+
+        // Determine which price field to sort by based on guest amount
+        $priceField = 'rooms.tariff.prices.price_' . $guestAmount;
+
+        $searchResults = $index->search($queryWord, [
+            'filter' => implode(' AND ', $filters),
+            'sort' => [$priceField . ':asc'],
+            'limit' => 1000
         ]);
-        return $res->getHits();
+
+        // Process results to add from_price
+        $hits = $searchResults->getHits();
+        foreach ($hits as &$hit) {
+            $minPrice = PHP_FLOAT_MAX;
+            foreach ($hit['rooms'] as $room) {
+                foreach ($room['tariff'] as $tariff) {
+                    foreach ($tariff['prices'] as $price) {
+                        $currentPrice = $price['price_' . $guestAmount];
+
+                        // If dates are provided, check for overlap
+                        if ($fromDate && $toDate) {
+                            if (
+                                $this->areDatesOverlapping(
+                                    $fromDate,
+                                    $toDate,
+                                    $price['from_date'],
+                                    $price['to_date']
+                                )
+                            ) {
+                                $minPrice = min($minPrice, $currentPrice);
+                            }
+                        } else {
+                            // If no dates provided, consider all prices
+                            $minPrice = min($minPrice, $currentPrice);
+                        }
+                    }
+                }
+            }
+            $hit['from_price'] = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
+        }
+
+        return $hits;
+
     }
+
+    private function areDatesOverlapping($start1, $end1, $start2, $end2)
+    {
+        $start1 = strtotime($start1);
+        $end1 = strtotime($end1);
+        $start2 = strtotime($start2);
+        $end2 = strtotime($end2);
+        
+        return $start1 <= $end2 && $start2 <= $end1;
+    }
+
+    
 
     public function actionView($id)
     {

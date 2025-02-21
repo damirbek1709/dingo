@@ -130,7 +130,7 @@ class RoomCat extends \yii\db\ActiveRecord
 
     public function isImageSet()
     {
-        $image = Yii::$app->db->createCommand("SELECT * FROM image WHERE itemId={$this->id} AND modelName='RoomCat'")->queryScalar();
+        $image = Yii::$app->db->createCommand("SELECT * FROM image WHERE itemId=$this->id AND modelName='RoomCat'")->queryScalar();
         if ($image) {
             return true;
         }
