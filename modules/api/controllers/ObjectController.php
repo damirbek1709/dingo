@@ -59,8 +59,8 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add'],
-                    'roles' => ['@'],
+                    'actions' => ['add', 'category-comfort-title'],
+                    'roles' => ['@', '?'],
                 ],
 
                 [
