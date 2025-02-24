@@ -50,7 +50,8 @@ class ObjectController extends BaseController
             'rating-count-grades',
             'list',
             'list2',
-            'category-comfort-title'
+            'category-comfort-title',
+            'search',
         ];
 
 
@@ -65,7 +66,7 @@ class ObjectController extends BaseController
 
                 [
                     'allow' => true,
-                    'actions' => ['list', 'view', 'list2'],
+                    'actions' => ['list', 'view', 'list2','search'],
                     'roles' => ['@', '?'],
                 ],
                 [
@@ -86,6 +87,7 @@ class ObjectController extends BaseController
                 'add' => ['POST'],
                 'edit' => ['POST'],
                 'list' => ['GET'],
+                'search' => ['GET'],
                 'list2' => ['GET'],
                 'remove' => ['POST'],
                 'activate' => ['POST'],
@@ -438,6 +440,43 @@ class ObjectController extends BaseController
 
     }
 
+    public function actionSearch()
+    {
+        $filters = [];
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $city_id = Yii::$app->request->get('city_id', '');
+
+        $pageSize = 10; // Number of results per page
+        $page = (int) Yii::$app->request->get('page', 1); // Get page from request
+        $offset = ($page - 1) * $pageSize;
+
+        $searchResults = $index->search('', [
+            'facets' => ['city_id'],
+            'filter' => 'city_id IN [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]'
+        ]);
+        
+        // Get the facet distribution
+        $cityDistribution = $searchResults['facetDistribution']['city_id'];
+        
+        // Format the result as requested
+        $formattedResult = [];
+        foreach ($cityDistribution as $cityId => $count) {
+            $formattedResult[] = "'{$cityId}'=>{$count}";
+        }
+        
+        // If you need to ensure city_id is a faceted attribute first:
+        // $index->updateSettings([
+        //     'filterableAttributes' => ['city_id'],
+        //     'faceting' => [
+        //         'maxValuesPerFacet' => 100
+        //     ]
+        // ]);
+
+        return $cityDistribution;
+        
+    }
+
     public function actionCategoryComfortTitle()
     {
         $arr = [
@@ -453,9 +492,9 @@ class ObjectController extends BaseController
                 Objects::COMFORT_CATEGORY_SERVICE => 'Кызматтар',
                 Objects::COMFORT_CATEGORY_SPORT => 'Спорт жана эс алуу',
                 Objects::COMFORT_CATEGORY_GENERAL => 'Общее',
-                Objects::COMFORT_CATEGORY_POOL => 'Бассейн и пляж',
-                Objects::COMFORT_CATEGORY_CHILDREN => 'Дети',
-                Objects::COMFORT_CATEGORY_WORK => 'Работа'
+                Objects::COMFORT_CATEGORY_POOL => 'Бассейн жана пляж',
+                Objects::COMFORT_CATEGORY_CHILDREN => 'Балдар',
+                Objects::COMFORT_CATEGORY_WORK => 'Жумуш'
             ],
             'en' => [
                 Objects::COMFORT_CATEGORY_SERVICE => 'Service',
