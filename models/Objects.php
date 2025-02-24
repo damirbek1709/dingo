@@ -32,6 +32,7 @@ class Objects extends Model
     public $lon;
     public $email;
     public $meal_terms;
+    public $rooms;
     public $terms;
     public $early_check_in;
     public $late_check_in;
