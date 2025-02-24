@@ -44,6 +44,14 @@ class Objects extends Model
     public $images;
     public $img;
     public $primaryKey = 'id';
+    public $children = [];
+
+    const COMFORT_CATEGORY_SERVICE = 1;
+    const COMFORT_CATEGORY_SPORT = 2;
+    const COMFORT_CATEGORY_GENERAL = 3;
+    const COMFORT_CATEGORY_POOL = 4;
+    const COMFORT_CATEGORY_CHILDREN = 5;
+    const COMFORT_CATEGORY_WORK = 6;
 
     public $comfort_list;
 
@@ -86,6 +94,8 @@ class Objects extends Model
             [['description'], 'string', 'max' => 1000], // Limit description length
         ];
     }
+
+    
 
 
     public function behaviors()

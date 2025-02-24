@@ -210,6 +210,7 @@ class ObjectController extends Controller
         $model->animals_allowed = $data['terms']['animals_allowed'] ?? false;
         $model->meal_purchaise = $data['terms']['meal_purchaise'] ?? false;
         $model->meal_terms = $data['terms']['meal_terms'] ?? [];
+        $model->children = $data['terms']['children'] ?? [];
 
 
         if (Yii::$app->request->isPost) {
@@ -219,6 +220,7 @@ class ObjectController extends Controller
             $model->internet_public = Yii::$app->request->post('internet_public', 0);
             $model->animals_allowed = Yii::$app->request->post('animals_allowed', 0);
             $model->meal_terms = Yii::$app->request->post('meal_terms', []);
+            $model->children = Yii::$app->request->post('children', []);
             $model->meal_purchaise = Yii::$app->request->post('meal_purchaise', false);
 
             // Store in Meilisearch with correct format
@@ -230,7 +232,8 @@ class ObjectController extends Controller
                     'internet_public' => (bool) $model->internet_public,
                     'animals_allowed' => (bool) $model->animals_allowed,
                     'meal_terms' => array_values($model->meal_terms),
-                    'meal_purchaise'=>(bool) $model->meal_purchaise
+                    'meal_purchaise'=>(bool) $model->meal_purchaise,
+                    'children'=>array_values($model->children),
                 ]
             ];
 

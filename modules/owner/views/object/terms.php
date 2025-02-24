@@ -116,6 +116,13 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Условия');
                     <?= Html::checkbox('animals_allowed', $model->animals_allowed ? true : false, ['label' => 'Разрешено проживание с животными']) ?>
                 </div>
 
+                <div class="terms_section">
+                    <h4><?= Yii::t('app', 'Младенцы'); ?></h4>
+                    <?= Html::input('children', $model->children ? true : false, ['label' => 'Грудные дети до']) ?>
+                    <div class="clear"></div>
+                </div>
+
+
 
                 <!-- Submit Button -->
                 <div class="form-group">

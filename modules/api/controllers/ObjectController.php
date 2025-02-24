@@ -12,6 +12,7 @@ use yii\web\UploadedFile;
 use DateTime;
 use DateInterval;
 use yii\data\Pagination;
+use app\models\Objects;
 
 class ObjectController extends BaseController
 {
@@ -57,7 +58,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add'],
+                    'actions' => ['add','category-comfort-title'],
                     'roles' => ['@'],
                 ],
 
@@ -97,6 +98,7 @@ class ObjectController extends BaseController
                 'delete-search' => ['POST'],
                 'add-to-favorites' => ['POST'],
                 'remove-from-favorites' => ['POST'],
+                'category-comfort-title' => ['POST'],
             ],
         ];
 
@@ -374,7 +376,7 @@ class ObjectController extends BaseController
         $priceField = 'rooms.tariff.prices.price_' . $guestAmount;
 
         $pageSize = 10; // Number of results per page
-        $page = (int)Yii::$app->request->get('page', 1); // Get page from request
+        $page = (int) Yii::$app->request->get('page', 1); // Get page from request
         $offset = ($page - 1) * $pageSize;
 
         $searchResults = $index->search($queryWord, [
@@ -433,6 +435,43 @@ class ObjectController extends BaseController
 
         return $arr;
 
+    }
+
+    public function actionCategoryComfortTitle($id)
+    {
+        $arr = [
+            Objects::COMFORT_CATEGORY_SERVICE => [
+                'ru' => 'Услуги',
+                'kg' => 'Кызматтар',
+                'en' => 'Service',
+            ],
+            Objects::COMFORT_CATEGORY_SPORT => [
+                'ru' => 'Спорт и отдых',
+                'kg' => 'Спорт жана эс алуу',
+                'en' => 'Sport and Rest',
+            ],
+            Objects::COMFORT_CATEGORY_GENERAL => [
+                'ru' => 'Общее',
+                'kg' => 'Жалпы',
+                'en' => 'GENERAL',
+            ],
+            Objects::COMFORT_CATEGORY_POOL => [
+                'ru' => 'Бассейн и пляж',
+                'kg' => 'Бассейн жана пляж',
+                'en' => 'Pool and beach',
+            ],
+            Objects::COMFORT_CATEGORY_CHILDREN => [
+                'ru' => 'Дети',
+                'kg' => 'Балдар',
+                'en' => 'Children',
+            ],
+            Objects::COMFORT_CATEGORY_WORK => [
+                'ru' => 'Работа',
+                'kg' => 'Жумуш',
+                'en' => 'Work',
+            ],
+        ];
+        return $arr[$id];
     }
 
     private function areDatesOverlapping($start1, $end1, $start2, $end2)
