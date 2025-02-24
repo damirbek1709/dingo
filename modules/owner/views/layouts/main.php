@@ -44,7 +44,7 @@ ModuleAsset::register($this);
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav navbar-right'],
         'items' => [
-            ['label' => 'Объекты', 'url' => ['/object/index'], 'visible' => Yii::$app->user->can('owner') ||  Yii::$app->user->can('admin')],
+            ['label' => 'Объекты', 'url' => ['/owner/object/index'], 'visible' => Yii::$app->user->can('owner') ||  Yii::$app->user->can('admin')],
             ['label' => !Yii::$app->user->isGuest ? Yii::$app->user->identity->username : '', 'items' => [
                 ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can('moderator')],
                 ['label' => 'Панель управления', 'url' => ['/admin'], 'visible' => Yii::$app->user->can('admin')],
