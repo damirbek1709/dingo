@@ -437,7 +437,7 @@ class ObjectController extends BaseController
 
     }
 
-    public function actionCategoryComfortTitle($id)
+    public function actionCategoryComfortTitle()
     {
         $arr = [
             'ru' => [
