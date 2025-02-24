@@ -98,7 +98,7 @@ class ObjectController extends BaseController
                 'delete-search' => ['POST'],
                 'add-to-favorites' => ['POST'],
                 'remove-from-favorites' => ['POST'],
-                'category-comfort-title' => ['POST'],
+                'category-comfort-title' => ['GET'],
             ],
         ];
 
