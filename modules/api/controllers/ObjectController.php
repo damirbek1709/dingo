@@ -49,7 +49,8 @@ class ObjectController extends BaseController
             'cities',
             'rating-count-grades',
             'list',
-            'list2'
+            'list2',
+            'category-comfort-title'
         ];
 
 
@@ -58,7 +59,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title'],
+                    'actions' => ['add'],
                     'roles' => ['@'],
                 ],
 
