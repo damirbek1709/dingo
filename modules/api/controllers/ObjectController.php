@@ -471,7 +471,7 @@ class ObjectController extends BaseController
                 'en' => 'Work',
             ],
         ];
-        return $arr[$id];
+        return $arr;
     }
 
     private function areDatesOverlapping($start1, $end1, $start2, $end2)
