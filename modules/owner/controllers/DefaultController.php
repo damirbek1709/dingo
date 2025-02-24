@@ -22,7 +22,7 @@ class DefaultController extends BaseController
                     [
                         'actions' => ['index'],
                         'allow' => true,
-                        'roles' => ['admin'],
+                        'roles' => ['admin','owner'],
                     ],
                 ],
             ],

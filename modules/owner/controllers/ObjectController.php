@@ -249,6 +249,21 @@ class ObjectController extends Controller
         ]);
     }
 
+    public function actionAddRoom($id){
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+
+        // Fetch object from Meilisearch
+        $searchResult = $index->search('', ['filter' => "id = $id"])->getHits();
+        if (empty($searchResult)) {
+            throw new \yii\web\NotFoundHttpException('Record not found.');
+        }
+
+        // Load object data
+        $model = new Objects($searchResult[0]);
+        $data = $searchResult[0];
+    }
+
 
 
     public function actionPayment($id)
