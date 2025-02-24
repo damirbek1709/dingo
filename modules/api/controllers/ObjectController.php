@@ -58,7 +58,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add','category-comfort-title'],
+                    'actions' => ['add', 'category-comfort-title'],
                     'roles' => ['@'],
                 ],
 
@@ -440,36 +440,30 @@ class ObjectController extends BaseController
     public function actionCategoryComfortTitle($id)
     {
         $arr = [
-            Objects::COMFORT_CATEGORY_SERVICE => [
-                'ru' => 'Услуги',
-                'kg' => 'Кызматтар',
-                'en' => 'Service',
+            'ru' => [
+                Objects::COMFORT_CATEGORY_SERVICE => 'Услуги',
+                Objects::COMFORT_CATEGORY_SPORT => 'Спорт и отдых',
+                Objects::COMFORT_CATEGORY_GENERAL => 'Общее',
+                Objects::COMFORT_CATEGORY_POOL => 'Общее',
+                Objects::COMFORT_CATEGORY_CHILDREN => 'Общее',
+                Objects::COMFORT_CATEGORY_WORK => 'Работа'
             ],
-            Objects::COMFORT_CATEGORY_SPORT => [
-                'ru' => 'Спорт и отдых',
-                'kg' => 'Спорт жана эс алуу',
-                'en' => 'Sport and Rest',
+            'kg' => [
+                Objects::COMFORT_CATEGORY_SERVICE => 'Кызматтар',
+                Objects::COMFORT_CATEGORY_SPORT => 'Спорт жана эс алуу',
+                Objects::COMFORT_CATEGORY_GENERAL => 'Общее',
+                Objects::COMFORT_CATEGORY_POOL => 'Бассейн и пляж',
+                Objects::COMFORT_CATEGORY_CHILDREN => 'Дети',
+                Objects::COMFORT_CATEGORY_WORK => 'Работа'
             ],
-            Objects::COMFORT_CATEGORY_GENERAL => [
-                'ru' => 'Общее',
-                'kg' => 'Жалпы',
-                'en' => 'GENERAL',
-            ],
-            Objects::COMFORT_CATEGORY_POOL => [
-                'ru' => 'Бассейн и пляж',
-                'kg' => 'Бассейн жана пляж',
-                'en' => 'Pool and beach',
-            ],
-            Objects::COMFORT_CATEGORY_CHILDREN => [
-                'ru' => 'Дети',
-                'kg' => 'Балдар',
-                'en' => 'Children',
-            ],
-            Objects::COMFORT_CATEGORY_WORK => [
-                'ru' => 'Работа',
-                'kg' => 'Жумуш',
-                'en' => 'Work',
-            ],
+            'en' => [
+                Objects::COMFORT_CATEGORY_SERVICE => 'Service',
+                Objects::COMFORT_CATEGORY_SPORT => 'Sport and Rest',
+                Objects::COMFORT_CATEGORY_GENERAL => 'General',
+                Objects::COMFORT_CATEGORY_POOL => 'Pool and beach',
+                Objects::COMFORT_CATEGORY_CHILDREN => 'Children',
+                Objects::COMFORT_CATEGORY_WORK => 'Work'
+            ]
         ];
         return $arr;
     }
