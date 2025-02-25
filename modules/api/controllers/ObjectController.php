@@ -445,23 +445,24 @@ class ObjectController extends BaseController
     {
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
+        $region_list = Objects::regionList();
         
         // Get cityIds from request and convert to array
-        $cityIds = Yii::$app->request->get('city_ids');
-        $cityIdsArray = $cityIds ? explode(',', $cityIds) : [1,2,3,4]; 
+        $cityIds = Yii::$app->request->get('city');
+        $cityIdsArray = $cityIds ? explode(',', $region_list) : []; 
         
         // Make sure filter syntax is correct for Meilisearch
-        $filter = 'city_id IN [' . implode(', ', $cityIdsArray) . ']';
+        $filter = 'city IN [' . implode(', ', $cityIdsArray) . ']';
         
         // Perform search with faceting
         $searchResults = $index->search('', [
-            'facets' => ['city_id'],
+            'facets' => ['city'],
             'filter' => $filter,
             'limit' => 0 // We only need the facet counts
         ]);
         
         // Extract city counts using the proper method
-        $cityCounts = $searchResults->getFacetDistribution()['city_id'] ?? [];
+        $cityCounts = $searchResults->getFacetDistribution()['city'] ?? [];
         
         // Return the result
         return $cityCounts;

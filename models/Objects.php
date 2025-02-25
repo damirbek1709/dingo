@@ -96,7 +96,12 @@ class Objects extends Model
         ];
     }
 
-    
+    public static function regionList()
+    {
+        return ArrayHelper::map(Oblast::find()->all(), 'id', 'title');
+    }
+
+
 
 
     public function behaviors()
