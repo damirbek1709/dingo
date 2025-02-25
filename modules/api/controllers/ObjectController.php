@@ -447,7 +447,7 @@ class ObjectController extends BaseController
         $index = $client->index('object');
 
         // Get region parameter (it might be a JSON array or comma-separated string)
-        $regionParam = Yii::$app->request->get('city', '');
+        $regionParam = Yii::$app->request->get('query', '');
 
         // Parse into array
         $regionsArray = [];
@@ -467,39 +467,65 @@ class ObjectController extends BaseController
             $regionsArray = Objects::regionList();
         }
 
-        // First, get all possible region values with their counts
-        $allRegionsSearch = $index->search('', [
-            'facets' => ['city'],
+        // First, get all possible region and hotel values with their counts
+        $allFacetsSearch = $index->search('', [
+            'facets' => ['city', 'title'],
             'limit' => 0
         ]);
 
-        $allRegionCounts = $allRegionsSearch->getFacetDistribution()['city'] ?? [];
+        $allRegionCounts = $allFacetsSearch->getFacetDistribution()['city'] ?? [];
+        $allHotelCounts = $allFacetsSearch->getFacetDistribution()['title'] ?? [];
 
         // Then, for each requested region, find the best match
         $regionCounts = [];
+        $hotelCounts = [];
+
         foreach ($regionsArray as $requestedRegion) {
-            $bestMatch = null;
-            $bestScore = 0;
-
-            // Compare each requested region with all available regions
-            foreach (array_keys($allRegionCounts) as $actualRegion) {
-                // Simple similarity score
-                $score = similar_text(strtolower($requestedRegion), strtolower($actualRegion), $percent);
-
-                // If similarity is above threshold (e.g., 70%)
-                if ($percent > 70 && $percent > $bestScore) {
-                    $bestScore = $percent;
-                    $bestMatch = $actualRegion;
-                }
+            // Find matching regions
+            $regionMatches = $this->findBestMatches($requestedRegion, array_keys($allRegionCounts));
+            foreach ($regionMatches as $match) {
+                $regionCounts[$match] = $allRegionCounts[$match];
             }
 
-            // If we found a match, add it to the results
-            if ($bestMatch !== null) {
-                $regionCounts[$bestMatch] = $allRegionCounts[$bestMatch];
+            // Find matching hotels
+            $hotelMatches = $this->findBestMatches($requestedRegion, array_keys($allHotelCounts));
+            foreach ($hotelMatches as $match) {
+                $hotelCounts[$match] = $allHotelCounts[$match];
             }
         }
 
-        return $regionCounts;
+        // Format the results as required
+        $results = [
+            'regions' => $regionCounts,
+            'hotels' => $hotelCounts
+        ];
+
+        return $results;
+    }
+
+    /**
+     * Find best matches for a search term among available options
+     * 
+     * @param string $searchTerm The term to search for
+     * @param array $availableOptions Array of available options to match against
+     * @param float $threshold Minimum similarity percentage (default: 70)
+     * @return array Array of matching options
+     */
+    private function findBestMatches($searchTerm, $availableOptions, $threshold = 70)
+    {
+        $matches = [];
+        $searchTerm = strtolower($searchTerm);
+
+        foreach ($availableOptions as $option) {
+            $percent = 0;
+            similar_text($searchTerm, strtolower($option), $percent);
+
+            if ($percent > $threshold) {
+                $matches[] = $option;
+            }
+        }
+
+        return $matches;
     }
 
     public function actionCategoryComfortTitle()
