@@ -461,7 +461,7 @@ class ObjectController extends BaseController
 
         // Default regions if none provided
         if (empty($regionsArray)) {
-            $regionsArray = ['Каракол','Бишкек'];
+            $regionsArray = ['г.Каракол','Бишкек'];
         }
 
         // First, get all possible region values with their counts
