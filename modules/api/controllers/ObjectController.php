@@ -444,24 +444,24 @@ class ObjectController extends BaseController
     {
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-
+        
         // Get cityIds from request and convert to array
         $cityIds = Yii::$app->request->get('city_ids');
-        $cityIdsArray = $cityIds ? explode(',', $cityIds) : [1, 2, 3, 4];
-
+        $cityIdsArray = $cityIds ? explode(',', $cityIds) : [1,2,3,4]; 
+        
         // Make sure filter syntax is correct for Meilisearch
         $filter = 'city_id IN [' . implode(', ', $cityIdsArray) . ']';
-
+        
         // Perform search with faceting
         $searchResults = $index->search('', [
             'facets' => ['city_id'],
             'filter' => $filter,
             'limit' => 0 // We only need the facet counts
         ]);
-
-        // Extract city counts from facets
-        $cityCounts = $searchResults['facetDistribution']['city_id'] ?? [];
-
+        
+        // Extract city counts using the proper method
+        $cityCounts = $searchResults->getFacetDistribution()['city_id'] ?? [];
+        
         // Return the result
         return $cityCounts;
     }
