@@ -469,7 +469,7 @@ class ObjectController extends BaseController
 
         // First, get all possible region and hotel values with their counts
         $allFacetsSearch = $index->search('', [
-            'facets' => ['city', 'title'],
+            'facets' => ['city', 'name'],
             'limit' => 0
         ]);
 
