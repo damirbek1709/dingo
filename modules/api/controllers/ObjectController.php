@@ -298,7 +298,7 @@ class ObjectController extends BaseController
                 'name_en' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'name'),
                 'type' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'type'),
                 'city' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'city'),
-                'city_id' => (int)ArrayHelper::getValue(Yii::$app->request->bodyParams, 'city_id'),
+                'city_id' => (int) ArrayHelper::getValue(Yii::$app->request->bodyParams, 'city_id'),
                 'address' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'address'),
                 'currency' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'currency'),
                 'features' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'features'),
@@ -445,27 +445,43 @@ class ObjectController extends BaseController
     {
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-        $region_list = Objects::regionList();
-        
-        // Get cityIds from request and convert to array
-        $cityIds = Yii::$app->request->get('city');
-        $cityIdsArray = $cityIds ? explode(',', $cityIds) : $region_list; 
-        
-        // Make sure filter syntax is correct for Meilisearch
-        $filter = 'city IN [' . implode(', ', $cityIdsArray) . ']';
-        
+
+        // Get regions from request
+        $regionsParam = Yii::$app->request->get('city', '');
+
+        // Parse the JSON string to get an array of region names
+        $regionsArray = [];
+        if (!empty($regionsParam)) {
+            $regionsArray = json_decode($regionsParam, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                // Fallback if not valid JSON - try comma-separated format
+                $regionsArray = explode(',', $regionsParam);
+            }
+        }
+
+        // Default regions if none provided
+        if (empty($regionsArray)) {
+            $regionsArray = Objects::regionList();
+        }
+
+        // Build filter with proper quoting for string values
+        $filter = 'city IN [' . implode(', ', array_map(function ($region) {
+            return '"' . addslashes($region) . '"'; // Add quotes and escape special chars
+        }, $regionsArray)) . ']';
+
         // Perform search with faceting
         $searchResults = $index->search('', [
             'facets' => ['city'],
             'filter' => $filter,
             'limit' => 0 // We only need the facet counts
         ]);
-        
-        // Extract city counts using the proper method
-        $cityCounts = $searchResults->getFacetDistribution()['city'] ?? [];
-        
+
+        // Extract region counts using the proper method
+        $regionCounts = $searchResults->getFacetDistribution()['city'] ?? [];
+
         // Return the result
-        return $cityCounts;
+        return $regionCounts;
+
     }
 
     public function actionCategoryComfortTitle()
