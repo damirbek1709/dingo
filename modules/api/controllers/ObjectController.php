@@ -447,7 +447,7 @@ class ObjectController extends BaseController
         $index = $client->index('object');
 
         // Get region parameter (it might be a JSON array or comma-separated string)
-        $regionParam = Yii::$app->request->get('query', '');
+        $regionParam = Yii::$app->request->get('city', '');
 
         // Parse into array
         $regionsArray = [];
@@ -475,47 +475,32 @@ class ObjectController extends BaseController
 
         $allRegionCounts = $allRegionsSearch->getFacetDistribution()['city'] ?? [];
 
-        // Searching in city field
+        // Then, for each requested region, find the best match
         $regionCounts = [];
         foreach ($regionsArray as $requestedRegion) {
             $bestMatch = null;
             $bestScore = 0;
 
+            // Compare each requested region with all available regions
             foreach (array_keys($allRegionCounts) as $actualRegion) {
+                // Simple similarity score
                 $score = similar_text(strtolower($requestedRegion), strtolower($actualRegion), $percent);
 
+                // If similarity is above threshold (e.g., 70%)
                 if ($percent > 70 && $percent > $bestScore) {
                     $bestScore = $percent;
                     $bestMatch = $actualRegion;
                 }
             }
 
+            // If we found a match, add it to the results
             if ($bestMatch !== null) {
                 $regionCounts[$bestMatch] = $allRegionCounts[$bestMatch];
             }
         }
 
-        // Searching in title field
-        $titleResults = [];
-        foreach ($regionsArray as $region) {
-            $titleSearch = $index->search($region, [
-                'filter' => ['name != null'], // Ensure title is indexed and exists
-                'limit' => 10, // Adjust limit as needed
-            ]);
-
-            foreach ($titleSearch->getHits() as $hit) {
-                if (!empty($hit['name'])) {
-                    $titleResults[$hit['name']] = $hit;
-                }
-            }
-        }
-
-        return [
-            'regions' => $regionCounts,
-            'hotels' => array_keys($titleResults),
-        ];
+        return $regionCounts;
     }
-
 
     public function actionCategoryComfortTitle()
     {
