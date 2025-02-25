@@ -499,13 +499,13 @@ class ObjectController extends BaseController
         $titleResults = [];
         foreach ($regionsArray as $region) {
             $titleSearch = $index->search($region, [
-                'filter' => ['title != null'], // Ensure title is indexed and exists
+                'filter' => ['name != null'], // Ensure title is indexed and exists
                 'limit' => 10, // Adjust limit as needed
             ]);
 
             foreach ($titleSearch->getHits() as $hit) {
-                if (!empty($hit['title'])) {
-                    $titleResults[$hit['title']] = $hit;
+                if (!empty($hit['name'])) {
+                    $titleResults[$hit['name']] = $hit;
                 }
             }
         }
