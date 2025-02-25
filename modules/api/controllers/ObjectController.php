@@ -298,6 +298,7 @@ class ObjectController extends BaseController
                 'name_en' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'name'),
                 'type' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'type'),
                 'city' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'city'),
+                'city_id' => (int)ArrayHelper::getValue(Yii::$app->request->bodyParams, 'city_id'),
                 'address' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'address'),
                 'currency' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'currency'),
                 'features' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'features'),
