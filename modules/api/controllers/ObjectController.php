@@ -463,7 +463,6 @@ class ObjectController extends BaseController
         if (empty($regionsArray)) {
             $regionsArray = Objects::regionList();
         }
-        return $regionsArray;
 
         // First, get all possible region values with their counts
         $allRegionsSearch = $index->search('', [
