@@ -446,16 +446,19 @@ class ObjectController extends BaseController
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
 
-        // Get regions from request
-        $regionsParam = Yii::$app->request->get('city', '');
+        // Get region parameter (it might be a JSON array or comma-separated string)
+        $regionParam = Yii::$app->request->get('city', '');
 
-        // Parse the JSON string to get an array of region names
+        // Parse into array
         $regionsArray = [];
-        if (!empty($regionsParam)) {
-            $regionsArray = json_decode($regionsParam, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                // Fallback if not valid JSON - try comma-separated format
-                $regionsArray = explode(',', $regionsParam);
+        if (!empty($regionParam)) {
+            // Try to decode as JSON
+            $regionsArray = json_decode($regionParam, true);
+
+            // If not valid JSON or not an array
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($regionsArray)) {
+                // Try comma-separated format
+                $regionsArray = explode(',', $regionParam);
             }
         }
 
@@ -480,7 +483,7 @@ class ObjectController extends BaseController
 
             // Compare each requested region with all available regions
             foreach (array_keys($allRegionCounts) as $actualRegion) {
-                // Simple similarity score (you can use more sophisticated methods)
+                // Simple similarity score
                 $score = similar_text(strtolower($requestedRegion), strtolower($actualRegion), $percent);
 
                 // If similarity is above threshold (e.g., 70%)
@@ -492,7 +495,7 @@ class ObjectController extends BaseController
 
             // If we found a match, add it to the results
             if ($bestMatch !== null) {
-                $regionCounts[$bestMatch] = $allRegionCounts[$bestMatch] ." ".Yii::t('app','отелей');
+                $regionCounts[$bestMatch] = $allRegionCounts[$bestMatch];
             }
         }
 
