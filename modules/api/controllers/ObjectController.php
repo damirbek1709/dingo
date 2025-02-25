@@ -449,7 +449,7 @@ class ObjectController extends BaseController
         
         // Get cityIds from request and convert to array
         $cityIds = Yii::$app->request->get('city');
-        $cityIdsArray = $cityIds ? explode(',', $region_list) : []; 
+        $cityIdsArray = $cityIds ? explode(',', $cityIds) : $region_list; 
         
         // Make sure filter syntax is correct for Meilisearch
         $filter = 'city IN [' . implode(', ', $cityIdsArray) . ']';
