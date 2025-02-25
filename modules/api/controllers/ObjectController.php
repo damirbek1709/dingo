@@ -66,7 +66,7 @@ class ObjectController extends BaseController
 
                 [
                     'allow' => true,
-                    'actions' => ['list', 'view', 'list2','search'],
+                    'actions' => ['list', 'view', 'list2', 'search'],
                     'roles' => ['@', '?'],
                 ],
                 [
@@ -451,30 +451,22 @@ class ObjectController extends BaseController
         $page = (int) Yii::$app->request->get('page', 1); // Get page from request
         $offset = ($page - 1) * $pageSize;
 
-        $searchResults = $index->search('', [
-            'facets' => ['city_id'],
-            'filter' => 'city_id IN [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]'
-        ]);
-        
-        // Get the facet distribution
-        $cityDistribution = $searchResults['facetDistribution']['city_id'];
-        
-        // Format the result as requested
-        $formattedResult = [];
-        foreach ($cityDistribution as $cityId => $count) {
-            $formattedResult[] = "'{$cityId}'=>{$count}";
-        }
-        
-        // If you need to ensure city_id is a faceted attribute first:
-        // $index->updateSettings([
-        //     'filterableAttributes' => ['city_id'],
-        //     'faceting' => [
-        //         'maxValuesPerFacet' => 100
-        //     ]
-        // ]);
+        $cityIds = Yii::$app->request->get('city_ids'); // e.g. "1,2,3,4,5,6,7,8,9,10,11"
+        $cityIdsArray = [1];
 
-        return $cityDistribution;
-        
+        // Perform a search with faceting
+        $searchResults = $index->search('', [
+            'facetDistribution' => ['city_id'], // Count results per city_id
+            'filter' => ["city_id IN [" . implode(',', array_map(fn($id) => "\"$id\"", $cityIdsArray)) . "]"],
+            'limit' => 0 // We only need the facet counts
+        ]);
+
+        // Extract city counts from facets
+        $cityCounts = $searchResults->getFacetDistribution()['city_id'] ?? [];
+
+        // Return the result
+        return $cityCounts;
+
     }
 
     public function actionCategoryComfortTitle()
