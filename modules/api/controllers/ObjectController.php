@@ -461,42 +461,41 @@ class ObjectController extends BaseController
 
         // Default regions if none provided
         if (empty($regionsArray)) {
-            $regionsArray = ["Бишкек","Каракол"];
+            $regionsArray = ['Каракол','Бишкек'];
         }
 
-        // Process each region name to get counts
+        // First, get all possible region values with their counts
+        $allRegionsSearch = $index->search('', [
+            'facets' => ['city'],
+            'limit' => 0
+        ]);
+
+        $allRegionCounts = $allRegionsSearch->getFacetDistribution()['city'] ?? [];
+
+        // Then, for each requested region, find the best match
         $regionCounts = [];
-        foreach ($regionsArray as $regionName) {
-            // Perform a fuzzy search for each region
-            $searchResult = $index->search($regionName, [
-                'attributesToSearchOn' => ['city'],
-                'attributesToRetrieve' => ['city'],
-                'limit' => 100,
-                'typoTolerance' => true
-            ]);
+        foreach ($regionsArray as $requestedRegion) {
+            $bestMatch = null;
+            $bestScore = 0;
 
-            // Count occurrences of each region in the results
-            $hits = $searchResult->getHits();
-            $regionDistribution = [];
+            // Compare each requested region with all available regions
+            foreach (array_keys($allRegionCounts) as $actualRegion) {
+                // Simple similarity score (you can use more sophisticated methods)
+                $score = similar_text(strtolower($requestedRegion), strtolower($actualRegion), $percent);
 
-            foreach ($hits as $hit) {
-                $hitRegion = $hit['city'];
-                if (!isset($regionDistribution[$hitRegion])) {
-                    $regionDistribution[$hitRegion] = 0;
+                // If similarity is above threshold (e.g., 70%)
+                if ($percent > 70 && $percent > $bestScore) {
+                    $bestScore = $percent;
+                    $bestMatch = $actualRegion;
                 }
-                $regionDistribution[$hitRegion]++;
             }
 
-            // Add each region's count to our results
-            foreach ($regionDistribution as $region => $count) {
-                if (!isset($regionCounts[$region])) {
-                    $regionCounts[$region] = 0;
-                }
-                $regionCounts[$region] += $count;
+            // If we found a match, add it to the results
+            if ($bestMatch !== null) {
+                $regionCounts[$bestMatch] = $allRegionCounts[$bestMatch];
             }
         }
 
-        // Return the result
         return $regionCounts;
     }
 
