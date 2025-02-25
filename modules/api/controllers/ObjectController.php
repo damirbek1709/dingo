@@ -461,27 +461,43 @@ class ObjectController extends BaseController
 
         // Default regions if none provided
         if (empty($regionsArray)) {
-            $regionsArray = ["Бишкек", "г.Каракол"];
+            $regionsArray = Objects::regionList();
         }
 
-        // Build filter with proper quoting for string values
-        $filter = 'city IN [' . implode(', ', array_map(function ($region) {
-            return '"' . addslashes($region) . '"'; // Add quotes and escape special chars
-        }, $regionsArray)) . ']';
+        // Process each region name to get counts
+        $regionCounts = [];
+        foreach ($regionsArray as $regionName) {
+            // Perform a fuzzy search for each region
+            $searchResult = $index->search($regionName, [
+                'attributesToSearchOn' => ['city'],
+                'attributesToRetrieve' => ['city'],
+                'limit' => 100,
+                'typoTolerance' => true
+            ]);
 
-        // Perform search with faceting
-        $searchResults = $index->search('', [
-            'facets' => ['city'],
-            'filter' => $filter,
-            'limit' => 0 // We only need the facet counts
-        ]);
+            // Count occurrences of each region in the results
+            $hits = $searchResult->getHits();
+            $regionDistribution = [];
 
-        // Extract region counts using the proper method
-        $regionCounts = $searchResults->getFacetDistribution()['city'] ?? [];
+            foreach ($hits as $hit) {
+                $hitRegion = $hit['city'];
+                if (!isset($regionDistribution[$hitRegion])) {
+                    $regionDistribution[$hitRegion] = 0;
+                }
+                $regionDistribution[$hitRegion]++;
+            }
+
+            // Add each region's count to our results
+            foreach ($regionDistribution as $region => $count) {
+                if (!isset($regionCounts[$region])) {
+                    $regionCounts[$region] = 0;
+                }
+                $regionCounts[$region] += $count;
+            }
+        }
 
         // Return the result
         return $regionCounts;
-
     }
 
     public function actionCategoryComfortTitle()
