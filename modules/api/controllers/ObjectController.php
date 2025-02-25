@@ -486,7 +486,9 @@ class ObjectController extends BaseController
             foreach ($regionMatches as $match) {
                 $regionCounts[$match] = $allRegionCounts[$match];
             }
+        }
 
+        if ($regionParam) {
             // Find matching hotels
             $hotelMatches = $this->findBestMatches($requestedRegion, array_keys($allHotelCounts));
             foreach ($hotelMatches as $match) {
