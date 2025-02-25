@@ -474,7 +474,7 @@ class ObjectController extends BaseController
         ]);
 
         $allRegionCounts = $allFacetsSearch->getFacetDistribution()['city'] ?? [];
-        $allHotelCounts = $allFacetsSearch->getFacetDistribution()['title'] ?? [];
+        $allHotelCounts = $allFacetsSearch->getFacetDistribution()['name'] ?? [];
 
         // Then, for each requested region, find the best match
         $regionCounts = [];
