@@ -488,20 +488,18 @@ class ObjectController extends BaseController
             }
         }
 
+        $results = [
+            'regions' => $regionCounts
+        ];
+
         if ($regionParam) {
             // Find matching hotels
             $hotelMatches = $this->findBestMatches($requestedRegion, array_keys($allHotelCounts));
             foreach ($hotelMatches as $match) {
                 $hotelCounts[$match] = $allHotelCounts[$match];
             }
+            $results['hotels'] = $hotelCounts;
         }
-
-        // Format the results as required
-        $results = [
-            'regions' => $regionCounts,
-            'hotels' => $hotelCounts
-        ];
-
         return $results;
     }
 
