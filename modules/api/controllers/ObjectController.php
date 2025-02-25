@@ -492,7 +492,7 @@ class ObjectController extends BaseController
 
             // If we found a match, add it to the results
             if ($bestMatch !== null) {
-                $regionCounts[$bestMatch] = $allRegionCounts[$bestMatch];
+                $regionCounts[$bestMatch] = $allRegionCounts[$bestMatch] ." ".Yii::t('app','отелей');
             }
         }
 
