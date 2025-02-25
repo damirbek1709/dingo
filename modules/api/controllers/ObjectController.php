@@ -456,7 +456,7 @@ class ObjectController extends BaseController
 
         // Perform a search with faceting
         $searchResults = $index->search('', [
-            'facetDistribution' => ['city_id'], // Count results per city_id
+            'facets' => ['city_id'], // Count results per city_id
             'filter' => ["city_id IN [" . implode(',', array_map(fn($id) => "\"$id\"", $cityIdsArray)) . "]"],
             'limit' => 0 // We only need the facet counts
         ]);
