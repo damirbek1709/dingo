@@ -442,31 +442,28 @@ class ObjectController extends BaseController
 
     public function actionSearch()
     {
-        $filters = [];
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-        $city_id = Yii::$app->request->get('city_id', '');
 
-        $pageSize = 10; // Number of results per page
-        $page = (int) Yii::$app->request->get('page', 1); // Get page from request
-        $offset = ($page - 1) * $pageSize;
+        // Get cityIds from request and convert to array
+        $cityIds = Yii::$app->request->get('city_ids');
+        $cityIdsArray = $cityIds ? explode(',', $cityIds) : [1, 2, 3, 4];
 
-        $cityIds = Yii::$app->request->get('city_ids'); // e.g. "1,2,3,4,5,6,7,8,9,10,11"
-        $cityIdsArray = [1];
+        // Make sure filter syntax is correct for Meilisearch
+        $filter = 'city_id IN [' . implode(', ', $cityIdsArray) . ']';
 
-        // Perform a search with faceting
+        // Perform search with faceting
         $searchResults = $index->search('', [
-            'facets' => ['city_id'], // Count results per city_id
-            'filter' => ["city_id IN [" . implode(',', array_map(fn($id) => "\"$id\"", $cityIdsArray)) . "]"],
+            'facets' => ['city_id'],
+            'filter' => $filter,
             'limit' => 0 // We only need the facet counts
         ]);
 
         // Extract city counts from facets
-        $cityCounts = $searchResults->getFacetDistribution()['city_id'] ?? [];
+        $cityCounts = $searchResults['facetDistribution']['city_id'] ?? [];
 
         // Return the result
         return $cityCounts;
-
     }
 
     public function actionCategoryComfortTitle()
