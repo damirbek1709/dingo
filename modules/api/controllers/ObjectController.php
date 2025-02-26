@@ -533,6 +533,17 @@ class ObjectController extends BaseController
                 ];
             }
         }
+        $user_auth = null;
+        $token = Yii::$app->request->headers->get('Authorization');
+        $user_search_data = [];
+        if ($token && preg_match('/^Bearer\s+(.*?)$/', $token, $matches)) {
+            $user_auth = $matches[1]; // Extract token
+        }
+        if ($user_auth) {
+            $user = User::find()->where(['auth_key' => $user_auth])->one();
+            $user_search_data = unserialize($user->search_data);
+        }
+        $results['user_search_data'] = $user_search_data;
         return $results;
     }
 
