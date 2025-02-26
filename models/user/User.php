@@ -7,11 +7,14 @@ use dektrium\user\helpers\Password;
 class User extends BaseUser
 {
 
-    public $search_data;
     
     public function scenarios()
     {
         $scenarios = parent::scenarios();
+
+        $scenarios['create'][]   = 'search_data';
+        $scenarios['update'][]   = 'search_data';
+        $scenarios['register'][] = 'search_data';
         return $scenarios;
     }
 
