@@ -6,6 +6,8 @@ use dektrium\user\helpers\Password;
 
 class User extends BaseUser
 {
+
+    public $search_data;
     
     public function scenarios()
     {

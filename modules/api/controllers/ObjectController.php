@@ -356,7 +356,14 @@ class ObjectController extends BaseController
         }
         if ($type && $user_auth) {
             $user = User::find()->where(['auth_key' => $user_auth])->one();
-            if ($user->search_data) {
+            $saved_data = $user->search_data ? unserialize($user->search_data) : [];
+            if ($user->search_data === null) {
+                $saved_data[] = [
+                    'type' => $type,
+                    'query' => $queryWord
+                ];
+                $user->search_data = serialize($saved_data);
+            } else {
                 $saved_data = unserialize($user->search_data);
                 if (count($saved_data) > 2) {
                     $saved_data[3] = [
@@ -369,13 +376,9 @@ class ObjectController extends BaseController
                         'query' => $queryWord
                     ];
                 }
-            } else {
-                $saved_data[] = [
-                    'type' => $type,
-                    'query' => $queryWord
-                ];
+                $user->search_data = serialize($saved_data);
             }
-            $user->search_data = serialize($saved_data);
+
             $user->save(false);
 
         }
