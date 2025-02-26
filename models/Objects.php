@@ -54,7 +54,7 @@ class Objects extends Model
     const COMFORT_CATEGORY_CHILDREN = 5;
     const COMFORT_CATEGORY_WORK = 6;
 
-    const SEARCH_TYPE_CITY = 0;
+    const SEARCH_TYPE_CITY = 3;
     const SEARCH_TYPE_REGION = 1;
     const SEARCH_TYPE_HOTEL = 2;
 
