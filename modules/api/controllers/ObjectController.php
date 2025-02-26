@@ -358,23 +358,45 @@ class ObjectController extends BaseController
             $user = User::find()->where(['auth_key' => $user_auth])->one();
             $saved_data = $user->search_data ? unserialize($user->search_data) : [];
             if ($user->search_data === null) {
-                $saved_data[] = [
-                    'type' => $type,
-                    'query' => $queryWord
-                ];
+                if ($type == Objects::SEARCH_TYPE_REGION) {
+                    $saved_data[] = [
+                        'type' => $type,
+                        'region' => $queryWord
+                    ];
+                } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
+                    $saved_data[] = [
+                        'type' => $type,
+                        'name' => $queryWord
+                    ];
+                }
+
                 $user->search_data = serialize($saved_data);
             } else {
                 $saved_data = unserialize($user->search_data);
                 if (count($saved_data) > 2) {
-                    $saved_data[3] = [
-                        'type' => $type,
-                        'query' => $queryWord
-                    ];
+                    if ($type == Objects::SEARCH_TYPE_REGION) {
+                        $saved_data[] = [
+                            'type' => $type,
+                            'region' => $queryWord
+                        ];
+                    } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
+                        $saved_data[] = [
+                            'type' => $type,
+                            'name' => $queryWord
+                        ];
+                    }
                 } else {
-                    $saved_data[] = [
-                        'type' => $type,
-                        'query' => $queryWord
-                    ];
+                    if ($type == Objects::SEARCH_TYPE_REGION) {
+                        $saved_data[] = [
+                            'type' => $type,
+                            'region' => $queryWord
+                        ];
+                    } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
+                        $saved_data[] = [
+                            'type' => $type,
+                            'name' => $queryWord
+                        ];
+                    }
                 }
                 $user->search_data = serialize($saved_data);
             }
