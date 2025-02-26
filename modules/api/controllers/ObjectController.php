@@ -385,7 +385,6 @@ class ObjectController extends BaseController
             else {
                 $saved_data = unserialize($user->search_data);
                 if (count($saved_data) > 2) {
-                    echo "worked";die();
                     array_shift($saved_data);
                     if ($type == Objects::SEARCH_TYPE_REGION) {
                         $saved_data[] = [
