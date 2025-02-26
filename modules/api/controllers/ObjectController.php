@@ -591,7 +591,7 @@ class ObjectController extends BaseController
             $user_search_data = unserialize($user->search_data);
             //rsort($user_search_data);
         }
-        $results['user_search_data'] = rsort($user_search_data);
+        $results['user_search_data'] = $user_search_data;
         return $results;
     }
 
