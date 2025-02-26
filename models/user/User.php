@@ -78,7 +78,6 @@ class User extends BaseUser
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
-        echo "extend";die();
     }
 
 
