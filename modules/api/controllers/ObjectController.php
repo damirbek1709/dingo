@@ -565,7 +565,7 @@ class ObjectController extends BaseController
             $user = User::find()->where(['auth_key' => $user_auth])->one();
             $user_search_data = unserialize($user->search_data);
         }
-        $results['user_search_data'] = $user_search_data;
+        $results['user_search_data'] = array_values($user_search_data);
         return $results;
     }
 
