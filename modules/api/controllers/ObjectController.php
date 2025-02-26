@@ -349,7 +349,6 @@ class ObjectController extends BaseController
         $fromDate = Yii::$app->request->get('from_date');
         $toDate = Yii::$app->request->get('to_date');
         $type = (int) Yii::$app->request->get('type', null);
-        $amount = (int) Yii::$app->request->get('amount', null);
         $user_auth = null;
         $token = Yii::$app->request->headers->get('Authorization');
         if ($token && preg_match('/^Bearer\s+(.*?)$/', $token, $matches)) {
@@ -362,8 +361,7 @@ class ObjectController extends BaseController
                 if ($type == Objects::SEARCH_TYPE_REGION) {
                     $saved_data[] = [
                         'type' => $type,
-                        'region' => $queryWord,
-                        'amount'=>$amount
+                        'region' => $queryWord
                     ];
                 } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
                     $saved_data[] = [
@@ -371,14 +369,7 @@ class ObjectController extends BaseController
                         'name' => $queryWord
                     ];
                 }
-
-                elseif ($type == Objects::SEARCH_TYPE_CITY) {
-                    $saved_data[] = [
-                        'type' => $type,
-                        'city' => $queryWord,
-                        'amount'=>$amount
-                    ];
-                }
+                
 
                 $user->search_data = serialize($saved_data);
             } else {
@@ -388,40 +379,24 @@ class ObjectController extends BaseController
                     if ($type == Objects::SEARCH_TYPE_REGION) {
                         $saved_data[] = [
                             'type' => $type,
-                            'region' => $queryWord,
-                            'amount'=>$amount
+                            'region' => $queryWord
                         ];
                     } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
                         $saved_data[] = [
                             'type' => $type,
                             'name' => $queryWord
-                        ];
-                    }
-                    elseif ($type == Objects::SEARCH_TYPE_CITY) {
-                        $saved_data[] = [
-                            'type' => $type,
-                            'city' => $queryWord,
-                            'amount'=>$amount
                         ];
                     }
                 } else {
                     if ($type == Objects::SEARCH_TYPE_REGION) {
                         $saved_data[] = [
                             'type' => $type,
-                            'region' => $queryWord,
-                            'amount'=>$amount
+                            'region' => $queryWord
                         ];
                     } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
                         $saved_data[] = [
                             'type' => $type,
                             'name' => $queryWord
-                        ];
-                    }
-                    elseif ($type == Objects::SEARCH_TYPE_CITY) {
-                        $saved_data[] = [
-                            'type' => $type,
-                            'city' => $queryWord,
-                            'amount'=>$amount
                         ];
                     }
                 }
