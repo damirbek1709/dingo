@@ -388,7 +388,8 @@ class ObjectController extends BaseController
                     if ($type == Objects::SEARCH_TYPE_REGION) {
                         $saved_data[] = [
                             'type' => $type,
-                            'region' => $queryWord
+                            'region' => $queryWord,
+                            'amount'=>$amount
                         ];
                     } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
                         $saved_data[] = [
@@ -407,7 +408,8 @@ class ObjectController extends BaseController
                     if ($type == Objects::SEARCH_TYPE_REGION) {
                         $saved_data[] = [
                             'type' => $type,
-                            'region' => $queryWord
+                            'region' => $queryWord,
+                            'amount'=>$amount
                         ];
                     } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
                         $saved_data[] = [
