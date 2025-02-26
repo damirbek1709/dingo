@@ -348,7 +348,7 @@ class ObjectController extends BaseController
         $queryWord = Yii::$app->request->get('query_word', '');
         $fromDate = Yii::$app->request->get('from_date');
         $toDate = Yii::$app->request->get('to_date');
-        $type = (int)Yii::$app->request->get('type', null);
+        $type = (int) Yii::$app->request->get('type', null);
         $user_auth = null;
         $token = Yii::$app->request->headers->get('Authorization');
         if ($token && preg_match('/^Bearer\s+(.*?)$/', $token, $matches)) {
@@ -374,8 +374,9 @@ class ObjectController extends BaseController
             } else {
                 $saved_data = unserialize($user->search_data);
                 if (count($saved_data) > 2) {
+                    array_shift($saved_data);
                     if ($type == Objects::SEARCH_TYPE_REGION) {
-                        $saved_data[0] = [
+                        $saved_data[] = [
                             'type' => $type,
                             'region' => $queryWord
                         ];
