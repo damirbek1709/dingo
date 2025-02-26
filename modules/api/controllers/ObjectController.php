@@ -67,7 +67,7 @@ class ObjectController extends BaseController
                 [
                     'allow' => true,
                     'actions' => ['list', 'view', 'list2', 'search'],
-                    'roles' => ['@', '?'],
+                    'roles' => ['@', '?','admin','owner'],
                 ],
                 [
                     'allow' => true,
