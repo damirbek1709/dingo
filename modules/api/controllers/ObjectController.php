@@ -348,7 +348,7 @@ class ObjectController extends BaseController
         $queryWord = Yii::$app->request->get('query_word', '');
         $fromDate = Yii::$app->request->get('from_date');
         $toDate = Yii::$app->request->get('to_date');
-        $type = Yii::$app->request->get('type', null);
+        $type = (int)Yii::$app->request->get('type', null);
         $user_auth = null;
         $token = Yii::$app->request->headers->get('Authorization');
         if ($token && preg_match('/^Bearer\s+(.*?)$/', $token, $matches)) {
