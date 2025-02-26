@@ -6,16 +6,20 @@ use dektrium\user\helpers\Password;
 
 class User extends BaseUser
 {
+    
     public function scenarios()
     {
         $scenarios = parent::scenarios();
         return $scenarios;
     }
 
+
     public function rules()
     {
         $rules = parent::rules();
         // add some rules
+
+        $rules['search_dataSafe'] = ['search_data', 'safe'];
         
         return $rules;
     }
@@ -40,7 +44,7 @@ class User extends BaseUser
 
         try {
             $this->confirmed_at = $this->module->enableConfirmation ? null : time();
-            $this->password     = $this->module->enableGeneratingPassword ? Password::generate(8) : $this->password;
+            $this->password = $this->module->enableGeneratingPassword ? Password::generate(8) : $this->password;
 
             $this->trigger(self::BEFORE_REGISTER);
 
@@ -72,6 +76,7 @@ class User extends BaseUser
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
+        echo "extend";die();
     }
 
 

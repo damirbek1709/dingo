@@ -2,7 +2,7 @@
 
 namespace app\modules\api\controllers;
 
-use app\models\UserModel;
+use app\models\user\User;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -348,6 +348,36 @@ class ObjectController extends BaseController
         $queryWord = Yii::$app->request->get('query_word', '');
         $fromDate = Yii::$app->request->get('from_date');
         $toDate = Yii::$app->request->get('to_date');
+        $type = Yii::$app->request->get('type', null);
+        //echo "it works";die();
+
+        if ($type && !Yii::$app->user->isGuest) {
+            echo "it works";die();
+            $user = User::findOne(Yii::$app->user->id);
+            if ($user->search_data) {
+                $saved_data = unserialize($user->search_data);
+                if (count($saved_data) > 2) {
+                    $saved_data[3] = [
+                        'type' => $type,
+                        'query' => $queryWord
+                    ];
+                } else {
+                    $saved_data[] = [
+                        'type' => $type,
+                        'query' => $queryWord
+                    ];
+                }
+            } else {
+                $saved_data[] = [
+                    'type' => $type,
+                    'query' => $queryWord
+                ];
+            }
+            $user->search_data = serialize($saved_data);
+            $user->save(false);
+
+        }
+
         $guestAmount = (int) Yii::$app->request->get('guest_amount', 1);
         //$filters = ['rooms.guest_amount >= ' . $guestAmount];
 
@@ -363,11 +393,6 @@ class ObjectController extends BaseController
             foreach ($period as $date) {
                 $searchDates[] = $date->format('d-m-Y');
             }
-
-
-
-
-
 
             $filters[] = 'NOT rooms.not_available_dates IN [' .
                 implode(',', array_map(function ($date) {
@@ -485,20 +510,23 @@ class ObjectController extends BaseController
             $regionMatches = $this->findBestMatches($requestedRegion, array_keys($allRegionCounts));
             foreach ($regionMatches as $match) {
                 $regionCounts[$match] = $allRegionCounts[$match];
+                $results['regions'][] = [
+                    "region" => $match,
+                    "amount" => $allRegionCounts[$match],
+                    "type" => Objects::SEARCH_TYPE_REGION
+                ];
             }
         }
-
-        $results = [
-            'regions' => $regionCounts
-        ];
 
         if ($regionParam) {
             // Find matching hotels
             $hotelMatches = $this->findBestMatches($requestedRegion, array_keys($allHotelCounts));
             foreach ($hotelMatches as $match) {
-                $hotelCounts[$match] = $allHotelCounts[$match];
+                $results['hotels'][] = [
+                    "name" => $match,
+                    "type" => Objects::SEARCH_TYPE_HOTEL
+                ];
             }
-            $results['hotels'] = $hotelCounts;
         }
         return $results;
     }
