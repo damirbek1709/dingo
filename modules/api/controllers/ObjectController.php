@@ -375,12 +375,12 @@ class ObjectController extends BaseController
                 $saved_data = unserialize($user->search_data);
                 if (count($saved_data) > 2) {
                     if ($type == Objects::SEARCH_TYPE_REGION) {
-                        $saved_data[] = [
+                        $saved_data[0] = [
                             'type' => $type,
                             'region' => $queryWord
                         ];
                     } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
-                        $saved_data[] = [
+                        $saved_data[0] = [
                             'type' => $type,
                             'name' => $queryWord
                         ];
