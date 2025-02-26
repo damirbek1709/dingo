@@ -564,6 +564,13 @@ class ObjectController extends BaseController
         if ($user_auth) {
             $user = User::find()->where(['auth_key' => $user_auth])->one();
             $user_search_data = unserialize($user->search_data);
+            $saved_data = json_decode($user->search_data, true);
+
+            foreach ($saved_data as &$item) {
+                if (isset($item['type'])) {
+                    $item['type'] = (int) $item['type']; // Convert string to integer
+                }
+            }
         }
         $results['user_search_data'] = array_values($user_search_data);
         return $results;
