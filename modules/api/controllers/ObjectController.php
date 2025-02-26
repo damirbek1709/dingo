@@ -67,7 +67,7 @@ class ObjectController extends BaseController
                 [
                     'allow' => true,
                     'actions' => ['list', 'view', 'list2', 'search'],
-                    'roles' => ['@', '?','admin','owner'],
+                    'roles' => ['@', '?', 'admin', 'owner'],
                 ],
                 [
                     'allow' => true,
@@ -349,11 +349,13 @@ class ObjectController extends BaseController
         $fromDate = Yii::$app->request->get('from_date');
         $toDate = Yii::$app->request->get('to_date');
         $type = Yii::$app->request->get('type', null);
-        //echo "it works";die();
-
-        if ($type && !Yii::$app->user->isGuest) {
-            echo "it works";die();
-            $user = User::findOne(Yii::$app->user->id);
+        $user_auth = null;
+        $token = Yii::$app->request->headers->get('Authorization');
+        if ($token && preg_match('/^Bearer\s+(.*?)$/', $token, $matches)) {
+            $user_auth = $matches[1]; // Extract token
+        }
+        if ($type && $user_auth) {
+            $user = User::find()->where(['auth_key' => $user_auth])->one();
             if ($user->search_data) {
                 $saved_data = unserialize($user->search_data);
                 if (count($saved_data) > 2) {
