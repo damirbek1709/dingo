@@ -380,9 +380,7 @@ class ObjectController extends BaseController
 
 
                 $user->search_data = serialize($saved_data);
-            }
-            
-            else {
+            } else {
                 $saved_data = unserialize($user->search_data);
                 if (count($saved_data) > 2) {
                     array_shift($saved_data);
@@ -409,7 +407,7 @@ class ObjectController extends BaseController
                         $saved_data[] = [
                             'type' => $type,
                             'region' => $queryWord,
-                            'amount'=>$amount
+                            'amount' => $amount
                         ];
                     } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
                         $saved_data[] = [
@@ -604,16 +602,42 @@ class ObjectController extends BaseController
      * @param float $threshold Minimum similarity percentage (default: 70)
      * @return array Array of matching options
      */
-    private function findBestMatches($searchTerm, $availableOptions, $threshold = 70)
+    private function findBestMatches($searchTerm, $availableOptions, $defaultThreshold = 70)
     {
         $matches = [];
-        $searchTerm = strtolower($searchTerm);
+        $searchTerm = strtolower(trim($searchTerm));
+
+        // If search term is empty, return empty array
+        if (empty($searchTerm)) {
+            return $matches;
+        }
+
+        // Adjust threshold based on string length
+        $threshold = $defaultThreshold;
+        $length = mb_strlen($searchTerm);
+        if ($length < 4) {
+            // Lower threshold for short strings
+            // For 3 chars: ~60%, 2 chars: ~50%, 1 char: ~40%
+            $threshold = max(40, $defaultThreshold - (20 * (4 - $length)));
+        }
+
+        // For very short strings (1-2 chars), also check for exact prefix match
+        $exactPrefixMatch = ($length <= 2);
 
         foreach ($availableOptions as $option) {
-            $percent = 0;
-            similar_text($searchTerm, strtolower($option), $percent);
+            $optionLower = strtolower($option);
 
-            if ($percent > $threshold) {
+            // For very short strings, check if the option starts with the search term
+            if ($exactPrefixMatch && strpos($optionLower, $searchTerm) === 0) {
+                $matches[] = $option;
+                continue; // Skip similarity check for this match
+            }
+
+            // Regular similarity check with adjusted threshold
+            $percent = 0;
+            similar_text($searchTerm, $optionLower, $percent);
+
+            if ($percent >= $threshold) {
                 $matches[] = $option;
             }
         }
