@@ -522,9 +522,10 @@ class ObjectController extends BaseController
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
 
-        // Get region parameter (can be JSON array or comma-separated string)
+        // Get the query (search term)
         $regionParam = Yii::$app->request->get('query', '');
 
+        // Parse query into array (support JSON array or comma-separated string)
         $regionsArray = [];
         if (!empty($regionParam)) {
             $regionsArray = json_decode($regionParam, true);
@@ -533,10 +534,12 @@ class ObjectController extends BaseController
             }
         }
 
+        // Default regions if no query provided
         if (empty($regionsArray)) {
             $regionsArray = Objects::regionList();
         }
 
+        // Fetch all facet data (get all cities and hotel names)
         $allFacetsSearch = $index->search('', [
             'facets' => ['city', 'name'],
             'limit' => 0
@@ -544,9 +547,6 @@ class ObjectController extends BaseController
 
         $allRegionCounts = $allFacetsSearch->getFacetDistribution()['city'] ?? [];
         $allHotelCounts = $allFacetsSearch->getFacetDistribution()['name'] ?? [];
-
-        $regionCounts = [];
-        $hotelCounts = [];
 
         $results = [
             'regions' => [],
@@ -556,35 +556,38 @@ class ObjectController extends BaseController
         foreach ($regionsArray as $requestedRegion) {
             $length = mb_strlen($requestedRegion);
 
+            $matchedRegions = [];
+            $matchedHotels = [];
+
             if ($length === 1 || $length === 2) {
-                // Direct prefix matching logic for short search terms (1 or 2 letters)
-                $regionMatches = $this->findPrefixMatches($requestedRegion, array_keys($allRegionCounts));
-                $hotelMatches = $this->findPrefixMatches($requestedRegion, array_keys($allHotelCounts));
-            } else {
-                // Fuzzy matching for 3+ letters
-                $regionMatches = $this->findBestMatches($requestedRegion, array_keys($allRegionCounts));
-                $hotelMatches = $this->findBestMatches($requestedRegion, array_keys($allHotelCounts));
+                // Direct prefix matching (for 1 or 2 letters)
+                $matchedRegions = $this->getPrefixMatches($requestedRegion, array_keys($allRegionCounts));
+                $matchedHotels = $this->getPrefixMatches($requestedRegion, array_keys($allHotelCounts));
+            } elseif ($length >= 3) {
+                // Use fuzzy matching (for 3+ letters)
+                $matchedRegions = $this->findBestMatches($requestedRegion, array_keys($allRegionCounts));
+                $matchedHotels = $this->findBestMatches($requestedRegion, array_keys($allHotelCounts));
             }
 
-            // Process matched regions
-            foreach ($regionMatches as $match) {
-                $regionCounts[$match] = $allRegionCounts[$match];
+            // Collect matched regions
+            foreach ($matchedRegions as $region) {
                 $results['regions'][] = [
-                    "region" => $match,
-                    "amount" => $allRegionCounts[$match],
+                    "region" => $region,
+                    "amount" => $allRegionCounts[$region] ?? 0,
                     "type" => Objects::SEARCH_TYPE_REGION
                 ];
             }
 
-            // Process matched hotels
-            foreach ($hotelMatches as $match) {
+            // Collect matched hotels
+            foreach ($matchedHotels as $hotel) {
                 $results['hotels'][] = [
-                    "name" => $match,
+                    "name" => $hotel,
                     "type" => Objects::SEARCH_TYPE_HOTEL
                 ];
             }
         }
 
+        // Handle user search data (same as your existing logic)
         $user_auth = null;
         $token = Yii::$app->request->headers->get('Authorization');
         $user_search_data = [];
@@ -601,63 +604,58 @@ class ObjectController extends BaseController
     }
 
     /**
-     * Find matches where option starts with the search term (case-insensitive)
+     * Find all matches where the option starts with the search term (case insensitive)
+     * 
+     * @param string $searchTerm
+     * @param array $availableOptions
+     * @return array
      */
-    private function findPrefixMatches($searchTerm, $availableOptions)
+    private function getPrefixMatches($searchTerm, $availableOptions)
     {
         $matches = [];
-        $searchTerm = strtolower($searchTerm);
+        $searchTermLower = mb_strtolower($searchTerm);
 
         foreach ($availableOptions as $option) {
-            if (stripos($option, $searchTerm) === 0) {
+            if (mb_strtolower(mb_substr($option, 0, mb_strlen($searchTerm))) === $searchTermLower) {
                 $matches[] = $option;
             }
         }
-
         return $matches;
     }
 
-
     /**
-     * Find best matches for a search term among available options
+     * Fuzzy matching for 3+ letters (this part you already have)
      * 
-     * @param string $searchTerm The term to search for
-     * @param array $availableOptions Array of available options to match against
-     * @param float $threshold Minimum similarity percentage (default: 70)
-     * @return array Array of matching options
+     * @param string $searchTerm
+     * @param array $availableOptions
+     * @param float $defaultThreshold
+     * @return array
      */
     private function findBestMatches($searchTerm, $availableOptions, $defaultThreshold = 70)
     {
         $matches = [];
         $searchTerm = strtolower(trim($searchTerm));
 
-        // If search term is empty, return empty array
         if (empty($searchTerm)) {
             return $matches;
         }
 
-        // Adjust threshold based on string length
         $threshold = $defaultThreshold;
         $length = mb_strlen($searchTerm);
         if ($length < 4) {
-            // Lower threshold for short strings
-            // For 3 chars: ~60%, 2 chars: ~50%, 1 char: ~40%
             $threshold = max(40, $defaultThreshold - (20 * (4 - $length)));
         }
 
-        // For very short strings (1-2 chars), also check for exact prefix match
         $exactPrefixMatch = ($length <= 2);
 
         foreach ($availableOptions as $option) {
             $optionLower = strtolower($option);
 
-            // For very short strings, check if the option starts with the search term
             if ($exactPrefixMatch && strpos($optionLower, $searchTerm) === 0) {
                 $matches[] = $option;
-                continue; // Skip similarity check for this match
+                continue;
             }
 
-            // Regular similarity check with adjusted threshold
             $percent = 0;
             similar_text($searchTerm, $optionLower, $percent);
 
@@ -668,6 +666,18 @@ class ObjectController extends BaseController
 
         return $matches;
     }
+
+
+
+    /**
+     * Find best matches for a search term among available options
+     * 
+     * @param string $searchTerm The term to search for
+     * @param array $availableOptions Array of available options to match against
+     * @param float $threshold Minimum similarity percentage (default: 70)
+     * @return array Array of matching options
+     */
+   
 
     public function actionCategoryComfortTitle()
     {
