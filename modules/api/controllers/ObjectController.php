@@ -361,7 +361,7 @@ class ObjectController extends BaseController
             if ($user->search_data === null) {
                 if ($type == Objects::SEARCH_TYPE_REGION) {
                     $saved_data[] = [
-                        'type' => $type,
+                        'name' => $type,
                         'region' => $queryWord,
                         'amount' => $amount
                     ];
@@ -373,7 +373,7 @@ class ObjectController extends BaseController
                 } elseif ($type == Objects::SEARCH_TYPE_CITY) {
                     $saved_data[] = [
                         'type' => $type,
-                        'city' => $queryWord,
+                        'name' => $queryWord,
                         'amount' => $amount
                     ];
                 }
@@ -387,7 +387,7 @@ class ObjectController extends BaseController
                     if ($type == Objects::SEARCH_TYPE_REGION) {
                         $saved_data[] = [
                             'type' => $type,
-                            'region' => $queryWord,
+                            'name' => $queryWord,
                             'amount' => $amount
                         ];
                     } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
@@ -398,7 +398,7 @@ class ObjectController extends BaseController
                     } elseif ($type == Objects::SEARCH_TYPE_CITY) {
                         $saved_data[] = [
                             'type' => $type,
-                            'city' => $queryWord,
+                            'name' => $queryWord,
                             'amount' => $amount
                         ];
                     }
@@ -417,7 +417,7 @@ class ObjectController extends BaseController
                     } elseif ($type == Objects::SEARCH_TYPE_CITY) {
                         $saved_data[] = [
                             'type' => $type,
-                            'city' => $queryWord,
+                            'name' => $queryWord,
                             'amount' => $amount
                         ];
                     }
@@ -572,7 +572,7 @@ class ObjectController extends BaseController
             // Collect matched regions
             foreach ($matchedRegions as $region) {
                 $results['regions'][] = [
-                    "region" => $region,
+                    "name" => $region,
                     "amount" => $allRegionCounts[$region] ?? 0,
                     "type" => Objects::SEARCH_TYPE_REGION
                 ];

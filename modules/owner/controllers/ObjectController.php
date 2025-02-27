@@ -17,6 +17,7 @@ use app\models\PaymentType;
  */
 class ObjectController extends Controller
 {
+    public $layout;
     /**
      * {@inheritdoc}
      */
@@ -71,6 +72,7 @@ class ObjectController extends Controller
      */
     public function actionView($id)
     {
+        $this->layout = 'main';
         $client = Yii::$app->meili->connect();
         $index = $client->index('object'); // Replace with your actual Meilisearch index
 
