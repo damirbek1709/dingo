@@ -605,24 +605,38 @@ class ObjectController extends BaseController
     private function findBestMatches($searchTerm, $availableOptions)
     {
         $matches = [];
-        $searchTerm = strtolower(trim($searchTerm));
+        $debug = [];  // For debugging
+        $searchTerm = trim($searchTerm);
 
         // If search term is empty, return empty array
         if (empty($searchTerm)) {
+            Yii::info("Search term is empty", 'search');
             return $matches;
         }
 
-        // Get length of search term
-        $length = mb_strlen($searchTerm);
+        $searchTermLower = strtolower($searchTerm);
+        Yii::info("Searching for prefix: '$searchTermLower'", 'search');
 
         foreach ($availableOptions as $option) {
             $optionLower = strtolower($option);
+            $startsWith = (strpos($optionLower, $searchTermLower) === 0);
 
-            // Check if the option starts with the search term
-            if (mb_strpos($optionLower, $searchTerm) === 0) {
+            $debug[] = [
+                'option' => $option,
+                'optionLower' => $optionLower,
+                'searchTerm' => $searchTermLower,
+                'strpos_result' => strpos($optionLower, $searchTermLower),
+                'startsWith' => $startsWith
+            ];
+
+            if ($startsWith) {
                 $matches[] = $option;
             }
         }
+
+        // Log first 10 debug items to see what's happening
+        Yii::info("Debug info (first 10 items): " . json_encode(array_slice($debug, 0, 10), JSON_PRETTY_PRINT), 'search');
+        Yii::info("Total matches found: " . count($matches), 'search');
 
         return $matches;
     }
