@@ -602,7 +602,7 @@ class ObjectController extends BaseController
      * @param float $threshold Minimum similarity percentage (default: 70)
      * @return array Array of matching options
      */
-    private function findBestMatches($searchTerm, $availableOptions, $defaultThreshold = 70)
+    private function findBestMatches($searchTerm, $availableOptions)
     {
         $matches = [];
         $searchTerm = strtolower(trim($searchTerm));
@@ -612,32 +612,14 @@ class ObjectController extends BaseController
             return $matches;
         }
 
-        // Adjust threshold based on string length
-        $threshold = $defaultThreshold;
+        // Get length of search term
         $length = mb_strlen($searchTerm);
-        if ($length < 4) {
-            // Lower threshold for short strings
-            // For 3 chars: ~60%, 2 chars: ~50%, 1 char: ~40%
-            $threshold = max(40, $defaultThreshold - (20 * (4 - $length)));
-        }
-
-        // For very short strings (1-2 chars), also check for exact prefix match
-        $exactPrefixMatch = ($length <= 2);
 
         foreach ($availableOptions as $option) {
             $optionLower = strtolower($option);
 
-            // For very short strings, check if the option starts with the search term
-            if ($exactPrefixMatch && strpos($optionLower, $searchTerm) === 0) {
-                $matches[] = $option;
-                continue; // Skip similarity check for this match
-            }
-
-            // Regular similarity check with adjusted threshold
-            $percent = 0;
-            similar_text($searchTerm, $optionLower, $percent);
-
-            if ($percent >= $threshold) {
+            // Check if the option starts with the search term
+            if (mb_strpos($optionLower, $searchTerm) === 0) {
                 $matches[] = $option;
             }
         }
