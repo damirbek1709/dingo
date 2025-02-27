@@ -380,7 +380,9 @@ class ObjectController extends BaseController
 
 
                 $user->search_data = serialize($saved_data);
-            } else {
+            }
+            
+            else {
                 $saved_data = unserialize($user->search_data);
                 if (count($saved_data) > 2) {
                     array_shift($saved_data);
@@ -407,7 +409,7 @@ class ObjectController extends BaseController
                         $saved_data[] = [
                             'type' => $type,
                             'region' => $queryWord,
-                            'amount' => $amount
+                            'amount'=>$amount
                         ];
                     } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
                         $saved_data[] = [
@@ -602,44 +604,48 @@ class ObjectController extends BaseController
      * @param float $threshold Minimum similarity percentage (default: 70)
      * @return array Array of matching options
      */
-    private function findBestMatches($searchTerm, $availableOptions)
-    {
-        $matches = [];
-        $debug = [];  // For debugging
-        $searchTerm = trim($searchTerm);
-
-        // If search term is empty, return empty array
-        if (empty($searchTerm)) {
-            Yii::info("Search term is empty", 'search');
-            return $matches;
-        }
-
-        $searchTermLower = strtolower($searchTerm);
-        Yii::info("Searching for prefix: '$searchTermLower'", 'search');
-
-        foreach ($availableOptions as $option) {
-            $optionLower = strtolower($option);
-            $startsWith = (strpos($optionLower, $searchTermLower) === 0);
-
-            $debug[] = [
-                'option' => $option,
-                'optionLower' => $optionLower,
-                'searchTerm' => $searchTermLower,
-                'strpos_result' => strpos($optionLower, $searchTermLower),
-                'startsWith' => $startsWith
-            ];
-
-            if ($startsWith) {
-                $matches[] = $option;
-            }
-        }
-
-        // Log first 10 debug items to see what's happening
-        Yii::info("Debug info (first 10 items): " . json_encode(array_slice($debug, 0, 10), JSON_PRETTY_PRINT), 'search');
-        Yii::info("Total matches found: " . count($matches), 'search');
-
+    private function findBestMatches($searchTerm, $availableOptions, $defaultThreshold = 70)
+{
+    $matches = [];
+    $searchTerm = strtolower(trim($searchTerm));
+    
+    // If search term is empty, return empty array
+    if (empty($searchTerm)) {
         return $matches;
     }
+    
+    // Adjust threshold based on string length
+    $threshold = $defaultThreshold;
+    $length = mb_strlen($searchTerm);
+    if ($length < 4) {
+        // Lower threshold for short strings
+        // For 3 chars: ~60%, 2 chars: ~50%, 1 char: ~40%
+        $threshold = max(40, $defaultThreshold - (20 * (4 - $length)));
+    }
+    
+    // For very short strings (1-2 chars), also check for exact prefix match
+    $exactPrefixMatch = ($length <= 2);
+    
+    foreach ($availableOptions as $option) {
+        $optionLower = strtolower($option);
+        
+        // For very short strings, check if the option starts with the search term
+        if ($exactPrefixMatch && strpos($optionLower, $searchTerm) === 0) {
+            $matches[] = $option;
+            continue; // Skip similarity check for this match
+        }
+        
+        // Regular similarity check with adjusted threshold
+        $percent = 0;
+        similar_text($searchTerm, $optionLower, $percent);
+        
+        if ($percent >= $threshold) {
+            $matches[] = $option;
+        }
+    }
+    
+    return $matches;
+}
 
     public function actionCategoryComfortTitle()
     {
