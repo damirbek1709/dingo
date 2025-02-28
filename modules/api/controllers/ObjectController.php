@@ -474,25 +474,28 @@ class ObjectController extends BaseController
             $minPrice = PHP_FLOAT_MAX;
             if ($hit['rooms']) {
                 foreach ($hit['rooms'] as $room) {
-                    foreach ($room['tariff'] as &$tariff) {
-                        foreach ($tariff['prices'] as &$price) {
-                            // Extract all prices (keys that start with 'price_')
-                            $priceValues = [];
-                            foreach ($price as $key => $value) {
-                                if (strpos($key, 'price_') === 0) {
-                                    $priceValues[] = $value;
+                    foreach ($room['tariff'] as $tariff) {
+                        foreach ($tariff['prices'] as $price) {
+                            $currentPrice = $price['price_' . $guestAmount];
+
+                            // If dates are provided, check for overlap
+                            if ($fromDate && $toDate) {
+                                if (
+                                    $this->areDatesOverlapping(
+                                        $fromDate,
+                                        $toDate,
+                                        $price['from_date'],
+                                        $price['to_date']
+                                    )
+                                ) {
+                                    $minPrice = min($minPrice, $currentPrice);
                                 }
+                            } else {
+                                // If no dates provided, consider all prices
+                                $minPrice = min($minPrice, $currentPrice);
                             }
-                    
-                            // Replace the price_* fields with a single "prices" array
-                            $price = [
-                                'prices' => $priceValues,
-                                'from_date' => $price['from_date'],
-                                'to_date' => $price['to_date']
-                            ];
                         }
                     }
-                    unset($tariff, $price);
                 }
             }
             $hit['from_price'] = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
