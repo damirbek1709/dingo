@@ -492,6 +492,7 @@ class ObjectController extends BaseController
                             ];
                         }
                     }
+                    unset($tariff, $price);
                 }
             }
             $hit['from_price'] = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
