@@ -430,7 +430,7 @@ class ObjectController extends BaseController
         }
 
         $guestAmount = (int) Yii::$app->request->get('guest_amount', 1);
-        //$filters = ['rooms.guest_amount >= ' . $guestAmount];
+        $filters = ['rooms.guest_amount >= ' . $guestAmount];
 
         // Add date filtering only if both dates are provided
         if ($fromDate && $toDate) {
