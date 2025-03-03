@@ -481,6 +481,22 @@ class ObjectController extends BaseController
                             foreach ($price as $key => $value) {
                                 if (strpos($key, 'price_') === 0) {
                                     $priceValues[] = $value;
+                                    if ($fromDate && $toDate) {
+                                        if (
+                                            $this->areDatesOverlapping(
+                                                $fromDate,
+                                                $toDate,
+                                                $price['from_date'],
+                                                $price['to_date']
+                                            )
+                                        ) {
+                                            $minPrice = min($minPrice, $value);
+                                        }
+                                    } else {
+                                        // If no dates provided, consider all prices
+                                        $minPrice = min($minPrice, $value);
+                                    }
+
                                 }
                             }
 
