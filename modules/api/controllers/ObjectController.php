@@ -476,22 +476,21 @@ class ObjectController extends BaseController
                 foreach ($hit['rooms'] as $room) {
                     foreach ($room['tariff'] as $tariff) {
                         foreach ($tariff['prices'] as $price) {
-                            $currentPrice = $price['price_' . $guestAmount];
-                            // If dates are provided, check for overlap
-                            if ($fromDate && $toDate) {
-                                if (
-                                    $this->areDatesOverlapping(
+                            if (isset($price['price_' . $guestAmount])) {
+                                $currentPrice = $price['price_' . $guestAmount];
+                                // Process the price if it exists
+                                if ($fromDate && $toDate) {
+                                    if ($this->areDatesOverlapping(
                                         $fromDate,
                                         $toDate,
                                         $price['from_date'],
                                         $price['to_date']
-                                    )
-                                ) {
+                                    )) {
+                                        $minPrice = min($minPrice, $currentPrice);
+                                    }
+                                } else {
                                     $minPrice = min($minPrice, $currentPrice);
                                 }
-                            } else {
-                                // If no dates provided, consider all prices
-                                $minPrice = min($minPrice, $currentPrice);
                             }
                         }
                     }
