@@ -471,7 +471,7 @@ class ObjectController extends BaseController
         $totalCount = count($hits);
 
         foreach ($hits as &$hit) {
-            $minPrice = PHP_FLOAT_MAX;
+            $minPrice = 1000;
             if ($hit['rooms']) {
                 foreach ($hit['rooms'] as $room) {
                     foreach ($room['tariff'] as &$tariff) {
@@ -482,6 +482,9 @@ class ObjectController extends BaseController
                             foreach ($price as $key => $value) {
                                 if (strpos($key, 'price_') === 0) {
                                     $priceValues[] = $value;
+                                    if($minPrice > $value){
+                                        $minPrice = $value;
+                                    }
                                 }
                             }
                            
@@ -493,7 +496,6 @@ class ObjectController extends BaseController
                                 'to_date' => $price['to_date']
                             ];
                         }
-                        $minPrice = !empty($priceValues) ? min($priceValues) : null;
                     }
                     unset($tariff, $price);
                 }
