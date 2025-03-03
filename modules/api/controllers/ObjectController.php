@@ -469,9 +469,10 @@ class ObjectController extends BaseController
         // Process results to add from_price
         $hits = $searchResults->getHits();
         $totalCount = count($hits);
+        $minPrice = 1000;
 
         foreach ($hits as &$hit) {
-            $minPrice = 1000;
+            
             if ($hit['rooms']) {
                 foreach ($hit['rooms'] as $room) {
                     foreach ($room['tariff'] as &$tariff) {
