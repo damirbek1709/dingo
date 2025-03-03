@@ -484,7 +484,7 @@ class ObjectController extends BaseController
                                     $priceValues[] = $value;
                                 }
                             }
-                            $minPrice = !empty($priceValues) ? min($priceValues) : null;
+                           
 
                             // Replace the price_* fields with a single "prices" array
                             $price = [
@@ -493,6 +493,7 @@ class ObjectController extends BaseController
                                 'to_date' => $price['to_date']
                             ];
                         }
+                        $minPrice = !empty($priceValues) ? min($priceValues) : null;
                     }
                     unset($tariff, $price);
                 }
