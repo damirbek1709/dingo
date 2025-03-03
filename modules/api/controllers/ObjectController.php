@@ -476,29 +476,15 @@ class ObjectController extends BaseController
                 foreach ($hit['rooms'] as $room) {
                     foreach ($room['tariff'] as &$tariff) {
                         foreach ($tariff['prices'] as &$price) {
+                            
                             // Extract all prices (keys that start with 'price_')
                             $priceValues = [];
                             foreach ($price as $key => $value) {
                                 if (strpos($key, 'price_') === 0) {
                                     $priceValues[] = $value;
-                                    if ($fromDate && $toDate) {
-                                        if (
-                                            $this->areDatesOverlapping(
-                                                $fromDate,
-                                                $toDate,
-                                                $price['from_date'],
-                                                $price['to_date']
-                                            )
-                                        ) {
-                                            $minPrice = min($minPrice, $value);
-                                        }
-                                    } else {
-                                        // If no dates provided, consider all prices
-                                        $minPrice = min($minPrice, $value);
-                                    }
-
                                 }
                             }
+                            $minPrice = !empty($priceValues) ? min($priceValues) : null;
 
                             // Replace the price_* fields with a single "prices" array
                             $price = [
@@ -506,22 +492,6 @@ class ObjectController extends BaseController
                                 'from_date' => $price['from_date'],
                                 'to_date' => $price['to_date']
                             ];
-                            // $currentPrice = $price['price_' . $guestAmount];
-                            // if ($fromDate && $toDate) {
-                            //     if (
-                            //         $this->areDatesOverlapping(
-                            //             $fromDate,
-                            //             $toDate,
-                            //             $price['from_date'],
-                            //             $price['to_date']
-                            //         )
-                            //     ) {
-                            //         $minPrice = min($minPrice, $currentPrice);
-                            //     }
-                            // } else {
-                            //     // If no dates provided, consider all prices
-                            //     $minPrice = min($minPrice, $currentPrice);
-                            // }
                         }
                     }
                     unset($tariff, $price);
