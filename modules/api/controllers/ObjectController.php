@@ -474,15 +474,20 @@ class ObjectController extends BaseController
             $minPrice = PHP_FLOAT_MAX;
             if ($hit['rooms']) {
                 foreach ($hit['rooms'] as $room) {
+                    $priceIndex = $guestAmount - 1;
                     foreach ($room['tariff'] as $tariff) {
-                        foreach ($tariff['prices'] as $price) {
-                            if (isset($price) && is_array($price['price_arr'])) {
-                                // Find the minimum price in this price_arr
-                                $currentMinPrice = min($price['price_arr']);
-                                
-                                // Update the overall minimum if this one is lower
-                                if ($currentMinPrice < $minPrice) {
-                                    $minPrice = $currentMinPrice;
+                        if (isset($tariff['prices']) && is_array($tariff['prices'])) {
+                            foreach ($tariff['prices'] as $priceData) {
+                                if (isset($priceData['price_arr']) && is_array($priceData['price_arr']) && 
+                                    isset($priceData['price_arr'][$priceIndex])) {
+                                    
+                                    // Get the price for the specific guest amount
+                                    $currentPrice = $priceData['price_arr'][$priceIndex];
+                                    
+                                    // Update the overall minimum if this one is lower
+                                    if ($currentPrice < $minPrice) {
+                                        $minPrice = $currentPrice;
+                                    }
                                 }
                             }
                         }
