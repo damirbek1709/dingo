@@ -476,6 +476,22 @@ class ObjectController extends BaseController
                 foreach ($hit['rooms'] as $room) {
                     foreach ($room['tariff'] as &$tariff) {
                         foreach ($tariff['prices'] as &$price) {
+                            $currentPrice = $price['price_' . $guestAmount];
+                            if ($fromDate && $toDate) {
+                                if (
+                                    $this->areDatesOverlapping(
+                                        $fromDate,
+                                        $toDate,
+                                        $price['from_date'],
+                                        $price['to_date']
+                                    )
+                                ) {
+                                    $minPrice = min($minPrice, $currentPrice);
+                                }
+                            } else {
+                                // If no dates provided, consider all prices
+                                $minPrice = min($minPrice, $currentPrice);
+                            }
                             // Extract all prices (keys that start with 'price_')
                             $priceValues = [];
                             foreach ($price as $key => $value) {
@@ -483,7 +499,7 @@ class ObjectController extends BaseController
                                     $priceValues[] = $value;
                                 }
                             }
-                    
+
                             // Replace the price_* fields with a single "prices" array
                             $price = [
                                 'prices' => $priceValues,
@@ -674,7 +690,7 @@ class ObjectController extends BaseController
      * @param float $threshold Minimum similarity percentage (default: 70)
      * @return array Array of matching options
      */
-   
+
 
     public function actionCategoryComfortTitle()
     {

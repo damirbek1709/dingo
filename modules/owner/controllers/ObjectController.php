@@ -12,6 +12,7 @@ use yii\helpers\ArrayHelper;
 use yii\data\ArrayDataProvider;
 use yii\web\UploadedFile;
 use app\models\PaymentType;
+use app\models\RoomCat;
 /**
  * EventController implements the CRUD actions for Event model.
  */
@@ -234,8 +235,8 @@ class ObjectController extends Controller
                     'internet_public' => (bool) $model->internet_public,
                     'animals_allowed' => (bool) $model->animals_allowed,
                     'meal_terms' => array_values($model->meal_terms),
-                    'meal_purchaise'=>(bool) $model->meal_purchaise,
-                    'children'=>array_values($model->children),
+                    'meal_purchaise' => (bool) $model->meal_purchaise,
+                    'children' => array_values($model->children),
                 ]
             ];
 
@@ -251,19 +252,67 @@ class ObjectController extends Controller
         ]);
     }
 
-    public function actionAddRoom($id){
-        $client = Yii::$app->meili->connect();
-        $index = $client->index('object');
+    public function actionAddRoom($id)
+    {
+        $model = new RoomCat();
 
-        // Fetch object from Meilisearch
-        $searchResult = $index->search('', ['filter' => "id = $id"])->getHits();
-        if (empty($searchResult)) {
-            throw new \yii\web\NotFoundHttpException('Record not found.');
+        if (Yii::$app->request->isPost) {
+            if ($model->load($this->request->post())) {
+                $client = Yii::$app->meili->connect();
+                $index = $client->index('object');
+
+                $model->images = UploadedFile::getInstances($model, 'images');
+                if ($model->images) {
+                    foreach ($model->images as $image) {
+                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
+                        $image->saveAs($path);
+                        $model->attachImage($path, true);
+                        @unlink($path);
+                    }
+                }
+                if ($model->img) {
+                    $img = $this->getImageById($model->img);
+                    $model->setMainImage($img);
+                }
+                if ($model->save()) {
+                    $client = Yii::$app->meili->connect();
+                    $object = $client->index('object')->getDocument($id);
+                    $rooms = $object['rooms'];
+                    echo "<pre>";
+                    print_r($rooms);
+                    echo "</pre>";
+                    die();
+                }
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+        } else {
+            return $this->render('/rooms/create', [
+                'model' => $model,
+                'id' => $id,
+            ]);
         }
 
-        // Load object data
-        $model = new Objects($searchResult[0]);
-        $data = $searchResult[0];
+        // if ($index->updateDocuments($meilisearchData)) {
+        //     Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+        //     return $this->refresh();
+        // }
+
+
+
+        // $meilisearchData = [
+        //     'id' => $id,
+        //     'rooms' => [
+        //         'early_check_in' => (bool) $model->early_check_in,
+        //         'late_check_in' => (bool) $model->late_check_in,
+        //         'internet_public' => (bool) $model->internet_public,
+        //         'animals_allowed' => (bool) $model->animals_allowed,
+        //         'meal_terms' => array_values($model->meal_terms),
+        //         'meal_purchaise' => (bool) $model->meal_purchaise,
+        //         'children' => array_values($model->children),
+        //     ]
+        // ];
+
+
     }
 
 
