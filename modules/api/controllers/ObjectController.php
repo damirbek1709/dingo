@@ -476,6 +476,20 @@ class ObjectController extends BaseController
                 foreach ($hit['rooms'] as $room) {
                     foreach ($room['tariff'] as &$tariff) {
                         foreach ($tariff['prices'] as &$price) {
+                            // Extract all prices (keys that start with 'price_')
+                            $priceValues = [];
+                            foreach ($price as $key => $value) {
+                                if (strpos($key, 'price_') === 0) {
+                                    $priceValues[] = $value;
+                                }
+                            }
+
+                            // Replace the price_* fields with a single "prices" array
+                            $price = [
+                                'prices' => $priceValues,
+                                'from_date' => $price['from_date'],
+                                'to_date' => $price['to_date']
+                            ];
                             $currentPrice = $price['price_' . $guestAmount];
                             if ($fromDate && $toDate) {
                                 if (
@@ -492,20 +506,6 @@ class ObjectController extends BaseController
                                 // If no dates provided, consider all prices
                                 $minPrice = min($minPrice, $currentPrice);
                             }
-                            // Extract all prices (keys that start with 'price_')
-                            $priceValues = [];
-                            foreach ($price as $key => $value) {
-                                if (strpos($key, 'price_') === 0) {
-                                    $priceValues[] = $value;
-                                }
-                            }
-
-                            // Replace the price_* fields with a single "prices" array
-                            $price = [
-                                'prices' => $priceValues,
-                                'from_date' => $price['from_date'],
-                                'to_date' => $price['to_date']
-                            ];
                         }
                     }
                     unset($tariff, $price);
