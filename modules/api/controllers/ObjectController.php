@@ -490,22 +490,22 @@ class ObjectController extends BaseController
                                 'from_date' => $price['from_date'],
                                 'to_date' => $price['to_date']
                             ];
-                            $currentPrice = $price['price_' . $guestAmount];
-                            if ($fromDate && $toDate) {
-                                if (
-                                    $this->areDatesOverlapping(
-                                        $fromDate,
-                                        $toDate,
-                                        $price['from_date'],
-                                        $price['to_date']
-                                    )
-                                ) {
-                                    $minPrice = min($minPrice, $currentPrice);
-                                }
-                            } else {
-                                // If no dates provided, consider all prices
-                                $minPrice = min($minPrice, $currentPrice);
-                            }
+                            // $currentPrice = $price['price_' . $guestAmount];
+                            // if ($fromDate && $toDate) {
+                            //     if (
+                            //         $this->areDatesOverlapping(
+                            //             $fromDate,
+                            //             $toDate,
+                            //             $price['from_date'],
+                            //             $price['to_date']
+                            //         )
+                            //     ) {
+                            //         $minPrice = min($minPrice, $currentPrice);
+                            //     }
+                            // } else {
+                            //     // If no dates provided, consider all prices
+                            //     $minPrice = min($minPrice, $currentPrice);
+                            // }
                         }
                     }
                     unset($tariff, $price);
