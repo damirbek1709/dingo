@@ -171,7 +171,7 @@ class ObjectController extends Controller
             $comfort_models = Comfort::find()->where(['id' => $comfort_list])->all();
             $comfortArr = [];
             foreach ($comfort_models as $item) {
-                $comfortArr[$item->category_id][] = [$item->id => $item->title];
+                $comfortArr[$item->category_id][$item->id] = [$item->title, $item->title_en, $item->title_ky];
             }
 
             $meilisearchData = [
