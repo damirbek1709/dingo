@@ -159,23 +159,23 @@ class ObjectController extends Controller
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $comfort_list = Yii::$app->request->post('comforts');
-        $searchResult = $index->search('', ['filter' => "id = $id"])->getHits();
+        $searchResult = $client->index('object')->getDocument($id);
         if (empty($searchResult)) {
             throw new \yii\web\NotFoundHttpException('Record not found.');
         }
 
-        $model = new Objects($searchResult[0]);
+        $model = new Objects($searchResult);
 
         if (isset($comfort_list)) {
             //echo "<pre>";print_r($comfort_list);echo "</pre>";die();
             $comfort_models = Comfort::find()->where(['id' => $comfort_list])->all();
             $comfortArr = [];
             foreach ($comfort_models as $item) {
-                $comfortArr[$item->category_id][$item->id] = [$item->title, $item->title_en, $item->title_ky];
+                $comfortArr[$item->category_id][$item->id] = ['ru'=>$item->title, 'en'=>$item->title_en, 'ky'=>$item->title_ky];
             }
 
             $meilisearchData = [
-                'id' => $id,
+                'id' => (int)$id,
                 'comfort_list' => $comfortArr
             ];
 

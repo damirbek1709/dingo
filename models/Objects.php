@@ -17,6 +17,7 @@ class Objects extends Model
     public $name_en;
     public $name_ky;
     public $city;
+    public $city_id;
     public $address;
     public $currency;
     public $features;

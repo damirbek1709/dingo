@@ -345,7 +345,7 @@ class ObjectController extends BaseController
         $filters = [];
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-        $queryWord = Yii::$app->request->get('query_word', '');
+        $queryWord = Yii::$app->request->get('query_word', 2);
         $fromDate = Yii::$app->request->get('from_date');
         $toDate = Yii::$app->request->get('to_date');
         $type = (int) Yii::$app->request->get('type', null);
@@ -478,12 +478,14 @@ class ObjectController extends BaseController
                     foreach ($room['tariff'] as $tariff) {
                         if (isset($tariff['prices']) && is_array($tariff['prices'])) {
                             foreach ($tariff['prices'] as $priceData) {
-                                if (isset($priceData['price_arr']) && is_array($priceData['price_arr']) && 
-                                    isset($priceData['price_arr'][$priceIndex])) {
-                                    
+                                if (
+                                    isset($priceData['price_arr']) && is_array($priceData['price_arr']) &&
+                                    isset($priceData['price_arr'][$priceIndex])
+                                ) {
+
                                     // Get the price for the specific guest amount
                                     $currentPrice = $priceData['price_arr'][$priceIndex];
-                                    
+
                                     // Update the overall minimum if this one is lower
                                     if ($currentPrice < $minPrice) {
                                         $minPrice = $currentPrice;
@@ -673,7 +675,7 @@ class ObjectController extends BaseController
      * @param float $threshold Minimum similarity percentage (default: 70)
      * @return array Array of matching options
      */
-   
+
 
     public function actionCategoryComfortTitle()
     {
