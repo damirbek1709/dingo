@@ -5,6 +5,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\widgets\ListView;
 
 /** @var yii\web\View $this */
 /** @var app\models\RoomCatSearch $searchModel */
@@ -17,39 +18,21 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Create Room Category'), ['create'], ['class' => 'btn btn-success']) ?>
+    <?php echo $this->render('../top_nav', ['model' => $model]); ?>
+    <p style="float:right">
+        <?= Html::a(Yii::t('app', 'Добавить номер'), ['add-room', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Создать тариф'), ['add-tariff', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-    <?= GridView::widget([
+    <?php
+    /** @var yii\web\View $this */
+    echo ListView::widget([
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'title',
-            'title_en',
-            'title_ky',
-            'guest_amount',
-            //'similar_room_amount',
-            //'area',
-            //'bathroom',
-            //'balcony',
-            //'air_cond',
-            //'kitchen',
-            //'base_price',
-            //'img',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, RoomCat $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
-            ],
-        ],
-    ]); ?>
+        'summary' => false,
+        'itemView' => '_item',  // Partial view for rendering each item
+        //'layout' => "{summary}\n{items}\n{pager}",  // Optional: customize layout
+    ]);
+    ?>
 
 
 </div>

@@ -1,7 +1,9 @@
 <?php
 use yii\helpers\Html;
 ?>
+
 <div class="owner-nav-cover row">
+
     <div class="owner-nav-item">
         <?= Html::a(Yii::t('app', 'Информация'), ['view', 'id' => $model->id]); ?>
     </div>

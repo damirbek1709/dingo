@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\helpers\Url;
 
@@ -26,6 +27,7 @@ use yii\helpers\Url;
 class RoomCat extends \yii\db\ActiveRecord
 {
     public $images;
+    public $primaryKey = 'id';
     /**
      * {@inheritdoc}
      */
@@ -49,7 +51,7 @@ class RoomCat extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'guest_amount', 'similar_room_amount', 'area'], 'required'],
+            [['title', 'guest_amount', 'similar_room_amount', 'area', 'type_id'], 'required'],
             [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen'], 'integer'],
             [['area', 'base_price', 'img'], 'number'],
             [['title', 'title_en', 'title_ky'], 'string', 'max' => 255],
@@ -76,6 +78,16 @@ class RoomCat extends \yii\db\ActiveRecord
             'base_price' => Yii::t('app', 'Базовая цена'),
             'img' => Yii::t('app', 'Фото'),
         ];
+    }
+
+    public function typeList()
+    {
+        return ArrayHelper::map(RoomType::find()->all(), 'id', 'title');
+    }
+
+    public function typeTitle($id)
+    {
+        return RoomType::findOne($id)->title ? RoomType::findOne($id)->title : '';
     }
 
     public function getWallpaper()

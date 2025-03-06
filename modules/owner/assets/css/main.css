@@ -52,13 +52,15 @@ a.desc:after {
 }
 
 a.asc:after {
-    content: /*"\e113"*/
-    "\e151";
+    content:
+        /*"\e113"*/
+        "\e151";
 }
 
 a.desc:after {
-    content: /*"\e114"*/
-    "\e152";
+    content:
+        /*"\e114"*/
+        "\e152";
 }
 
 .sort-numerical a.asc:after {
@@ -128,11 +130,16 @@ a.desc:after {
     max-height: 100%;
 }
 
-.comfort_list_grid{
+.comfort_list_grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 40px;
 }
-.owner-nav-cover{
+
+.owner-nav-cover {
     background-color: #f6f6f6;
+}
+
+.top_nav_title {
+    margin: 10px 15px 15px;
 }

@@ -1,6 +1,3 @@
-<?php
-/** @var yii\web\View $this */?>
-
 
 <?php
 echo \yii\grid\GridView::widget([

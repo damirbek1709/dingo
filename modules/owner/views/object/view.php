@@ -14,15 +14,15 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="meilisearch-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
-
+    <?php echo $this->render('top_nav', ['model' => $model]); ?>
     <p>
         <?php //= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?php /* Html::a('Delete', ['delete', 'id' => $model->id], [
-  'class' => 'btn btn-danger',
-  'data' => [
-      'confirm' => 'Are you sure you want to delete this item?',
-      'method' => 'post',
-  ],
+'class' => 'btn btn-danger',
+'data' => [
+ 'confirm' => 'Are you sure you want to delete this item?',
+ 'method' => 'post',
+],
 ])*/ ?>
     </p>
 

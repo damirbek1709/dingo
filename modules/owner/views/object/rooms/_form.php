@@ -17,11 +17,8 @@ use yii\widgets\ActiveForm;
             'enctype' => 'multipart/form-data'
         ]
     ]); ?>
-    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'title_en')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'title_ky')->textInput(['maxlength' => true]) ?>
+    <?=$form->field($model,'type_id')->dropDownList(items: $model->typeList())?>
 
     <?= $form->field($model, 'guest_amount')->textInput() ?>
 

@@ -1,4 +1,5 @@
 <?php
+
 /** @var yii\web\View $this */
 echo \yii\grid\GridView::widget([
     'dataProvider' => $dataProvider,

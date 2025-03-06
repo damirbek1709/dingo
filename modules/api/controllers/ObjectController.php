@@ -345,7 +345,7 @@ class ObjectController extends BaseController
         $filters = [];
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-        $queryWord = Yii::$app->request->get('query_word', 2);
+        $queryWord = Yii::$app->request->get('query_word', '');
         $fromDate = Yii::$app->request->get('from_date');
         $toDate = Yii::$app->request->get('to_date');
         $type = (int) Yii::$app->request->get('type', null);

@@ -65,6 +65,31 @@ class ObjectController extends Controller
         ]);
     }
 
+    public function actionRoomList($id)
+    {
+        $this->layout = "main";
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($id);
+
+        $model = new Objects($object);
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $object['rooms'],
+            'pagination' => [
+                'pageSize' => 12, // Adjust page size as needed
+            ],
+            // 'sort' => [
+            //     'attributes' => ['id', 'name', 'email'], // Sortable attributes
+            // ],
+        ]);
+
+        return $this->render('rooms/index', [
+            'dataProvider' => $dataProvider,
+            'model' => $model
+        ]);
+    }
+
+
     /**
      * Displays a single Event model.
      * @param integer $id
@@ -73,7 +98,7 @@ class ObjectController extends Controller
      */
     public function actionView($id)
     {
-        $this->layout = 'main';
+        //$this->layout = 'main';
         $client = Yii::$app->meili->connect();
         $index = $client->index('object'); // Replace with your actual Meilisearch index
 
@@ -171,11 +196,11 @@ class ObjectController extends Controller
             $comfort_models = Comfort::find()->where(['id' => $comfort_list])->all();
             $comfortArr = [];
             foreach ($comfort_models as $item) {
-                $comfortArr[$item->category_id][$item->id] = ['ru'=>$item->title, 'en'=>$item->title_en, 'ky'=>$item->title_ky];
+                $comfortArr[$item->category_id][$item->id] = ['ru' => $item->title, 'en' => $item->title_en, 'ky' => $item->title_ky];
             }
 
             $meilisearchData = [
-                'id' => (int)$id,
+                'id' => (int) $id,
                 'comfort_list' => $comfortArr
             ];
 
@@ -252,16 +277,22 @@ class ObjectController extends Controller
         ]);
     }
 
+    public function actionRooms()
+    {
+
+    }
+
     public function actionAddRoom($id)
     {
         $model = new RoomCat();
-
         if (Yii::$app->request->isPost) {
-            if ($model->load($this->request->post())) {
+            if ($model->load(Yii::$app->request->post())) {
                 $client = Yii::$app->meili->connect();
                 $index = $client->index('object');
 
+
                 $model->images = UploadedFile::getInstances($model, 'images');
+                $image_path = [];
                 if ($model->images) {
                     foreach ($model->images as $image) {
                         $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
@@ -270,48 +301,48 @@ class ObjectController extends Controller
                         @unlink($path);
                     }
                 }
+
+                $img = "";
                 if ($model->img) {
-                    $img = $this->getImageById($model->img);
-                    $model->setMainImage($img);
+                    $img = $model->getImageById($model->img);
                 }
-                if ($model->save()) {
-                    $client = Yii::$app->meili->connect();
-                    $object = $client->index('object')->getDocument($id);
-                    $rooms = $object['rooms'];
-                    echo "<pre>";
-                    print_r($rooms);
-                    echo "</pre>";
-                    die();
+
+                $object = $client->index('object')->getDocument($id);
+                $rooms_arr = [
+                    'room_title' => $model->typeTitle($model->type_id),
+                    'guest_amount' => (int) $model->guest_amount,
+                    'similar_room_amount' => (int) $model->similar_room_amount,
+                    'area' => (int) $model->area,
+                    'bathroom' => (int) $model->bathroom,
+                    'balcony' => (int) $model->balcony,
+                    'air_cond' => (int) $model->air_cond,
+                    'kitchen' => (int) $model->kitchen,
+                    'base_price' => (int) $model->base_price,
+                    'img' => $img,
+                    'images' => $model->getImages(),
+
+                ];
+                $meiliRooms = $object['rooms'] ?? [];  // Default to empty array if 'rooms' does not exist
+                $meiliRooms[] = $rooms_arr;  // Append new room data
+
+                // Ensure it's a clean, sequential array (remove any potential associative keys)
+                $meiliRooms = array_values($meiliRooms);
+
+                $meilisearchData = [
+                    'id' => (int) $id,
+                    'rooms' => $meiliRooms
+                ];
+                if ($index->updateDocuments($meilisearchData)) {
+                    Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+                    return $this->refresh();
                 }
-                return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
-            return $this->render('/rooms/create', [
+            return $this->render('rooms/create', [
                 'model' => $model,
                 'id' => $id,
             ]);
         }
-
-        // if ($index->updateDocuments($meilisearchData)) {
-        //     Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
-        //     return $this->refresh();
-        // }
-
-
-
-        // $meilisearchData = [
-        //     'id' => $id,
-        //     'rooms' => [
-        //         'early_check_in' => (bool) $model->early_check_in,
-        //         'late_check_in' => (bool) $model->late_check_in,
-        //         'internet_public' => (bool) $model->internet_public,
-        //         'animals_allowed' => (bool) $model->animals_allowed,
-        //         'meal_terms' => array_values($model->meal_terms),
-        //         'meal_purchaise' => (bool) $model->meal_purchaise,
-        //         'children' => array_values($model->children),
-        //     ]
-        // ];
-
 
     }
 
