@@ -37,11 +37,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attributes' => [
                         'id',
                         'name',
-                        'type',
+                        //'type',
                         'city',
-                        'address',
+                        //'address',
                         'currency',
-                        //'features',
+                        'features',
                         'phone',
                         [
                             'attribute' => 'site',
@@ -52,8 +52,8 @@ $this->params['breadcrumbs'][] = $this->title;
                         ],
                         'check_in',
                         'check_out',
-                        'reception',
-                        'description:ntext',
+                        //'reception',
+                        //'description:ntext',
                         'lat',
                         'lon',
                         [

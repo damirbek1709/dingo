@@ -27,6 +27,7 @@ use yii\helpers\Url;
 class RoomCat extends \yii\db\ActiveRecord
 {
     public $images;
+    public $room_title;
     public $primaryKey = 'id';
     /**
      * {@inheritdoc}

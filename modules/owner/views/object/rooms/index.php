@@ -16,7 +16,7 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="room-cat-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::encode($model->name) ?></h1>
 
     <?php echo $this->render('../top_nav', ['model' => $model]); ?>
     <p style="float:right">
@@ -24,15 +24,19 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a(Yii::t('app', 'Создать тариф'), ['add-tariff', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php
-    /** @var yii\web\View $this */
-    echo ListView::widget([
-        'dataProvider' => $dataProvider,
-        'summary' => false,
-        'itemView' => '_item',  // Partial view for rendering each item
-        //'layout' => "{summary}\n{items}\n{pager}",  // Optional: customize layout
-    ]);
-    ?>
-
-
+    <div class="room_list clear">
+        <?php foreach ($rooms as $key => $val) {
+            echo Html::beginTag('div', []);
+            echo Html::tag('div', $val['room_title']);
+            echo Html::tag('div', "Количество людей: " . $val['guest_amount']);
+            echo Html::endTag('div');
+        }
+        ?>
+    </div>
 </div>
+
+<?php
+echo "<pre>";
+print_r($rooms);
+echo "</pre>";
+?>

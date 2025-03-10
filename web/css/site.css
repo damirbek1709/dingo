@@ -15,9 +15,10 @@ body {
 }
 
 @media (min-width: 1200px) {
-    #main{
+    #main {
         min-height: 100%;
     }
+
     .wrap>.container {
         padding: 0px 15px 20px;
     }
@@ -978,75 +979,99 @@ a[aria-expanded=true] .glyph-plus {
     grid-gap: 0 20px;
 }
 
-.navbar-dark{
+.navbar-dark {
     background-color: #3b3b3b;
     border-radius: 0;
 }
-.navbar-dark a{
-    color:#fff;
+
+.navbar-dark a {
+    color: #fff;
 }
-.owner-nav-cover{
+
+.owner-nav-cover {
     background-color: #f6f6f6;
     padding: 10px;
     line-height: 30px;
     font-size: 17px;
     border-radius: 4px;
 }
-#footer{
-    width:100%;
-    padding:20px;
+
+#footer {
+    width: 100%;
+    padding: 20px;
 }
-.text-md-end{
+
+.text-md-end {
     text-align: right;
 }
-.margin-15{
+
+.margin-15 {
     margin-top: 15px;
 }
-.select-box-double{
+
+.select-box-double {
     border: 1px solid #ccc;
     padding: 10px;
     border-radius: 4px;
     margin-right: 20px;
 }
-.select-box-double select{
+
+.select-box-double select {
     border: none;
     outline: none;
     box-shadow: none;
     padding: 0;
 }
-.select-box-double label{
+
+.select-box-double label {
     font-size: 12px;
     font-weight: normal;
 }
-.select-box-double input{
+
+.select-box-double input {
     border: none;
     outline: none;
     box-shadow: none;
     padding: 0;
 }
-.meal-row{
+
+.meal-row {
     display: flex;
     align-items: center;
     margin: 10px 0;
 }
-#meal-terms-container{
+
+#meal-terms-container {
     margin: 20px 0 15px;
 }
-.terms_section{
+
+.terms_section {
     margin: 30px 0;
 }
-.terms_container label{
+
+.terms_container label {
     font-weight: normal;
 }
-.btn-terms{
+
+.btn-terms {
     background-color: transparent;
     color: purple;
 }
-.remove-meal{
+
+.remove-meal {
     background-color: transparent;
     color: #1e1e6a;
 }
 
+.top_nav_title {
+    margin-right: 30px;
+}
+
+.top_nav {
+    padding: 15px 0;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 15px;
+}
 
 
 /* .glyph-minus {
