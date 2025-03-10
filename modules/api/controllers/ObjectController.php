@@ -475,7 +475,7 @@ class ObjectController extends BaseController
             if ($hit['rooms']) {
                 foreach ($hit['rooms'] as $room) {
                     $priceIndex = $guestAmount - 1;
-                    if ($room['tariff']) {
+                    if (array_key_exists('tariff', $room)) {
                         foreach ($room['tariff'] as $tariff) {
                             if (isset($tariff['prices']) && is_array($tariff['prices'])) {
                                 foreach ($tariff['prices'] as $priceData) {
