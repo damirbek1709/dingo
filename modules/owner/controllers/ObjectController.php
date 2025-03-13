@@ -5,6 +5,7 @@ namespace app\modules\owner\controllers;
 use Yii;
 use app\models\Objects;
 use app\models\Comfort;
+use yii\helpers\FileHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -86,7 +87,7 @@ class ObjectController extends Controller
         return $this->render('rooms/index', [
             'dataProvider' => $dataProvider,
             'model' => $model,
-            'rooms'=>$object['rooms']
+            'rooms' => $object['rooms']
         ]);
     }
 
@@ -302,6 +303,8 @@ class ObjectController extends Controller
                     }
                 }
 
+
+
                 $img = "";
                 if ($model->img) {
                     $img = $model->getImageById($model->img);
@@ -375,21 +378,33 @@ class ObjectController extends Controller
 
         if (Yii::$app->request->isPost) {
             if ($model->load(Yii::$app->request->post())) {
-                //$model->images = UploadedFile::getInstances(model: $model, 'images');
+                $model->images = UploadedFile::getInstances($model, 'images');
                 $image_path = [];
                 if ($model->images) {
                     foreach ($model->images as $image) {
-                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $id . "/" . $image->name;
+                        $dir = Yii::getAlias('@webroot/uploads/images/rooms') . $object_id . "_" . $id;
+                        if (!is_dir($dir)) {
+                            FileHelper::createDirectory($dir);
+                        }
+                        $path = $dir . "/" . $image->name;
                         $image->saveAs($path);
                         $model->attachImage($path, true);
-                        @unlink($path);
+                        //@unlink($path);
                     }
                 }
-
                 $img = "";
                 if ($model->img) {
                     $img = $model->getImageById($model->img);
                 }
+
+                $model->save();
+                foreach ($model->getImages() as $file) {
+                    echo "<pre>";
+                    print_r($file->getUrl('300x'));
+                    echo "</pre>";
+                    die();
+                }
+
                 $rooms_arr = [
                     'id' => (int) $id,
                     'room_title' => $model->typeTitle($model->type_id),

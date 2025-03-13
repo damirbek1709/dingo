@@ -20,8 +20,8 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php /* Html::a('Delete', ['delete', 'id' => $model->id], [
 'class' => 'btn btn-danger',
 'data' => [
- 'confirm' => 'Are you sure you want to delete this item?',
- 'method' => 'post',
+'confirm' => 'Are you sure you want to delete this item?',
+'method' => 'post',
 ],
 ])*/ ?>
     </p>
@@ -41,7 +41,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'city',
                         //'address',
                         'currency',
-                        'features',
+                        //'features',
                         'phone',
                         [
                             'attribute' => 'site',
@@ -56,13 +56,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         //'description:ntext',
                         'lat',
                         'lon',
-                        [
-                            'attribute' => 'email',
-                            'format' => 'raw',
-                            'value' => function ($model) {
-                                                return Html::mailto($model->email);
-                                            },
-                        ],
+                        // [
+                        //     'attribute' => 'email',
+                        //     'format' => 'raw',
+                        //     'value' => function ($model) {
+                        //                         return Html::mailto($model->email);
+                        //                     },
+                        // ],
                     ],
                 ]); ?>
             </div>
