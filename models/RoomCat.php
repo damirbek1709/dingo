@@ -28,7 +28,6 @@ class RoomCat extends \yii\db\ActiveRecord
 {
     public $images;
     public $room_title;
-    public $primaryKey = 'id';
     /**
      * {@inheritdoc}
      */
@@ -46,15 +45,38 @@ class RoomCat extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getPictures()
+    {
+        $list = [];
+        foreach ($this->getImages() as $image) {
+            $filePath = $image->filePath;
+            $img_url = $image->getUrl('120x');
+            $picture = $image->getUrl('500x');
+            // Check if the original image was a webp
+            // if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
+            //     $img_url = 'https://selva.kg/uploads/images/store/' . $filePath;
+            //     $picture = 'https://selva.kg/uploads/images/store/' . $filePath;
+            // }
+            $list[] = [
+                'id' => $image->id,
+                'picture' => $picture,
+                'thumbnailPicture' => $img_url,
+                'isMain' => $image->isMain,
+            ];
+        }
+
+        return $list;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['title', 'guest_amount', 'similar_room_amount', 'area', 'type_id'], 'required'],
-            [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen'], 'integer'],
-            [['area', 'base_price', 'img'], 'number'],
+            [['guest_amount', 'similar_room_amount', 'area'], 'required'],
+            [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen','type_id'], 'integer'],
+            [['area', 'base_price', 'img','title'], 'number'],
             [['title', 'title_en', 'title_ky'], 'string', 'max' => 255],
         ];
     }

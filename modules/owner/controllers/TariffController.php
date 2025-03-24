@@ -1,52 +1,45 @@
 <?php
 
-namespace app\controllers;
-use Yii;
-use app\models\RoomCat;
-use app\models\RoomCatSearch;
+namespace app\modules\owner\controllers;
+
+use app\models\Tariff;
+use app\models\TariffSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use yii\web\UploadedFile;
-use dektrium\user\filters\AccessRule;
-use yii\filters\AccessControl;
 
 /**
- * RoomCatController implements the CRUD actions for RoomCat model.
+ * TariffController implements the CRUD actions for Tariff model.
  */
-class RoomCatController extends Controller
+class TariffController extends Controller
 {
-    public $layout;
+    public $layout = "main";
     /**
      * @inheritDoc
      */
     public function behaviors()
     {
-        return [
-            'roleAccess' => [
-                'class' => AccessControl::className(),
-                'ruleConfig' => [
-                    'class' => AccessRule::className(),
-                ],
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['create','update','admin','delete','remove-image','index','view'],
-                        'roles' => ['admin']
+        return array_merge(
+            parent::behaviors(),
+            [
+                'verbs' => [
+                    'class' => VerbFilter::className(),
+                    'actions' => [
+                        'delete' => ['POST'],
                     ],
                 ],
-            ],
-        ];
+            ]
+        );
     }
 
     /**
-     * Lists all RoomCat models.
+     * Lists all Tariff models.
      *
      * @return string
      */
     public function actionIndex()
     {
-        $searchModel = new RoomCatSearch();
+        $searchModel = new TariffSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
@@ -55,10 +48,8 @@ class RoomCatController extends Controller
         ]);
     }
 
-
-
     /**
-     * Displays a single RoomCat model.
+     * Displays a single Tariff model.
      * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
@@ -71,32 +62,16 @@ class RoomCatController extends Controller
     }
 
     /**
-     * Creates a new RoomCat model.
+     * Creates a new Tariff model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new RoomCat();
+        $model = new Tariff();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                $client = Yii::$app->meili->connect();
-                $index = $client->index('object');
-                
-                $model->images = UploadedFile::getInstances($model, 'images');
-                if ($model->images) {
-                    foreach ($model->images as $image) {
-                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                        $image->saveAs($path);
-                        $model->attachImage($path, true);
-                        @unlink($path);
-                    }
-                }
-                if ($model->img) {
-                    $img = $this->getImageById($model->img);
-                    $model->setMainImage($img);
-                }
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
@@ -109,7 +84,7 @@ class RoomCatController extends Controller
     }
 
     /**
-     * Updates an existing RoomCat model.
+     * Updates an existing Tariff model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
      * @return string|\yii\web\Response
@@ -120,15 +95,6 @@ class RoomCatController extends Controller
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            $model->images = UploadedFile::getInstances($model, 'images');
-            if ($model->images) {
-                foreach ($model->images as $image) {
-                    $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                    $image->saveAs($path);
-                    $model->attachImage($path, true);
-                    @unlink($path);
-                }
-            }
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -138,7 +104,7 @@ class RoomCatController extends Controller
     }
 
     /**
-     * Deletes an existing RoomCat model.
+     * Deletes an existing Tariff model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return \yii\web\Response
@@ -152,15 +118,15 @@ class RoomCatController extends Controller
     }
 
     /**
-     * Finds the RoomCat model based on its primary key value.
+     * Finds the Tariff model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return RoomCat the loaded model
+     * @return Tariff the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = RoomCat::findOne(['id' => $id])) !== null) {
+        if (($model = Tariff::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

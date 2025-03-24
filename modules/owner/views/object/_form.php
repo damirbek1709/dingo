@@ -1,3 +1,5 @@
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+
 <?php
 
 use yii\helpers\Html;
@@ -11,7 +13,7 @@ use yii\widgets\ActiveForm;
 
 <div class="oblast-form">
 
-<?php $form = ActiveForm::begin([
+    <?php $form = ActiveForm::begin([
         'enableClientValidation' => false,
         'options' => [
             'enctype' => 'multipart/form-data'
@@ -21,21 +23,11 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'name_en')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'type')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'type')->dropDownList($model->objectTypeList()) ?>
     <?= $form->field($model, 'city')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'currency')->textInput(['maxlength' => true]) ?>
-    <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'site')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'check_in')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'check_out')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'reception')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
-    <?= $form->field($model, 'lat')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'lon')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-    <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
+
 
     <?php
     $initial_preview = false;
@@ -75,7 +67,34 @@ use yii\widgets\ActiveForm;
                 ],
             ],
         ]
-    ); ?>
+    )->label(Yii::t('app', 'Фотографии')); ?>
+
+
+    <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'site')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'check_in')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'check_out')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'reception')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
+
+    <div id="map" style="width: 600px; height: 400px;"></div>
+    <?php
+    if ($model->lat)
+        $lat = $model->lat;
+    else
+        $lat = 41.2044;
+    if ($model->lon)
+        $lon = $model->lon;
+    else
+        $lon = 74.7661;
+    ?>
+    <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
+    <?= $form->field($model, 'lon')->textInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
+    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
+    <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
+
+
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
@@ -86,6 +105,37 @@ use yii\widgets\ActiveForm;
 </div>
 
 <script>
+    ymaps.ready(init);
+
+    function init() {
+        const map = new ymaps.Map('map', {
+            center: [41.2044, 74.7661], // Moscow coordinates as default
+            zoom: 10
+        });
+
+        // Create a draggable placemark
+        const placemark = new ymaps.Placemark(
+            [41.2044, 74.7661],
+            {},
+            { draggable: true }
+        );
+
+        map.geoObjects.add(placemark);
+
+        // Update coordinates on drag
+        placemark.events.add('dragend', function () {
+            const coords = placemark.geometry.getCoordinates();
+            $('#latitude').val(coords[0]);
+            $('#longitude').val(coords[1]);
+        });
+
+        // Update coordinates initially
+        $('#latitude').val(placemark.geometry.getCoordinates()[0]);
+        $('#longitude').val(placemark.geometry.getCoordinates()[1]);
+    }
+
+
+
     var mainImgIdField = $('#object-img');
     $('body').on('click', '.img-main', function () {
         var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
@@ -94,6 +144,7 @@ use yii\widgets\ActiveForm;
         $('.img-main').removeClass('main');
         $(this).addClass('main');
     });
+
 </script>
 
 <style>

@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\admin\controllers;
 use Yii;
 use app\models\RoomCat;
 use app\models\RoomCatSearch;
@@ -46,6 +46,7 @@ class RoomCatController extends Controller
      */
     public function actionIndex()
     {
+        $this->layout = "main";
         $searchModel = new RoomCatSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 

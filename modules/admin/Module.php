@@ -10,6 +10,7 @@ use Yii;
 class Module extends \yii\base\Module
 {
     public $name = 'Admin Panel';
+    public $layout = "main";
 
     /**
      * {@inheritdoc}

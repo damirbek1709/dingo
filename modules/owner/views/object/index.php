@@ -1,4 +1,9 @@
-
+<?php
+use yii\helpers\Html;
+?>
+<p>
+    <?php echo Html::a('Добавить объект', ['create'],['class' => 'btn btn-primary']) ?>
+</p>
 <?php
 echo \yii\grid\GridView::widget([
     'dataProvider' => $dataProvider,

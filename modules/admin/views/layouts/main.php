@@ -46,17 +46,8 @@ ModuleAsset::register($this);
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => [
-                ['label' => 'Категории', 'items' => [
-                    ['label' => 'Минимизировано', 'url' => ['/admin/category/minimized'], 'visible' => Yii::$app->user->can('admin')],
-                    //['label' => 'Полностью', 'url' => ['/admin/category'], 'visible' => Yii::$app->user->can('admin')],
-                ], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => 'Справочники', 'url' => ['/admin/directory'], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => 'Верификация пользователей', 'url' => ['/user/admin/verify-list'], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => 'Бизнес аккаунты', 'url' => ['/user/admin/business-account-list'], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => 'Виды жалоб', 'url' => ['/admin/complaint-type'], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => 'Отзывы разраб-кам', 'url' => ['/admin/feedback'], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => 'Платные услуги', 'url' => ['/admin/paid-service'], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => 'Вход', 'url' => ['/user/registration/signin/'], 'visible' => Yii::$app->user->isGuest],
+                ['label' => 'Категории номеров', 'url' => ['/admin/room-cat'], 'visible' => Yii::$app->user->can('admin')],
+                ['label' => 'Пользователи', 'url' => ['/admin/user'], 'visible' => Yii::$app->user->can('admin')],
                 ['label' => !Yii::$app->user->isGuest ? Yii::$app->user->identity->username : '', 'items' => [
                     ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can('moderator')],
                     ['label' => 'Панель оператора', 'url' => ['/operator'], 'visible' => Yii::$app->user->can('operator')],

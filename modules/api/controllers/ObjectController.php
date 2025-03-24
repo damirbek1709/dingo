@@ -13,6 +13,7 @@ use DateTime;
 use DateInterval;
 use yii\data\Pagination;
 use app\models\Objects;
+use app\models\RoomCat;
 
 class ObjectController extends BaseController
 {
@@ -52,6 +53,7 @@ class ObjectController extends BaseController
             'list2',
             'category-comfort-title',
             'search',
+            'room-images'
         ];
 
 
@@ -102,6 +104,7 @@ class ObjectController extends BaseController
                 'add-to-favorites' => ['POST'],
                 'remove-from-favorites' => ['POST'],
                 'category-comfort-title' => ['GET'],
+                'room-images' => ['GET'],
             ],
         ];
 
@@ -241,6 +244,12 @@ class ObjectController extends BaseController
         return $result;
     }
 
+    public function actionRoomImages($id)
+    {
+        $model = RoomCat::findOne($id);
+        return $model->getImages();
+    }
+
     /**
      * Add a new Post model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -378,7 +387,6 @@ class ObjectController extends BaseController
                     ];
                 }
 
-
                 $user->search_data = serialize($saved_data);
             } else {
                 $saved_data = unserialize($user->search_data);
@@ -426,7 +434,6 @@ class ObjectController extends BaseController
             }
 
             $user->save(false);
-
         }
 
         $guestAmount = (int) Yii::$app->request->get('guest_amount', 1);

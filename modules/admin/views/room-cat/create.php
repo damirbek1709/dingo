@@ -6,8 +6,7 @@ use yii\helpers\Html;
 /** @var app\models\RoomCat $model */
 
 $this->title = Yii::t('app', 'Create Room Category');
-$this->params['breadcrumbs'][] = ['label' => $object_title, 'url' => ['view', 'id' => $object_id]];
-//$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Room Categories'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Room Categories'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="room-cat-create">
@@ -16,7 +15,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('_form', [
         'model' => $model,
-        'id'=> $id
     ]) ?>
 
 </div>

@@ -5,9 +5,11 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var app\models\RoomCat $model */
 
-$this->title = Yii::t('app', 'Update Room Category')." ".$model->title;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Room Categories'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'id' => $model->id]];
+$this->title = Yii::t('app', 'Update Room Category') . " " . $model->room_title;
+$this->params['breadcrumbs'][] = ['label' => $object_title, 'url' => ['room', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Список номеров'), 'url' => ['room-list', 'id' => $object_id]];
+
+$this->params['breadcrumbs'][] = ['label' => $model->room_title, 'url' => ['room', 'id' => $model->id,'object_id'=>$object_id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 <div class="room-cat-update">
@@ -16,6 +18,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 
     <?= $this->render('_form', [
         'model' => $model,
+        'bindModel' => $bindModel
     ]) ?>
 
 </div>

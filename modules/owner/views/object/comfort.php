@@ -27,23 +27,15 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенно
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
                 <?php foreach ($list_comfort as $categoryId => $comforts):
-                    $category_name = Comfort::getComfortCategoryTitle($categoryId);
+                    $category_name = Comfort::getComfortCategoryTitle(id: $categoryId);
                     $selectedComforts = $model->comfort_list[$categoryId] ?? []; // Get selected comforts for this category
                     ?>
                     <fieldset>
                         <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong></legend>
                         <div class="comfort_list_grid">
-                            <?php foreach ($comforts as $comfort):
-                                $checked = false;
-                                foreach ($selectedComforts as $selectedComfort) {
-                                    if (isset($selectedComfort[$comfort->id])) {
-                                        $checked = true;
-                                        break;
-                                    }
-                                }
-                                ?>
+                            <?php foreach ($comforts as $comfort): ?>
                                 <div>
-                                    <?= Html::checkbox("comforts[]", $checked, ['value' => $comfort->id]) ?>
+                                    <?= Html::checkbox("comforts[]", isset($selectedComforts[$comfort->id]), ['value' => $comfort->id]) ?>
                                     <?= Html::encode($comfort->title) ?>
                                 </div>
                             <?php endforeach; ?>

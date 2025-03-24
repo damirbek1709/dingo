@@ -118,7 +118,16 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Условия');
 
                 <div class="terms_section">
                     <h4><?= Yii::t('app', 'Младенцы'); ?></h4>
-                    <?= Html::input('children', $model->children ? true : false, ['label' => 'Грудные дети до']) ?>
+                    <div class="hint"><?= Yii::t('app', 'Размещаются с родителями бесплатно без места'); ?></div>
+                    <div class="increment-input">
+                        <button type="button" class="decrement">-</button>
+                        <?= Html::input('text', 'children', $model->children ? $model->children : 0, [
+                            'class' => 'form-control children-count',
+                            'readonly' => true,
+                            'label' => 'Грудные дети до'
+                        ]); ?>
+                        <button type="button" class="increment">+</button>
+                    </div>
                     <div class="clear"></div>
                 </div>
 
@@ -138,6 +147,20 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Условия');
 $mealListJson = json_encode($meal_list);
 $script = <<<JS
 $(document).ready(function() {
+    $('.increment').click(function() {
+        let input = $(this).siblings('.children-count');
+        let value = parseInt(input.val());
+        input.val(value + 1);
+    });
+
+    $('.decrement').click(function() {
+        let input = $(this).siblings('.children-count');
+        let value = parseInt(input.val());
+        if (value > 0) {
+            input.val(value - 1);
+        }
+    });
+
     let mealIndex = $(".meal-row").length; 
     let mealList = $mealListJson; // Convert PHP array to JS object
 
@@ -185,3 +208,32 @@ $(document).ready(function() {
 JS;
 $this->registerJs($script);
 ?>
+
+<style>
+    .increment-input {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ccc;
+        padding: 5px;
+        border-radius: 5px;
+        width: fit-content;
+    }
+
+    .increment-input button {
+        background: none;
+        border: none;
+        font-size: 18px;
+        padding: 0 10px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .increment-input .children-count {
+        width: 50px;
+        text-align: center;
+        border: none;
+        outline: none;
+        background: none;
+        font-size: 16px;
+    }
+</style>

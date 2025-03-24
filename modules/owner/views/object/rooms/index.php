@@ -11,7 +11,9 @@ use yii\widgets\ListView;
 /** @var app\models\RoomCatSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = Yii::t('app', 'Room Categories');
+$this->title = Yii::t('app', 'Список номеров');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Объекты'), 'url' => ['object/view', 'id' => $object_id]];
+$this->params['breadcrumbs'][] = ['label' => $object_title, 'url' => ['view', 'id' => $object_id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="room-cat-index">
@@ -25,18 +27,20 @@ $this->params['breadcrumbs'][] = $this->title;
     </p>
 
     <div class="room_list clear">
-        <?php foreach ($rooms as $key => $val) {
-            echo Html::beginTag('div', []);
-            echo Html::tag('div', $val['room_title']);
-            echo Html::tag('div', "Количество людей: " . $val['guest_amount']);
-            echo Html::endTag('div');
-        }
-        ?>
+        <?php foreach ($rooms as $key => $val): ?>
+            <a href="room?id=<?= $val['id'] ?>&object_id=<?= $object_id ?>">
+                <div class="room_list_owner">
+                    <img src="<?= $val['images'][0]['thumbnailPicture'] ?? 'default.jpg' ?>" alt="Room Image">
+                    <div class="room_list_info">
+                        <div class="title"> <?= $val['room_title'] ?> </div>
+                        <div class="details">
+                            <span class="room_area"><?= $val['area'] . " " . Yii::t('app', 'м²'); ?></span>
+                            <span class="room_guest_amount">Количество людей: <?= $val['guest_amount'] ?></span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        <?php endforeach; ?>
     </div>
-</div>
 
-<?php
-echo "<pre>";
-print_r($rooms);
-echo "</pre>";
-?>
+</div>

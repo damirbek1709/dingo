@@ -46,7 +46,7 @@ class Objects extends Model
     public $images;
     public $img;
     public $primaryKey = 'id';
-    public $children = [];
+    public $children;
 
     const COMFORT_CATEGORY_SERVICE = 1;
     const COMFORT_CATEGORY_SPORT = 2;
@@ -63,6 +63,16 @@ class Objects extends Model
 
     const TERM_MEAL_BREAKFEST = 1;
     const TERM_MEAL_THREE_TIMES = 2;
+
+    const OBJECT_TYPE_APARTHOTEL = 1;
+    const OBJECT_TYPE_APARTMENTS = 2;
+    const OBJECT_TYPE_RESTBASE = 3;
+    const OBJECT_TYPE_BUNGALOW = 4;
+    const OBJECT_TYPE_BOUTIQUE_HOTEL = 5;
+    const OBJECT_TYPE_VILLA = 6;
+    const OBJECT_TYPE_GLAMPING = 7;
+    const OBJECT_TYPE_GUESTHOUSE = 8;
+    const OBJECT_TYPE_RESIDENTIAL_PREMISES = 9;
 
     public function rules()
     {
@@ -106,6 +116,22 @@ class Objects extends Model
         return ArrayHelper::map(Oblast::find()->all(), 'id', 'title');
     }
 
+    public static function objectTypeList()
+    {
+        return [
+            self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
+            self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
+            self::OBJECT_TYPE_RESTBASE => 'База отдыха',
+            self::OBJECT_TYPE_BUNGALOW => 'Бунгало',
+            self::OBJECT_TYPE_BOUTIQUE_HOTEL => 'Бутик-отель',
+            self::OBJECT_TYPE_VILLA => 'Вилла',
+            self::OBJECT_TYPE_GLAMPING => 'Глэмпинг',
+            self::OBJECT_TYPE_GUESTHOUSE => 'Гостевой дом',
+            self::OBJECT_TYPE_RESIDENTIAL_PREMISES => 'Жилое помещение',
+        ];
+
+    }
+
 
 
 
@@ -122,20 +148,23 @@ class Objects extends Model
     {
         return [
             'id' => 'ID',
-            'type' => 'Type',
-            'city' => 'City',
-            'address' => 'Address',
-            'currency' => 'Currency',
-            'features' => 'Features',
-            'phone' => 'Phone',
-            'site' => 'Website',
-            'check_in' => 'Check-in Time',
-            'check_out' => 'Check-out Time',
-            'reception' => 'Reception Hours',
-            'description' => 'Description',
+            'type' => Yii::t('app', 'Тип'),
+            'city' => Yii::t('app', 'Город'),
+            'address' => Yii::t('app', 'Адрес'),
+            'currency' => Yii::t('app', 'Валюта'),
+            'features' => Yii::t('app', 'Адрес'),
+            'phone' => Yii::t('app', 'Телефон'),
+            'site' => Yii::t('app', 'Сайт'),
+            'check_in' => Yii::t('app', 'Заезд'),
+            'check_out' => Yii::t('app', 'Выезд'),
+            'reception' => Yii::t('app', 'Ресепшн'),
+            'description' => Yii::t('app', 'Описание'),
             'lat' => 'Latitude',
             'lon' => 'Longitude',
-            'email' => 'Email',
+            'email' => 'E-mail',
+            'name' => Yii::t('app', 'Название'),
+            'name_en' => Yii::t('app', 'Название на английском'),
+            'name_ky' => Yii::t('app', 'Название на русском')
         ];
     }
 
@@ -201,11 +230,13 @@ class Objects extends Model
 
     public function isImageSet()
     {
-        $image = Yii::$app->db->createCommand("SELECT * FROM image WHERE itemId={$this->id} AND modelName='Objects'")->queryScalar();
+        $image = false;
+        if ($this->id)
+            $image = Yii::$app->db->createCommand("SELECT * FROM image WHERE itemId={$this->id} AND modelName='Objects'")->queryScalar();
         if ($image) {
             return true;
         }
-        return false;
+        return $image;
     }
 
     /**
