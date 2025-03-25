@@ -218,9 +218,12 @@ class ObjectController extends Controller
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $model->id = (int) $this->lastIncrement() + 1;
+            $model->type = (int) $model->type;
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
             $model->user_id = (int) Yii::$app->user->id;
+            $name_arr = [$model->name, $model->name_en, $model->name_ky];
+            $model->name = array_values($name_arr);
             $model->images = UploadedFile::getInstances($model, 'images');
             if ($model->images) {
                 foreach ($model->images as $image) {
