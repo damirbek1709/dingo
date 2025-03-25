@@ -587,7 +587,7 @@ class ObjectController extends BaseController
             // Collect matched regions
             foreach ($matchedRegions as $region) {
                 $results['regions'][] = [
-                    "name" => $translit_word,
+                    "name" => $translit_city,
                     "amount" => $allRegionCounts[$region] ?? 0,
                     "type" => Objects::SEARCH_TYPE_REGION
                 ];
@@ -596,7 +596,7 @@ class ObjectController extends BaseController
             // Collect matched hotels
             foreach ($matchedHotels as $hotel) {
                 $results['hotels'][] = [
-                    "name" => $translit_word,
+                    "name" => $translit_hotel,
                     "type" => Objects::SEARCH_TYPE_HOTEL
                 ];
             }
