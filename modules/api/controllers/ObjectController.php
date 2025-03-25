@@ -536,7 +536,7 @@ class ObjectController extends BaseController
         ])->getHits();
 
         $translit_city = isset($hit[0]['city']) ? $hit[0]['city'] : [];
-        $translit_hotel = isset($hit[0]['hotel']) ? $hit[0]['hotel'] : [];
+        $translit_hotel = isset($hit[0]['name']) ? $hit[0]['name'] : [];
 
         // Parse query into array (support JSON array or comma-separated string)
         $regionsArray = [];
