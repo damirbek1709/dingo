@@ -381,7 +381,7 @@ class ObjectController extends BaseController
                     ];
 
                 } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
-                    $translit_word = isset($hit[0]['hotel']) ? $hit[0]['hotel'] : [];
+                    $translit_word = isset($hit[0]['name']) ? $hit[0]['name'] : [];
                     $saved_data[] = [
                         'type' => $type,
                         'name' => $translit_word
