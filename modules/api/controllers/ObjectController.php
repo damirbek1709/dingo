@@ -275,8 +275,8 @@ class ObjectController extends BaseController
                 'check_out' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'check_out'),
                 'reception' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'reception'),
                 'description' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'description'),
-                'lat' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lat'),
-                'lon' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lon'),
+                'lat' => (float)ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lat'),
+                'lon' => (float)ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lon'),
                 'uploadImages' => UploadedFile::getInstancesByName('images'),
                 'email' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email'),
                 'user_id' => Yii::$app->user->id,
@@ -531,6 +531,12 @@ class ObjectController extends BaseController
 
         // Get the query (search term)
         $regionParam = Yii::$app->request->get('query', '');
+        $hit = $index->search($regionParam, [
+            'limit' => 1
+        ])->getHits();
+
+        $translit_city = isset($hit[0]['city']) ? $hit[0]['city'] : [];
+        $translit_hotel = isset($hit[0]['hotel']) ? $hit[0]['hotel'] : [];
 
         // Parse query into array (support JSON array or comma-separated string)
         $regionsArray = [];
@@ -551,6 +557,8 @@ class ObjectController extends BaseController
             'facets' => ['city', 'name'],
             'limit' => 0
         ]);
+
+
 
         $allRegionCounts = $allFacetsSearch->getFacetDistribution()['city'] ?? [];
         $allHotelCounts = $allFacetsSearch->getFacetDistribution()['name'] ?? [];
@@ -579,7 +587,7 @@ class ObjectController extends BaseController
             // Collect matched regions
             foreach ($matchedRegions as $region) {
                 $results['regions'][] = [
-                    "name" => $region,
+                    "name" => $translit_word,
                     "amount" => $allRegionCounts[$region] ?? 0,
                     "type" => Objects::SEARCH_TYPE_REGION
                 ];
@@ -588,7 +596,7 @@ class ObjectController extends BaseController
             // Collect matched hotels
             foreach ($matchedHotels as $hotel) {
                 $results['hotels'][] = [
-                    "name" => $hotel,
+                    "name" => $translit_word,
                     "type" => Objects::SEARCH_TYPE_HOTEL
                 ];
             }
@@ -603,7 +611,8 @@ class ObjectController extends BaseController
         }
         if ($user_auth) {
             $user = User::find()->where(['auth_key' => $user_auth])->one();
-            $user_search_data = unserialize($user->search_data);
+            if ($user && $user->search_data)
+                $user_search_data = unserialize($user->search_data);
         }
         $results['user_search_data'] = $user_search_data;
 

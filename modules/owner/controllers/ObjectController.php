@@ -69,7 +69,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room','update'],
+                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'edit-room'],
                     'roles' => ['owner'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('id');
@@ -99,7 +99,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['index','create'],
+                    'actions' => ['index', 'create'],
                     'roles' => ['admin', 'owner'],
                 ],
             ],
@@ -217,6 +217,10 @@ class ObjectController extends Controller
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            $model->id = (int) $this->lastIncrement() + 1;
+            $model->lat = (float) $model->lat;
+            $model->lon = (float) $model->lon;
+            $model->user_id = (int) Yii::$app->user->id;
             $model->images = UploadedFile::getInstances($model, 'images');
             if ($model->images) {
                 foreach ($model->images as $image) {
@@ -227,13 +231,34 @@ class ObjectController extends Controller
                 }
             }
 
-            $index->addDocuments([$model->attributes]);
+            $index->addDocuments(array_values([$model->attributes]));
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
         return $this->render('create', [
             'model' => $model,
         ]);
+    }
+
+    public function lastIncrement()
+    {
+        try {
+            $client = Yii::$app->meili->connect();
+            $searchResults = $client->index('object')->search('', [
+                'sort' => ['id:desc'],
+                'limit' => 1
+            ]);
+            if (!empty($searchResults->getHits())) {
+                $lastDocument = $searchResults->getHits()[0];
+                return $lastDocument['id'];
+            }
+
+            return 0; // Return 0 if no documents found
+
+        } catch (\Exception $e) {
+            Yii::error("Meilisearch error: " . $e->getMessage());
+            return $e->getMessage();
+        }
     }
 
     /**
