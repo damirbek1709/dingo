@@ -275,8 +275,8 @@ class ObjectController extends BaseController
                 'check_out' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'check_out'),
                 'reception' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'reception'),
                 'description' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'description'),
-                'lat' => (float)ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lat'),
-                'lon' => (float)ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lon'),
+                'lat' => (float) ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lat'),
+                'lon' => (float) ArrayHelper::getValue(Yii::$app->request->bodyParams, 'lon'),
                 'uploadImages' => UploadedFile::getInstancesByName('images'),
                 'email' => ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email'),
                 'user_id' => Yii::$app->user->id,
@@ -365,25 +365,33 @@ class ObjectController extends BaseController
             $user_auth = $matches[1]; // Extract token
         }
         if ($type && $user_auth) {
+            $hit = $index->search($queryWord, [
+                'limit' => 1
+            ])->getHits();
+
             $user = User::find()->where(['auth_key' => $user_auth])->one();
             $saved_data = $user->search_data ? unserialize($user->search_data) : [];
             if ($user->search_data === null) {
                 if ($type == Objects::SEARCH_TYPE_REGION) {
+                    $translit_word = isset($hit[0]['region']) ? $hit[0]['region'] : [];
                     $saved_data[] = [
-                        'name' => $type,
+                        'name' => $translit_word,
                         'region' => $queryWord,
                         'amount' => $amount
                     ];
+
                 } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
+                    $translit_word = isset($hit[0]['hotel']) ? $hit[0]['hotel'] : [];
                     $saved_data[] = [
                         'type' => $type,
-                        'name' => $queryWord
+                        'name' => $translit_word
                     ];
                 } elseif ($type == Objects::SEARCH_TYPE_CITY) {
+                    $translit_word = isset($hit[0]['city']) ? $hit[0]['city'] : [];
                     $saved_data[] = [
                         'type' => $type,
                         'name' => $queryWord,
-                        'amount' => $amount
+                        'amount' => $translit_word
                     ];
                 }
 
@@ -611,8 +619,10 @@ class ObjectController extends BaseController
         }
         if ($user_auth) {
             $user = User::find()->where(['auth_key' => $user_auth])->one();
-            if ($user && $user->search_data)
+            if ($user && $user->search_data) {
                 $user_search_data = unserialize($user->search_data);
+
+            }
         }
         $results['user_search_data'] = $user_search_data;
 
