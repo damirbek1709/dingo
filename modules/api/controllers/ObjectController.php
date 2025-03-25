@@ -390,8 +390,8 @@ class ObjectController extends BaseController
                     $translit_word = isset($hit[0]['city']) ? $hit[0]['city'] : [];
                     $saved_data[] = [
                         'type' => $type,
-                        'name' => $queryWord,
-                        'amount' => $translit_word
+                        'name' => $translit_word,
+                        'amount' => $amount
                     ];
                 }
 
