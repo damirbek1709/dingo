@@ -13,7 +13,8 @@ echo \yii\grid\GridView::widget([
         [
             'attribute' => 'name',
             'value' => function ($model) {
-                return $model->name[0];
+                $name =  $model->name[0];
+                return $name[0];
             }
         ],
         [
