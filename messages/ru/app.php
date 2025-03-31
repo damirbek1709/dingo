@@ -102,4 +102,5 @@ return [
     'Create Room Category'=>'Добавить категорию номера',
     'Update Room Category'=>'Редактировать категорию номера',
     'Room Categories'=>'Категории номеров',
+    'Room Types'=>'Категории номеров',
 ];
