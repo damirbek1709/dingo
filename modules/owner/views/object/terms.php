@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 
 $this->title = Yii::t('app', 'Условия');
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Objects'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => $model->name[0], 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Условия');
 ?>
 <div class="oblast-update">
