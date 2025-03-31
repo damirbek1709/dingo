@@ -23,26 +23,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
-    <?= GridView::widget([
-        'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
-        'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'payment_on_book',
-            'payment_on_reception',
-            'cancellation',
-            'meal_type',
-            //'title',
-            [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Tariff $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
-            ],
-        ],
-    ]); ?>
-
+    <?php 
+    foreach($list as $item){
+        echo $item['title'];
+    }
+    ?>
 
 </div>

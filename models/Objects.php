@@ -8,8 +8,7 @@ use yii\helpers\FileHelper;
 use yii\helpers\Url;
 use rico\yii2images\models\Image;
 
-class Objects extends Model
-{
+class Objects extends \yii\db\ActiveRecord {
     public $id;
     public $user_id;
     public $type;
@@ -45,7 +44,6 @@ class Objects extends Model
     public $uploadImages;
     public $images;
     public $img;
-    public $primaryKey = 'id';
     public $children;
 
     const COMFORT_CATEGORY_SERVICE = 1;
@@ -74,6 +72,8 @@ class Objects extends Model
     const OBJECT_TYPE_GUESTHOUSE = 8;
     const OBJECT_TYPE_RESIDENTIAL_PREMISES = 9;
 
+    public $primaryKey = 'link_id';
+
     public function rules()
     {
         return [
@@ -100,15 +100,38 @@ class Objects extends Model
                     'images',
                     'img',
                     'name_en',
-                    'name_ky'
+                    'name_ky',
+                    'user_id',
                 ],
                 'safe'
             ],
+            [['link_id'], 'default', 'value'=> $this->lastIncrement()],
             [['email'], 'email'], // Validate email format
             [['phone'], 'match', 'pattern' => '/^\+?[0-9 ]{7,15}$/'], // Phone validation
             [['lat', 'lon'], 'number'], // Latitude and longitude should be numeric
             [['description'], 'string', 'max' => 1000], // Limit description length
         ];
+    }
+
+    public function lastIncrement()
+    {
+        try {
+            $client = Yii::$app->meili->connect();
+            $searchResults = $client->index('object')->search('', [
+                'sort' => ['id:desc'],
+                'limit' => 1
+            ]);
+            if (!empty($searchResults->getHits())) {
+                $lastDocument = $searchResults->getHits()[0];
+                return $lastDocument['id'];
+            }
+
+            return 0; // Return 0 if no documents found
+
+        } catch (\Exception $e) {
+            Yii::error("Meilisearch error: " . $e->getMessage());
+            return $e->getMessage();
+        }
     }
 
     public static function regionList()
@@ -132,8 +155,21 @@ class Objects extends Model
 
     }
 
-
-
+    public function objectTypeString()
+    {
+        $arr = [
+            self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
+            self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
+            self::OBJECT_TYPE_RESTBASE => 'База отдыха',
+            self::OBJECT_TYPE_BUNGALOW => 'Бунгало',
+            self::OBJECT_TYPE_BOUTIQUE_HOTEL => 'Бутик-отель',
+            self::OBJECT_TYPE_VILLA => 'Вилла',
+            self::OBJECT_TYPE_GLAMPING => 'Глэмпинг',
+            self::OBJECT_TYPE_GUESTHOUSE => 'Гостевой дом',
+            self::OBJECT_TYPE_RESIDENTIAL_PREMISES => 'Жилое помещение',
+        ];
+        return $arr[$this->type];
+    }
 
     public function behaviors()
     {
@@ -174,6 +210,29 @@ class Objects extends Model
             (int) self::TERM_MEAL_BREAKFEST => Yii::t('app', 'Завтрак'),
             (int) self::TERM_MEAL_THREE_TIMES => Yii::t('app', 'Трехразовое питание'),
         ];
+    }
+
+    public function getPictures()
+    {
+        $list = [];
+        foreach ($this->getImages() as $image) {
+            $filePath = $image->filePath;
+            $img_url = $image->getUrl('120x');
+            $picture = $image->getUrl('500x');
+            // Check if the original image was a webp
+            // if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
+            //     $img_url = 'https://selva.kg/uploads/images/store/' . $filePath;
+            //     $picture = 'https://selva.kg/uploads/images/store/' . $filePath;
+            // }
+            $list[] = [
+                'id' => $image->id,
+                'picture' => $picture,
+                'thumbnailPicture' => $img_url,
+                'isMain' => $image->isMain,
+            ];
+        }
+
+        return $list;
     }
 
     public static function сomfortList()

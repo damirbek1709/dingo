@@ -22,6 +22,7 @@ class ModuleAsset extends AssetBundle
     public $css = [
         'css/main.css',
         'css/navbar.css',
+        'css/calendar.css',
     ];
     public $js = [
         'js/app.js',

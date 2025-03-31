@@ -9,7 +9,6 @@ echo \yii\grid\GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
         'id',
-        'name',
         'email',
         [
             'class' => 'yii\grid\ActionColumn',

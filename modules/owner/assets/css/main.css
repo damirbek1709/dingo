@@ -317,3 +317,70 @@ a.desc:after {
     border-bottom: 1px solid #ccc;
     margin-bottom: 15px;
 }
+.card {
+    background: #fff;
+    padding: 20px;
+    width: 500px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.edit {
+    font-size: 14px;
+    color: #777;
+    cursor: pointer;
+}
+
+.title {
+    font-size: 22px;
+    margin: 10px 0;
+}
+
+.info h2 {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.address a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.address a:hover {
+    text-decoration: underline;
+}
+
+.info-grid {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.info-grid div {
+    width: 48%;
+}
+
+.info-grid h2 {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.info-grid p {
+    font-size: 16px;
+    margin: 0;
+}
+.tariff-room-list{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr ;
+}
+.tariff-room-cover{
+    border: 1px solid #ccc;
+}

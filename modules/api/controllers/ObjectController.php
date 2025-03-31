@@ -243,6 +243,7 @@ class ObjectController extends BaseController
 
         return $result;
     }
+    
 
     public function actionRoomImages($id)
     {

@@ -16,6 +16,7 @@ use app\models\PaymentType;
 use app\models\RoomCat;
 use yii\web\Response;
 use yii\filters\AccessControl;
+use app\models\Tariff;
 /**
  * EventController implements the CRUD actions for Event model.
  */
@@ -84,7 +85,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['room', 'edit-room'],
+                    'actions' => ['room', 'edit-room', 'add-tariff', 'tariff-list'],
                     'roles' => ['owner'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -99,7 +100,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['index', 'create'],
+                    'actions' => ['index', 'create', 'add-tariff', 'prices'],
                     'roles' => ['admin', 'owner'],
                 ],
             ],
@@ -172,7 +173,50 @@ class ObjectController extends Controller
             'model' => $model,
             'rooms' => $rooms,
             'object_id' => $id,
-            'object_title' => $object['name'],
+            'object_title' => $object['name'][0],
+        ]);
+    }
+
+    public function actionTariffList($object_id, $room_id)
+    {
+        $this->layout = "main";
+        $tariff = [];
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($object_id);
+        $rooms = [];
+
+        if (array_key_exists('rooms', $object)) {
+            $roomData = [];
+            foreach ($object['rooms'] as $room) {
+                if ($room['id'] == $room_id) {
+                    $roomData = $room;
+                    break;
+                }
+            }
+
+            if (array_key_exists('tariff', $roomData)) {
+                $tariff = $roomData['tariff'];
+            }
+        }
+
+        return $this->render('/tariff/index', [
+            'list' => $tariff,
+            'object_title' => $object['name'][0],
+        ]);
+    }
+
+    public function actionPrices($id)
+    {
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($id);
+        $rooms = [];
+
+        $model = new Objects($object);
+        if (array_key_exists('rooms', $object)) {
+            $rooms = $object['rooms'];
+        }
+        return $this->render('prices_test',[
+            'rooms'=>$rooms
         ]);
     }
 
@@ -212,34 +256,51 @@ class ObjectController extends Controller
     {
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-
         $model = new Objects();
+        $last_id = (int) $this->lastIncrement() + 1;
 
-        // Handle form submission
-        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $model->id = (int) $this->lastIncrement() + 1;
-            $model->type = (int) $model->type;
-            $model->lat = (float) $model->lat;
-            $model->lon = (float) $model->lon;
-            $model->user_id = (int) Yii::$app->user->id;
-            $name_arr = [$model->name, $model->name_en, $model->name_ky];
-            $model->name = array_values($name_arr);
-            $model->images = UploadedFile::getInstances($model, 'images');
-            if ($model->images) {
-                foreach ($model->images as $image) {
-                    $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                    $image->saveAs($path);
-                    $model->attachImage($path, true);
-                    @unlink($path);
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            if ($model->save(false)) {
+                $model->images = UploadedFile::getInstances($model, 'images');
+                if ($model->images) {
+                    foreach ($model->images as $image) {
+                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
+                        $image->saveAs($path);
+                        $model->attachImage($path, true);
+                        @unlink($path);
+                    }
                 }
-            }
 
-            $index->addDocuments(array_values([$model->attributes]));
-            return $this->redirect(['view', 'id' => $model->id]);
+                $object_arr = [
+                    'id' => (int) $last_id,
+                    'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
+                    'type' => (int) $model->type,
+                    'city' => $model->city,
+                    'address' => $model->address,
+                    'currency' => $model->currency,
+                    'phone' => $model->phone,
+                    'site' => $model->site,
+                    'check_in' => $model->check_in,
+                    'check_out' => $model->check_out,
+                    'description' => $model->description,
+                    'lat' => (float) $model->lat,
+                    'lon' => (float) $model->lon,
+                    'early_check_in' => (bool) $model->early_check_in,
+                    'late_check_in' => (bool) $model->late_check_in,
+                    'internet_public' => (bool) $model->internet_public,
+                    'user_id' => (int) Yii::$app->user->id,
+                    'email' => $model->email,
+                    'features' => $model->features ?? [],
+                    'images' => $model->getPictures(),
+                ];
+
+                $index->addDocuments($object_arr);
+                return $this->redirect(['view', 'id' => $last_id]);
+            }
         }
 
         return $this->render('create', [
-            'model' => $model,
+            'model' => $model
         ]);
     }
 
@@ -277,30 +338,62 @@ class ObjectController extends Controller
         $index = $client->index('object');
 
         // Fetch record from Meilisearch
-        $searchResult = $index->search('', ['filter' => "id = $id"])->getHits();
+        $searchResult = $index->getDocument($id);
 
         if (empty($searchResult)) {
             throw new \yii\web\NotFoundHttpException('Record not found.');
         }
 
         // Convert the first result into a model
-        $model = new Objects($searchResult[0]);
-
+        $model = new Objects($searchResult);
+        $bindModel = Objects::findOne($id);
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            $model->images = UploadedFile::getInstances($model, 'images');
-            if ($model->images) {
-                foreach ($model->images as $image) {
-                    $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                    $image->saveAs($path);
-                    $model->attachImage($path, true);
-                    @unlink($path);
-                }
-            }
+            $model->type = (int) $model->type;
+            $model->lat = (float) $model->lat;
+            $model->lon = (float) $model->lon;
+            $model->user_id = (int) Yii::$app->user->id;
+            $name_arr = [$model->name, $model->name_en, $model->name_ky];
+            $model->name = array_values($name_arr);
 
-            $index->updateDocuments([$model->attributes]);
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($bindModel->save(false)) {
+                $bindModel->images = UploadedFile::getInstances($model, 'images');
+                if ($bindModel->images) {
+                    foreach ($bindModel->images as $image) {
+                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
+                        $image->saveAs($path);
+                        $model->attachImage($path, true);
+                        @unlink($path);
+                    }
+                }
+
+                $object_arr = [
+                    'id' => (int) $id,
+                    'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
+                    'type' => (int) $model->type,
+                    'city' => $model->city,
+                    'address' => $model->address,
+                    'currency' => $model->currency,
+                    'phone' => $model->phone,
+                    'site' => $model->site,
+                    'check_in' => $model->check_in,
+                    'check_out' => $model->check_out,
+                    'description' => $model->description,
+                    'lat' => (float) $model->lat,
+                    'lon' => (float) $model->lon,
+                    'early_check_in' => (bool) $model->early_check_in,
+                    'late_check_in' => (bool) $model->late_check_in,
+                    'internet_public' => (bool) $model->internet_public,
+                    'user_id' => (int) Yii::$app->user->id,
+                    'email' => $model->email,
+                    'features' => $model->features ?? [],
+                    'images' => $model->getPictures(),
+                ];
+
+                $index->updateDocuments($object_arr);
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
@@ -413,7 +506,7 @@ class ObjectController extends Controller
         $model = new RoomCat();
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-        $object = $client->index('object')->getDocument($id);
+        $object = $index->getDocument($id);
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
             $model->images = UploadedFile::getInstances($model, 'images');
             if ($model->images) {
@@ -435,7 +528,6 @@ class ObjectController extends Controller
 
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 $meiliRooms = $object['rooms'];
-                $last_room = end($object['rooms']);
                 $room_id = $room_id + 1;
             }
 
@@ -453,9 +545,7 @@ class ObjectController extends Controller
                 'img' => $img,
                 'images' => $model->getPictures(),
             ];
-            $meiliRooms[] = $rooms_arr;  // Append new room data
-
-            // Ensure it's a clean, sequential array (remove any potential associative keys)
+            $meiliRooms[] = $rooms_arr;
             $meiliRooms = array_values($meiliRooms);
 
             $meilisearchData = [
@@ -472,7 +562,7 @@ class ObjectController extends Controller
             return $this->render('rooms/create', [
                 'model' => $model,
                 'id' => $id,
-                'object_title' => $object['name'],
+                'object_title' => $object['name'][0],
                 'object_id' => $id
             ]);
         }
@@ -489,20 +579,24 @@ class ObjectController extends Controller
             throw new NotFoundHttpException('Room not found.');
         }
 
+        $rooms = $object['rooms'] ?? []; // Get existing rooms
         $room = null;
-        if (isset($object['rooms']) && is_array($object['rooms'])) {
-            foreach ($object['rooms'] as $roomData) {
-                if (isset($roomData['id']) && $roomData['id'] == $id) {
-                    $room = $roomData;
-                    break;
-                }
+
+        foreach ($rooms as &$roomData) { // Use reference to modify the array
+            if ($roomData['id'] == $id) {
+                $room = &$roomData;
+                break;
             }
         }
-        $model = new RoomCat();
-        if ($room) {
-            $model->setAttributes($room, false);
+
+        if (!$room) {
+            throw new NotFoundHttpException('Room not found in Meilisearch.');
         }
+
+        $model = new RoomCat();
+        $model->setAttributes($room, false);
         $model->img = $bind_model->getImage() ? $bind_model->getImage()->id : null;
+
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             $model->images = UploadedFile::getInstances($model, 'images');
             if ($model->images) {
@@ -513,26 +607,26 @@ class ObjectController extends Controller
                     @unlink($path);
                 }
             }
-            $rooms_arr = [
-                'id' => (int) $id,
-                'room_title' => $model->typeTitle($model->type_id),
-                'guest_amount' => (int) $model->guest_amount,
-                'similar_room_amount' => (int) $model->similar_room_amount,
-                'area' => (int) $model->area,
-                'bathroom' => (int) $model->bathroom,
-                'balcony' => (int) $model->balcony,
-                'air_cond' => (int) $model->air_cond,
-                'kitchen' => (int) $model->kitchen,
-                'base_price' => (int) $model->base_price,
-                'img' => $model->img,
-                'images' => $bind_model->getPictures(),
-            ];
 
-            $meiliRooms = [$rooms_arr];
+            // Update only the existing room data
+            $room['room_title'] = $model->typeTitle($model->type_id);
+            $room['guest_amount'] = (int) $model->guest_amount;
+            $room['similar_room_amount'] = (int) $model->similar_room_amount;
+            $room['area'] = (int) $model->area;
+            $room['bathroom'] = (int) $model->bathroom;
+            $room['balcony'] = (int) $model->balcony;
+            $room['air_cond'] = (int) $model->air_cond;
+            $room['kitchen'] = (int) $model->kitchen;
+            $room['base_price'] = (int) $model->base_price;
+            $room['img'] = $model->img;
+            $room['images'] = $bind_model->getPictures();
+
+            // Update the document in Meilisearch
             $meilisearchData = [
                 'id' => (int) $object_id,
-                'rooms' => $meiliRooms
+                'rooms' => $rooms // Preserve all rooms
             ];
+
             if ($index->updateDocuments($meilisearchData)) {
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
@@ -542,12 +636,94 @@ class ObjectController extends Controller
         return $this->render('rooms/update', [
             'model' => $model,
             'object_id' => $object_id,
-            'object_title' => $object['name'],
+            'object_title' => $object['name'][0],
             'bindModel' => $bind_model
         ]);
     }
 
-    public function actionRoom($id, $object_id)
+    public function actionAddTariff($object_id)
+    {
+        $model = new Tariff();
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($object_id);
+        $object_title = $object['name'][0];
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                $room_list = $this->request->post()['Tariff']['room_list'][0];
+                $room_list = $this->stringToNumericArray($room_list);
+
+                try {
+                    $rooms = $object['rooms'] ?? [];
+                    $updatedRooms = [];
+                    foreach ($rooms as $roomData) {
+                        if (!is_array($roomData) || !isset($roomData['id'])) {
+                            Yii::warning("Invalid room data: " . json_encode($roomData));
+                            continue;
+                        }
+
+                        $roomData['id'] = (int) $roomData['id'];
+                        if (in_array($roomData['id'], $room_list)) {
+                            $roomData['tariff'] = $roomData['tariff'] ?? [];
+                            $tariff = [
+                                'id' => (int) $model->id,
+                                'payment_on_book' => (int) $model->payment_on_book,
+                                'payment_on_reception' => (int) $model->payment_on_reception,
+                                'cancellation' => (int) $model->cancellation,
+                                'meal_type' => (int) $model->meal_type,
+                                'title' => $model->title,
+                                'object_id' => (int) $object_id,
+                                'price'=>(float)$roomData['base_price'],
+                                'from_date'=>'',
+                                'to_date'=>''
+                            ];
+
+                            $roomData['tariff'][] = $tariff;
+                        }
+                        $updatedRooms[] = $roomData;
+                    }
+
+                    $meilisearchData = [
+                        'id' => (int) $object_id,
+                        'rooms' => $updatedRooms
+                    ];
+
+                    $index->updateDocuments([$meilisearchData]);
+                    return $this->redirect(['room-list', 'id' => $object_id]);
+                } catch (\Exception $e) {
+                    Yii::error("Meilisearch operation error: " . $e->getMessage());
+                }
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
+
+        return $this->render('/tariff/create', [
+            'model' => $model,
+            'object_id' => $object_id,
+            'object_title' => $object_title
+        ]);
+    }
+
+    function stringToNumericArray($stringInput)
+    {
+        // Remove square brackets and split by comma
+        $cleanString = trim($stringInput, '[]');
+        $items = explode(',', $cleanString);
+
+        // Trim whitespace and convert to numeric array
+        $numericArray = array_map(function ($item) {
+            return (int) trim($item);
+        }, $items);
+
+        // Convert to associative array with numeric keys
+        return array_values($numericArray);
+    }
+
+
+
+    public function actionTariff($object_id)
     {
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
@@ -555,7 +731,7 @@ class ObjectController extends Controller
 
         if (isset($object['rooms']) && is_array($object['rooms'])) {
             foreach ($object['rooms'] as $roomData) {
-                if (isset($roomData['id']) && $roomData['id'] == $id) {
+                if (isset($roomData['id']) && $roomData['id'] == $object_id) {
                     $room = $roomData;
                     break;
                 }
@@ -566,7 +742,7 @@ class ObjectController extends Controller
         return $this->render('rooms/view', [
             'model' => $model,
             'object_id' => $object_id,
-            'object_title' => $object['name']
+            'object_title' => $object['name'][0]
         ]);
     }
 
@@ -635,6 +811,30 @@ class ObjectController extends Controller
         ]);
     }
 
+    public function actionRoom($id, $object_id)
+    {
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($object_id);
+
+        if (isset($object['rooms']) && is_array($object['rooms'])) {
+            foreach ($object['rooms'] as $roomData) {
+                if (isset($roomData['id']) && $roomData['id'] == $id) {
+                    $room = $roomData;
+                    break;
+                }
+            }
+        }
+
+        $model = new RoomCat($room);
+        return $this->render('rooms/view', [
+            'model' => $model,
+            'object_id' => $object_id,
+            'object_title' => $object['name'][0]
+        ]);
+    }
+
+
 
 
     /**
@@ -666,3 +866,4 @@ class ObjectController extends Controller
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 }
+

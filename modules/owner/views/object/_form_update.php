@@ -18,11 +18,13 @@ use yii\widgets\ActiveForm;
         'options' => [
             'enctype' => 'multipart/form-data'
         ]
-    ]); ?>
+    ]);
+    $name_list = $model->name;
+    ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'name_en')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'value' => $name_list[0]]) ?>
+    <?= $form->field($model, 'name_en')->textInput(['maxlength' => true, 'value' => $name_list[1]]) ?>
+    <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true, 'value' => $name_list[2]]) ?>
     <?= $form->field($model, 'type')->dropDownList($model->objectTypeList()) ?>
     <?= $form->field($model, 'city')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
@@ -78,7 +80,7 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'reception')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
 
-    <div id="map" style="width: 600px; height: 400px;"></div>
+    <div id="map" style="width: 100%; height: 400px;"></div>
     <?php
     if ($model->lat)
         $lat = $model->lat;
@@ -89,10 +91,12 @@ use yii\widgets\ActiveForm;
     else
         $lon = 74.7661;
     ?>
-   <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
+    <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
     <?= $form->field($model, 'lon')->hiddenInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
     <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
+
+
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
@@ -123,13 +127,13 @@ use yii\widgets\ActiveForm;
         // Update coordinates on drag
         placemark.events.add('dragend', function () {
             const coords = placemark.geometry.getCoordinates();
-            $('#latitude').val(coords[0]);
-            $('#longitude').val(coords[1]);
+            $('#objects-lat').val(coords[0]);
+            $('#objects-lon').val(coords[1]);
         });
 
         // Update coordinates initially
-        $('#latitude').val(placemark.geometry.getCoordinates()[0]);
-        $('#longitude').val(placemark.geometry.getCoordinates()[1]);
+        $('#objects-lat').val(placemark.geometry.getCoordinates()[0]);
+        $('#objects-lon').val(placemark.geometry.getCoordinates()[1]);
     }
 
 

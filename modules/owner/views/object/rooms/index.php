@@ -18,12 +18,12 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="room-cat-index">
 
-    <h1><?= Html::encode($model->name) ?></h1>
+    <h1><?= Html::encode($object_title) ?></h1>
 
     <?php echo $this->render('../top_nav', ['model' => $model]); ?>
     <p style="float:right">
         <?= Html::a(Yii::t('app', 'Добавить номер'), ['add-room', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
-        <?= Html::a(Yii::t('app', 'Создать тариф'), ['add-tariff', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Создать тариф'), ['add-tariff', 'object_id' => $object_id], ['class' => 'btn btn-success']) ?>
     </p>
 
     <div class="room_list clear">
@@ -35,7 +35,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="title"> <?= $val['room_title'] ?> </div>
                         <div class="details">
                             <span class="room_area"><?= $val['area'] . " " . Yii::t('app', 'м²'); ?></span>
-                            <span class="room_guest_amount">Количество людей: <?= $val['guest_amount'] ?></span>
+                            <span class="room_guest_amount"><?= Yii::t('app', 'Количество людей') ?>:
+                                <?= $val['guest_amount'] ?>
+                            </span>
+                            <span class="room_tariff">
+                                <?= Html::a(Yii::t('app', 'Привязанные тарифы'), ['tariff-list', 'object_id' => $object_id, 'room_id' => $val['id']]) ?>
+                            </span>
                         </div>
                     </div>
                 </div>

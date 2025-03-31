@@ -2,18 +2,20 @@
 
 use yii\widgets\DetailView;
 use yii\helpers\Html;
-
+use app\models\Objects;
 /* @var $this yii\web\View */
 /* @var $model app\models\MeilisearchModel */
 
-$this->title = $model->name;
+$name_list = $model->name;
+$title = $name_list[0];
+$this->title = $title;
 $this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = $title;
 ?>
 
 <div class="meilisearch-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::encode($title) ?></h1>
     <?php echo $this->render('top_nav', ['model' => $model]); ?>
     <p>
         <?php //= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
@@ -32,39 +34,52 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php echo $this->render('nav', ['model' => $model]); ?>
             </div>
             <div class="col-md-9">
-                <?= DetailView::widget([
-                    'model' => $model,
-                    'attributes' => [
-                        'id',
-                        'name',
-                        //'type',
-                        'city',
-                        //'address',
-                        'currency',
-                        //'features',
-                        'phone',
-                        [
-                            'attribute' => 'site',
-                            'format' => 'raw',
-                            'value' => function ($model) {
-                                                return Html::a($model->site, $model->site, ['target' => '_blank']);
-                                            },
-                        ],
-                        'check_in',
-                        'check_out',
-                        //'reception',
-                        //'description:ntext',
-                        'lat',
-                        'lon',
-                        // [
-                        //     'attribute' => 'email',
-                        //     'format' => 'raw',
-                        //     'value' => function ($model) {
-                        //                         return Html::mailto($model->email);
-                        //                     },
-                        // ],
-                    ],
-                ]); ?>
+                <div class="card">
+                    <div class="header">
+                        <div class="info">
+                            <h2>Название</h2>
+                        </div>
+                        <span class="edit">✏️
+                            <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => '']) ?>
+                        </span>
+
+                    </div>
+                    <h1 class="title"><?= $title; ?></h1>
+
+                    <div class="info">
+                        <h2>Адрес</h2>
+                        <p class="address">📍 <?= $model->address; ?></p>
+                    </div>
+
+                    <div class="info-grid">
+                        <div>
+                            <h2>Тип объекта</h2>
+                            <p><?= $model->objectTypeString(); ?></p>
+                        </div>
+                        <div>
+                            <h2>Количество номеров</h2>
+                            <p>-</p>
+                        </div>
+                    </div>
+
+                    <div class="info-grid">
+                        <div>
+                            <h2>Заезд</h2>
+                            <p><?= $model->check_in; ?></p>
+                        </div>
+                        <div>
+                            <h2>Выезд</h2>
+                            <p><?= $model->check_out ?></p>
+                        </div>
+                    </div>
+
+                </div>
+                <?php
+                $images = $model->getImages();
+                foreach ($images as $img) {
+                    echo Html::img($img->getUrl('150x100'));
+                }
+                ?>
             </div>
         </div>
     </div>
