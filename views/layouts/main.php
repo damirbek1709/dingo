@@ -37,6 +37,14 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         'options' => ['class' => 'navbar-nav'],
         'items' => [
             ['label' => 'Главная', 'url' => ['/site/index']],
+            ['label' => !Yii::$app->user->isGuest ? Yii::$app->user->identity->username : '', 'items' => [
+                ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can(permissionName: 'moderator')],
+                ['label' => 'Панель хоста', 'url' => ['/owner'], 'visible' => Yii::$app->user->can('owner')],
+                ['label' => 'Выход',
+                    'url' => ['/user/logout'],
+                    'linkOptions' => ['data-method' => 'post']
+                ],
+            ], 'visible' => !Yii::$app->user->isGuest],
         ]
     ]);
     NavBar::end();
