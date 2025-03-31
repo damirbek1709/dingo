@@ -13,7 +13,8 @@ echo \yii\grid\GridView::widget([
         [
             'attribute' => 'name',
             'value' => function ($model) {
-                echo print_r($model);die();
+
+                echo print_r($model['name']);die();
                 $name = "";
                 foreach ($model as $val) {
                     $name = " " . $val;
