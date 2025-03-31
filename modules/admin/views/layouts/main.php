@@ -46,7 +46,7 @@ ModuleAsset::register($this);
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => [
-                ['label' => 'Категории номеров', 'url' => ['/admin/room-cat'], 'visible' => Yii::$app->user->can('admin')],
+                ['label' => 'Категории номеров', 'url' => ['/admin/room-type'], 'visible' => Yii::$app->user->can('admin')],
                 ['label' => 'Пользователи', 'url' => ['/admin/user'], 'visible' => Yii::$app->user->can('admin')],
                 ['label' => !Yii::$app->user->isGuest ? Yii::$app->user->identity->username : '', 'items' => [
                     ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can('moderator')],
