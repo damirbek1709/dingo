@@ -9,7 +9,6 @@ echo \yii\grid\GridView::widget([
     'dataProvider' => $dataProvider,
     'columns' => [
         'id',
-        'email',
         [
             'attribute' => 'name',
             'value' => function ($model) {
@@ -19,6 +18,7 @@ echo \yii\grid\GridView::widget([
                 return $name;
             }
         ],
+        'email',
         [
             'class' => 'yii\grid\ActionColumn',
             'urlCreator' => function ($action, $model, $key, $index) {
