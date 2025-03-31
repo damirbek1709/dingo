@@ -2,7 +2,7 @@
 use yii\helpers\Html;
 ?>
 <p>
-    <?php echo Html::a('Добавить объект', ['create'],['class' => 'btn btn-primary']) ?>
+    <?php echo Html::a('Добавить объект', ['create'], ['class' => 'btn btn-primary']) ?>
 </p>
 <?php
 echo \yii\grid\GridView::widget([
@@ -10,6 +10,12 @@ echo \yii\grid\GridView::widget([
     'columns' => [
         'id',
         'email',
+        [
+            'attribute' => 'name',
+            'value' => function ($model) {
+                return $model->name[0];
+            }
+        ],
         [
             'class' => 'yii\grid\ActionColumn',
             'urlCreator' => function ($action, $model, $key, $index) {
