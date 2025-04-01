@@ -28,6 +28,7 @@ class RoomCat extends \yii\db\ActiveRecord
 {
     public $images;
     public $room_title;
+    public $tariff;
     /**
      * {@inheritdoc}
      */

@@ -28,7 +28,7 @@ class RoomType extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title'], 'required'],
+            [['title','room_amount'], 'required'],
             [['title', 'title_en', 'title_ky'], 'string', 'max' => 255],
         ];
     }
@@ -43,6 +43,7 @@ class RoomType extends \yii\db\ActiveRecord
             'title' => Yii::t('app', 'Title'),
             'title_en' => Yii::t('app', 'Title En'),
             'title_ky' => Yii::t('app', 'Title Ky'),
+            'room_amount' => Yii::t('app', 'Количество гостей'),
         ];
     }
 }

@@ -3,16 +3,16 @@
 use yii\db\Migration;
 
 /**
- * Class m250326_080806_add_field_tariff
+ * Class m250401_051856_add_field_room_type
  */
-class m250326_080806_add_field_tariff extends Migration
+class m250401_051856_add_field_room_type extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-
+        $this->addColumn('room_type', 'room_amount', $this->integer(11));
     }
 
     /**
@@ -20,7 +20,7 @@ class m250326_080806_add_field_tariff extends Migration
      */
     public function safeDown()
     {
-        echo "m250326_080806_add_field_tariff cannot be reverted.\n";
+        echo "m250401_051856_add_field_room_type cannot be reverted.\n";
 
         return false;
     }
@@ -34,7 +34,7 @@ class m250326_080806_add_field_tariff extends Migration
 
     public function down()
     {
-        echo "m250326_080806_add_field_tariff cannot be reverted.\n";
+        echo "m250401_051856_add_field_room_type cannot be reverted.\n";
 
         return false;
     }

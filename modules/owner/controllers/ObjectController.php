@@ -215,8 +215,8 @@ class ObjectController extends Controller
         if (array_key_exists('rooms', $object)) {
             $rooms = $object['rooms'];
         }
-        return $this->render('prices_test',[
-            'rooms'=>$rooms
+        return $this->render('prices_test', [
+            'rooms' => $rooms
         ]);
     }
 
@@ -674,9 +674,9 @@ class ObjectController extends Controller
                                 'meal_type' => (int) $model->meal_type,
                                 'title' => $model->title,
                                 'object_id' => (int) $object_id,
-                                'price'=>(float)$roomData['base_price'],
-                                'from_date'=>'',
-                                'to_date'=>''
+                                'price' => (float) $roomData['base_price'],
+                                'from_date' => '',
+                                'to_date' => ''
                             ];
 
                             $roomData['tariff'][] = $tariff;

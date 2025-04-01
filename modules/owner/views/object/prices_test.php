@@ -9,6 +9,27 @@
 </head>
 
 <body>
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-close" id="sidebar-close">&times;</button>
+        <div class="sidebar-inner">
+            <h3>Редактирование</h3>
+
+            <div class="form-group">
+                <label>Заезд</label>
+                <input type="text" id="checkin" readonly />
+            </div>
+
+            <div class="form-group">
+                <label>Выезд</label>
+                <input type="text" id="checkout" readonly />
+            </div>
+
+            <div id="sidebar-details"></div>
+        </div>
+    </div>
+
+
+
     <div class="calendar-layout">
         <div class="fixed-column">
             <div class="month-header-sticky" id="month-header"></div>
@@ -21,6 +42,9 @@
             </div>
         </div>
     </div>
+
+
+
 
     <script>
         const rooms = <?php echo json_encode($rooms, JSON_UNESCAPED_UNICODE); ?>;
@@ -115,7 +139,7 @@
                         if (matchingTariff) {
                             $cell.text(matchingTariff.price);
                         } else {
-                            $cell.append('<div class="unavailable">❗</div>');
+                            $cell.append('❗');
                         }
                         if (day.isToday) $cell.addClass('today');
                         $tariffRow.append($cell);
@@ -133,46 +157,70 @@
             $('#scroll-wrapper').on('scroll', function () {
                 const scrollLeft = $(this).scrollLeft();
                 const maxScroll = this.scrollWidth - $(this).outerWidth();
-
                 updateMonthHeader(scrollLeft);
-
                 if (scrollLeft >= maxScroll - 100) {
                     appendMonth();
                 }
             });
         });
 
-        const room = rooms.find(r => r.id == roomId);
-        let html = `<h4>${room.room_title} (${room.area})</h4>`;
-        html += `<p><b>Доступно номеров:</b> ${room.similar_room_amount}</p>`;
+        $('#data-rows').on('click', '.room_cell', function () {
 
-        if (Array.isArray(room.tariff)) {
-            const grouped = {};
+            const date = $(this).attr('date');
+            const roomId = $(this).attr('room_id');
+            const room = rooms.find(r => r.id == roomId);
+            if (!room) return;
 
-            // Group tariffs by title
-            room.tariff.forEach(t => {
-                if (!grouped[t.title]) grouped[t.title] = [];
-                grouped[t.title].push(t);
-            });
+            $('#checkin').val(date);
+            $('#checkout').val(date);
 
-            for (const [title, tariffs] of Object.entries(grouped)) {
-                html += `<div style="margin-top: 16px;"><h5>${title}</h5>`;
-                tariffs.forEach(t => {
-                    html += `
-        <div class="form-group">
-          <label>${t.guest_amount} гостя</label>
-          <input type="text" value="${t.price} KGS" readonly>
-        </div>
-      `;
+            let html = `<h4>${room.room_title} (${room.area})</h4>`;
+            html += `<p><b>Доступно номеров:</b> ${room.similar_room_amount}</p>`;
+
+            if (Array.isArray(room.tariff)) {
+                const grouped = {};
+                room.tariff.forEach(t => {
+                    if (!grouped[t.title]) grouped[t.title] = [];
+                    grouped[t.title].push(t);
                 });
-                html += `</div>`;
-            }
-        } else {
-            html += `<p><i>Нет доступных тарифов</i></p>`;
-        }
 
-        $('#sidebar-details').html(html);
+                for (const [title, tariffs] of Object.entries(grouped)) {
+                    html += `<div style="margin-top: 16px;"><h5>${title}</h5>`;
+                    tariffs.forEach(t => {
+                        html += `
+          <div class="form-group">
+            <label>${t.guest_amount} гостя</label>
+            <input type="text" value="${t.price} KGS" readonly>
+          </div>
+        `;
+                    });
+                    html += `</div>`;
+                }
+            } else {
+                html += `<p><i>Нет доступных тарифов</i></p>`;
+            }
+
+            $('#sidebar-details').html(html);
+            $('#sidebar').fadeIn().css('display', 'block');
+        });
+
+        $('#sidebar-close').on('click', function () {
+            $('#sidebar').fadeOut();
+        });
+
+        // Close when clicking outside sidebar
+        $(document).on('click', function (e) {
+            const $sidebar = $('#sidebar');
+            if (
+                $sidebar.is(':visible') &&
+                !$(e.target).closest('#sidebar').length &&
+                !$(e.target).hasClass('room_cell')
+            ) {
+                $sidebar.fadeOut();
+            }
+        });
 
     </script>
 </body>
+
 </html>
