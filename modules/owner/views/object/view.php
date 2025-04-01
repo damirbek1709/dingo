@@ -48,7 +48,7 @@ $this->params['breadcrumbs'][] = $title;
 
                     <div class="info">
                         <h2>Адрес</h2>
-                        <p class="address">📍 <?= $model->address; ?></p>
+                        <p class="address">📍 <?= $model->address[0]; ?></p>
                     </div>
 
                     <div class="info-grid">

@@ -107,7 +107,7 @@
     box-shadow: -2px 0 8px rgba(0,0,0,0.05);
     display: none;
     overflow-y: auto;
-    z-index: 10;
+    z-index: 2000;
   }
   
   .sidebar h3 {
@@ -163,4 +163,6 @@
     cursor: pointer;
   }
   
-  
+  .sidebar_date_grid{
+    display: grid;
+  }

@@ -216,7 +216,8 @@ class ObjectController extends Controller
             $rooms = $object['rooms'];
         }
         return $this->render('prices_test', [
-            'rooms' => $rooms
+            'rooms' => $rooms,
+            'object_id' => $id
         ]);
     }
 

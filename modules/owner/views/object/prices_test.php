@@ -14,17 +14,24 @@
         <div class="sidebar-inner">
             <h3>Редактирование</h3>
 
-            <div class="form-group">
-                <label>Заезд</label>
-                <input type="text" id="checkin" readonly />
-            </div>
+            <form id="w0" method="post">
+                <div class="sidebar_date_grid">
+                    <div class="form-group">
+                        <label>Заезд</label>
+                        <input type="text" id="checkin" readonly />
+                    </div>
 
-            <div class="form-group">
-                <label>Выезд</label>
-                <input type="text" id="checkout" readonly />
-            </div>
+                    <div class="form-group">
+                        <label>Выезд</label>
+                        <input type="text" id="checkout" readonly />
+                    </div>
+                </div>
 
-            <div id="sidebar-details"></div>
+                <div id="sidebar-details"></div>
+                <div class="sidebar_submit">
+                    <div class="btn btn-success update-tariff">Сохранить</div>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -122,30 +129,40 @@
                 });
                 $('#data-rows').append($availRow);
 
-                if (!Array.isArray(room.tariff)) return;
 
-                const uniqueGuestAmounts = [...new Set(room.tariff.map(t => t.guest_amount))];
-
-                uniqueGuestAmounts.forEach(guestAmount => {
-                    const tariff = room.tariff.find(t => t.guest_amount === guestAmount);
-                    $fixed.append(`<div class="fixed-cell">${tariff.title}<br>${guestAmount} гостя</div>`);
-                    const $tariffRow = $('<div>').addClass('data-row');
-                    allDays.forEach(day => {
-                        const matchingTariff = room.tariff.find(t => t.guest_amount === guestAmount && isDateInRange(day.fullDate, t.from_date, t.to_date));
-                        const $cell = $('<div>').addClass('data-cell room_cell')
-                            .attr('date', day.fullDate.slice(0, 8))
-                            .attr('room_id', room.id);
-
-                        if (matchingTariff) {
-                            $cell.text(matchingTariff.price);
-                        } else {
-                            $cell.append('❗');
-                        }
-                        if (day.isToday) $cell.addClass('today');
-                        $tariffRow.append($cell);
+                if (!Array.isArray(room.tariff) || room.tariff.length === 0) {
+                    $fixed.append(`<div class="fixed-cell">Нет тарифов</div>`);
+                    const $row = $('<div>').addClass('data-row');
+                    allDays.forEach(() => {
+                        $row.append('<div class="data-cell"><div class="unavailable">❗</div></div>');
                     });
-                    $('#data-rows').append($tariffRow);
-                });
+                    $('#data-rows').append($row);
+                } else {
+                    room.tariff.forEach(tariff => {
+                        $fixed.append(`<div class="fixed-cell">${tariff.title}<br>${room.guest_amount} гостя</div>`);
+
+                        const $tariffRow = $('<div>').addClass('data-row');
+                        allDays.forEach(day => {
+                            const $cell = $('<div>')
+                                .addClass('data-cell room_cell')
+                                .attr('date', day.fullDate.slice(0, 8))
+                                .attr('room_id', room.id);
+
+                            if (isDateInRange(day.fullDate, tariff.from_date, tariff.to_date)) {
+                                $cell.text(tariff.price);
+                            } else {
+                                $cell.append('<div class="unavailable">❗</div>');
+                            }
+
+                            if (day.isToday) $cell.addClass('today');
+                            $tariffRow.append($cell);
+                        });
+
+                        $('#data-rows').append($tariffRow);
+                    });
+                }
+
+
             });
             updateMonthHeader();
         }
@@ -175,7 +192,10 @@
             $('#checkout').val(date);
 
             let html = `<h4>${room.room_title} (${room.area})</h4>`;
-            html += `<p><b>Доступно номеров:</b> ${room.similar_room_amount}</p>`;
+            html += `<div class="form-group">
+                            <label>Доступно номеров </label>
+                            <input type="text" id="similar_room_count" value="${room.similar_room_amount}" readonly>
+                        </div>`;
 
             if (Array.isArray(room.tariff)) {
                 const grouped = {};
@@ -185,16 +205,21 @@
                 });
 
                 for (const [title, tariffs] of Object.entries(grouped)) {
-                    html += `<div style="margin-top: 16px;"><h5>${title}</h5>`;
+                    html += `<div class="" style="margin-top: 16px;"><h5>${title}</h5>
+                    <div class="sidebar_tariff_grid">`;
                     tariffs.forEach(t => {
-                        html += `
-          <div class="form-group">
-            <label>${t.guest_amount} гостя</label>
-            <input type="text" value="${t.price} KGS" readonly>
-          </div>
-        `;
+                        for (i = 1; i <= room.guest_amount; i++) {
+                            html += `
+                                <div>
+                                    <div class="form-group">
+                                        <label>${i} гостя</label>
+                                        <input class="tariff_price" type="text" value="${t.price}" id="${t.id}" room_id="${room.id}", guest_amount="${$i}">
+                                    </div>
+                                </div>
+                            `;
+                        }
                     });
-                    html += `</div>`;
+                    html += `</div></div>`;
                 }
             } else {
                 html += `<p><i>Нет доступных тарифов</i></p>`;
@@ -208,6 +233,24 @@
             $('#sidebar').fadeOut();
         });
 
+        const tariff_list = {};
+        $('.tariff_price').each(function () {
+            const price = parseFloat($(this).val());
+            const tariffId = $(this).attr('id');
+            const roomId = $(this).attr('room_id');
+            const guestAmount = $(this).attr('guest_amount');
+
+            if (!tariff_list[tariffId]) {
+                tariff_list[tariffId] = {
+                    price: price,
+                    guests: {},
+                    room_id: roomId
+                };
+            }
+
+            tariff_list[tariffId].guests[guestAmount] = price;
+        });
+
         // Close when clicking outside sidebar
         $(document).on('click', function (e) {
             const $sidebar = $('#sidebar');
@@ -219,6 +262,31 @@
                 $sidebar.fadeOut();
             }
         });
+
+        $('.update-tariff').on('click', function (e) {
+            e.stopImmediatePropagation();
+            e.preventDefault(); // prevent normal form submit
+
+            var similiar_room_count = $('#similar_room_count').val();
+            var object_id = "<?= $object_id ?>";
+
+            $.ajax({
+                url: '/owner/tariff/edit-tariff',
+                type: 'POST',
+                data: { tariff_list: tariff_list },
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    alert('Тариф успешно сохранён!');
+                    //$('#sidebar').fadeOut(); // optional: close sidebar after save
+                },
+                error: function (xhr, status, error) {
+                    alert('Ошибка при сохранении. Попробуйте снова.');
+                    console.error('AJAX error:', error);
+                }
+            });
+        });
+
 
     </script>
 </body>

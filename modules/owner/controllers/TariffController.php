@@ -1,12 +1,13 @@
 <?php
 
 namespace app\modules\owner\controllers;
-
+use Yii;
 use app\models\Tariff;
 use app\models\TariffSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * TariffController implements the CRUD actions for Tariff model.
@@ -116,6 +117,15 @@ class TariffController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    public function actionEditTariff()
+    {
+        $tariff_list = Yii::$app->request->post('tariff_list');
+        echo "<pre>";print_r($tariff_list);echo "</pre>";
+
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return true;
     }
 
     /**
