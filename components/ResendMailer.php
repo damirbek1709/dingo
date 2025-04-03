@@ -5,7 +5,7 @@ use GuzzleHttp\Client;
 
 class ResendMailer
 {
-    public $apiKey = 're_atcXWkEq_LaWuaA5QKX5GmHNpWyFbGKDx';
+    public $apiKey = 're_MrDjBCEM_13XEtNrkHUQrSoWusNBh72T4';
     private $client;
 
     public function __construct($apiKey)
