@@ -56,6 +56,13 @@ class UserController extends BaseController
             $user->email = $email;
 
             if ($user->register()) {
+                
+                $auth = Yii::$app->authManager;
+                $role = $auth->getRole('owner'); // Make sure "owner" role exists in RBAC
+                if ($role) {
+                    $auth->assign($role, $user->id);
+                }
+
                 $response["success"] = true;
                 $response["message"] = "Пользователь создан";
                 if (in_array($email, ['damirbek@gmail.com'])) {
