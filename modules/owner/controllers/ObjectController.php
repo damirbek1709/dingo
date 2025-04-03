@@ -379,7 +379,7 @@ class ObjectController extends Controller
                     'type' => (int) $model->type,
                     'city' => [$model->city, $model->city_en, $model->city_ky],
                     'address' => [$model->address, $model->address_en, $model->address_ky],
-                    'description' => [$model->description, $model->description_en, $model->description_ky],
+                    'description' => $model->descriptiom,
                     'currency' => $model->currency,
                     'phone' => $model->phone,
                     'site' => $model->site,
