@@ -1,29 +1,38 @@
-<?php 
+<?php
 namespace app\components;
 
-use yii\mail\BaseMailer;
-use Resend\Resend as ResendClient;
-use yii\mail\MessageInterface;
+use GuzzleHttp\Client;
 
-class ResendMailer extends BaseMailer
+class ResendMailer
 {
-    public $apiKey;
-    public $messageClass = 'app\components\ResendMessage';
+    private $apiKey;
+    private $client;
 
-    protected function sendMessage($message)
+    public function __construct($apiKey)
     {
-        $resend = new ResendClient($this->apiKey);
-        
-        $response = $resend->emails->send([
-            'from' => $message->getFrom(),
-            'to' => $message->getTo(),
-            'subject' => $message->getSubject(),
-            'html' => $message->getHtmlBody(),
-            'text' => $message->getTextBody(),
+        $this->apiKey = $apiKey;
+
+        $this->client = new Client([
+            'base_uri' => 'https://api.resend.com/',
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ]
+        ]);
+    }
+
+    public function send($from, $to, $subject, $html)
+    {
+        $response = $this->client->post('emails', [
+            'json' => [
+                'from' => $from,
+                'to' => $to,
+                'subject' => $subject,
+                'html' => $html
+            ]
         ]);
 
-        return !empty($response->id);
+        return json_decode($response->getBody()->getContents(), true);
     }
 }
-
-?>

@@ -80,28 +80,10 @@ $config = [
             'errorAction' => 'site/error',
         ],
 
-        'mailer' => [
+        'resendMailer' => [
             'class' => 'app\components\ResendMailer',
-            'apiKey' => 're_atcXWkEq_LaWuaA5QKX5GmHNpWyFbGKDx', // Replace with your actual API key
-            'messageClass' => 'app\components\ResendMessage',
+            'apiKey' => 're_atcXWkEq_LaWuaA5QKX5GmHNpWyFbGKDx',
         ],
-
-        // 'mailer' => [
-        //     'class' => 'yii\base\Mailer',
-        //     'useFileTransport' => false, // Set this to false to send real emails
-        //     'transport' => [
-        //         'class' => 'yii\base\Mailer',
-        //         'host' => 'smtp.resend.com',
-        //         'username' => 'resend',
-        //         'password' => 're_atcXWkEq_LaWuaA5QKX5GmHNpWyFbGKDx',
-        //         'port' => '465',
-        //         'encryption' => 'ssl',
-        //         'useFileTransport' => false,
-        //     ],
-        // ],
-        // 'resendClient' => [
-        //     'class' => 'app\components\ResendClient',
-        // ],
 
         'meili' => [
             'class' => 'app\components\Meili',
