@@ -95,7 +95,7 @@ $config = [
                 'class' => 'Swift_SmtpTransport',
                 'host' => 'smtp.resend.com',
                 'username' => 'resend',
-                'password' => 're_YJxw1NJ5_E6t67R26fgNHwDnrWwTrJwxj',
+                'password' => 're_MrDjBCEM_13XEtNrkHUQrSoWusNBh72T4',
                 'port' => '465',
                 'encryption' => 'ssl',
             ],
