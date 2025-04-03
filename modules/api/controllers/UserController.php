@@ -49,13 +49,13 @@ class UserController extends BaseController
         $model = Yii::createObject(RegistrationForm::className());
         $model->username = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
         $model->email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
-        $user = User::find()->where(['email' => $model->email])->one();
+        $user = User::find()->where(['email' => $model->username])->one();
 
         if (!$user) {
             if ($model->register()) {
                 $response["success"] = true;
                 $response["message"] = "Пользователь создан";
-                if (in_array($user->email, ['damirbek@gmail.com'])) {
+                if (in_array($model->email, ['damirbek@gmail.com'])) {
                     $dao = Yii::$app->db;
                     $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
                     $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
@@ -64,6 +64,16 @@ class UserController extends BaseController
                     $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
                     $token->link('user', $user);
                     $response['code'] = $token->code;
+                    $sendSMS = false;
+                    if ($sendSMS) {
+                        Yii::$app->mailer->compose()
+                            ->setFrom('send@dingo.kg')
+                            ->setTo($model->email)
+                            ->setSubject("Ваш код авторизации: " . $token->code)
+                            ->setHtmlBody("<h1>{$token->code}</h1>")
+                            ->setTextBody('Hello from Resend! This is a test email.')
+                            ->send();
+                    }
                 }
             }
         } else {
