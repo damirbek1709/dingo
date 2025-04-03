@@ -211,7 +211,7 @@ class SiteController extends Controller
     public function actionSendEmail()
     {
         Yii::$app->mailer->compose()
-            ->setFrom('info@green-alliance.kg')
+            ->setFrom('send@dingo.kg')
             ->setTo('damirbek@gmail.com')
             ->setSubject('Test Email')
             ->setHtmlBody('<h1>Hello from Resend!</h1><p>This is a test email.</p>')
