@@ -15,9 +15,13 @@ class Objects extends \yii\db\ActiveRecord {
     public $name;
     public $name_en;
     public $name_ky;
+    public $city_en;
+    public $city_ky;
     public $city;
     public $city_id;
     public $address;
+    public $address_ky;
+    public $address_en;
     public $currency;
     public $features;
     public $phone;
@@ -27,6 +31,8 @@ class Objects extends \yii\db\ActiveRecord {
     public $object;
     public $reception;
     public $description;
+    public $description_en;
+    public $description_ky;
     public $payment;
     public $lat;
     public $lon;
@@ -72,7 +78,7 @@ class Objects extends \yii\db\ActiveRecord {
     const OBJECT_TYPE_GUESTHOUSE = 8;
     const OBJECT_TYPE_RESIDENTIAL_PREMISES = 9;
 
-    public $primaryKey = 'link_id';
+    //public $primaryKey = 'link_id'; 
 
     public function rules()
     {
@@ -82,7 +88,11 @@ class Objects extends \yii\db\ActiveRecord {
                     'id',
                     'type',
                     'city',
+                    'city_en',
+                    'city_ky',
                     'address',
+                    'address_en',
+                    'address_ky',
                     'currency',
                     'features',
                     'phone',
@@ -109,7 +119,7 @@ class Objects extends \yii\db\ActiveRecord {
             [['email'], 'email'], // Validate email format
             [['phone'], 'match', 'pattern' => '/^\+?[0-9 ]{7,15}$/'], // Phone validation
             [['lat', 'lon'], 'number'], // Latitude and longitude should be numeric
-            [['description'], 'string', 'max' => 1000], // Limit description length
+            [['description','description_en','description_ky'], 'string', 'max' => 1000], // Limit description length
         ];
     }
 
@@ -200,7 +210,16 @@ class Objects extends \yii\db\ActiveRecord {
             'email' => 'E-mail',
             'name' => Yii::t('app', 'Название'),
             'name_en' => Yii::t('app', 'Название на английском'),
-            'name_ky' => Yii::t('app', 'Название на русском')
+            'name_ky' => Yii::t('app', 'Название на кыргызском'),
+
+            'city_en' => Yii::t('app', 'Город на английском'),
+            'city_ky' => Yii::t('app', 'Город на кыргызском'),
+
+            'address_en' => Yii::t('app', 'Адрес на английском'),
+            'address_ky' => Yii::t('app', 'Адрес на кыргызском'),
+
+            'description_en' => Yii::t('app', 'Описание на английском'),
+            'description_ky' => Yii::t('app', 'Описание на кыргызском')
         ];
     }
 

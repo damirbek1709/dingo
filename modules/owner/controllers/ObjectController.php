@@ -276,14 +276,14 @@ class ObjectController extends Controller
                     'id' => (int) $last_id,
                     'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
                     'type' => (int) $model->type,
-                    'city' => $model->city,
-                    'address' => $model->address,
+                    'city' => [$model->city, $model->city_en, $model->city_ky],
+                    'address' => [$model->address, $model->address_en, $model->address_ky],
+                    'description' => [$model->description, $model->description_en, $model->description_ky],
                     'currency' => $model->currency,
                     'phone' => $model->phone,
                     'site' => $model->site,
                     'check_in' => $model->check_in,
                     'check_out' => $model->check_out,
-                    'description' => $model->description,
                     'lat' => (float) $model->lat,
                     'lon' => (float) $model->lon,
                     'early_check_in' => (bool) $model->early_check_in,
@@ -358,10 +358,10 @@ class ObjectController extends Controller
             $name_arr = [$model->name, $model->name_en, $model->name_ky];
             $model->name = array_values($name_arr);
 
-            if ($bindModel->save(false)) {
-                $bindModel->images = UploadedFile::getInstances($model, 'images');
-                if ($bindModel->images) {
-                    foreach ($bindModel->images as $image) {
+            if ($model->save(false)) {
+                $model->images = UploadedFile::getInstances($model, 'images');
+                if ($model->images) {
+                    foreach ($model->images as $image) {
                         $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
                         $image->saveAs($path);
                         $model->attachImage($path, true);
@@ -371,16 +371,16 @@ class ObjectController extends Controller
 
                 $object_arr = [
                     'id' => (int) $id,
-                    'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
+                    'name' => $model->name,
                     'type' => (int) $model->type,
-                    'city' => $model->city,
-                    'address' => $model->address,
+                    'city' => [$model->city, $model->city_en, $model->city_ky],
+                    'address' => [$model->address, $model->address_en, $model->address_ky],
+                    'description' => [$model->description, $model->description_en, $model->description_ky],
                     'currency' => $model->currency,
                     'phone' => $model->phone,
                     'site' => $model->site,
                     'check_in' => $model->check_in,
                     'check_out' => $model->check_out,
-                    'description' => $model->description,
                     'lat' => (float) $model->lat,
                     'lon' => (float) $model->lon,
                     'early_check_in' => (bool) $model->early_check_in,

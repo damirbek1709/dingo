@@ -18,12 +18,12 @@
                 <div class="sidebar_date_grid">
                     <div class="form-group">
                         <label>Заезд</label>
-                        <input type="text" id="checkin" readonly />
+                        <input type="text" id="checkin" />
                     </div>
 
                     <div class="form-group">
                         <label>Выезд</label>
-                        <input type="text" id="checkout" readonly />
+                        <input type="text" id="checkout" />
                     </div>
                 </div>
 
@@ -56,8 +56,12 @@
     <script>
         const rooms = <?php echo json_encode($rooms, JSON_UNESCAPED_UNICODE); ?>;
         const today = new Date();
+        let tariff_list = {};
+
+        let roomId;
         let loadedMonths = 0;
         let allDays = [];
+        let updatedTariffs = {};
         let monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
 
         function isDateInRange(dateStr, from, to) {
@@ -140,20 +144,32 @@
                 } else {
                     room.tariff.forEach(tariff => {
                         $fixed.append(`<div class="fixed-cell">${tariff.title}<br>${room.guest_amount} гостя</div>`);
-
                         const $tariffRow = $('<div>').addClass('data-row');
+
                         allDays.forEach(day => {
                             const $cell = $('<div>')
                                 .addClass('data-cell room_cell')
                                 .attr('date', day.fullDate.slice(0, 8))
                                 .attr('room_id', room.id);
 
-                            if (isDateInRange(day.fullDate, tariff.from_date, tariff.to_date)) {
-                                $cell.text(tariff.price);
-                            } else {
+                            let matched = false;
+
+                            if (Array.isArray(tariff.prices)) {
+                                tariff.prices.forEach(priceBlock => {
+                                    if (isDateInRange(day.fullDate, priceBlock.from_date, priceBlock.to_date)) {
+                                        const displayPrice = Array.isArray(priceBlock.price_arr) && priceBlock.price_arr.length > 0
+                                            ? parseFloat(priceBlock.price_arr[0])
+                                            : '❗';
+
+                                        $cell.text(displayPrice);
+                                        $cell.attr('title', priceBlock.price_arr.join(' / '));
+                                        matched = true;
+                                    }
+                                });
+                            }
+                            if (!matched) {
                                 $cell.append('<div class="unavailable">❗</div>');
                             }
-
                             if (day.isToday) $cell.addClass('today');
                             $tariffRow.append($cell);
                         });
@@ -161,8 +177,6 @@
                         $('#data-rows').append($tariffRow);
                     });
                 }
-
-
             });
             updateMonthHeader();
         }
@@ -182,10 +196,11 @@
         });
 
         $('#data-rows').on('click', '.room_cell', function () {
-
+            tariff_list = {};
             const date = $(this).attr('date');
-            const roomId = $(this).attr('room_id');
+            roomId = $(this).attr('room_id');
             const room = rooms.find(r => r.id == roomId);
+
             if (!room) return;
 
             $('#checkin').val(date);
@@ -194,7 +209,7 @@
             let html = `<h4>${room.room_title} (${room.area})</h4>`;
             html += `<div class="form-group">
                             <label>Доступно номеров </label>
-                            <input type="text" id="similar_room_count" value="${room.similar_room_amount}" readonly>
+                            <input type="text" id="similar_room_count" value="${room.similar_room_amount}">
                         </div>`;
 
             if (Array.isArray(room.tariff)) {
@@ -205,15 +220,28 @@
                 });
 
                 for (const [title, tariffs] of Object.entries(grouped)) {
-                    html += `<div class="" style="margin-top: 16px;"><h5>${title}</h5>
+                    html += `<div class="" style="margin-top: 15px;"><h5>${title}</h5>
                     <div class="sidebar_tariff_grid">`;
                     tariffs.forEach(t => {
-                        for (i = 1; i <= room.guest_amount; i++) {
+                        tariff_list[t.id] = {
+                            id: t.id,
+                            payment_on_book: t.payment_on_book,
+                            payment_on_reception: t.payment_on_reception,
+                            cancellation: t.cancellation,
+                            meal_type: t.meal_type,
+                            title: t.title,
+                            object_id: t.object_id,
+                            prices: {
+                                price_arr: []
+                            }
+                        };
+
+                        for (i = 0; i < room.guest_amount; i++) {
                             html += `
                                 <div>
                                     <div class="form-group">
-                                        <label>${i} гостя</label>
-                                        <input class="tariff_price" type="text" value="${t.price}" id="${t.id}" room_id="${room.id}", guest_amount="${$i}">
+                                        <label>${i + 1} гостя</label>
+                                        <input class="tariff_price" type="text" value="${t.prices[0]['price_arr'][i]}" tariff_id="${t.id}">
                                     </div>
                                 </div>
                             `;
@@ -227,64 +255,63 @@
 
             $('#sidebar-details').html(html);
             $('#sidebar').fadeIn().css('display', 'block');
+
+
         });
 
         $('#sidebar-close').on('click', function () {
             $('#sidebar').fadeOut();
         });
 
-        const tariff_list = {};
-        $('.tariff_price').each(function () {
-            const price = parseFloat($(this).val());
-            const tariffId = $(this).attr('id');
-            const roomId = $(this).attr('room_id');
-            const guestAmount = $(this).attr('guest_amount');
-
-            if (!tariff_list[tariffId]) {
-                tariff_list[tariffId] = {
-                    price: price,
-                    guests: {},
-                    room_id: roomId
-                };
-            }
-
-            tariff_list[tariffId].guests[guestAmount] = price;
-        });
-
-        // Close when clicking outside sidebar
-        $(document).on('click', function (e) {
-            const $sidebar = $('#sidebar');
-            if (
-                $sidebar.is(':visible') &&
-                !$(e.target).closest('#sidebar').length &&
-                !$(e.target).hasClass('room_cell')
-            ) {
-                $sidebar.fadeOut();
-            }
-        });
-
         $('.update-tariff').on('click', function (e) {
+            let from_date = $('#checkin').val();
+            let to_date = $('#checkout').val();
+
+            $('.tariff_price').each(function () {
+                const price = parseFloat($(this).val()) || 0;
+                const tariffId = parseInt($(this).attr('tariff_id'));
+
+                if (!Array.isArray(tariff_list[tariffId].prices)) {
+                    tariff_list[tariffId].prices = [{
+                        price_arr: [],
+                        from_date: from_date,
+                        to_date: to_date
+                    }];
+                }
+
+                // Push price into the first price block
+                tariff_list[tariffId].prices[0].price_arr.push(price);
+
+                tariff_list[tariffId].prices.from_date = checkin;
+                tariff_list[tariffId].prices.to_date = checkout;
+            });
+
             e.stopImmediatePropagation();
             e.preventDefault(); // prevent normal form submit
 
             var similiar_room_count = $('#similar_room_count').val();
             var object_id = "<?= $object_id ?>";
 
+
             $.ajax({
                 url: '/owner/tariff/edit-tariff',
                 type: 'POST',
-                data: { tariff_list: tariff_list },
-                contentType: false,
-                processData: false,
+                data: {
+                    object_id: object_id,
+                    room_id: roomId,
+                    tariff_list: tariff_list,
+                    _csrf: $('meta[name="csrf-token"]').attr('content') // Add CSRF token if needed
+                },
                 success: function (response) {
+                    //console.log(response);
                     alert('Тариф успешно сохранён!');
-                    //$('#sidebar').fadeOut(); // optional: close sidebar after save
                 },
                 error: function (xhr, status, error) {
                     alert('Ошибка при сохранении. Попробуйте снова.');
                     console.error('AJAX error:', error);
                 }
             });
+
         });
 
 

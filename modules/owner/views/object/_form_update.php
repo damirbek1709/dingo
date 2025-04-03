@@ -5,6 +5,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use vova07\imperavi\Widget;
 
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
@@ -20,14 +21,22 @@ use yii\widgets\ActiveForm;
         ]
     ]);
     $name_list = $model->name;
+    $city_list = $model->city;
+    $address_list = $model->address;
     ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'value' => $name_list[0]]) ?>
     <?= $form->field($model, 'name_en')->textInput(['maxlength' => true, 'value' => $name_list[1]]) ?>
     <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true, 'value' => $name_list[2]]) ?>
     <?= $form->field($model, 'type')->dropDownList($model->objectTypeList()) ?>
-    <?= $form->field($model, 'city')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
+    
+    <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'value' => $city_list[0]]) ?>
+    <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'value' => $city_list[1]]) ?>
+    <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'value' => $city_list[2]]) ?>
+
+    <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address_list[0]]) ?>
+    <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_list[1]]) ?>
+    <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_list[2]]) ?>
     <?= $form->field($model, 'currency')->textInput(['maxlength' => true]) ?>
 
 
@@ -78,7 +87,84 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'check_in')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'check_out')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'reception')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
+
+    <?php 
+    $model->description = $model->description[0];
+    echo $form->field($model, 'description')->widget(
+        Widget::className(),
+        [
+            'settings' => [
+                'lang' => 'ru',
+                'minHeight' => 200,
+                'formatting' => ['p', 'blockquote', 'h2'],
+                'imageCaption' => true,
+                'imageUpload' => Url::to(['site/image-upload']),
+                'fileUpload' => Url::to(['site/file-upload']),
+                'plugins' => [
+                    'imagemanager',
+                    'filemanager',
+                    'clips',
+                    'fullscreen',
+                    'table',
+                    'fontsize',
+                    'fontcolor',
+                    'video',
+                ],
+            ],
+        ]
+    ); ?>
+
+    <?php 
+    $model->description_en = $model->description[1];
+    echo $form->field($model, 'description_en')->widget(
+        Widget::className(),
+        [
+            'settings' => [
+                'lang' => 'ru',
+                'minHeight' => 200,
+                'formatting' => ['p', 'blockquote', 'h2'],
+                'imageCaption' => true,
+                'imageUpload' => Url::to(['site/image-upload']),
+                'fileUpload' => Url::to(['site/file-upload']),
+                'plugins' => [
+                    'imagemanager',
+                    'filemanager',
+                    'clips',
+                    'fullscreen',
+                    'table',
+                    'fontsize',
+                    'fontcolor',
+                    'video',
+                ]
+            ],
+        ]
+    ); ?>
+
+    <?php 
+    $model->description_ky = $model->description[2];
+    echo $form->field($model, 'description_ky')->widget(
+        Widget::className(),
+        [
+            'settings' => [
+                'lang' => 'ru',
+                'minHeight' => 200,
+                'formatting' => ['p', 'blockquote', 'h2'],
+                'imageCaption' => true,
+                'imageUpload' => Url::to(['site/image-upload']),
+                'fileUpload' => Url::to(['site/file-upload']),
+                'plugins' => [
+                    'imagemanager',
+                    'filemanager',
+                    'clips',
+                    'fullscreen',
+                    'table',
+                    'fontsize',
+                    'fontcolor',
+                    'video',
+                ]
+            ],
+        ]
+    ); ?>
 
     <div id="map" style="width: 100%; height: 400px;"></div>
     <?php

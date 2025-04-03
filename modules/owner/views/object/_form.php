@@ -5,6 +5,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
+use vova07\imperavi\Widget;
 
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
@@ -24,8 +25,15 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'name_en')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'type')->dropDownList($model->objectTypeList()) ?>
+
     <?= $form->field($model, 'city')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'city_en')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true]) ?>
+
     <?= $form->field($model, 'address')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'address_en')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true]) ?>
+
     <?= $form->field($model, 'currency')->textInput(['maxlength' => true]) ?>
 
 
@@ -76,7 +84,78 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'check_in')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'check_out')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'reception')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'description')->textarea(['rows' => 4]) ?>
+
+    <?= $form->field($model, 'description')->widget(
+        Widget::className(),
+        [
+            'settings' => [
+                'lang' => 'ru',
+                'minHeight' => 200,
+                'formatting' => ['p', 'blockquote', 'h2'],
+                'imageCaption' => true,
+                'imageUpload' => Url::to(['site/image-upload']),
+                'fileUpload' => Url::to(['site/file-upload']),
+                'plugins' => [
+                    'imagemanager',
+                    'filemanager',
+                    'clips',
+                    'fullscreen',
+                    'table',
+                    'fontsize',
+                    'fontcolor',
+                    'video',
+                ]
+            ],
+        ]
+    ); ?>
+
+    <?= $form->field($model, 'description_en')->widget(
+        Widget::className(),
+        [
+            'settings' => [
+                'lang' => 'ru',
+                'minHeight' => 200,
+                'formatting' => ['p', 'blockquote', 'h2'],
+                'imageCaption' => true,
+                'imageUpload' => Url::to(['site/image-upload']),
+                'fileUpload' => Url::to(['site/file-upload']),
+                'plugins' => [
+                    'imagemanager',
+                    'filemanager',
+                    'clips',
+                    'fullscreen',
+                    'table',
+                    'fontsize',
+                    'fontcolor',
+                    'video',
+                ]
+            ],
+        ]
+    ); ?>
+
+    <?= $form->field($model, 'description_ky')->widget(
+        Widget::className(),
+        [
+            'settings' => [
+                'lang' => 'ru',
+                'minHeight' => 200,
+                'formatting' => ['p', 'blockquote', 'h2'],
+                'imageCaption' => true,
+                'imageUpload' => Url::to(['site/image-upload']),
+                'fileUpload' => Url::to(['site/file-upload']),
+                'plugins' => [
+                    'imagemanager',
+                    'filemanager',
+                    'clips',
+                    'fullscreen',
+                    'table',
+                    'fontsize',
+                    'fontcolor',
+                    'video',
+                ]
+            ],
+        ]
+    ); ?>
 
     <div id="map" style="width: 600px; height: 400px;"></div>
     <?php
@@ -89,7 +168,7 @@ use yii\widgets\ActiveForm;
     else
         $lon = 74.7661;
     ?>
-   <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
+    <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
     <?= $form->field($model, 'lon')->hiddenInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
     <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>

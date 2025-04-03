@@ -122,11 +122,32 @@ class TariffController extends Controller
     public function actionEditTariff()
     {
         $tariff_list = Yii::$app->request->post('tariff_list');
-        echo "<pre>";print_r($tariff_list);echo "</pre>";
+        $object_id = Yii::$app->request->post('object_id');
+        $room_id = Yii::$app->request->post('room_id');
 
         Yii::$app->response->format = Response::FORMAT_JSON;
-        return true;
+
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($object_id);
+
+        if (isset($object['rooms']) && is_array($object['rooms'])) {
+            foreach ($object['rooms'] as $index => $roomData) {
+                if (isset($roomData['id']) && $roomData['id'] == $room_id) {
+                    $object['rooms'][$index]['tariff'] = array_values($tariff_list); // Replace tariffs
+                    break;
+                }
+            }
+
+            // ✅ Save updated object
+            $client->index('object')->updateDocuments([
+                'id' => $object_id,
+                'rooms' => $object['rooms']
+            ]);
+        }
+
+        return $tariff_list;
     }
+
 
     /**
      * Finds the Tariff model based on its primary key value.
