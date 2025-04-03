@@ -70,7 +70,7 @@ class UserController extends BaseController
             $sendSMS = true;
             $response["success"] = true;
             $response["message"] = "Пользователь найден";
-            if (in_array($user->email, ['damirbek@gmail.com','adiletprosoft@gmail.com'])) {
+            if (in_array($user->email, ['damirbek@gmail.com', 'adiletprosoft@gmail.com'])) {
                 $dao = Yii::$app->db;
                 $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
                 $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '000000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
@@ -80,7 +80,17 @@ class UserController extends BaseController
                 $token->link('user', $user);
                 $response['code'] = $token->code;
             }
+            if ($sendSMS) {
+                Yii::$app->mailer->compose()
+                    ->setFrom('send@dingo.kg')
+                    ->setTo($model->email)
+                    ->setSubject("Ваш код авторизации: " . $token->code)
+                    ->setHtmlBody("<h1>{$token->code}</h1>")
+                    ->setTextBody('Hello from Resend! This is a test email.')
+                    ->send();
+            }
         }
+
         return $response;
     }
 
