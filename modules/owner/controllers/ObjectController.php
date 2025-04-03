@@ -262,15 +262,15 @@ class ObjectController extends Controller
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             if ($model->save(false)) {
-                $model->images = UploadedFile::getInstances($model, 'images');
-                if ($model->images) {
-                    foreach ($model->images as $image) {
-                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                        $image->saveAs($path);
-                        $model->attachImage($path, true);
-                        @unlink($path);
-                    }
-                }
+                // $model->images = UploadedFile::getInstances($model, 'images');
+                // if ($model->images) {
+                //     foreach ($model->images as $image) {
+                //         $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
+                //         $image->saveAs($path);
+                //         $model->attachImage($path, true);
+                //         @unlink($path);
+                //     }
+                // }
 
                 $object_arr = [
                     'id' => (int) $last_id,
@@ -363,15 +363,15 @@ class ObjectController extends Controller
             $model->description = $description_arr;
 
             if ($model->save(false)) {
-                $model->images = UploadedFile::getInstances($model, 'images');
-                if ($model->images) {
-                    foreach ($model->images as $image) {
-                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                        $image->saveAs($path);
-                        $model->attachImage($path, true);
-                        @unlink($path);
-                    }
-                }
+                // $model->images = UploadedFile::getInstances($model, 'images');
+                // if ($model->images) {
+                //     foreach ($model->images as $image) {
+                //         $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
+                //         $image->saveAs($path);
+                //         $model->attachImage($path, true);
+                //         @unlink($path);
+                //     }
+                // }
 
                 $object_arr = [
                     'id' => (int) $id,
