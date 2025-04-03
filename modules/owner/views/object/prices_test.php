@@ -138,7 +138,7 @@
                     $fixed.append(`<div class="fixed-cell">Нет тарифов</div>`);
                     const $row = $('<div>').addClass('data-row');
                     allDays.forEach(() => {
-                        $row.append('<div class="data-cell"><div class="unavailable">❗</div></div>');
+                        $row.append('<div class="data-cell">❗</div>');
                     });
                     $('#data-rows').append($row);
                 } else {
@@ -149,7 +149,7 @@
                         allDays.forEach(day => {
                             const $cell = $('<div>')
                                 .addClass('data-cell room_cell')
-                                .attr('date', day.fullDate.slice(0, 8))
+                                .attr('date', day.fullDate)
                                 .attr('room_id', room.id);
 
                             let matched = false;
@@ -168,7 +168,7 @@
                                 });
                             }
                             if (!matched) {
-                                $cell.append('<div class="unavailable">❗</div>');
+                                $cell.append('❗');
                             }
                             if (day.isToday) $cell.addClass('today');
                             $tariffRow.append($cell);

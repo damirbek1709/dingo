@@ -89,82 +89,86 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'reception')->textInput(['maxlength' => true]) ?>
 
     <?php 
-    $model->description = $model->description[0];
-    echo $form->field($model, 'description')->widget(
-        Widget::className(),
-        [
-            'settings' => [
-                'lang' => 'ru',
-                'minHeight' => 200,
-                'formatting' => ['p', 'blockquote', 'h2'],
-                'imageCaption' => true,
-                'imageUpload' => Url::to(['site/image-upload']),
-                'fileUpload' => Url::to(['site/file-upload']),
-                'plugins' => [
-                    'imagemanager',
-                    'filemanager',
-                    'clips',
-                    'fullscreen',
-                    'table',
-                    'fontsize',
-                    'fontcolor',
-                    'video',
-                ],
-            ],
-        ]
-    ); ?>
+    // $model->description = $model->description[0];
+    // echo $form->field($model, 'description')->widget(
+    //     Widget::className(),
+    //     [
+    //         'settings' => [
+    //             'lang' => 'ru',
+    //             'minHeight' => 200,
+    //             'formatting' => ['p', 'blockquote', 'h2'],
+    //             'imageCaption' => true,
+    //             'imageUpload' => Url::to(['site/image-upload']),
+    //             'fileUpload' => Url::to(['site/file-upload']),
+    //             'plugins' => [
+    //                 'imagemanager',
+    //                 'filemanager',
+    //                 'clips',
+    //                 'fullscreen',
+    //                 'table',
+    //                 'fontsize',
+    //                 'fontcolor',
+    //                 'video',
+    //             ],
+    //         ],
+    //     ]
+    // ); ?>
 
     <?php 
-    $model->description_en = $model->description[1];
-    echo $form->field($model, 'description_en')->widget(
-        Widget::className(),
-        [
-            'settings' => [
-                'lang' => 'ru',
-                'minHeight' => 200,
-                'formatting' => ['p', 'blockquote', 'h2'],
-                'imageCaption' => true,
-                'imageUpload' => Url::to(['site/image-upload']),
-                'fileUpload' => Url::to(['site/file-upload']),
-                'plugins' => [
-                    'imagemanager',
-                    'filemanager',
-                    'clips',
-                    'fullscreen',
-                    'table',
-                    'fontsize',
-                    'fontcolor',
-                    'video',
-                ]
-            ],
-        ]
-    ); ?>
+    echo $form->field($model, 'description')->textarea(['value'=>$model->description[0]]);
+    echo $form->field($model, 'description_en')->textarea(['value'=>$model->description[1]]);
+    echo $form->field($model, 'description_ky')->textarea(['value'=>$model->description[2]]);
+
+    // $model->description_en = $model->description[1];
+    // echo $form->field($model, 'description_en')->widget(
+    //     Widget::className(),
+    //     [
+    //         'settings' => [
+    //             'lang' => 'ru',
+    //             'minHeight' => 200,
+    //             'formatting' => ['p', 'blockquote', 'h2'],
+    //             'imageCaption' => true,
+    //             'imageUpload' => Url::to(['site/image-upload']),
+    //             'fileUpload' => Url::to(['site/file-upload']),
+    //             'plugins' => [
+    //                 'imagemanager',
+    //                 'filemanager',
+    //                 'clips',
+    //                 'fullscreen',
+    //                 'table',
+    //                 'fontsize',
+    //                 'fontcolor',
+    //                 'video',
+    //             ]
+    //         ],
+    //     ]
+    // ); ?>
 
     <?php 
-    $model->description_ky = $model->description[2];
-    echo $form->field($model, 'description_ky')->widget(
-        Widget::className(),
-        [
-            'settings' => [
-                'lang' => 'ru',
-                'minHeight' => 200,
-                'formatting' => ['p', 'blockquote', 'h2'],
-                'imageCaption' => true,
-                'imageUpload' => Url::to(['site/image-upload']),
-                'fileUpload' => Url::to(['site/file-upload']),
-                'plugins' => [
-                    'imagemanager',
-                    'filemanager',
-                    'clips',
-                    'fullscreen',
-                    'table',
-                    'fontsize',
-                    'fontcolor',
-                    'video',
-                ]
-            ],
-        ]
-    ); ?>
+    // $model->description_ky = $model->description[2];
+    // echo $form->field($model, 'description_ky')->widget(
+    //     Widget::className(),
+    //     [
+    //         'settings' => [
+    //             'lang' => 'ru',
+    //             'minHeight' => 200,
+    //             'formatting' => ['p', 'blockquote', 'h2'],
+    //             'imageCaption' => true,
+    //             'imageUpload' => Url::to(['site/image-upload']),
+    //             'fileUpload' => Url::to(['site/file-upload']),
+    //             'plugins' => [
+    //                 'imagemanager',
+    //                 'filemanager',
+    //                 'clips',
+    //                 'fullscreen',
+    //                 'table',
+    //                 'fontsize',
+    //                 'fontcolor',
+    //                 'video',
+    //             ]
+    //         ],
+    //     ]
+    // ); ?>
 
     <div id="map" style="width: 100%; height: 400px;"></div>
     <?php

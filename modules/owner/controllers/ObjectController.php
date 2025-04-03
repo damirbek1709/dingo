@@ -356,7 +356,9 @@ class ObjectController extends Controller
             $model->lon = (float) $model->lon;
             $model->user_id = (int) Yii::$app->user->id;
             $name_arr = [$model->name, $model->name_en, $model->name_ky];
+            $description_arr = [$model->description, $model->description_en, $model->description_ky];
             $model->name = array_values($name_arr);
+            $model->description = array_values($description_arr);
 
             if ($model->save(false)) {
                 $model->images = UploadedFile::getInstances($model, 'images');
