@@ -51,9 +51,10 @@ class UserController extends BaseController
         $user = User::find()->where(['email' => $email])->one();
 
         if (!$user) {
+            $user = new User();
             $user->username = $email;
             $user->email = $email;
-            
+
             if ($user->register()) {
                 $response["success"] = true;
                 $response["message"] = "Пользователь создан";
