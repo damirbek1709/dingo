@@ -101,6 +101,11 @@ $config = [
             ],
         ],
 
+        'meili' => [
+            'class' => 'app\components\Meili',
+        ],
+
+
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -153,3 +158,4 @@ if (YII_ENV_DEV) {
 }
 
 return $config;
+

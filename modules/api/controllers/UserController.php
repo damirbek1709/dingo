@@ -89,7 +89,7 @@ class UserController extends BaseController
             } else {
                 $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
                 $token->link('user', $user);
-                $response['code'] = $token->code;
+                //$response['code'] = $token->code;
             }
             if ($sendSMS) {
                 Yii::$app->mailer->compose()
