@@ -1,8 +1,7 @@
 <?php
 
 return [
-    'adminEmail' => 'mailer@dilbar.style',
-    'senderEmail' => 'no.reply@biovit.kg',
-    'senderName' => 'Администрация Dilbar',
-    'resendApiKey' => 're_atcXWkEq_LaWuaA5QKX5GmHNpWyFbGKDx', 
+    'adminEmail' => 'mg@prosoft.kg',
+    'senderEmail' => 'mg@prosoft.kg',
+    'senderName' => 'Example.com mailer',
 ];

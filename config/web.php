@@ -85,9 +85,19 @@ $config = [
             'apiKey' => 're_atcXWkEq_LaWuaA5QKX5GmHNpWyFbGKDx',
         ],
 
-        'meili' => [
-            'class' => 'app\components\Meili',
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'useFileTransport' => false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'host' => 'smtp.yandex.com',
+                'username' => 'mg@prosoft.kg',
+                'password' => 'Mascot85qw!',
+                'port' => '465',
+                'encryption' => 'ssl'
+            ],
         ],
+        
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
