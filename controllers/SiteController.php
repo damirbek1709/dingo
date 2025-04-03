@@ -210,13 +210,13 @@ class SiteController extends Controller
 
     public function actionSendEmail()
     {
-        Yii::$app->mailer->compose()
-            ->setFrom('send@dingo.kg')
-            ->setTo('damirbek@gmail.com')
-            ->setSubject('Test Email')
-            ->setHtmlBody('<h1>Hello from Resend!</h1><p>This is a test email.</p>')
-            ->setTextBody('Hello from Resend! This is a test email.')
-            ->send();
+        Yii::$app->resendMailer->send(
+            'send.com@dingo.kg',
+            'damirbek@gmail.com',
+            'Welcome to our site!',
+            '<h1>Hello, user!</h1><p>Thanks for signing up.</p>'
+        );
+
     }
 
     public function actionThankyou()
