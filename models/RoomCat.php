@@ -77,7 +77,7 @@ class RoomCat extends \yii\db\ActiveRecord
         return [
             [['guest_amount', 'similar_room_amount', 'area'], 'required'],
             [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen','type_id'], 'integer'],
-            [['area', 'base_price', 'img','title'], 'number'],
+            [['area', 'base_price','title'], 'number'],
             [['title', 'title_en', 'title_ky'], 'string', 'max' => 255],
         ];
     }
