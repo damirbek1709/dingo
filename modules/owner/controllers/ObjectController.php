@@ -35,12 +35,12 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'room', 'view'],
+                    'actions' => ['room-list', 'room', 'view','delete'],
                     'roles' => ['admin'],
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'edit-room', 'add-room'],
+                    'actions' => ['room-list', 'edit-room', 'add-room','delete'],
                     'roles' => ['admin'], // Authenticated users
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -70,7 +70,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'edit-room'],
+                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'edit-room','delete'],
                     'roles' => ['owner'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('id');
@@ -849,7 +849,11 @@ class ObjectController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($id);
+        $client->index('object')->deleteDocument($id);
+
 
         return $this->redirect(['index']);
     }
