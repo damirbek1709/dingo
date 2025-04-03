@@ -1,7 +1,8 @@
 <?php
 
 return [
-    'adminEmail' => 'mg@prosoft.kg',
-    'senderEmail' => 'mg@prosoft.kg',
+    'adminEmail' => 'info@green-alliance.kg',
+    //'adminEmail' => 'mg@prosoft.kg',
+    'senderEmail' => 'info@green-alliance.kg',
     'senderName' => 'Example.com mailer',
 ];
