@@ -86,7 +86,7 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'site')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'check_in')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'check_out')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'reception')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'reception')->checkbox() ?>
 
     <?php 
     // $model->description = $model->description[0];

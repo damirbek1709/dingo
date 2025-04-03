@@ -51,6 +51,7 @@ class Objects extends \yii\db\ActiveRecord {
     public $images;
     public $img;
     public $children;
+    public $link_id;
 
     const COMFORT_CATEGORY_SERVICE = 1;
     const COMFORT_CATEGORY_SPORT = 2;
