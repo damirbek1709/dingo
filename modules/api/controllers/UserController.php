@@ -67,16 +67,14 @@ class UserController extends BaseController
                     $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
                     $token->link('user', $user);
                     $response['code'] = $token->code;
-                    $sendSMS = false;
-                    if ($sendSMS) {
-                        Yii::$app->mailer->compose()
-                            ->setFrom('send@dingo.kg')
-                            ->setTo($email)
-                            ->setSubject("Ваш код авторизации: " . $token->code)
-                            ->setHtmlBody("<h1>{$token->code}</h1>")
-                            ->setTextBody('Hello from Resend! This is a test email.')
-                            ->send();
-                    }
+                    Yii::$app->mailer->compose()
+                        ->setFrom('send@dingo.kg')
+                        ->setTo($email)
+                        ->setSubject("Ваш код авторизации: " . $token->code)
+                        ->setHtmlBody("<h1>{$token->code}</h1>")
+                        ->setTextBody('Hello from Resend! This is a test email.')
+                        ->send();
+
                 }
             }
         } else {
