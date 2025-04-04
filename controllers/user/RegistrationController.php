@@ -137,8 +137,6 @@ class RegistrationController extends BaseRegistrationController
 
     public function actionSignin()
     {
-        $model = new SigninForm();
-
         if (!$this->module->enableRegistration) {
             throw new NotFoundHttpException();
         }
@@ -150,30 +148,26 @@ class RegistrationController extends BaseRegistrationController
         $this->trigger(self::EVENT_BEFORE_REGISTER, $event);
 
         $this->performAjaxValidation($model);
-        $email = $model->email;
-        $model->username = $email;
+        if ($model->load(Yii::$app->request->post()) && $model->register()) {
+            $user = User::find()->where(['email' => $model->email])->one();
+            $token = new Token();
+            $token->user_id = $user->id; // Ensure user_id is set
+            $token->type = Token::TYPE_CONFIRMATION;
+            $token->code = rand(1000, 9999); // Generate a random code
+            $token->created_at = time();
 
-
-        if ($model->load(Yii::$app->request->post()) && $model->signin()) {
-            $user = User::find()->where(['email' => $email])->one();
-            if (in_array($email, ['damirbek@gmail.com'])) {
-                $dao = Yii::$app->db;
-                $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
-                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
-                $sendSMS = false;
-            } else {
-                $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
-                $token->link('user', $user);
-                $response['code'] = $token->code;
+            if ($token->save()) {
                 Yii::$app->mailer->compose()
                     ->setFrom('send@dingo.kg')
-                    ->setTo($email)
+                    ->setTo($model->email)
                     ->setSubject("Ваш код авторизации: " . $token->code)
                     ->setHtmlBody("<h1>{$token->code}</h1>")
                     ->setTextBody('Hello from Resend! This is a test email.')
                     ->send();
-
+            } else {
+                Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
             }
+
             $this->trigger(self::EVENT_AFTER_REGISTER, $event);
 
             return $this->redirect('confirm-number');
@@ -195,7 +189,7 @@ class RegistrationController extends BaseRegistrationController
 
         $this->performAjaxValidation($model);
         if (Yii::$app->request->post('code')) {
-            echo "test";die();
+            echo "post exists";die();
             $model->confirmation_code = Yii::$app->request->post('code');
 
             if ($model->confirmationCodeFound()) {
@@ -212,11 +206,11 @@ class RegistrationController extends BaseRegistrationController
                 echo "Error";
             }
         }
+        else{
+            echo "post does not exist";
+        }
 
-        return $this->render('confirm-number', [
-            'model' => $model,
-            'module' => $this->module,
-        ]);
+        return $this->render('confirm-number');
     }
 
     private function generateUniqueReferralId()
