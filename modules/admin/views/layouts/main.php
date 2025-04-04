@@ -48,6 +48,7 @@ ModuleAsset::register($this);
             'items' => [
                 ['label' => 'Категории номеров', 'url' => ['/admin/room-type'], 'visible' => Yii::$app->user->can('admin')],
                 ['label' => 'Пользователи', 'url' => ['/admin/user'], 'visible' => Yii::$app->user->can('admin')],
+                ['label' => 'Области', 'url' => ['/admin/oblast'], 'visible' => Yii::$app->user->can('admin')],
                 ['label' => !Yii::$app->user->isGuest ? Yii::$app->user->identity->username : '', 'items' => [
                     ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can('moderator')],
                     ['label' => 'Панель оператора', 'url' => ['/operator'], 'visible' => Yii::$app->user->can('operator')],
