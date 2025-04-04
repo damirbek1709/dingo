@@ -39,7 +39,7 @@ class RegistrationController extends BaseRegistrationController
      * @return string
      * @throws \yii\web\HttpException
      */
-    public function actionRegister()
+    public function actionRegister2()
     {
         if (!$this->module->enableRegistration) {
             throw new NotFoundHttpException();
@@ -52,9 +52,31 @@ class RegistrationController extends BaseRegistrationController
         $this->trigger(self::EVENT_BEFORE_REGISTER, $event);
 
         $this->performAjaxValidation($model);
-        $model->username = $model->email;
-        
+        $email = $model->email;
+        $model->username = $email;
+
+
         if ($model->load(Yii::$app->request->post()) && $model->register()) {
+            $user = User::find()->where(['email' => $email])->one();
+            $token = new Token();
+            $token->user_id = $user->id; // Ensure user_id is set
+            $token->type = Token::TYPE_CONFIRMATION;
+            $token->code = rand(1000, 9999); // Generate a random code
+            $token->created_at = time();
+
+            if ($token->save()) {
+                Yii::$app->mailer->compose()
+                    ->setFrom('send@dingo.kg')
+                    ->setTo($email)
+                    ->setSubject("Ваш код авторизации: " . $token->code)
+                    ->setHtmlBody("<h1>{$token->code}</h1>")
+                    ->setTextBody('Hello from Resend! This is a test email.')
+                    ->send();
+            } else {
+                Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
+            }
+
+
             $this->trigger(self::EVENT_AFTER_REGISTER, $event);
 
             return $this->redirect('confirm-number');
@@ -68,71 +90,47 @@ class RegistrationController extends BaseRegistrationController
 
     public function actionRegister()
     {
-        $response["success"] = false;
+        if (!$this->module->enableRegistration) {
+            throw new NotFoundHttpException();
+        }
 
+        /** @var RegistrationForm $model */
         $model = Yii::createObject(RegistrationForm::className());
-        $user = User::find()->where(['email' => $email])->one();
+        $event = $this->getFormEvent($model);
 
-        if (!$user) {
-            $user = new User();
-            $user->username = $email;
-            $user->email = $email;
+        $this->trigger(self::EVENT_BEFORE_REGISTER, $event);
 
-            if ($user->register()) {
+        $this->performAjaxValidation($model);
+        if ($model->load(Yii::$app->request->post()) && $model->register()) {
+            $user = User::find()->where(['email' => $model->email])->one();
+            $token = new Token();
+            $token->user_id = $user->id; // Ensure user_id is set
+            $token->type = Token::TYPE_CONFIRMATION;
+            $token->code = rand(1000, 9999); // Generate a random code
+            $token->created_at = time();
 
-                $auth = Yii::$app->authManager;
-                $role = $auth->getPermission('owner'); // Make sure "owner" role exists in RBAC
-                if ($role) {
-                    $auth->assign($role, $user->id);
-                }
-
-                $response["success"] = true;
-                $response["message"] = "Пользователь создан";
-                if (in_array($email, ['damirbek@gmail.com'])) {
-                    $dao = Yii::$app->db;
-                    $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
-                    $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
-                    $sendSMS = false;
-                } else {
-                    $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
-                    $token->link('user', $user);
-                    $response['code'] = $token->code;
-                    Yii::$app->mailer->compose()
-                        ->setFrom('send@dingo.kg')
-                        ->setTo($email)
-                        ->setSubject("Ваш код авторизации: " . $token->code)
-                        ->setHtmlBody("<h1>{$token->code}</h1>")
-                        ->setTextBody('Hello from Resend! This is a test email.')
-                        ->send();
-
-                }
-            }
-        } else {
-            $sendSMS = true;
-            $response["success"] = true;
-            $response["message"] = "Пользователь найден";
-            if (in_array($email, ['damirbek@gmail.com', 'adiletprosoft@gmail.com'])) {
-                $dao = Yii::$app->db;
-                $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
-                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '000000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
-                $sendSMS = false;
-            } else {
-                $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
-                $token->link('user', $user);
-                //$response['code'] = $token->code;
-            }
-            if ($sendSMS) {
+            if ($token->save()) {
                 Yii::$app->mailer->compose()
                     ->setFrom('send@dingo.kg')
-                    ->setTo($email)
+                    ->setTo($model->email)
                     ->setSubject("Ваш код авторизации: " . $token->code)
                     ->setHtmlBody("<h1>{$token->code}</h1>")
                     ->setTextBody('Hello from Resend! This is a test email.')
                     ->send();
+            } else {
+                Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
             }
+
+
+            $this->trigger(self::EVENT_AFTER_REGISTER, $event);
+
+            return $this->redirect('confirm-number');
         }
 
-        return $response;
+        return $this->render('register', [
+            'model' => $model,
+            'module' => $this->module,
+        ]);
     }
 
 
@@ -141,12 +139,47 @@ class RegistrationController extends BaseRegistrationController
     {
         $model = new SigninForm();
 
-        $this->performAjaxValidation($model);
-        if ($model->load(Yii::$app->request->post()) && $model->signin()) {
-            return $this->redirect('confirm-code');
+        if (!$this->module->enableRegistration) {
+            throw new NotFoundHttpException();
         }
 
-        return $this->render('signin', [
+        /** @var RegistrationForm $model */
+        $model = Yii::createObject(RegistrationForm::className());
+        $event = $this->getFormEvent($model);
+
+        $this->trigger(self::EVENT_BEFORE_REGISTER, $event);
+
+        $this->performAjaxValidation($model);
+        $email = $model->email;
+        $model->username = $email;
+
+
+        if ($model->load(Yii::$app->request->post()) && $model->signin()) {
+            $user = User::find()->where(['email' => $email])->one();
+            if (in_array($email, ['damirbek@gmail.com'])) {
+                $dao = Yii::$app->db;
+                $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
+                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
+                $sendSMS = false;
+            } else {
+                $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
+                $token->link('user', $user);
+                $response['code'] = $token->code;
+                Yii::$app->mailer->compose()
+                    ->setFrom('send@dingo.kg')
+                    ->setTo($email)
+                    ->setSubject("Ваш код авторизации: " . $token->code)
+                    ->setHtmlBody("<h1>{$token->code}</h1>")
+                    ->setTextBody('Hello from Resend! This is a test email.')
+                    ->send();
+
+            }
+            $this->trigger(self::EVENT_AFTER_REGISTER, $event);
+
+            return $this->redirect('confirm-number');
+        }
+
+        return $this->render('register', [
             'model' => $model,
             'module' => $this->module,
         ]);
