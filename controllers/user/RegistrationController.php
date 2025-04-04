@@ -201,29 +201,12 @@ class RegistrationController extends BaseRegistrationController
                 $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
                 $user = $token->user;
                 $user->confirmed_at = time();
-                $user->referral_id = $this->generateUniqueReferralId();
-                Yii::$app->balanceManager->increase(
-                    [
-                        'user_id' => $user->id,
-                        'type' => Wallet::TYPE_KGS,
-                    ],
-                    100,
-                    [
-                        'type' => WalletTransaction::TYPE_REGISTER_USER,
-                        'userId' => $user->id,
-                        'userRegisteredDate' => $user->confirmed_at,
-                    ]
-                );
                 $user->save();
                 $token->delete();
                 if (Yii::$app->user->login($user)) {
-                    return $user->auth_key;
-                } else {
-                    return "false";
-                }
-            } else {
-                return "false";
-            }
+                    return $this->redirect('/owner');
+                } 
+            } 
         }
 
         return $this->render('confirm-number', [
