@@ -188,10 +188,8 @@ class RegistrationController extends BaseRegistrationController
         $model = new ConfirmNumberForm();
 
         $this->performAjaxValidation($model);
-        if (Yii::$app->request->post('code')) {
-            echo "post exists";die();
+        if (Yii::$app->request->post('confirmation_code')) {
             $model->confirmation_code = Yii::$app->request->post('code');
-
             if ($model->confirmationCodeFound()) {
                 $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
                 $user = $token->user;
