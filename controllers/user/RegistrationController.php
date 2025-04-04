@@ -195,6 +195,7 @@ class RegistrationController extends BaseRegistrationController
 
         $this->performAjaxValidation($model);
         if (Yii::$app->request->post('code')) {
+            echo "test";die();
             $model->confirmation_code = Yii::$app->request->post('code');
 
             if ($model->confirmationCodeFound()) {
@@ -206,7 +207,10 @@ class RegistrationController extends BaseRegistrationController
                 if (Yii::$app->user->login($user)) {
                     return $this->redirect('/owner');
                 } 
-            } 
+            }
+            else{
+                echo "Error";
+            }
         }
 
         return $this->render('confirm-number', [
