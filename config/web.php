@@ -40,7 +40,20 @@ $config = [
                 'RegistrationForm' => 'app\models\user\RegistrationForm',
             ],
             'controllerMap' => [
-                ''
+                'registration' => 'app\controllers\user\RegistrationController',
+                // 'admin' => 'app\controllers\user\AdminController',
+                // 'profile' => 'app\controllers\user\ProfileController',
+                // 'settings' => 'app\controllers\user\SettingsController',
+            ],
+            'urlRules' => [
+                '<id:\d+>' => 'profile/show',
+                '<action:(login|logout|auth)>' => 'security/<action>',
+                '<action:(register|resend|signin|confirm-number)>' => 'registration/<action>',
+                'confirm/<id:\d+>/<code:[A-Za-z0-9_-]+>' => 'registration/confirm',
+                'forgot' => 'recovery/request',
+                'confirm-code' => 'registration/confirm-code',
+                'recover/<id:\d+>/<code:[A-Za-z0-9_-]+>' => 'recovery/reset',
+                'settings/<action:\w+>' => 'settings/<action>',
             ],
         ],
         'rbac' => 'dektrium\rbac\RbacWebModule',

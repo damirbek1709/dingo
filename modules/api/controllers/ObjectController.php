@@ -2,6 +2,7 @@
 
 namespace app\modules\api\controllers;
 
+use app\models\Comfort;
 use app\models\user\User;
 use Yii;
 use yii\filters\AccessControl;
@@ -243,7 +244,7 @@ class ObjectController extends BaseController
 
         return $result;
     }
-    
+
 
     public function actionRoomImages($id)
     {
@@ -710,28 +711,55 @@ class ObjectController extends BaseController
     {
         $arr = [
             'ru' => [
-                Objects::COMFORT_CATEGORY_SERVICE => 'Услуги',
-                Objects::COMFORT_CATEGORY_SPORT => 'Спорт и отдых',
-                Objects::COMFORT_CATEGORY_GENERAL => 'Общее',
-                Objects::COMFORT_CATEGORY_POOL => 'Общее',
-                Objects::COMFORT_CATEGORY_CHILDREN => 'Общее',
-                Objects::COMFORT_CATEGORY_WORK => 'Работа'
+                Comfort::COMFORT_CAT_SERVICE => Yii::t('app', 'Услуги'),
+                Comfort::COMFORT_CAT_SPORT => Yii::t('app', 'Спорт и отдых'),
+                Comfort::COMFORT_CAT_GENERAL => Yii::t('app', 'Общее'),
+                Comfort::COMFORT_CAT_POOL => Yii::t('app', 'Бассейн и пляж'),
+                Comfort::COMFORT_CAT_CHILDREN => Yii::t('app', 'Для детей'),
+                Comfort::COMFORT_CAT_WORK => Yii::t('app', 'Для работы'),
+                Comfort::COMFORT_CAT_AVAILABILITY => Yii::t('app', 'Доступность'),
+                Comfort::COMFORT_CAT_WINTER_SPORTS => Yii::t('app', 'Зимние виды спорта'),
+                Comfort::COMFORT_CAT_ANIMALS => Yii::t('app', 'Животные'),
+                Comfort::COMFORT_CAT_INTERNET => Yii::t('app', 'Интернет'),
+                Comfort::COMFORT_CAT_BEATY => Yii::t('app', 'Красота и здоровье'),
+                Comfort::COMFORT_CAT_PARKING => Yii::t('app', 'Парковка'),
+                Comfort::COMFORT_CAT_STAFF_SPEAKS => Yii::t('app', 'Персонал говорит'),
+                Comfort::COMFORT_CAT_TRANSFER => Yii::t('app', 'Трансфер'),
+                Comfort::COMFORT_CAT_SANITAR => Yii::t('app', 'Санитарные меры'),
             ],
             'kg' => [
-                Objects::COMFORT_CATEGORY_SERVICE => 'Кызматтар',
-                Objects::COMFORT_CATEGORY_SPORT => 'Спорт жана эс алуу',
-                Objects::COMFORT_CATEGORY_GENERAL => 'Общее',
-                Objects::COMFORT_CATEGORY_POOL => 'Бассейн жана пляж',
-                Objects::COMFORT_CATEGORY_CHILDREN => 'Балдар',
-                Objects::COMFORT_CATEGORY_WORK => 'Жумуш'
+                Comfort::COMFORT_CAT_SERVICE => Yii::t('app', 'Кызматтар'),
+                Comfort::COMFORT_CAT_SPORT => Yii::t('app', 'Спорт жана эс алуу'),
+                Comfort::COMFORT_CAT_GENERAL => Yii::t('app', 'Жалпы'),
+                Comfort::COMFORT_CAT_POOL => Yii::t('app', 'Бассейн жана пляж'),
+                Comfort::COMFORT_CAT_CHILDREN => Yii::t('app', 'Балдар үчүн'),
+                Comfort::COMFORT_CAT_WORK => Yii::t('app', 'Иш үчүн'),
+                Comfort::COMFORT_CAT_AVAILABILITY => Yii::t('app', 'Жеткиликтүүлүк'),
+                Comfort::COMFORT_CAT_ANIMALS => Yii::t('app', 'Жаныбарлар'),
+                Comfort::COMFORT_CAT_INTERNET => Yii::t('app', 'Интернет'),
+                Comfort::COMFORT_CAT_BEATY => Yii::t('app', 'Сулуулук жана ден соолук'),
+                Comfort::COMFORT_CAT_PARKING => Yii::t('app', 'Токтотуучу жай'),
+                Comfort::COMFORT_CAT_STAFF_SPEAKS => Yii::t('app', 'Кызматкерлер сүйлөйт'),
+                Comfort::COMFORT_CAT_TRANSFER => Yii::t('app', 'Трансфер'),
+                Comfort::COMFORT_CAT_SANITAR => Yii::t('app', 'Санитардык чаралар'),
+                Comfort::COMFORT_CAT_WINTER_SPORTS => Yii::t('app', 'Кышкы спорт түрлөрү'),
             ],
             'en' => [
-                Objects::COMFORT_CATEGORY_SERVICE => 'Service',
-                Objects::COMFORT_CATEGORY_SPORT => 'Sport and Rest',
-                Objects::COMFORT_CATEGORY_GENERAL => 'General',
-                Objects::COMFORT_CATEGORY_POOL => 'Pool and beach',
-                Objects::COMFORT_CATEGORY_CHILDREN => 'Children',
-                Objects::COMFORT_CATEGORY_WORK => 'Work'
+                Comfort::COMFORT_CAT_SERVICE => Yii::t('app', 'Services'),
+                Comfort::COMFORT_CAT_SPORT => Yii::t('app', 'Sports and recreation'),
+                Comfort::COMFORT_CAT_GENERAL => Yii::t('app', 'General'),
+                Comfort::COMFORT_CAT_POOL => Yii::t('app', 'Pool and beach'),
+                Comfort::COMFORT_CAT_CHILDREN => Yii::t('app', 'For children'),
+                Comfort::COMFORT_CAT_WORK => Yii::t('app', 'For work'),
+                Comfort::COMFORT_CAT_AVAILABILITY => Yii::t('app', 'Accessibility'),
+                Comfort::COMFORT_CAT_WINTER_SPORTS => Yii::t('app', 'Winter sports'),
+                Comfort::COMFORT_CAT_ANIMALS => Yii::t('app', 'Animals'),
+                Comfort::COMFORT_CAT_INTERNET => Yii::t('app', 'Internet'),
+                Comfort::COMFORT_CAT_BEATY => Yii::t('app', 'Beauty and health'),
+                Comfort::COMFORT_CAT_PARKING => Yii::t('app', 'Parking'),
+                Comfort::COMFORT_CAT_STAFF_SPEAKS => Yii::t('app', 'Staff speaks'),
+                Comfort::COMFORT_CAT_TRANSFER => Yii::t('app', 'Transfer'),
+                Comfort::COMFORT_CAT_SANITAR => Yii::t('app', 'Sanitary measures'),
             ]
         ];
         return $arr;

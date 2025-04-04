@@ -53,12 +53,7 @@ class Objects extends \yii\db\ActiveRecord {
     public $children;
     public $link_id;
 
-    const COMFORT_CATEGORY_SERVICE = 1;
-    const COMFORT_CATEGORY_SPORT = 2;
-    const COMFORT_CATEGORY_GENERAL = 3;
-    const COMFORT_CATEGORY_POOL = 4;
-    const COMFORT_CATEGORY_CHILDREN = 5;
-    const COMFORT_CATEGORY_WORK = 6;
+    
 
     const SEARCH_TYPE_CITY = 3;
     const SEARCH_TYPE_REGION = 1;
