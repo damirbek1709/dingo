@@ -186,6 +186,7 @@ class RegistrationController extends BaseRegistrationController
     public function actionConfirmNumber()
     {
         $model = new ConfirmNumberForm();
+        echo "<pre>";print_r(Yii::$app->request->post());echo "</pre>";die();
         if ($model->load(Yii::$app->request->post())) {
             echo $model->confirmation_code;die();
         }
