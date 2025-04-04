@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Календарь с несколькими комнатами</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 
 <body>
@@ -12,17 +13,20 @@
         <button class="sidebar-close" id="sidebar-close">&times;</button>
         <div class="sidebar-inner">
             <h3>Редактирование</h3>
+
             <form id="w0" method="post">
                 <div class="sidebar_date_grid">
                     <div class="form-group">
                         <label>Заезд</label>
                         <input type="date" id="checkin" />
                     </div>
+
                     <div class="form-group">
                         <label>Выезд</label>
                         <input type="date" id="checkout" />
                     </div>
                 </div>
+
                 <div id="sidebar-details"></div>
                 <div class="sidebar_submit">
                     <div class="btn btn-success update-tariff">Сохранить</div>
@@ -30,6 +34,8 @@
             </form>
         </div>
     </div>
+
+
 
     <div class="calendar-layout">
         <div class="fixed-column">
@@ -44,20 +50,20 @@
         </div>
     </div>
 
+
+
+
     <script>
         const rooms = <?php echo json_encode($rooms, JSON_UNESCAPED_UNICODE); ?>;
+        console.log(rooms);
         const today = new Date();
-        let tariff_list = {}; // persist across saves
+        let tariff_list = {};
 
         let roomId;
         let loadedMonths = 0;
         let allDays = [];
+        let updatedTariffs = {};
         let monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-
-        function convertToISO(dateStr) {
-            const [dd, mm, yyyy] = dateStr.split('-');
-            return `${yyyy}-${mm}-${dd}`;
-        }
 
         function isDateInRange(dateStr, from, to) {
             const parse = str => new Date(str.split('-').reverse().join('-'));
@@ -128,6 +134,7 @@
                 });
                 $('#data-rows').append($availRow);
 
+
                 if (!Array.isArray(room.tariff) || room.tariff.length === 0) {
                     $fixed.append(`<div class="fixed-cell">Нет тарифов</div>`);
                     const $row = $('<div>').addClass('data-row');
@@ -190,6 +197,7 @@
         });
 
         $('#data-rows').on('click', '.room_cell', function () {
+            tariff_list = {};
             const date = $(this).attr('date');
             roomId = $(this).attr('room_id');
             const room = rooms.find(r => r.id == roomId);
@@ -201,9 +209,9 @@
 
             let html = `<h4>${room.room_title} (${room.area})</h4>`;
             html += `<div class="form-group">
-                        <label>Доступно номеров </label>
-                        <input type="text" id="similar_room_count" value="${room.similar_room_amount}">
-                    </div>`;
+                            <label>Доступно номеров </label>
+                            <input type="text" id="similar_room_count" value="${room.similar_room_amount}">
+                        </div>`;
 
             if (Array.isArray(room.tariff)) {
                 const grouped = {};
@@ -213,29 +221,31 @@
                 });
 
                 for (const [title, tariffs] of Object.entries(grouped)) {
-                    html += `<div style="margin-top: 15px;"><h5>${title}</h5><div class="sidebar_tariff_grid">`;
+                    html += `<div class="" style="margin-top: 15px;"><h5>${title}</h5>
+                    <div class="sidebar_tariff_grid">`;
                     tariffs.forEach(t => {
-                        if (!tariff_list[t.id]) {
-                            tariff_list[t.id] = {
-                                id: t.id,
-                                payment_on_book: t.payment_on_book,
-                                payment_on_reception: t.payment_on_reception,
-                                cancellation: t.cancellation,
-                                meal_type: t.meal_type,
-                                title: t.title,
-                                object_id: t.object_id,
-                                prices: []
-                            };
-                        }
+                        tariff_list[t.id] = {
+                            id: t.id,
+                            payment_on_book: t.payment_on_book,
+                            payment_on_reception: t.payment_on_reception,
+                            cancellation: t.cancellation,
+                            meal_type: t.meal_type,
+                            title: t.title,
+                            object_id: t.object_id,
+                            prices: {
+                                price_arr: []
+                            }
+                        };
 
-                        for (let i = 0; i < room.guest_amount; i++) {
+                        for (i = 0; i < room.guest_amount; i++) {
                             html += `
                                 <div>
                                     <div class="form-group">
                                         <label>${i + 1} гостя</label>
-                                        <input class="tariff_price" type="text" value="" tariff_id="${t.id}">
+                                        <input class="tariff_price" type="text" value="${t.prices[0]['price_arr'][i]}" tariff_id="${t.id}">
                                     </div>
-                                </div>`;
+                                </div>
+                            `;
                         }
                     });
                     html += `</div></div>`;
@@ -246,71 +256,73 @@
 
             $('#sidebar-details').html(html);
             $('#sidebar').fadeIn().css('display', 'block');
-        });
 
-        $('.update-tariff').on('click', function (e) {
-            e.preventDefault();
-            let from_date = convertToISO($('#checkin').val());
-            let to_date = convertToISO($('#checkout').val());
 
-            const temp_price_map = {};
-
-            $('.tariff_price').each(function () {
-                const price = parseFloat($(this).val()) || 0;
-                const tariffId = parseInt($(this).attr('tariff_id'));
-
-                if (!temp_price_map[tariffId]) {
-                    temp_price_map[tariffId] = [];
-                }
-
-                temp_price_map[tariffId].push(price);
-            });
-
-            Object.entries(temp_price_map).forEach(([tariffId, priceArr]) => {
-                tariffId = parseInt(tariffId);
-
-                if (!tariff_list[tariffId]) {
-                    tariff_list[tariffId] = {
-                        id: tariffId,
-                        prices: []
-                    };
-                }
-
-                if (!Array.isArray(tariff_list[tariffId].prices)) {
-                    tariff_list[tariffId].prices = [];
-                }
-
-                tariff_list[tariffId].prices.push({
-                    price_arr: priceArr,
-                    from_date: from_date,
-                    to_date: to_date
-                });
-            });
-
-            // Example submit
-            $.ajax({
-                url: '/owner/tariff/edit-tariff',
-                type: 'POST',
-                data: {
-                    object_id: "<?= $object_id ?>",
-                    room_id: roomId,
-                    tariff_list: tariff_list,
-                    _csrf: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function () {
-                    alert('Тариф успешно сохранён!');
-                    $('#sidebar').fadeOut();
-                },
-                error: function (xhr) {
-                    alert('Ошибка при сохранении');
-                    console.error(xhr.responseText);
-                }
-            });
         });
 
         $('#sidebar-close').on('click', function () {
             $('#sidebar').fadeOut();
         });
+
+        $('.update-tariff').on('click', function (e) {
+            let new_price
+            let from_date = convertToISO($('#checkin').val());
+            let to_date = convertToISO($('#checkout').val());
+
+            $('.tariff_price').each(function () {
+                const price = parseFloat($(this).val()) || 0;
+                const tariffId = parseInt($(this).attr('tariff_id'));
+
+                if (!Array.isArray(tariff_list[tariffId].prices)) {
+                    tariff_list[tariffId].prices = [{
+                        price_arr: [],
+                        from_date: from_date,
+                        to_date: to_date
+                    }];
+                }
+
+                // Push price into the first price block
+                tariff_list[tariffId].prices[0].price_arr.push(price);
+                tariff_list[tariffId].prices.from_date = checkin;
+                tariff_list[tariffId].prices.to_date = checkout;
+            });
+
+            
+
+            e.stopImmediatePropagation();
+            e.preventDefault(); // prevent normal form submit
+
+            var similiar_room_count = $('#similar_room_count').val();
+            var object_id = "<?= $object_id ?>";
+
+
+            $.ajax({
+                url: '/owner/tariff/edit-tariff',
+                type: 'POST',
+                data: {
+                    object_id: object_id,
+                    room_id: roomId,
+                    tariff_list: tariff_list,
+                    _csrf: $('meta[name="csrf-token"]').attr('content') // Add CSRF token if needed
+                },
+                success: function (response) {
+                    //console.log(response);
+                    alert('Тариф успешно сохранён!');
+                },
+                error: function (xhr, status, error) {
+                    alert('Ошибка при сохранении. Попробуйте снова.');
+                    console.error('AJAX error:', error);
+                }
+            });
+
+        });
+
+        function convertToISO(dateStr) {
+            const [dd, mm, yyyy] = dateStr.split('-');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+
     </script>
 </body>
 

@@ -674,7 +674,6 @@ class ObjectController extends Controller
                             $tariff = [
                                 'id' => (int) $model->id,
                                 'payment_on_book' => (int) $model->payment_on_book,
-                                'payment_on_reception' => (int) $model->payment_on_reception,
                                 'cancellation' => (int) $model->cancellation,
                                 'meal_type' => (int) $model->meal_type,
                                 'title' => $model->title,
