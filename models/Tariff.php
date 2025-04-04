@@ -21,6 +21,7 @@ class Tariff extends \yii\db\ActiveRecord
     const NO_CANCELLATION = 3;
 
     public $room_list;
+    
     /**
      * {@inheritdoc}
      */
@@ -32,13 +33,13 @@ class Tariff extends \yii\db\ActiveRecord
     public function getCancellationList()
     {
         $arr = [
-            self::FREE_CANCELLATION_WITH_PENALTY => [
-                'label' => 'Бесплатная отмена, а затем отмена со штрафом вплоть до времени заезда',
-                'hint' => 'В случае отмены до указанного времени, стоимость бронирования или предоплаты будет полностью возвращена гостю. Если бронирование отменено позже указанного времени, вы сможете списать штраф.'
-            ],
             self::NO_CANCELLATION => [
                 'label' => 'Невозвратный тариф',
                 'hint' => 'В случае отмены бронирования с гостя будет удержана полная стоимость бронирования или предоплата.'
+            ],
+            self::FREE_CANCELLATION_WITH_PENALTY => [
+                'label' => 'Бесплатная отмена, а затем отмена со штрафом вплоть до времени заезда',
+                'hint' => 'В случае отмены до указанного времени, стоимость бронирования или предоплаты будет полностью возвращена гостю. Если бронирование отменено позже указанного времени, вы сможете списать штраф.'
             ]
         ];
         return $arr;
@@ -50,8 +51,9 @@ class Tariff extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['payment_on_book', 'payment_on_reception', 'cancellation', 'meal_type', 'object_id'], 'integer'],
+            [['payment_on_book', 'payment_on_reception', 'cancellation', 'meal_type', 'object_id','penalty_days'], 'integer'],
             [['cancellation', 'meal_type', 'title'], 'required'],
+            [['penalty_sum'], 'number'],
             [['title'], 'string', 'max' => 255],
         ];
     }
@@ -81,6 +83,8 @@ class Tariff extends \yii\db\ActiveRecord
             'meal_type' => Yii::t('app', 'Meal Type'),
             'title' => Yii::t('app', 'Title'),
             'object_id' => Yii::t('app', 'Объект'),
+            'penalty_sum' => Yii::t('app', 'Сумма штрафа'),
+            'penalty_days' => Yii::t('app', 'Количество дней до заезда'),
         ];
     }
 }

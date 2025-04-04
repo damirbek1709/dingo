@@ -35,6 +35,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'cancellation',
             'meal_type',
             'title',
+            'penalty_days',
+            'penalty_sum'
         ],
     ]) ?>
 

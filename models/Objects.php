@@ -220,7 +220,7 @@ class Objects extends \yii\db\ActiveRecord {
             'address_ky' => Yii::t('app', 'Адрес на кыргызском'),
 
             'description_en' => Yii::t('app', 'Описание на английском'),
-            'description_ky' => Yii::t('app', 'Описание на кыргызском')
+            'description_ky' => Yii::t('app', 'Описание на кыргызском'),
         ];
     }
 

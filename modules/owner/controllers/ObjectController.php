@@ -35,12 +35,12 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'room', 'view','delete'],
+                    'actions' => ['room-list', 'room', 'view', 'delete'],
                     'roles' => ['admin'],
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'edit-room', 'add-room','delete'],
+                    'actions' => ['room-list', 'edit-room', 'add-room', 'delete'],
                     'roles' => ['admin'], // Authenticated users
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -70,7 +70,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'edit-room','delete'],
+                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'edit-room', 'delete'],
                     'roles' => ['owner'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('id');
@@ -356,7 +356,7 @@ class ObjectController extends Controller
             $model->lon = (float) $model->lon;
             $model->user_id = (int) Yii::$app->user->id;
             $name_arr = [$model->name, $model->name_en, $model->name_ky];
-            
+
 
             $description_arr = [$model->description ? $model->description : "", $model->description_en ? $model->description_en : "", $model->description_ky ? $model->description_ky : ""];
             $model->name = array_values($name_arr);
@@ -649,6 +649,7 @@ class ObjectController extends Controller
     public function actionAddTariff($object_id)
     {
         $model = new Tariff();
+        $model->object_id = $object_id;
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $object = $index->getDocument($object_id);
@@ -680,7 +681,9 @@ class ObjectController extends Controller
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],
                                 'from_date' => '',
-                                'to_date' => ''
+                                'to_date' => '',
+                                'penalty_sum' => $model->penalty_sum,
+                                'penalty_days' => $model->penalty_days,
                             ];
 
                             $roomData['tariff'][] = $tariff;

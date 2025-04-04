@@ -35,9 +35,21 @@ use yii\widgets\ActiveForm;
                 'itemOptions' => ['class' => 'cancellation-option'], // Custom class for styling
             ]
         )->label(false); ?>
+        <div class="penalty_block">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-6">
+                        <?= $form->field($model, 'penalty_sum')->textInput() ?>
+                    </div>
+                    <div class="col-md-6">
+                        <?= $form->field($model, 'penalty_days')->textInput() ?>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="tariff_meal_block">
+    <div class="tariff_meal_block clear">
         <h3><?= Yii::t('app', 'Питание'); ?></h3>
         <?= $form->field($model, 'meal_type')->dropDownList([1 => 'Завтрак', 2 => 'Трехразовое питание'])->label('Включено в цену тарифа, указать стоимость можно во вкладке отель'); ?>
     </div>
@@ -67,6 +79,12 @@ use yii\widgets\ActiveForm;
 
 </div>
 
+<style>
+    .penalty_block {
+        display: none;
+    }
+</style>
+
 <script>
     $(document).ready(function () {
         let selectedRooms = [];
@@ -85,9 +103,7 @@ use yii\widgets\ActiveForm;
             $('#tariff-room_list').val(JSON.stringify(selectedRooms));
         });
 
-        function togglePenaltyFields() {
-            // Get the currently selected cancellation option value
-            const selectedValue = $('input[name="TariffForm[cancellation]"]:checked').val();
+        function togglePenaltyFields(selectedValue) {
 
             // Check if the container for penalty fields already exists, if not create it
             let penaltyFieldsContainer = $('.penalty-fields-container');
@@ -97,36 +113,27 @@ use yii\widgets\ActiveForm;
                 penaltyFieldsContainer = $('.penalty-fields-container');
             }
 
+            var penalty_option = "<?php echo Tariff::FREE_CANCELLATION_WITH_PENALTY; ?>";
+
             // Show or hide penalty fields based on selection
-            if (selectedValue === "<?php echo Tariff::FREE_CANCELLATION_WITH_PENALTY;?>") {
+            if (selectedValue === penalty_option) {
                 // If we need to show the fields, populate the container
-                penaltyFieldsContainer.html(`
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group field-tariffform-penalty_sum">
-                            <label class="control-label" for="tariffform-penalty_sum">Сумма штрафа</label>
-                            <input type="text" id="tariffform-penalty_sum" class="form-control" name="TariffForm[penalty_sum]">
-                            <div class="help-block"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group field-tariffform-days">
-                            <label class="control-label" for="tariffform-days">Количество дней</label>
-                            <input type="number" id="tariffform-days" class="form-control" name="TariffForm[days]" min="1">
-                            <div class="help-block"></div>
-                        </div>
-                    </div>
-                </div>
-            `);
-                penaltyFieldsContainer.show();
+                $('.penalty_block').css('display', 'block');
+                $('#tariffform-penalty_sum').val('');
+                $('#tariffform-days').val('');
             } else {
+                $('.penalty_block').css('display', 'none');
                 // Hide the fields if another option is selected
                 penaltyFieldsContainer.hide();
             }
         }
 
         // Run the function once on page load to set the initial state
-        togglePenaltyFields();
+
+        $(document).on('change', '.cancellation-option', function () {
+            var selectedValue = $(this).val();
+            togglePenaltyFields(selectedValue);
+        });
 
 
     });
