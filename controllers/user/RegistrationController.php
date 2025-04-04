@@ -210,7 +210,10 @@ class RegistrationController extends BaseRegistrationController
             echo "post does not exist";
         }
 
-        return $this->render('confirm-number');
+        return $this->render('confirm-number',[
+            'model'=>$model,
+            'module'=>$this->module,
+        ]);
     }
 
     private function generateUniqueReferralId()
