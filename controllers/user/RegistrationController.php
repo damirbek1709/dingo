@@ -186,27 +186,32 @@ class RegistrationController extends BaseRegistrationController
     public function actionConfirmNumber()
     {
         $model = new ConfirmNumberForm();
-
-        $this->performAjaxValidation($model);
-        if (Yii::$app->request->post('confirmation_code')) {
-            $model->confirmation_code = Yii::$app->request->post('confirmation_code');
-            if ($model->confirmationCodeFound()) {
-                $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
-                $user = $token->user;
-                $user->confirmed_at = time();
-                $user->save();
-                $token->delete();
-                if (Yii::$app->user->login($user)) {
-                    return $this->redirect('/owner');
-                } 
-            }
-            else{
-                echo "Error";
-            }
+        if ($model->load(Yii::$app->request->post())) {
+            echo $model->confirmation_code;die();
         }
         else{
-            echo "post does not exist";
+            echo "Something wrong";die();
         }
+        // if (Yii::$app->request->post('confirmation_code')) {
+        //     $model->confirmation_code = Yii::$app->request->post('confirmation_code');
+            
+        //     if ($model->confirmationCodeFound()) {
+        //         $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
+        //         $user = $token->user;
+        //         $user->confirmed_at = time();
+        //         $user->save();
+        //         $token->delete();
+        //         if (Yii::$app->user->login($user)) {
+        //             return $this->redirect('/owner');
+        //         } 
+        //     }
+        //     else{
+        //         echo "Error";
+        //     }
+        // }
+        // else{
+        //     echo "post does not exist";die();
+        // }
 
         return $this->render('confirm-number',[
             'model'=>$model,
