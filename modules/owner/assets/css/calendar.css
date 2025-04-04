@@ -1,168 +1,178 @@
 .calendar-layout {
-    display: flex;
-    font-family: sans-serif;
+  display: flex;
+  font-family: sans-serif;
 }
 
 .fixed-column {
-    min-width: 220px;
-    flex-shrink: 0;
-    border-right: 1px solid #ccc;
+  min-width: 220px;
+  flex-shrink: 0;
+  border-right: 1px solid #ccc;
 }
 
 .fixed-cell {
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-    height: 60px;
-    width: 300px;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  height: 60px;
+  width: 300px;
 }
 
 .scroll-wrapper {
-    overflow-x: auto;
-    width: 100%;
+  overflow-x: auto;
+  width: 100%;
 }
 
 .scroll-container {
-    display: flex;
-    flex-direction: column;
-    min-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  min-width: 1000px;
 }
 
 .month-labels {
-    display: flex;
+  display: flex;
 }
 
 .month-label {
-    width: 60px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 13px;
-    color: #2196f3;
-    padding: 4px 0;
-    border-bottom: 1px solid #ccc;
+  width: 60px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 13px;
+  color: #2196f3;
+  padding: 4px 0;
+  border-bottom: 1px solid #ccc;
 }
 
 .days-row,
 .data-row {
-    display: flex;
+  display: flex;
 }
 
 .day-header,
 .data-cell {
-    width: 60px;
-    text-align: center;
-    padding: 6px;
-    border-bottom: 1px solid #eee;
-    border-left: 1px solid #f0f0f0;
-    box-sizing: border-box;
-    min-width: 60px;
-    height: 60px;
-    display: flex;
-    min-width: 60px;
-    align-items: center;
-    justify-content: center;
+  width: 60px;
+  text-align: center;
+  padding: 6px;
+  border-bottom: 1px solid #eee;
+  border-left: 1px solid #f0f0f0;
+  box-sizing: border-box;
+  min-width: 60px;
+  height: 60px;
+  display: flex;
+  min-width: 60px;
+  align-items: center;
+  justify-content: center;
 }
 
 .day-header {
-    background: #f9f9f9;
-    font-weight: bold;
+  background: #f9f9f9;
+  font-weight: bold;
 }
 
 .today {
-    background: #fff3cd !important;
+  background: #fff3cd !important;
 }
 
 .unavailable {
-    color: red;
-    font-weight: bold;
+  color: red;
+  font-weight: bold;
 }
 
 .month-header-sticky {
-    position: sticky;
-    left: 0;
-    top: 0;
-    z-index: 3;
-    background: #fff;
-    font-weight: bold;
-    font-size: 18px;
-    /* padding: 10px; */
-    color: #2196f3;
-    border-bottom: 1px solid #ddd;
-    /* border-right: 1px solid #ccc; */
-    width: 100%;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: sticky;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  background: #fff;
+  font-weight: bold;
+  font-size: 18px;
+  /* padding: 10px; */
+  color: #2196f3;
+  border-bottom: 1px solid #ddd;
+  /* border-right: 1px solid #ccc; */
+  width: 100%;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .sidebar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 320px;
-    height: 100%;
-    background: #f9f9f9;
-    border-left: 1px solid #ccc;
-    padding: 20px;
-    box-shadow: -2px 0 8px rgba(0,0,0,0.05);
-    display: none;
-    overflow-y: auto;
-    z-index: 2000;
-  }
-  
-  .sidebar h3 {
-    margin-top: 0;
-    font-size: 18px;
-  }
-  
-  .sidebar h4 {
-    margin: 16px 0 8px;
-    font-size: 16px;
-  }
-  
-  .sidebar h5 {
-    margin: 12px 0 6px;
-    font-size: 14px;
-    font-weight: bold;
-  }
-  
-  .form-group {
-    margin-bottom: 12px;
-  }
-  
-  .form-group label {
-    display: block;
-    margin-bottom: 4px;
-    font-weight: 500;
-    font-size: 13px;
-  }
-  
-  .form-group input {
-    width: 100%;
-    padding: 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    background: #fff;
-  }
-  .sidebar-close {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    background: none;
-    border: none;
-    font-size: 24px;
-    line-height: 1;
-    cursor: pointer;
-    color: #888;
-  }
-  .sidebar-close:hover {
-    color: #000;
-  }
-  .room_cell{
-    cursor: pointer;
-  }
-  
-  .sidebar_date_grid{
-    display: grid;
-  }
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 320px;
+  height: 100%;
+  background: #f9f9f9;
+  border-left: 1px solid #ccc;
+  padding: 20px;
+  box-shadow: -2px 0 8px rgba(0,0,0,0.05);
+  display: none;
+  overflow-y: auto;
+  z-index: 2000;
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  font-size: 18px;
+}
+
+.sidebar h4 {
+  margin: 16px 0 8px;
+  font-size: 16px;
+}
+
+.sidebar h5 {
+  margin: 12px 0 6px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.tariff_price {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+}
+.sidebar-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #888;
+}
+.sidebar-close:hover {
+  color: #000;
+}
+.room_cell{
+  cursor: pointer;
+}
+
+.sidebar_date_grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px;
+}
+.sidebar_tariff_grid{
+display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 10px;
+}
+.tariff-form-group{
+display:none;
+}
