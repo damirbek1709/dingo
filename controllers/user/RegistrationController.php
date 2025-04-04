@@ -189,9 +189,7 @@ class RegistrationController extends BaseRegistrationController
         if ($model->load(Yii::$app->request->post())) {
             echo $model->confirmation_code;die();
         }
-        else{
-            echo "Something wrong";die();
-        }
+        
         // if (Yii::$app->request->post('confirmation_code')) {
         //     $model->confirmation_code = Yii::$app->request->post('confirmation_code');
             
