@@ -142,9 +142,7 @@ class RegistrationController extends BaseRegistrationController
     public function actionSignin()
     {
         $model = new SigninForm();
-
         $this->performAjaxValidation($model);
-
         if ($model->load(Yii::$app->request->post()) && $model->signin()) {
 
             return $this->redirect('confirm-number');
