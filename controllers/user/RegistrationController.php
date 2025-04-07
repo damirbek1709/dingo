@@ -201,18 +201,18 @@ class RegistrationController extends BaseRegistrationController
                         $token->created_at = time();
 
                         if ($token->save()) {
-                            // Yii::$app->mailer->compose()
-                            //     ->setFrom('send@dingo.kg')
-                            //     ->setTo($model->email)
-                            //     ->setSubject("Ваш код авторизации: " . $token->code)
-                            //     ->setHtmlBody("<h1>{$token->code}</h1>")
-                            //     ->setTextBody('Hello from Resend! This is a test email.')
-                            //     ->send();
+                            Yii::$app->mailer->compose()
+                                ->setFrom('send@dingo.kg')
+                                ->setTo($model->email)
+                                ->setSubject("Ваш код авторизации: " . $token->code)
+                                ->setHtmlBody("<h1>{$token->code}</h1>")
+                                ->setTextBody('Hello from Resend! This is a test email.')
+                                ->send();
                         } else {
                             Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
                         }
                         $this->trigger(self::EVENT_AFTER_REGISTER, $event);
-                        return $this->redirect('confirm-number', ['email' => $model->email]);
+                        return $this->redirect('confirm-number');
                     }
                 }
 
@@ -229,16 +229,15 @@ class RegistrationController extends BaseRegistrationController
      *
      * @return type
      */
-    public function actionConfirmNumber($email)
+    public function actionConfirmNumber()
     {
         $model = new ConfirmNumberForm();
         $this->performAjaxValidation($model);
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
                 if ($model->validate()) {
-                    $user = User::find()->where(['email' => $email])->one();
-                    $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION, 'id' => $user->id])->one();
-
+                    $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
+                    $user = $token->user;
                     $user->confirmed_at = time();
                     $user->save();
                     $token->delete();
@@ -250,8 +249,9 @@ class RegistrationController extends BaseRegistrationController
                     if (Yii::$app->user->login($user)) {
                         return $this->redirect('/owner');
                     }
-                } else {
-                    return $model->addError('confirmation_code', 'Неверно введен проверочный код');
+                }
+                else{
+                    return $model->addError('confirmation_code','Неверно введен проверочный код');
                 }
             }
         } else {
