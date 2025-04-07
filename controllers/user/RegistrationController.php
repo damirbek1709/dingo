@@ -249,6 +249,9 @@ class RegistrationController extends BaseRegistrationController
                         return $this->redirect('/owner');
                     }
                 }
+                else{
+                    return $model->addError('confirmation_code','Неверно введен проверочный код');
+                }
             }
         } else {
             return $this->render('confirm-number', [
