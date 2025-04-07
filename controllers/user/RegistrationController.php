@@ -182,6 +182,9 @@ class RegistrationController extends BaseRegistrationController
                     return $this->redirect('confirm-number');
 
                 } else {
+                    $user = new User();
+                    $user->username = $model->email;
+                    $user->email = $model->email;
                     if ($user->register()) {
                         $token = new Token();
                         $token->user_id = $user->id; // Ensure user_id is set
