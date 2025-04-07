@@ -188,9 +188,8 @@ class RegistrationController extends BaseRegistrationController
                     $this->trigger(self::EVENT_BEFORE_REGISTER, $event);
                     $this->performAjaxValidation($model);
 
-                    $user->email = $model->email;
                     $model->username = $model->email;
-                    
+
                     if ($model->register()) {
                         $token = new Token();
                         $token->user_id = $user->id; // Ensure user_id is set
