@@ -160,6 +160,11 @@ class RegistrationController extends BaseRegistrationController
                 $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
                 return $this->redirect('confirm-number');
             } else {
+                $model = Yii::createObject(RegistrationForm::className());
+                $event = $this->getFormEvent($model);
+                $this->performAjaxValidation($model);
+                $model->username = $model->email;
+                
                 if ($model->register()) {
                     $user = User::find()->where(['email' => $model->email])->one();
                     $token = new Token();
@@ -198,7 +203,6 @@ class RegistrationController extends BaseRegistrationController
     public function actionConfirmNumber()
     {
         $model = new ConfirmNumberForm();
-
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
                 if ($model->confirmationCodeFound()) {

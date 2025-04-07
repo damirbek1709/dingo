@@ -45,6 +45,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     'linkOptions' => ['data-method' => 'post']
                 ],
             ], 'visible' => !Yii::$app->user->isGuest],
+            ['label' => 'Войти', 'url' => ['/user/register']],
         ]
     ]);
     NavBar::end();
