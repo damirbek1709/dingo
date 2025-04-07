@@ -25,6 +25,7 @@ class User extends BaseUser
         // add some rules
 
         $rules['search_dataSafe'] = ['search_data', 'safe'];
+        $rules['usernameUnique'] = [];
         
         return $rules;
     }
