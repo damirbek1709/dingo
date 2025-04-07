@@ -182,10 +182,16 @@ class RegistrationController extends BaseRegistrationController
                     return $this->redirect('confirm-number');
 
                 } else {
+                    $model = Yii::createObject(RegistrationForm::className());
+                    $event = $this->getFormEvent($model);
+
+                    $this->trigger(self::EVENT_BEFORE_REGISTER, $event);
+                    $this->performAjaxValidation($model);
 
                     $user->email = $model->email;
-                    $user->username = $model->username;
-                    if ($user->register()) {
+                    $model->username = $model->email;
+                    
+                    if ($model->register()) {
                         $token = new Token();
                         $token->user_id = $user->id; // Ensure user_id is set
                         $token->type = Token::TYPE_CONFIRMATION;
