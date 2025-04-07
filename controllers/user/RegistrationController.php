@@ -226,7 +226,7 @@ class RegistrationController extends BaseRegistrationController
         $model = new ConfirmNumberForm();
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
-                if ($model->confirmationCodeFound()) {
+                if ($model->validate()) {
                     $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
                     $user = $token->user;
                     $user->confirmed_at = time();

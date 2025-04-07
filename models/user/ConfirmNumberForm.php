@@ -21,6 +21,7 @@ class ConfirmNumberForm extends \yii\base\Model
         return [
             [['confirmation_code'], 'required'],
             [['confirmation_code'], 'integer'],
+            [['confirmation_code'], 'validateConfirmationCode'],
         ];
     }
 
@@ -38,16 +39,13 @@ class ConfirmNumberForm extends \yii\base\Model
      *
      * @return type
      */
-    public function confirmationCodeFound()
-    {
-        if ($this->validate()) {
-            $token = Token::find()->where(['code' => $this->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
+    
 
-            if ($token === null || $token->isExpired || $token->user === null) {
-                $this->addError('confirmation_code', 'Проверочный код не найден или устарел');
-            } else {
-                return true;
-            }
+    public function validateConfirmationCode($attribute, $params)
+    {
+        $token = Token::find()->where(['code' => $this->$attribute, 'type' => Token::TYPE_CONFIRMATION])->one();
+        if ($token === null || $token->isExpired || $token->user === null) {
+            $this->addError($attribute, 'Проверочный код не найден или устарел');
         }
     }
 }
