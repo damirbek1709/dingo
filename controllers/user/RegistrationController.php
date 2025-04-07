@@ -150,7 +150,6 @@ class RegistrationController extends BaseRegistrationController
         /** @var RegistrationForm $model */
         $model = Yii::createObject(SigninForm::className());
         $event = $this->getFormEvent($model);
-
         $this->performAjaxValidation($model);
         if ($model->load(Yii::$app->request->post())) {
             if (in_array($model->email, ['damirbek@gmail.com'])) {
@@ -160,13 +159,9 @@ class RegistrationController extends BaseRegistrationController
                 $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
                 return $this->redirect('confirm-number');
             } else {
-                $model = Yii::createObject(RegistrationForm::className());
-                $event = $this->getFormEvent($model);
-                $this->performAjaxValidation($model);
-                $model->username = $model->email;
-                
-                if ($model->register()) {
-                    $user = User::find()->where(['email' => $model->email])->one();
+                $user = User::find()->where(['email' => $model->email])->one();
+                $user->username = $model->email;
+                if ($user->register()) {
                     $token = new Token();
                     $token->user_id = $user->id; // Ensure user_id is set
                     $token->type = Token::TYPE_CONFIRMATION;
