@@ -212,7 +212,7 @@ class RegistrationController extends BaseRegistrationController
                             Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
                         }
                         $this->trigger(self::EVENT_AFTER_REGISTER, $event);
-                        return $this->redirect('confirm-number');
+                        return $this->redirect('confirm-number', ['email' => $model->email]);
                     }
                 }
 
@@ -229,15 +229,16 @@ class RegistrationController extends BaseRegistrationController
      *
      * @return type
      */
-    public function actionConfirmNumber()
+    public function actionConfirmNumber($email)
     {
         $model = new ConfirmNumberForm();
         $this->performAjaxValidation($model);
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
                 if ($model->validate()) {
-                    $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
-                    $user = $token->user;
+                    $user = User::find()->where(['email' => $email])->one();
+                    $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION, 'id' => $user->id])->one();
+
                     $user->confirmed_at = time();
                     $user->save();
                     $token->delete();
@@ -249,9 +250,8 @@ class RegistrationController extends BaseRegistrationController
                     if (Yii::$app->user->login($user)) {
                         return $this->redirect('/owner');
                     }
-                }
-                else{
-                    return $model->addError('confirmation_code','Неверно введен проверочный код');
+                } else {
+                    return $model->addError('confirmation_code', 'Неверно введен проверочный код');
                 }
             }
         } else {
