@@ -189,27 +189,29 @@ class RegistrationController extends BaseRegistrationController
                     $this->performAjaxValidation($model);
 
                     $model->username = $model->email;
-                    if ($model->load(Yii::$app->request->post()) && $model->register()) {
-                        
-                        $token = new Token();
-                        $token->user_id = $user->id; // Ensure user_id is set
-                        $token->type = Token::TYPE_CONFIRMATION;
-                        $token->code = rand(1000, 9999); // Generate a random code
-                        $token->created_at = time();
+                    if ($model->load(Yii::$app->request->post())) {
+                        if ($model->register()) {
+                            $token = new Token();
+                            $token->user_id = $user->id; // Ensure user_id is set
+                            $token->type = Token::TYPE_CONFIRMATION;
+                            $token->code = rand(1000, 9999); // Generate a random code
+                            $token->created_at = time();
 
-                        if ($token->save()) {
-                            Yii::$app->mailer->compose()
-                                ->setFrom('send@dingo.kg')
-                                ->setTo($model->email)
-                                ->setSubject("Ваш код авторизации: " . $token->code)
-                                ->setHtmlBody("<h1>{$token->code}</h1>")
-                                ->setTextBody('Hello from Resend! This is a test email.')
-                                ->send();
-                        } else {
-                            Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
+                            if ($token->save()) {
+                                Yii::$app->mailer->compose()
+                                    ->setFrom('send@dingo.kg')
+                                    ->setTo($model->email)
+                                    ->setSubject("Ваш код авторизации: " . $token->code)
+                                    ->setHtmlBody("<h1>{$token->code}</h1>")
+                                    ->setTextBody('Hello from Resend! This is a test email.')
+                                    ->send();
+                            } else {
+                                Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
+                            }
+                            $this->trigger(self::EVENT_AFTER_REGISTER, $event);
+                            return $this->redirect('confirm-number');
                         }
-                        $this->trigger(self::EVENT_AFTER_REGISTER, $event);
-                        return $this->redirect('confirm-number');
+
                     }
                 }
 
