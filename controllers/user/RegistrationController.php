@@ -201,13 +201,17 @@ class RegistrationController extends BaseRegistrationController
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
-                //echo "<pre>";print_r(Yii::$app->request->post());echo "</pre>";die();
                 if ($model->confirmationCodeFound()) {
                     $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
                     $user = $token->user;
                     $user->confirmed_at = time();
                     $user->save();
                     $token->delete();
+                    $auth = Yii::$app->authManager;
+                    $role = $auth->getPermission('owner'); // Make sure "owner" role exists in RBAC
+                    if ($role) {
+                        $auth->assign($role, $user->id);
+                    }
                     if (Yii::$app->user->login($user)) {
                         return $this->redirect('/owner');
                     }
