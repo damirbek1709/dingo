@@ -42,22 +42,23 @@ class SigninForm extends \yii\base\Model
     public function signin()
     {
         if ($this->validate()) {
-            $user = User::find()->where(['username' => $this->phone_number])->one();
+            $user = User::find()->where(['email' => $this->email])->one();
             if ($user === null) {
                 $model = new RegistrationForm();
-                $model->username = $this->phone_number;
+                $model->username = $this->email;
+                $model->email = $this->email;
 
                 if ($model->validate() && $model->register()) {
                     return true;
                 } else {
-                    $this->addError('phone_number', $model->getFirstError('username'));
+                    $this->addError('email', $model->getFirstError('username'));
                 }
             } else {
                 //$user->confirmed_at = null;
                 $user->save();
                 $sendSMS = true;
 
-                if (in_array($user->username, ['996553000665', '996707889512', '996551170990', '996505170990','996555555555','996333333333','996777777777','996999999999'])) {
+                if (in_array($user->username, ['damirbek@gmail.com'])) {
                     $dao = Yii::$app->db;
                     $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
                     $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
@@ -67,11 +68,14 @@ class SigninForm extends \yii\base\Model
                     $token->link('user', $user);
                 }
 
-                $recipient = '+' . $user->username;
 
                 if ($sendSMS) {
-                    Yii::$app->nikita->setRecipient($recipient)
-                        ->setText('Ваш код: ' . $token->code)
+                    Yii::$app->mailer->compose()
+                        ->setFrom('send@dingo.kg')
+                        ->setTo($this->email)
+                        ->setSubject("Ваш код авторизации: " . $token->code)
+                        ->setHtmlBody("<h1>{$token->code}</h1>")
+                        ->setTextBody('Hello from Resend! This is a test email.')
                         ->send();
                 }
 

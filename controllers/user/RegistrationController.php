@@ -139,78 +139,15 @@ class RegistrationController extends BaseRegistrationController
         ]);
     }
 
-
-
     public function actionSignin()
     {
-        if (!$this->module->enableRegistration) {
-            throw new NotFoundHttpException();
-        }
+        $model = new SigninForm();
 
-        /** @var RegistrationForm $model */
-        $model = Yii::createObject(SigninForm::className());
-        $event = $this->getFormEvent($model);
         $this->performAjaxValidation($model);
 
-        if ($model->load(Yii::$app->request->post())) {
-            if (in_array($model->email, ['damirbek@gmail.com'])) {
-                $user = User::find()->where(['email' => $model->email])->one();
-                $dao = Yii::$app->db;
-                $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
-                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
-                return $this->redirect('confirm-number');
-            } else {
-                $user = User::find()->where(['email' => $model->email])->one();
-                if ($user) {
-                    $token = new Token();
-                    $token->user_id = $user->id; // Ensure user_id is set
-                    $token->type = Token::TYPE_CONFIRMATION;
-                    $token->code = rand(1000, 9999); // Generate a random code
-                    $token->created_at = time();
+        if ($model->load(Yii::$app->request->post()) && $model->signin()) {
 
-                    if ($token->save()) {
-                        Yii::$app->mailer->compose()
-                            ->setFrom('send@dingo.kg')
-                            ->setTo($model->email)
-                            ->setSubject("Ваш код авторизации: " . $token->code)
-                            ->setHtmlBody("<h1>{$token->code}</h1>")
-                            ->setTextBody('Hello from Resend! This is a test email.')
-                            ->send();
-                    } else {
-                        Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
-                    }
-                    $this->trigger(self::EVENT_AFTER_REGISTER, $event);
-                    return $this->redirect('confirm-number');
-
-                } else {
-                    $user = new User();
-                    $user->username = $model->email;
-                    $user->email = $model->email;
-                    
-                    if ($user->register()) {
-                        $token = new Token();
-                        $token->user_id = $user->id; // Ensure user_id is set
-                        $token->type = Token::TYPE_CONFIRMATION;
-                        $token->code = rand(1000, 9999); // Generate a random code
-                        $token->created_at = time();
-
-                        if ($token->save()) {
-                            Yii::$app->mailer->compose()
-                                ->setFrom('send@dingo.kg')
-                                ->setTo($model->email)
-                                ->setSubject("Ваш код авторизации: " . $token->code)
-                                ->setHtmlBody("<h1>{$token->code}</h1>")
-                                ->setTextBody('Hello from Resend! This is a test email.')
-                                ->send();
-                        } else {
-                            Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
-                        }
-                        $this->trigger(self::EVENT_AFTER_REGISTER, $event);
-                        return $this->redirect('confirm-number');
-                    }
-                }
-
-            }
+            return $this->redirect('confirm-number');
         }
 
         return $this->render('signin', [
@@ -218,6 +155,85 @@ class RegistrationController extends BaseRegistrationController
             'module' => $this->module,
         ]);
     }
+
+
+    // public function actionSignin()
+    // {
+    //     if (!$this->module->enableRegistration) {
+    //         throw new NotFoundHttpException();
+    //     }
+
+    //     /** @var RegistrationForm $model */
+    //     $model = Yii::createObject(SigninForm::className());
+    //     $event = $this->getFormEvent($model);
+    //     $this->performAjaxValidation($model);
+
+    //     if ($model->load(Yii::$app->request->post())) {
+    //         if (in_array($model->email, ['damirbek@gmail.com'])) {
+    //             $user = User::find()->where(['email' => $model->email])->one();
+    //             $dao = Yii::$app->db;
+    //             $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
+    //             $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
+    //             return $this->redirect('confirm-number');
+    //         } else {
+    //             $user = User::find()->where(['email' => $model->email])->one();
+    //             if ($user) {
+    //                 $token = new Token();
+    //                 $token->user_id = $user->id; // Ensure user_id is set
+    //                 $token->type = Token::TYPE_CONFIRMATION;
+    //                 $token->code = rand(1000, 9999); // Generate a random code
+    //                 $token->created_at = time();
+
+    //                 if ($token->save()) {
+    //                     Yii::$app->mailer->compose()
+    //                         ->setFrom('send@dingo.kg')
+    //                         ->setTo($model->email)
+    //                         ->setSubject("Ваш код авторизации: " . $token->code)
+    //                         ->setHtmlBody("<h1>{$token->code}</h1>")
+    //                         ->setTextBody('Hello from Resend! This is a test email.')
+    //                         ->send();
+    //                 } else {
+    //                     Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
+    //                 }
+    //                 $this->trigger(self::EVENT_AFTER_REGISTER, $event);
+    //                 return $this->redirect('confirm-number');
+
+    //             } else {
+    //                 $user = new User();
+    //                 $user->username = $model->email;
+    //                 $user->email = $model->email;
+
+    //                 if ($user->register()) {
+    //                     $token = new Token();
+    //                     $token->user_id = $user->id; // Ensure user_id is set
+    //                     $token->type = Token::TYPE_CONFIRMATION;
+    //                     $token->code = rand(1000, 9999); // Generate a random code
+    //                     $token->created_at = time();
+
+    //                     if ($token->save()) {
+    //                         Yii::$app->mailer->compose()
+    //                             ->setFrom('send@dingo.kg')
+    //                             ->setTo($model->email)
+    //                             ->setSubject("Ваш код авторизации: " . $token->code)
+    //                             ->setHtmlBody("<h1>{$token->code}</h1>")
+    //                             ->setTextBody('Hello from Resend! This is a test email.')
+    //                             ->send();
+    //                     } else {
+    //                         Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
+    //                     }
+    //                     $this->trigger(self::EVENT_AFTER_REGISTER, $event);
+    //                     return $this->redirect('confirm-number');
+    //                 }
+    //             }
+
+    //         }
+    //     }
+
+    //     return $this->render('signin', [
+    //         'model' => $model,
+    //         'module' => $this->module,
+    //     ]);
+    // }
 
     /**
      *
