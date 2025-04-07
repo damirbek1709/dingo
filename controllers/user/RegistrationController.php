@@ -189,8 +189,8 @@ class RegistrationController extends BaseRegistrationController
                     $this->performAjaxValidation($model);
 
                     $model->username = $model->email;
-
-                    if ($model->register()) {
+                    if ($model->load(Yii::$app->request->post()) && $model->register()) {
+                        
                         $token = new Token();
                         $token->user_id = $user->id; // Ensure user_id is set
                         $token->type = Token::TYPE_CONFIRMATION;
