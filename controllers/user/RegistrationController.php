@@ -151,6 +151,7 @@ class RegistrationController extends BaseRegistrationController
         $model = Yii::createObject(SigninForm::className());
         $event = $this->getFormEvent($model);
         $this->performAjaxValidation($model);
+
         if ($model->load(Yii::$app->request->post())) {
             if (in_array($model->email, ['damirbek@gmail.com'])) {
                 $user = User::find()->where(['email' => $model->email])->one();
@@ -185,6 +186,7 @@ class RegistrationController extends BaseRegistrationController
                     $user = new User();
                     $user->username = $model->email;
                     $user->email = $model->email;
+                    
                     if ($user->register()) {
                         $token = new Token();
                         $token->user_id = $user->id; // Ensure user_id is set
