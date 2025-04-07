@@ -232,6 +232,7 @@ class RegistrationController extends BaseRegistrationController
     public function actionConfirmNumber()
     {
         $model = new ConfirmNumberForm();
+        $this->performAjaxValidation($model);
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
                 if ($model->validate()) {
