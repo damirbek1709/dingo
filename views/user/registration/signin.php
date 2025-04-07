@@ -35,7 +35,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 ]); ?>
 
                 <?= $form->errorSummary($model) ?>
-                <?= $form->field($model, 'phone_number') ?>
+                <?= $form->field($model, 'email'); ?>
 
                 <?= Html::submitButton(Yii::t('user', 'Sign in'), ['class' => 'btn btn-success btn-block']) ?>
 

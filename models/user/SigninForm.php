@@ -11,7 +11,7 @@ use app\models\user\RegistrationForm;
  */
 class SigninForm extends \yii\base\Model
 {
-    public $phone_number;
+    public $email;
 
     /**
      * {@inheritdoc}
@@ -19,10 +19,9 @@ class SigninForm extends \yii\base\Model
     public function rules()
     {
         return [
-            ['phone_number', 'trim'],
-            ['phone_number', 'required', 'on' => ['register', 'create', 'connect', 'update']],
-            ['phone_number', 'match', 'pattern' => User::$phoneRegexp],
-            ['phone_number', 'string', 'min' => 3, 'max' => 255],
+            ['email', 'trim'],
+            ['email', 'required', 'on' => ['register', 'create', 'connect', 'update']],
+            ['email', 'string', 'min' => 3, 'max' => 255],
         ];
     }
 
@@ -32,7 +31,7 @@ class SigninForm extends \yii\base\Model
     public function attributeLabels()
     {
         return [
-            'phone_number' => 'Номер телефона',
+            'email' => 'E-mail',
         ];
     }
 

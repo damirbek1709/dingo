@@ -32,6 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'id' => 'confirm-number-form',
                     'enableAjaxValidation' => true,
                     'enableClientValidation' => false,
+                    
                 ]); ?>
 
                 <?= $form->errorSummary($model) ?>
