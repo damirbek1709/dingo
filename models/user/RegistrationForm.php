@@ -58,12 +58,7 @@ class RegistrationForm extends BaseRegistrationForm
             'emailTrim' => ['email', 'trim'],
             'emailRequired' => ['email', 'required'],
             'emailPattern' => ['email', 'email'],
-            'emailUnique' => [
-                'email',
-                'unique',
-                'targetClass' => $user,
-                'message' => Yii::t('user', 'This email address has already been taken')
-            ],
+            
             // password rules
             'passwordRequired' => ['password', 'required', 'skipOnEmpty' => $this->module->enableGeneratingPassword],
             'passwordLength' => ['password', 'string', 'min' => 6, 'max' => 72],
