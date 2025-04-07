@@ -88,7 +88,7 @@ class RegistrationController extends BaseRegistrationController
         ]);
     }
 
-    public function actionRegister()
+    public function actionRegisterOld()
     {
         if (!$this->module->enableRegistration) {
             throw new NotFoundHttpException();
@@ -141,7 +141,7 @@ class RegistrationController extends BaseRegistrationController
 
 
 
-    public function actionSignin()
+    public function actionRegister()
     {
         if (!$this->module->enableRegistration) {
             throw new NotFoundHttpException();
