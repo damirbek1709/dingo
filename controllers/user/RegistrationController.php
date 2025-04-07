@@ -146,6 +146,22 @@ class RegistrationController extends BaseRegistrationController
         if ($model->load(Yii::$app->request->post())) {
             $user = User::find()->where(['email' => $model->email])->one();
             if ($user) {
+                $token = new Token();
+                $token->user_id = $user->id; // Ensure user_id is set
+                $token->type = Token::TYPE_CONFIRMATION;
+                $token->code = rand(1000, 9999); // Generate a random code
+                $token->created_at = time();
+
+                Yii::$app->mailer->compose()
+                    ->setFrom('send@dingo.kg')
+                    ->setTo($model->email)
+                    ->setSubject("Ваш код авторизации: " . $token->code)
+                    ->setHtmlBody("<h1>{$token->code}</h1>")
+                    ->setTextBody('Hello from Resend! This is a test email.')
+                    ->send();
+                return $this->redirect(['confirm-code', 'email' => $model->email]);
+
+            } else {
                 $model->username = $model->email;
                 $this->performAjaxValidation($model);
                 if ($model->register()) {
@@ -166,10 +182,9 @@ class RegistrationController extends BaseRegistrationController
                 }
             }
 
-
         }
 
-        return $this->render('register', [
+        return $this->render('signin', [
             'model' => $model,
             'module' => $this->module,
         ]);
