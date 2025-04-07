@@ -35,7 +35,6 @@ $this->params['breadcrumbs'][] = $this->title;
                     
                 ]); ?>
 
-                <?= $form->errorSummary($model) ?>
                 <?= $form->field($model, 'confirmation_code') ?>
 
                 <?= Html::submitButton('Подтвердить', ['class' => 'btn btn-success btn-block']) ?>
