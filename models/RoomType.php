@@ -33,6 +33,18 @@ class RoomType extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function сomfortList()
+    {
+        $comfortItems = RoomComfort::find()->orderBy(['category_id' => SORT_ASC])->all();
+        $groupedComfort = [];
+
+        foreach ($comfortItems as $item) {
+            $groupedComfort[$item->category_id][] = $item;
+        }
+
+        return $groupedComfort;
+    }
+
     /**
      * {@inheritdoc}
      */

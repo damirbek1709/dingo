@@ -3,6 +3,7 @@
 namespace app\modules\api\controllers;
 
 use app\models\Comfort;
+use app\models\RoomComfort;
 use app\models\user\User;
 use Yii;
 use yii\filters\AccessControl;
@@ -64,7 +65,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title','similar'],
+                    'actions' => ['add', 'category-comfort-title', 'similar','room-comfort-title'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -107,6 +108,7 @@ class ObjectController extends BaseController
                 'similar' => ['GET'],
                 'remove-from-favorites' => ['POST'],
                 'category-comfort-title' => ['GET'],
+                'room-comfort-title' => ['GET'],
                 'room-images' => ['GET'],
             ],
         ];
@@ -763,6 +765,56 @@ class ObjectController extends BaseController
         return $arr;
     }
 
+
+    public function actionRoomComfortTitle()
+    {
+        $arr = [
+            'ru' => [
+                RoomComfort::ROOM_COMFORT_SPORT => Yii::t('app', 'Спорт и отдых'),
+                RoomComfort::ROOM_COMFORT_GENERAL => Yii::t('app', 'Общее'),
+                RoomComfort::ROOM_COMFORT_BATHROOM => Yii::t('app', 'Ванная'),
+                RoomComfort::ROOM_COMFORT_INSIDE => Yii::t('app', 'В номерах'),
+                RoomComfort::ROOM_COMFORT_EXTRA => Yii::t('app', 'Дополнительно'),
+                RoomComfort::ROOM_COMFORT_MEAL => Yii::t('app', 'Питание'),
+                RoomComfort::ROOM_COMFORT_OUTSIDE => Yii::t('app', 'Вне помещения и вид'),
+                RoomComfort::ROOM_COMFORT_LAUNDRY => Yii::t('app', 'Стирка'),
+                RoomComfort::ROOM_COMFORT_POOL => Yii::t('app', 'Бассейн и пляж'),
+                RoomComfort::ROOM_COMFORT_INTERNET => Yii::t('app', 'Интернет'),
+                RoomComfort::ROOM_COMFORT_BEAUTY => Yii::t('app', 'Красота и здоровье'),
+                RoomComfort::ROOM_COMFORT_TV => Yii::t('app', 'Телевидение и техника'),
+            ],
+            'en' => [
+                RoomComfort::ROOM_COMFORT_SPORT => Yii::t('app', 'Sport and recreation'),
+                RoomComfort::ROOM_COMFORT_GENERAL => Yii::t('app', 'General'),
+                RoomComfort::ROOM_COMFORT_BATHROOM => Yii::t('app', 'Bathroom'),
+                RoomComfort::ROOM_COMFORT_INSIDE => Yii::t('app', 'In-room facilities'),
+                RoomComfort::ROOM_COMFORT_EXTRA => Yii::t('app', 'Additional'),
+                RoomComfort::ROOM_COMFORT_MEAL => Yii::t('app', 'Meal'),
+                RoomComfort::ROOM_COMFORT_OUTSIDE => Yii::t('app', 'Outdoor and view'),
+                RoomComfort::ROOM_COMFORT_LAUNDRY => Yii::t('app', 'Laundry'),
+                RoomComfort::ROOM_COMFORT_POOL => Yii::t('app', 'Pool and beach'),
+                RoomComfort::ROOM_COMFORT_INTERNET => Yii::t('app', 'Internet'),
+                RoomComfort::ROOM_COMFORT_BEAUTY => Yii::t('app', 'Beauty and health'),
+                RoomComfort::ROOM_COMFORT_TV => Yii::t('app', 'Television and appliances'),
+            ],
+            'ky' => [
+                RoomComfort::ROOM_COMFORT_SPORT => Yii::t('app', 'Спорт жана эс алуу'),
+                RoomComfort::ROOM_COMFORT_GENERAL => Yii::t('app', 'Жалпы'),
+                RoomComfort::ROOM_COMFORT_BATHROOM => Yii::t('app', 'Ванна бөлмөсү'),
+                RoomComfort::ROOM_COMFORT_INSIDE => Yii::t('app', 'Бөлмөдөгү ыңгайлуулуктар'),
+                RoomComfort::ROOM_COMFORT_EXTRA => Yii::t('app', 'Кошумча'),
+                RoomComfort::ROOM_COMFORT_MEAL => Yii::t('app', 'Тамак-аш'),
+                RoomComfort::ROOM_COMFORT_OUTSIDE => Yii::t('app', 'Сыртта жана көрүнүш'),
+                RoomComfort::ROOM_COMFORT_LAUNDRY => Yii::t('app', 'Жуу жана тазалоо'),
+                RoomComfort::ROOM_COMFORT_POOL => Yii::t('app', 'Бассейн жана пляж'),
+                RoomComfort::ROOM_COMFORT_INTERNET => Yii::t('app', 'Интернет'),
+                RoomComfort::ROOM_COMFORT_BEAUTY => Yii::t('app', 'Сулуулук жана ден соолук'),
+                RoomComfort::ROOM_COMFORT_TV => Yii::t('app', 'Телевидение жана техника'),
+            ]
+        ];
+        return $arr;
+    }
+
     private function areDatesOverlapping($start1, $end1, $start2, $end2)
     {
         $start1 = strtotime($start1);
@@ -786,23 +838,23 @@ class ObjectController extends BaseController
     {
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-    
+
         // Step 1: Get the target object by ID
         $targetHit = $index->search('', [
-            'filter' => 'id = ' . (int)$id,
+            'filter' => 'id = ' . (int) $id,
             'limit' => 1,
         ])->getHits();
-    
+
         if (empty($targetHit)) {
             throw new \yii\web\NotFoundHttpException('Object not found');
         }
-    
+
         $target = $targetHit[0];
-    
+
         // Step 2: Get city list from target and normalize it
         $targetCities = array_map('mb_strtolower', $target['city'] ?? []);
         $targetCities = array_filter($targetCities);
-    
+
         // Step 3: Calculate from_price of the target object
         $targetPrice = null;
         if (!empty($target['rooms'])) {
@@ -826,22 +878,23 @@ class ObjectController extends BaseController
             }
             $targetPrice = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
         }
-    
+
         if ($targetPrice === null) {
             throw new \yii\web\BadRequestHttpException('Target object has no valid price');
         }
-    
+
         // Step 4: Fetch all other objects
         $searchResults = $index->search('', [
             'limit' => 1000 // Cap for now
         ]);
-    
+
         $hits = $searchResults->getHits();
         $similar = [];
-    
+
         foreach ($hits as $hit) {
-            if ($hit['id'] == $id) continue;
-    
+            if ($hit['id'] == $id)
+                continue;
+
             // Check if city matches
             $cityMatch = false;
             if (!empty($hit['city']) && is_array($hit['city'])) {
@@ -852,9 +905,10 @@ class ObjectController extends BaseController
                     }
                 }
             }
-    
-            if (!$cityMatch) continue;
-    
+
+            if (!$cityMatch)
+                continue;
+
             // Calculate from_price
             $minPrice = PHP_FLOAT_MAX;
             if (!empty($hit['rooms'])) {
@@ -876,23 +930,23 @@ class ObjectController extends BaseController
                     }
                 }
             }
-    
+
             if ($minPrice !== PHP_FLOAT_MAX) {
                 $hit['from_price'] = $minPrice;
                 $similar[] = $hit;
             }
         }
-    
+
         // Step 5: Separate cheaper and more expensive
         $cheaper = array_filter($similar, fn($h) => $h['from_price'] < $targetPrice);
         $expensive = array_filter($similar, fn($h) => $h['from_price'] > $targetPrice);
-    
+
         usort($cheaper, fn($a, $b) => $b['from_price'] <=> $a['from_price']); // descending
         usort($expensive, fn($a, $b) => $a['from_price'] <=> $b['from_price']); // ascending
-    
+
         // Step 6: Assemble result with fallback logic
         $result = [];
-    
+
         if (count($cheaper) >= 2 && count($expensive) >= 2) {
             $result = array_merge(array_slice($cheaper, 0, 2), array_slice($expensive, 0, 2));
         } elseif (count($cheaper) < 2 && count($expensive) >= (4 - count($cheaper))) {
@@ -902,13 +956,13 @@ class ObjectController extends BaseController
         } else {
             $result = array_merge(array_slice($cheaper, 0, 4));
         }
-    
+
         return [
             'target_price' => $targetPrice,
             'data' => $result
         ];
     }
-    
+
 
 
 
@@ -1245,9 +1299,9 @@ class ObjectController extends BaseController
         }
         return [];
     }
-    
-    
-    
+
+
+
 
     protected static function attr()
     {
@@ -1377,7 +1431,7 @@ class ObjectController extends BaseController
     }
 
 
-   
+
     /**
      * Finds the Favorite model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -1394,9 +1448,9 @@ class ObjectController extends BaseController
         throw new NotFoundHttpException('Избранное не найдено.');
     }
 
-    
 
-   
+
+
 
     /**
      * Finds the Post model based on its primary key value.

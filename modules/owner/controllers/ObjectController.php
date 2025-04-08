@@ -2,6 +2,7 @@
 
 namespace app\modules\owner\controllers;
 
+use app\models\RoomComfort;
 use Yii;
 use app\models\Objects;
 use app\models\Comfort;
@@ -85,7 +86,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['room', 'edit-room', 'add-tariff', 'tariff-list'],
+                    'actions' => ['room', 'edit-room', 'add-tariff', 'tariff-list', 'room-comfort'],
                     'roles' => ['owner'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -841,6 +842,65 @@ class ObjectController extends Controller
             'object_title' => $object['name'][0]
         ]);
     }
+
+    public function actionNew()
+    {
+
+    }
+
+
+    public function actionRoomComfort($id, $object_id)
+    {
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $comfort_list = Yii::$app->request->post('comforts');
+        $object = $index->getDocument($object_id);
+
+        $room = [];
+        $model = new Objects($object);
+
+        if (!empty($comfort_list)) {
+            // Fetch comfort info from DB
+            $comfort_models = RoomComfort::find()->where(['id' => $comfort_list])->all();
+            $comfortArr = [];
+            foreach ($comfort_models as $item) {
+                $comfortArr[$item->category_id][$item->id] = [
+                    'ru' => $item->title,
+                    'en' => $item->title_en,
+                    'ky' => $item->title_ky
+                ];
+            }
+
+            // Update room inside object
+            if (isset($object['rooms']) && is_array($object['rooms'])) {
+                foreach ($object['rooms'] as &$roomData) {
+                    if (isset($roomData['id']) && $roomData['id'] == $id) {
+                        $roomData['comfort'] = $comfortArr;
+                        $room = $roomData;
+                        break;
+                    }
+                }
+
+                // Re-index the entire object with updated rooms
+                $meilisearchData = [
+                    'id' => (int) $object_id,
+                    'rooms' => $object['rooms']
+                ];
+
+                $index->updateDocuments([$meilisearchData]); // Must pass array of documents
+
+                Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+                return $this->refresh();
+            }
+        }
+
+        return $this->render('rooms/comfort', [
+            'object_id' => $object_id,
+            'room' => $room,
+            'model' => $model
+        ]);
+    }
+
 
 
 

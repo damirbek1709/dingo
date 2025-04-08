@@ -150,7 +150,10 @@ $(document).ready(function() {
     $('.increment').click(function() {
         let input = $(this).siblings('.children-count');
         let value = parseInt(input.val());
-        input.val(value + 1);
+        if(value <= 18)
+        {
+            input.val(value + 1);
+        }
     });
 
     $('.decrement').click(function() {

@@ -262,6 +262,18 @@ class Objects extends \yii\db\ActiveRecord {
         return $groupedComfort;
     }
 
+    public static function roomComfortList()
+    {
+        $comfortItems = RoomComfort::find()->orderBy(['category_id' => SORT_ASC])->all();
+        $groupedComfort = [];
+
+        foreach ($comfortItems as $item) {
+            $groupedComfort[$item->category_id][] = $item;
+        }
+
+        return $groupedComfort;
+    }
+
     public static function paymentList()
     {
         return ArrayHelper::map(PaymentType::find()->all(), 'id', 'id');
