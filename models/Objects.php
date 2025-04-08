@@ -120,6 +120,11 @@ class Objects extends \yii\db\ActiveRecord {
         ];
     }
 
+    public static function tableName()
+    {
+        return 'objects';
+    }
+
     public function lastIncrement()
     {
         try {
