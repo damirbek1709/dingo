@@ -52,6 +52,7 @@ class Objects extends \yii\db\ActiveRecord {
     public $img;
     public $children;
 
+
     
 
     const SEARCH_TYPE_CITY = 3;
@@ -73,7 +74,7 @@ class Objects extends \yii\db\ActiveRecord {
     const OBJECT_TYPE_GUESTHOUSE = 8;
     const OBJECT_TYPE_RESIDENTIAL_PREMISES = 9;
 
-    //public $primaryKey = 'link_id'; 
+    public $primaryKey = 'link_id'; 
 
     public function rules()
     {
