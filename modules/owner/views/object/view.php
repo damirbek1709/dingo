@@ -75,10 +75,11 @@ $this->params['breadcrumbs'][] = $title;
 
                 </div>
                 <?php
-                $images = $model->getImages();
-                foreach ($images as $img) {
-                    echo Html::img($img->getUrl('150x100'));
-                }
+                echo "<pre>";print_r($model->getPictures());echo "</pre>";
+                // $images = $model->getImages();
+                // foreach ($images as $img) {
+                //     echo Html::img($img->getUrl('150x100'));
+                // }
                 ?>
             </div>
         </div>

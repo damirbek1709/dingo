@@ -36,7 +36,7 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'room', 'view', 'delete','comfort'],
+                    'actions' => ['room-list', 'room', 'view', 'delete','comfort','index-admin'],
                     'roles' => ['admin'],
                 ],
                 [
@@ -140,6 +140,28 @@ class ObjectController extends Controller
             // 'sort' => [
             //     'attributes' => ['id', 'name', 'email'], // Sortable attributes
             // ],
+        ]);
+
+        return $this->render('index', [
+            'dataProvider' => $dataProvider
+        ]);
+    }
+
+    public function actionIndexAdmin()
+    {
+        $client = Yii::$app->meili->connect();
+        $res = $client->index('object')->search('', [
+            'limit' => 10000
+        ]);
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $res->getHits(),
+            'pagination' => [
+                'pageSize' => 12, // Adjust page size as needed
+            ],
+            'sort' => [
+                'attributes' => ['id'], // Sortable attributes
+            ],
         ]);
 
         return $this->render('index', [
@@ -364,15 +386,15 @@ class ObjectController extends Controller
             $model->description = $description_arr;
 
             if ($model->save(false)) {
-                // $model->images = UploadedFile::getInstances($model, 'images');
-                // if ($model->images) {
-                //     foreach ($model->images as $image) {
-                //         $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                //         $image->saveAs($path);
-                //         $model->attachImage($path, true);
-                //         @unlink($path);
-                //     }
-                // }
+                $model->images = UploadedFile::getInstances($model, 'images');
+                if ($model->images) {
+                    foreach ($model->images as $image) {
+                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
+                        $image->saveAs($path);
+                        $model->attachImage($path, true);
+                        @unlink($path);
+                    }
+                }
 
                 $object_arr = [
                     'id' => (int) $id,

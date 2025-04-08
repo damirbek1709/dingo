@@ -235,10 +235,10 @@ class Objects extends \yii\db\ActiveRecord {
             $img_url = $image->getUrl('120x');
             $picture = $image->getUrl('500x');
             // Check if the original image was a webp
-            // if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
-            //     $img_url = 'https://selva.kg/uploads/images/store/' . $filePath;
-            //     $picture = 'https://selva.kg/uploads/images/store/' . $filePath;
-            // }
+            if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
+                $img_url = 'https://dingo.kg/uploads/images/store/' . $filePath;
+                $picture = 'https://dingo.kg/uploads/images/store/' . $filePath;
+            }
             $list[] = [
                 'id' => $image->id,
                 'picture' => $picture,
@@ -248,6 +248,18 @@ class Objects extends \yii\db\ActiveRecord {
         }
 
         return $list;
+    }
+
+    public function getPicture()
+    {
+        $image = $this->getImage();
+        $filePath = $image->filePath;
+        // Check if the original image was a webp
+        if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
+            return 'https://dingo.kg/uploads/images/store/' . $filePath;
+        } else {
+            return $this->getImage()->getUrl();
+        }
     }
 
     public static function сomfortList()
