@@ -36,7 +36,7 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'room', 'view', 'delete'],
+                    'actions' => ['room-list', 'room', 'view', 'delete','comfort'],
                     'roles' => ['admin'],
                 ],
                 [
