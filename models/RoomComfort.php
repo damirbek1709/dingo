@@ -14,6 +14,7 @@ use Yii;
  */
 class RoomComfort extends \yii\db\ActiveRecord
 {
+    public $comfort;
     const ROOM_COMFORT_SPORT = 1;
     const ROOM_COMFORT_GENERAL = 2;
     const ROOM_COMFORT_TV = 12;

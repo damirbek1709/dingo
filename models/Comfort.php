@@ -30,6 +30,7 @@ class Comfort extends \yii\db\ActiveRecord
     const COMFORT_CAT_STAFF_SPEAKS = 13;
     const COMFORT_CAT_TRANSFER = 14;
     const COMFORT_CAT_SANITAR = 15;
+    const COMFORT_CAT_IN_ROOMS = 16;
     /**
      * {@inheritdoc}
      */
@@ -69,6 +70,7 @@ class Comfort extends \yii\db\ActiveRecord
             self::COMFORT_CAT_STAFF_SPEAKS => Yii::t('app', 'Персонал говорит'),
             self::COMFORT_CAT_TRANSFER => Yii::t('app', 'Трансфер'),
             self::COMFORT_CAT_SANITAR => Yii::t('app', 'Санитарные меры'),
+            self::COMFORT_CAT_IN_ROOMS => Yii::t('app', 'В номерах'),
         ];
         return $arr[$id];
     }
