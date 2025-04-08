@@ -54,7 +54,8 @@ class ObjectController extends BaseController
             'list2',
             'category-comfort-title',
             'search',
-            'room-images'
+            'room-images',
+            'similar'
         ];
 
 
@@ -63,7 +64,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title'],
+                    'actions' => ['add', 'category-comfort-title','similar'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -103,6 +104,7 @@ class ObjectController extends BaseController
                 'up-schedule-new' => ['POST'],
                 'delete-search' => ['POST'],
                 'add-to-favorites' => ['POST'],
+                'similar' => ['GET'],
                 'remove-from-favorites' => ['POST'],
                 'category-comfort-title' => ['GET'],
                 'room-images' => ['GET'],
@@ -349,8 +351,6 @@ class ObjectController extends BaseController
         return $searchResults->getHits();
     }
 
-
-
     public function actionList()
     {
         $filters = [];
@@ -361,6 +361,8 @@ class ObjectController extends BaseController
         $toDate = Yii::$app->request->get('to_date');
         $type = (int) Yii::$app->request->get('type', null);
         $amount = (int) Yii::$app->request->get('amount', null);
+        $guestAmount = (int) Yii::$app->request->get('guest_amount', 1);
+
         $user_auth = null;
         $token = Yii::$app->request->headers->get('Authorization');
         if ($token && preg_match('/^Bearer\s+(.*?)$/', $token, $matches)) {
@@ -442,14 +444,13 @@ class ObjectController extends BaseController
                 }
                 $user->search_data = serialize($saved_data);
             }
-
             $user->save(false);
         }
 
-        $guestAmount = (int) Yii::$app->request->get('guest_amount', 1);
-        $filters = ['rooms.guest_amount >= ' . $guestAmount];
+        // Base filter: guest amount
+        $filters[] = 'rooms.guest_amount >= ' . $guestAmount;
 
-        // Add date filtering only if both dates are provided
+        // Date availability filtering
         if ($fromDate && $toDate) {
             $period = new \DatePeriod(
                 new \DateTime($fromDate),
@@ -469,42 +470,35 @@ class ObjectController extends BaseController
                 ']';
         }
 
-        // Determine which price field to sort by based on guest amount
-        $priceField = 'rooms.tariff.prices.price_' . $guestAmount;
-
-        $pageSize = 10; // Number of results per page
-        $page = (int) Yii::$app->request->get('page', 1); // Get page from request
+        $pageSize = 10;
+        $page = (int) Yii::$app->request->get('page', 1);
         $offset = ($page - 1) * $pageSize;
 
+        // Fetch extra results to sort locally
         $searchResults = $index->search($queryWord, [
             'filter' => $filters,
-            'sort' => [$priceField . ':asc'],
-            'limit' => $pageSize,
-            'offset' => $offset
+            'limit' => $pageSize * 5,
+            'offset' => 0
         ]);
 
-        // Process results to add from_price
         $hits = $searchResults->getHits();
-        $totalCount = count($hits);
 
+        // Calculate from_price
         foreach ($hits as &$hit) {
             $minPrice = PHP_FLOAT_MAX;
-            if ($hit['rooms']) {
+            if (!empty($hit['rooms'])) {
                 foreach ($hit['rooms'] as $room) {
                     $priceIndex = $guestAmount - 1;
-                    if (array_key_exists('tariff', $room)) {
+                    if (isset($room['tariff']) && is_array($room['tariff'])) {
                         foreach ($room['tariff'] as $tariff) {
                             if (isset($tariff['prices']) && is_array($tariff['prices'])) {
                                 foreach ($tariff['prices'] as $priceData) {
                                     if (
-                                        isset($priceData['price_arr']) && is_array($priceData['price_arr']) &&
+                                        isset($priceData['price_arr']) &&
+                                        is_array($priceData['price_arr']) &&
                                         isset($priceData['price_arr'][$priceIndex])
                                     ) {
-
-                                        // Get the price for the specific guest amount
                                         $currentPrice = $priceData['price_arr'][$priceIndex];
-
-                                        // Update the overall minimum if this one is lower
                                         if ($currentPrice < $minPrice) {
                                             $minPrice = $currentPrice;
                                         }
@@ -518,21 +512,25 @@ class ObjectController extends BaseController
             $hit['from_price'] = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
         }
 
-        $pagination = new Pagination([
-            'totalCount' => $totalCount,
-            'pageSize' => $pageSize,
-        ]);
+        // Sort by from_price ascending
+        usort($hits, function ($a, $b) {
+            return ($a['from_price'] ?? PHP_FLOAT_MAX) <=> ($b['from_price'] ?? PHP_FLOAT_MAX);
+        });
+
+        // Paginate after sorting
+        $totalCount = count($hits);
+        $paginatedHits = array_slice($hits, $offset, $pageSize);
 
         $arr = [
-            'pageSize' => $pagination->pageSize,
-            'totalCount' => $searchResults->getEstimatedTotalHits(),
-            'page' => (int) $page,
-            'data' => $hits,
+            'pageSize' => $pageSize,
+            'totalCount' => $totalCount,
+            'page' => $page,
+            'data' => $paginatedHits,
         ];
 
         return $arr;
-
     }
+
 
     public function actionSearch()
     {
@@ -783,6 +781,135 @@ class ObjectController extends BaseController
         $document = $client->index('object')->getDocument($id);
         return $document;
     }
+
+    public function actionSimilar($id)
+    {
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+    
+        // Step 1: Get the target object by ID
+        $targetHit = $index->search('', [
+            'filter' => 'id = ' . (int)$id,
+            'limit' => 1,
+        ])->getHits();
+    
+        if (empty($targetHit)) {
+            throw new \yii\web\NotFoundHttpException('Object not found');
+        }
+    
+        $target = $targetHit[0];
+    
+        // Step 2: Get city list from target and normalize it
+        $targetCities = array_map('mb_strtolower', $target['city'] ?? []);
+        $targetCities = array_filter($targetCities);
+    
+        // Step 3: Calculate from_price of the target object
+        $targetPrice = null;
+        if (!empty($target['rooms'])) {
+            $minPrice = PHP_FLOAT_MAX;
+            foreach ($target['rooms'] as $room) {
+                if (isset($room['tariff'])) {
+                    foreach ($room['tariff'] as $tariff) {
+                        if (isset($tariff['prices'])) {
+                            foreach ($tariff['prices'] as $priceData) {
+                                if (!empty($priceData['price_arr']) && is_array($priceData['price_arr'])) {
+                                    foreach ($priceData['price_arr'] as $p) {
+                                        if ($p < $minPrice) {
+                                            $minPrice = $p;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            $targetPrice = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
+        }
+    
+        if ($targetPrice === null) {
+            throw new \yii\web\BadRequestHttpException('Target object has no valid price');
+        }
+    
+        // Step 4: Fetch all other objects
+        $searchResults = $index->search('', [
+            'limit' => 1000 // Cap for now
+        ]);
+    
+        $hits = $searchResults->getHits();
+        $similar = [];
+    
+        foreach ($hits as $hit) {
+            if ($hit['id'] == $id) continue;
+    
+            // Check if city matches
+            $cityMatch = false;
+            if (!empty($hit['city']) && is_array($hit['city'])) {
+                foreach ($hit['city'] as $cityName) {
+                    if (in_array(mb_strtolower($cityName), $targetCities, true)) {
+                        $cityMatch = true;
+                        break;
+                    }
+                }
+            }
+    
+            if (!$cityMatch) continue;
+    
+            // Calculate from_price
+            $minPrice = PHP_FLOAT_MAX;
+            if (!empty($hit['rooms'])) {
+                foreach ($hit['rooms'] as $room) {
+                    if (isset($room['tariff'])) {
+                        foreach ($room['tariff'] as $tariff) {
+                            if (isset($tariff['prices'])) {
+                                foreach ($tariff['prices'] as $priceData) {
+                                    if (!empty($priceData['price_arr'])) {
+                                        foreach ($priceData['price_arr'] as $p) {
+                                            if ($p < $minPrice) {
+                                                $minPrice = $p;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+    
+            if ($minPrice !== PHP_FLOAT_MAX) {
+                $hit['from_price'] = $minPrice;
+                $similar[] = $hit;
+            }
+        }
+    
+        // Step 5: Separate cheaper and more expensive
+        $cheaper = array_filter($similar, fn($h) => $h['from_price'] < $targetPrice);
+        $expensive = array_filter($similar, fn($h) => $h['from_price'] > $targetPrice);
+    
+        usort($cheaper, fn($a, $b) => $b['from_price'] <=> $a['from_price']); // descending
+        usort($expensive, fn($a, $b) => $a['from_price'] <=> $b['from_price']); // ascending
+    
+        // Step 6: Assemble result with fallback logic
+        $result = [];
+    
+        if (count($cheaper) >= 2 && count($expensive) >= 2) {
+            $result = array_merge(array_slice($cheaper, 0, 2), array_slice($expensive, 0, 2));
+        } elseif (count($cheaper) < 2 && count($expensive) >= (4 - count($cheaper))) {
+            $result = array_merge($cheaper, array_slice($expensive, 0, 4 - count($cheaper)));
+        } elseif (count($expensive) < 2 && count($cheaper) >= (4 - count($expensive))) {
+            $result = array_merge(array_slice($cheaper, 0, 4 - count($expensive)), $expensive);
+        } else {
+            $result = array_merge(array_slice($cheaper, 0, 4));
+        }
+    
+        return [
+            'target_price' => $targetPrice,
+            'data' => $result
+        ];
+    }
+    
+
 
 
     /**
@@ -1118,164 +1245,9 @@ class ObjectController extends BaseController
         }
         return [];
     }
-
-    public function actionUpSchedule()
-    {
-        $user = Yii::$app->user->identity;
-        $response["success"] = false;
-        $params = Yii::$app->request->bodyParams;
-        $schedule = new UpSchedule();
-        $schedule->total_price = $params['total_price'] ? $params['total_price'] : null;
-        $schedule->time_from = $params['time_from'] ? $params['time_from'] : null;
-        $schedule->time_to = $params['time_to'] ? $params['time_to'] : null;
-        $schedule->frequency = $params['frequency'] ? $params['frequency'] : null;
-        $schedule->posts = serialize($params['post']);
-        $schedule->type = $params['type'] ? $params['type'] : null;
-        $schedule->created_at = date('Y-m-d H:i:s');
-        $begin_day = null;
-        $end_day = null;
-
-        if ($params['type'] == UpSchedule::TYPE_MULTIPLE) {
-            $schedule->days_amount = $params['days_amount'];
-            $currentDateTime = new DateTime();
-            $currentDateTime->add(new DateInterval("P{$params['days_amount']}D"));
-            $schedule->date_to = $currentDateTime->format('Y-m-d H:i:s');
-
-            if (date('H', strtotime($schedule->time_from)) <= date('H')) {
-                $concat_begin_day = date('Y-m-d') . ' ' . $schedule->time_from;
-                $timestamp = strtotime($concat_begin_day);
-                $new_timestamp = $timestamp + 86400;
-                $begin_day = date('Y-m-d', $new_timestamp);
-            } else {
-                $begin_day = date('Y-m-d');
-            }
-            $response["diapazon"] = "Кол-во дней: " . $params['days_amount'] . ". " . date('d.m.Y', strtotime($begin_day)) . " - " . date('d.m.Y', strtotime($begin_day . ' +' . $params['days_amount'] . ' days'));
-            $response["type"] = UpSchedule::TYPE_MULTIPLE;
-        } else {
-            if (date('H', strtotime($schedule->time_from)) <= date('H')) {
-                $concat_begin_day = date('Y-m-d') . ' ' . $schedule->time_from;
-                $timestamp = strtotime($concat_begin_day);
-                $new_timestamp = $timestamp + 86400;
-                $schedule->date_to = date('Y-m-d H:i', $new_timestamp);
-            } else {
-                $schedule->date_to = $concat_begin_day = date('Y-m-d') . ' ' . $schedule->time_from;
-            }
-            $schedule->days_amount = null;
-            $response["diapazon"] = date('d.m.Y H:i', strtotime($schedule->date_to));
-            $response["type"] = UpSchedule::TYPE_SINGLE;
-        }
-
-        if ($user->kgsWallet === null || $params['total_price'] > $user->kgsWallet->balance) {
-            $response["errors"][] = 'Недостаточно средств на балансе. Пополните кошелёк.';
-        }
-
-        if (empty($response["errors"])) {
-            if ($schedule->save()) {
-                Yii::$app->balanceManager->decrease(
-                    [
-                        'user_id' => $user->id,
-                        'type' => Wallet::TYPE_KGS,
-                    ],
-                    $params['total_price'],
-                    [
-                        'type' => WalletTransaction::TYPE_PAID_SERVICE,
-                        'multipleUp' => $user->id,
-                    ]
-                );
-                $response["success"] = true;
-
-                //$response["begin_date"] = $begin_day;
-                //$response["end_date"] = date('Y-m-d', strtotime($begin_day . ' +' . $params['days_amount'] . ' days'));
-                $response["paid_time"] = date('H:i', strtotime($schedule->created_at));
-            } else {
-                return $schedule->errors;
-            }
-        } else {
-            return $response["errors"];
-        }
-        return $response;
-    }
-
-
-    public function actionUpScheduleNew()
-    {
-        $user = Yii::$app->user->identity;
-        $response["success"] = false;
-        $params = Yii::$app->request->bodyParams;
-        $schedule = new UpScheduleNew();
-        $schedule->total_price = $params['total_price'] ? $params['total_price'] : null;
-        $schedule->post_list = $params['post'] ? serialize($params['post']) : null;
-        $schedule->time_list = $params['time'] ? serialize($params['time']) : null;
-        $schedule->date_from = date('Y-m-d', strtotime($params['date_from']));
-        $schedule->date_to = date('Y-m-d', strtotime($params['date_to']));
-
-        if ($user->kgsWallet === null || $params['total_price'] > $user->kgsWallet->balance) {
-            $response["errors"][] = 'Недостаточно средств на балансе. Пополните кошелёк.';
-        }
-
-        if (empty($response["errors"])) {
-            if ($schedule->save()) {
-                Yii::$app->balanceManager->decrease(
-                    [
-                        'user_id' => $user->id,
-                        'type' => Wallet::TYPE_KGS,
-                    ],
-                    $params['total_price'],
-                    [
-                        'type' => WalletTransaction::TYPE_PAID_SERVICE,
-                        'multipleUp' => $user->id,
-                    ]
-                );
-                $response["success"] = true;
-                $response["paid_time"] = date('d-m-Y H:i');
-            } else {
-                return $schedule->errors;
-            }
-        } else {
-            return $response["errors"];
-        }
-        return $response;
-    }
-
-    public function actionRatingCountGrades()
-    {
-        $req = Yii::$app->request->get();
-        if (!empty($req['post_id'])) {
-            $rate_arr = [];
-            for ($i = 1; $i <= 5; $i++) {
-                $rate_arr[$i] = (int) Rating::find()->where(['post_id' => $req['post_id'], 'rate' => $i])->count();
-            }
-            $all_count = (int) Rating::find()->where(['post_id' => $req['post_id']])->count();
-            $rate_arr['all'] = $all_count;
-            return $rate_arr;
-        }
-        return [];
-    }
-
-    protected static function dict($lang)
-    {
-        $dict = [
-            'ru' => [
-                'cond' => 'Состояние',
-                'new' => 'Новый',
-                'used' => 'б/у',
-                'from_pre' => 'от',
-                'from_su' => '',
-                'to_pre' => 'до',
-                'to_su' => '',
-            ],
-            'ky' => [
-                'cond' => 'Абалы',
-                'new' => 'Жаңы',
-                'used' => 'б/у',
-                'from_pre' => 'от',
-                'from_su' => '',
-                'to_pre' => 'до',
-                'to_su' => '',
-            ]
-        ];
-        return $dict[$lang];
-    }
+    
+    
+    
 
     protected static function attr()
     {
@@ -1405,95 +1377,7 @@ class ObjectController extends BaseController
     }
 
 
-    protected static function titleDesc($qp)
-    {
-        $title = '';
-        $desc = [];
-        $lang = 'ru';
-        if (isset($qp['lang'])) {
-            $lang = $qp['lang'];
-        }
-        $dict = self::dict($lang);
-        $attrTb = self::attr();
-        $options = self::options();
-        $attrLbls = $attrTb['titles'];
-        $attrType = $attrTb['types'];
-
-        $dao = Yii::$app->db;
-        $prices = [];
-        $attribs = [];
-        $currency = '';
-        if (isset($qp['keyword'])) {
-            $desc[] = $qp['keyword'];
-        }
-        if (isset($qp['PostSearch'])) {
-            foreach ($qp['PostSearch'] as $k => $v) {
-                if ($k == 'ctg_ids') {
-                    foreach ($v as $ctg_id) {
-                        $ctg = $dao->createCommand("SELECT title, title_ky FROM `category` WHERE id={$ctg_id}")->queryOne();
-                        $title = $ctg['title'] . ' ';
-                    }
-                } else if ($k == 'category_id') {
-                    $ctg = $dao->createCommand("SELECT title, title_ky FROM `category` WHERE id={$v}")->queryOne();
-                    $title = $ctg['title'];
-                } else if ($k == 'condition') {
-                    if ($v == Post::CONDITION_NEW) {
-                        $desc[] = $dict['cond'] . ': ' . $dict['new'];
-                    } else {
-                        $desc[] = $dict['cond'] . ': ' . $dict['used'];
-                    }
-                } else if ($k == 'keyword') {
-                    $desc[] = $v;
-                } else if ($k == 'price_kgs_from') {
-                    $prices[0] = $v;
-                    $currency = 'сом';
-                } else if ($k == 'price_kgs_to') {
-                    if (!isset($prices[0])) {
-                        $prices[0] = 0;
-                    }
-                    $prices[1] = $v;
-                    $currency = 'сом';
-                } else if ($k == 'price_usd_from') {
-                    $prices[0] = $v;
-                    $currency = 'дол';
-                } else if ($k == 'price_usd_to') {
-                    if (!isset($prices[0])) {
-                        $prices[0] = '0';
-                    }
-                    $prices[1] = $v;
-                    $currency = 'дол';
-                } else {
-                    $ex = explode('_', $k);
-                    if (isset($attrType[$ex[0]])) {
-                        if ($attrType[$ex[0]] == 'directory_multiple') {
-                            $opts = [];
-                            foreach ($v as $opt) {
-                                $opts[] = $options[$opt];
-                            }
-                            $desc[] = $attrLbls[$k] . ': ' . implode(', ', $opts);
-                        } else if ($attrType[$ex[0]] == 'directory') {
-                            $desc[] = $attrLbls[$k] . ': ' . $options[$v];
-                        } else {
-                            $attribs[$ex[0]][] = $v;
-                        }
-                    }
-                }
-            }
-            foreach ($attribs as $ak => $av) {
-                $desc[] = $attrLbls[$ak] . ': ' . implode('-', $av);
-            }
-            if ($prices) {
-                if (count($prices) == 2) {
-                    $desc[] = implode('-', $prices) . ' ' . $currency;
-                } else {
-                    $desc[] = $prices[0] . '+ ' . $currency;
-                }
-            }
-        }
-
-        return ['title' => $title, 'desc' => implode(', ', $desc)];
-    }
-
+   
     /**
      * Finds the Favorite model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
@@ -1510,26 +1394,9 @@ class ObjectController extends BaseController
         throw new NotFoundHttpException('Избранное не найдено.');
     }
 
-    /**
-     * Finds the Category model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Category the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findCategory($id)
-    {
-        if (($model = Category::findOne($id)) !== null) {
-            return $model;
-        }
+    
 
-        throw new NotFoundHttpException('Категория не найдена.');
-    }
-
-    public function actionCities()
-    {
-        return City::find()->orderBy('priortet ASC')->all();
-    }
+   
 
     /**
      * Finds the Post model based on its primary key value.

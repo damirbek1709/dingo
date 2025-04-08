@@ -684,6 +684,7 @@ class ObjectController extends Controller
                                 'to_date' => '',
                                 'penalty_sum' => $model->penalty_sum,
                                 'penalty_days' => $model->penalty_days,
+                                'prices' => [],
                             ];
 
                             $roomData['tariff'][] = $tariff;

@@ -238,14 +238,18 @@
                         };
 
                         for (i = 0; i < room.guest_amount; i++) {
+                            const priceValue = (t.prices && t.prices[0] && Array.isArray(t.prices[0].price_arr) && t.prices[0].price_arr[i])
+                                ? t.prices[0].price_arr[i]
+                                : '';
+
                             html += `
                                 <div>
                                     <div class="form-group">
-                                        <label>${i + 1} гостя</label>
-                                        <input class="tariff_price" type="text" value="${t.prices[0]['price_arr'][i]}" tariff_id="${t.id}">
+                                    <label>${i + 1} гостя</label>
+                                    <input class="tariff_price" type="text" value="${priceValue}" tariff_id="${t.id}">
                                     </div>
                                 </div>
-                            `;
+                                `;
                         }
                     });
                     html += `</div></div>`;
@@ -287,7 +291,7 @@
                 tariff_list[tariffId].prices.to_date = checkout;
             });
 
-            
+
 
             e.stopImmediatePropagation();
             e.preventDefault(); // prevent normal form submit
