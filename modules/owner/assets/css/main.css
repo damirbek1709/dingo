@@ -384,3 +384,6 @@ a.desc:after {
 .tariff-room-cover{
     border: 1px solid #ccc;
 }
+.view-thumbnail-img{
+    margin-right: 15px;
+}

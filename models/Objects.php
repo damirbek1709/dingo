@@ -51,7 +51,6 @@ class Objects extends \yii\db\ActiveRecord {
     public $images;
     public $img;
     public $children;
-    public $link_id;
 
     
 
@@ -108,10 +107,11 @@ class Objects extends \yii\db\ActiveRecord {
                     'name_en',
                     'name_ky',
                     'user_id',
+                    'link_id'
                 ],
                 'safe'
             ],
-            [['link_id'], 'default', 'value'=> $this->lastIncrement()],
+            [['link_id'], 'integer'],
             [['email'], 'email'], // Validate email format
             [['phone'], 'match', 'pattern' => '/^\+?[0-9 ]{7,15}$/'], // Phone validation
             [['lat', 'lon'], 'number'], // Latitude and longitude should be numeric
@@ -232,7 +232,7 @@ class Objects extends \yii\db\ActiveRecord {
         $list = [];
         foreach ($this->getImages() as $image) {
             $filePath = $image->filePath;
-            $img_url = $image->getUrl('120x');
+            $thumb = $image->getUrl('220x150');
             $picture = $image->getUrl('500x');
             // Check if the original image was a webp
             if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
@@ -242,7 +242,7 @@ class Objects extends \yii\db\ActiveRecord {
             $list[] = [
                 'id' => $image->id,
                 'picture' => $picture,
-                'thumbnailPicture' => $img_url,
+                'thumbnailPicture' => $thumb,
                 'isMain' => $image->isMain,
             ];
         }

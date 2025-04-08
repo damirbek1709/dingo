@@ -36,7 +36,7 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'room', 'view', 'delete','comfort','index-admin'],
+                    'actions' => ['room-list', 'room', 'view', 'delete', 'comfort', 'index-admin'],
                     'roles' => ['admin'],
                 ],
                 [
@@ -258,17 +258,20 @@ class ObjectController extends Controller
         $index = $client->index('object'); // Replace with your actual Meilisearch index
 
         // Fetch record from Meilisearch
-        $searchResult = $index->search('', ['filter' => "id = $id"])->getHits();
+        $searchResult = $index->getDocument($id);
 
         if (empty($searchResult)) {
             throw new NotFoundHttpException('Record not found.');
         }
 
         // Convert the result into a Yii2 model
-        $model = new Objects($searchResult[0]);
+        $model = new Objects($searchResult);
+        $bind_model = Objects::find()->where(['link_id' => $id])->one();
+
 
         return $this->render('view', [
             'model' => $model,
+            'bind_model' => $bind_model
         ]);
     }
     /**
@@ -282,23 +285,26 @@ class ObjectController extends Controller
         $index = $client->index('object');
         $model = new Objects();
         $last_id = (int) $this->lastIncrement() + 1;
+        
 
         if ($this->request->isPost && $model->load($this->request->post())) {
-            if ($model->save(false)) {
-                // $model->images = UploadedFile::getInstances($model, 'images');
-                // if ($model->images) {
-                //     foreach ($model->images as $image) {
-                //         $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                //         $image->saveAs($path);
-                //         $model->attachImage($path, true);
-                //         @unlink($path);
-                //     }
-                // }
+            $model->link_id = $last_id;
+            if ($model->save()) {
+                $model->images = UploadedFile::getInstances($model, 'images');
+                if ($model->images) {
+                    foreach ($model->images as $image) {
+                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
+                        $image->saveAs($path);
+                        $model->attachImage($path, true);
+                        @unlink($path);
+                    }
+                }
 
                 $object_arr = [
                     'id' => (int) $last_id,
                     'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
                     'type' => (int) $model->type,
+                    'reception' => (int) $model->reception,
                     'city' => [$model->city, $model->city_en, $model->city_ky],
                     'address' => [$model->address, $model->address_en, $model->address_ky],
                     'description' => [$model->description, $model->description_en, $model->description_ky],
@@ -370,7 +376,8 @@ class ObjectController extends Controller
 
         // Convert the first result into a model
         $model = new Objects($searchResult);
-        $bindModel = Objects::findOne($id);
+        $bind_model = Objects::find()->where(['link_id' => $id])->one();
+        $model->link_id = $id;
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
@@ -384,8 +391,9 @@ class ObjectController extends Controller
             $description_arr = [$model->description ? $model->description : "", $model->description_en ? $model->description_en : "", $model->description_ky ? $model->description_ky : ""];
             $model->name = array_values($name_arr);
             $model->description = $description_arr;
+            $model->link_id = $id;
 
-            if ($model->save(false)) {
+            if ($bind_model->save(false)) {
                 $model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
                     foreach ($model->images as $image) {
@@ -417,6 +425,7 @@ class ObjectController extends Controller
                     'email' => $model->email,
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
+                    'reception' => (int) $model->reception,
                 ];
 
                 $index->updateDocuments($object_arr);

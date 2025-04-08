@@ -74,13 +74,16 @@ $this->params['breadcrumbs'][] = $title;
                     </div>
 
                 </div>
-                <?php
-                echo "<pre>";print_r($model->getPictures());echo "</pre>";
-                // $images = $model->getImages();
-                // foreach ($images as $img) {
-                //     echo Html::img($img->getUrl('150x100'));
-                // }
-                ?>
+                <div class="view-img-list" style="margin-top:20px">
+                    <?php
+                    if ($bind_model->getImages()) {
+                        foreach ($bind_model->getImages() as $image) {
+                            echo Html::img($image->getUrl('220x150'), ['class' => 'view-thumbnail-img']);
+                        }
+                    }
+                    ?>
+                </div>
+
             </div>
         </div>
     </div>
