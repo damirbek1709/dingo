@@ -21,7 +21,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенно
         <div class="row">
 
             <div class="col-md-3">
-                <?php echo $this->render('nav', ['model' => $model]); ?>
+                <?= $this->render('nav', ['model' => $model]); ?>
             </div>
 
             <div class="col-md-9">
@@ -35,8 +35,13 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенно
                         <div class="comfort_list_grid">
                             <?php foreach ($comforts as $comfort): ?>
                                 <div>
-                                    <?= Html::checkbox("comforts[]", isset($selectedComforts[$comfort->id]), ['value' => $comfort->id]) ?>
+                                    <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][selected]", isset($selectedComforts[$comfort->id]), ['value' => 1]) ?>
                                     <?= Html::encode($comfort->title) ?>
+                                    ( 
+                                    <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][is_paid]", isset($selectedComforts[$comfort->id]['is_paid']) && $selectedComforts[$comfort->id]['is_paid'], ['value' => 1]) ?>
+                                    <label style="font-weight:normal">Платная услуга</label>
+                                    )
+                                    
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -50,5 +55,6 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенно
         </div>
     </div>
     <?php ActiveForm::end(); ?>
+
 
 </div>

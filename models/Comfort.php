@@ -31,6 +31,8 @@ class Comfort extends \yii\db\ActiveRecord
     const COMFORT_CAT_TRANSFER = 14;
     const COMFORT_CAT_SANITAR = 15;
     const COMFORT_CAT_IN_ROOMS = 16;
+
+    public $is_paid;
     /**
      * {@inheritdoc}
      */

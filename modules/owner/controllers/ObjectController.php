@@ -413,18 +413,29 @@ class ObjectController extends Controller
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $comfort_list = Yii::$app->request->post('comforts');
-        $searchResult = $client->index('object')->getDocument($id);
+
+        $searchResult = $index->getDocument($id);
         if (empty($searchResult)) {
             throw new \yii\web\NotFoundHttpException('Record not found.');
         }
 
         $model = new Objects($searchResult);
 
-        if (isset($comfort_list)) {
-            $comfort_models = Comfort::find()->where(['id' => $comfort_list])->all();
+        if (!empty($comfort_list)) {
             $comfortArr = [];
-            foreach ($comfort_models as $item) {
-                $comfortArr[$item->category_id][$item->id] = ['ru' => $item->title, 'en' => $item->title_en, 'ky' => $item->title_ky];
+
+            foreach ($comfort_list as $categoryId => $comforts) {
+                foreach ($comforts as $comfortId => $comfortData) {
+                    $comfort = Comfort::findOne($comfortId);
+                    if ($comfort) {
+                        $comfortArr[$categoryId][$comfortId] = [
+                            'ru' => $comfort->title,
+                            'en' => $comfort->title_en,
+                            'ky' => $comfort->title_ky,
+                            'is_paid' => isset($comfortData['is_paid']) ? 1 : 0,
+                        ];
+                    }
+                }
             }
 
             $meilisearchData = [
@@ -443,6 +454,7 @@ class ObjectController extends Controller
             'id' => $id,
         ]);
     }
+
 
     public function actionTerms($id)
     {
@@ -841,11 +853,6 @@ class ObjectController extends Controller
             'object_id' => $object_id,
             'object_title' => $object['name'][0]
         ]);
-    }
-
-    public function actionNew()
-    {
-
     }
 
 
