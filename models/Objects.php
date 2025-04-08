@@ -122,7 +122,7 @@ class Objects extends \yii\db\ActiveRecord {
 
     public static function tableName()
     {
-        return 'objects';
+        return 'object';
     }
 
     public function lastIncrement()
