@@ -12,7 +12,7 @@ class m250408_121503_add_field_link_id extends Migration
      */
     public function safeUp()
     {
-
+        $this->addColumn('objects', 'link_id', $this->integer()->notNull());
     }
 
     /**
