@@ -397,11 +397,10 @@ class ObjectController extends Controller
 
                 $object_arr = [
                     'id' => (int) $id,
-                    'name' => [$model->name ? $model->name : "", $model->name_en ? $model->name_en : "", $model->name_ky ? $model->name_ky : ""],
-                    'type' => (int) $model->type,
-                    'city' => [$model->city, $model->city_en, $model->city_ky],
-                    'address' => [$model->address, $model->address_en, $model->address_ky],
-                    'description' => [$model->description ? $model->description : "", $model->description_en ? $model->description_en : "", $model->description_ky ? $model->description_ky : ""],
+                    'name' => array_values(array_filter([$model->name, $model->name_en, $model->name_ky])),
+                    'city' => array_values(array_filter([$model->city, $model->city_en, $model->city_ky])),
+                    'address' => array_values(array_filter([$model->address, $model->address_en, $model->address_ky])),
+                    'description' => array_values(array_filter([$model->description, $model->description_en, $model->description_ky])),
                     'currency' => $model->currency,
                     'phone' => $model->phone,
                     'site' => $model->site,
@@ -418,6 +417,7 @@ class ObjectController extends Controller
                     'images' => $model->getPictures(),
                     'reception' => (int) $model->reception,
                 ];
+                
 
                 $index->updateDocuments($object_arr);
                 return $this->redirect(['view', 'id' => $model->id]);
