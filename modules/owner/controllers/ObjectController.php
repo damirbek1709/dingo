@@ -375,7 +375,6 @@ class ObjectController extends Controller
         // Convert the first result into a model
         $model = new Objects($searchResult);
         $bind_model = Objects::findOne($id);
-        $model->link_id = $id;
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->save(false)) {
