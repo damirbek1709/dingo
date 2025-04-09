@@ -23,20 +23,37 @@ use vova07\imperavi\Widget;
     $name_list = $model->name;
     $city_list = $model->city;
     $address_list = $model->address;
+    $description_list = $model->description;
+
+    $name = $name_list[0] ? $name_list[0] : "";
+    $name_en = $name_list[1] ? $name_list[1] : "";
+    $name_ky = $name_list[2] ? $name_list[2] : "";
+
+    $city = $city_list[0] ? $city_list[0] : "";
+    $city_en = $city_list[1] ? $city_list[1] : "";
+    $city_ky = $city_list[2] ? $city_list[2] : "";
+
+    $address = $address_list[0] ? $address_list[0] : "";
+    $address_en = $address_list[1] ? $address_list[1] : "";
+    $address_ky = $address_list[2] ? $address_list[2] : "";
+
+    $description = $description_list[0] ? $description_list[0] : "";
+    $description_en = $description_list[1] ? $description_list[1] : "";
+    $description_ky = $description_list[2] ? $description_list[2] : "";
     ?>
 
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'value' => $name_list[0]]) ?>
-    <?= $form->field($model, 'name_en')->textInput(['maxlength' => true, 'value' => $name_list[1]]) ?>
-    <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true, 'value' => $name_list[2]]) ?>
+    <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'value' => $name]) ?>
+    <?= $form->field($model, 'name_en')->textInput(['maxlength' => true, 'value' => $name_en]) ?>
+    <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true, 'value' => $name_ky]) ?>
     <?= $form->field($model, 'type')->dropDownList($model->objectTypeList()) ?>
     
-    <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'value' => $city_list[0]]) ?>
-    <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'value' => $city_list[1]]) ?>
-    <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'value' => $city_list[2]]) ?>
+    <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'value' => $city]) ?>
+    <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'value' => $city_en]) ?>
+    <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'value' => $city_ky]) ?>
 
-    <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address_list[0]]) ?>
-    <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_list[1]]) ?>
-    <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_list[2]]) ?>
+    <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address]) ?>
+    <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_en]) ?>
+    <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
     <?= $form->field($model, 'currency')->textInput(['maxlength' => true]) ?>
 
 
@@ -115,9 +132,9 @@ use vova07\imperavi\Widget;
     // ); ?>
 
     <?php 
-    echo $form->field($model, 'description')->textarea(['value'=>$model->description[0]]);
-    echo $form->field($model, 'description_en')->textarea(['value'=>$model->description[1]]);
-    echo $form->field($model, 'description_ky')->textarea(['value'=>$model->description[2]]);
+    echo $form->field($model, 'description')->textarea(['value'=>$description]);
+    echo $form->field($model, 'description_en')->textarea(['value'=>$description_en]);
+    echo $form->field($model, 'description_ky')->textarea(['value'=>$description_ky]);
 
     // $model->description_en = $model->description[1];
     // echo $form->field($model, 'description_en')->widget(
