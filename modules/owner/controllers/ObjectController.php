@@ -934,19 +934,22 @@ class ObjectController extends Controller
             }
 
             
-
+            $roomId = (int) $id;
             // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 foreach ($object['rooms'] as $roomData) {
-                    if (isset($roomData['id']) && $roomData['id'] == $id) {
+                    // Debug print (optional)
+                    // echo "Checking room ID {$roomData['id']} vs target {$roomId}<br>";
+            
+                    if (isset($roomData['id']) && (int)$roomData['id'] === $roomId) {
                         $room = $roomData;
                         break;
                     }
                 }
             
-                // ✅ Ensure comfort is always set
-                if (!isset($room['comfort'])) {
-                    $room['comfort'] = [];
+                // If not found, fallback message
+                if (empty($room)) {
+                    Yii::error("Room with ID $roomId not found in object $object_id");
                 }
 
                 // Re-index the entire object with updated rooms
