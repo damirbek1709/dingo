@@ -8,8 +8,9 @@ use yii\helpers\FileHelper;
 use yii\helpers\Url;
 use rico\yii2images\models\Image;
 
-class Objects extends \yii\db\ActiveRecord {
-    public $id;
+class Objects extends \yii\db\ActiveRecord
+{
+    
     public $user_id;
     public $type;
     public $name;
@@ -53,11 +54,14 @@ class Objects extends \yii\db\ActiveRecord {
     public $children;
 
 
-    
+
 
     const SEARCH_TYPE_CITY = 3;
     const SEARCH_TYPE_REGION = 1;
     const SEARCH_TYPE_HOTEL = 2;
+
+    const CURRENCY_KGS = 1;
+    const CURRENCY_USD = 2;
 
     public $comfort_list;
 
@@ -76,18 +80,14 @@ class Objects extends \yii\db\ActiveRecord {
 
     //public $primaryKey = 'link_id';
 
-    
+
 
     public function rules()
     {
         return [
             [
                 [
-                    'id',
                     'type',
-                    'city',
-                    'city_en',
-                    'city_ky',
                     'address',
                     'address_en',
                     'address_ky',
@@ -102,23 +102,34 @@ class Objects extends \yii\db\ActiveRecord {
                     'lat',
                     'lon',
                     'email',
-                    'name',
                     'uploadImages',
                     'user_id',
                     'images',
                     'img',
-                    'name_en',
-                    'name_ky',
                     'user_id',
                     'link_id'
                 ],
                 'safe'
             ],
+            [
+                [
+                    'city',
+                    'city_en',
+                    'city_ky',
+                    'address',
+                    'address_en',
+                    'address_ky',
+                    'name',
+                    'name_en',
+                    'name_ky'
+                ],
+                'required'
+            ],
             [['link_id'], 'integer'],
             [['email'], 'email'], // Validate email format
             [['phone'], 'match', 'pattern' => '/^\+?[0-9 ]{7,15}$/'], // Phone validation
             [['lat', 'lon'], 'number'], // Latitude and longitude should be numeric
-            [['description','description_en','description_ky'], 'string', 'max' => 1000], // Limit description length
+            [['description', 'description_en', 'description_ky'], 'string', 'max' => 1000], // Limit description length
         ];
     }
 

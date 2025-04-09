@@ -284,11 +284,10 @@ class ObjectController extends Controller
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $model = new Objects();
-        
+        $model->link_id = 1;
 
-        if ($this->request->isPost && $model->load($this->request->post())) {
-            $model->link_id = $model->id;
-            if ($model->save()) {
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
                 $model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
                     foreach ($model->images as $image) {
@@ -298,7 +297,6 @@ class ObjectController extends Controller
                         @unlink($path);
                     }
                 }
-
                 $object_arr = [
                     'id' => $model->id,
                     'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
@@ -326,6 +324,7 @@ class ObjectController extends Controller
                 $index->addDocuments($object_arr);
                 return $this->redirect(['view', 'id' => $model->id]);
             }
+
         }
 
         return $this->render('create', [
@@ -434,7 +433,7 @@ class ObjectController extends Controller
         return $this->render('update', [
             'model' => $model,
             'id' => $id,
-            'bindModel'=>$bind_model
+            'bindModel' => $bind_model
         ]);
     }
 

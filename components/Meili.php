@@ -32,25 +32,10 @@ class Meili extends Component
 
     public function connect($content = null)
     {
-        // try {
-        //     $client = new Client(
-        //         'http://host.docker.internal:7700',  // This should work on Mac
-        //         'masterKey',
-        //         new GuzzleHttpClient([
-        //             'timeout' => 5,
-        //             'verify' => false
-        //         ])
-        //     );
-        //     return $client;
-        // } catch (\Exception $e) {
-        //     Yii::error("Meilisearch connection error: " . $e->getMessage());
-        //     throw $e;
-        // }
-
         try {
             $client = new Client(
-                'https://meili.selva.kg',  // This should work on Mac
-                'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
+                'http://host.docker.internal:7700',  // This should work on Mac
+                'masterKey',
                 new GuzzleHttpClient([
                     'timeout' => 5,
                     'verify' => false
@@ -61,6 +46,21 @@ class Meili extends Component
             Yii::error("Meilisearch connection error: " . $e->getMessage());
             throw $e;
         }
+
+        // try {
+        //     $client = new Client(
+        //         'https://meili.selva.kg',  // This should work on Mac
+        //         'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
+        //         new GuzzleHttpClient([
+        //             'timeout' => 5,
+        //             'verify' => false
+        //         ])
+        //     );
+        //     return $client;
+        // } catch (\Exception $e) {
+        //     Yii::error("Meilisearch connection error: " . $e->getMessage());
+        //     throw $e;
+        // }
     }
 
     public function getClient()

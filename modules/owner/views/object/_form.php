@@ -34,8 +34,6 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'address_en')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'currency')->textInput(['maxlength' => true]) ?>
-
 
     <?php
     $initial_preview = false;
