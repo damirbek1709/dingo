@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <h1><?= Html::encode($this->title) ?></h1>
                 <?php foreach ($list_comfort as $categoryId => $comforts):
                     $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
-                    $selectedComforts = $model->comfort_list[$categoryId] ?? [];
+                    $selectedComforts = $room['comfort'][$categoryId] ?? [];
                     ?>
                     <fieldset>
                         <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong></legend>
