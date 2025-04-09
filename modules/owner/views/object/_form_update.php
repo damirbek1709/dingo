@@ -16,7 +16,7 @@ use vova07\imperavi\Widget;
 
     <?php $form = ActiveForm::begin([
         'enableClientValidation' => false,
-        'enableAjaxValidation' => true,
+        'enableAjaxValidation' => false,
         'options' => [
             'enctype' => 'multipart/form-data'
         ]
