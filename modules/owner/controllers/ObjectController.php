@@ -266,7 +266,7 @@ class ObjectController extends Controller
 
         // Convert the result into a Yii2 model
         $model = new Objects($searchResult);
-        $bind_model = Objects::find()->where(['link_id' => $id])->one();
+        $bind_model = Objects::find()->where(['id' => $id])->one();
 
 
         return $this->render('view', [
