@@ -666,7 +666,7 @@ class ObjectController extends Controller
             throw new NotFoundHttpException('Room not found in Meilisearch.');
         }
 
-        $model = new RoomCat($object);
+        $model = new RoomCat($room);
         $model->setAttributes($room, false);
         $model->img = $bind_model->getImage() ? $bind_model->getImage()->id : null;
 
