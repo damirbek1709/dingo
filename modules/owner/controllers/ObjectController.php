@@ -384,7 +384,12 @@ class ObjectController extends Controller
             $model->user_id = (int) Yii::$app->user->id;
             $bind_model->link_id = $id;
 
-            $name = [$model->name, $model->name_en, $model->name_ky];
+            $name = [];
+
+            $name[] = $model->name;
+            $name[] = $model->name_en;
+            $name[] = $model->name_ky;
+            
             $city = [$model->city, $model->city_en, $model->city_ky];
             $address = [$model->address, $model->address_en, $model->address_ky];
 
