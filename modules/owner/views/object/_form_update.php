@@ -20,16 +20,14 @@ use vova07\imperavi\Widget;
             'enctype' => 'multipart/form-data'
         ]
     ]);
-    $name_list = $model->name;
-    $city_list = $model->city;
-    $address_list = $model->address;
-    $description_list = $model->description;
+    $name_list = json_decode($model->name);
+    $city_list = json_decode($model->city);
+    $address_list = json_decode($model->address);
+    $description_list = json_decode($model->description);
 
     $name = $name_list[0] ? $name_list[0] : "";
     $name_en = $name_list[1] ? $name_list[1] : "";
     $name_ky = $name_list[2] ? $name_list[2] : "";
-
-    echo "<pre>";print_r($model->city);echo "</pre>";die();
 
     $city = $city_list[0] ? $city_list[0] : "";
     $city_en = $city_list[1] ? $city_list[1] : "";
