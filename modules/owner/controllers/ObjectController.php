@@ -937,7 +937,7 @@ class ObjectController extends Controller
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 foreach ($object['rooms'] as &$roomData) {
                     if (isset($roomData['id']) && $roomData['id'] == $id) {
-                        $roomData['comfort'][] = $comfortArr;
+                        $roomData['comfort']= $comfortArr;
                         $room = $roomData;
                         break;
                     }
