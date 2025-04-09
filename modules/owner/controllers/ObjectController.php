@@ -384,19 +384,31 @@ class ObjectController extends Controller
             $model->user_id = (int) Yii::$app->user->id;
             $bind_model->link_id = $id;
 
-            $name = [];
+            $request = Yii::$app->request->post();
 
-            $name[] = $model->name;
-            $name[] = $model->name_en;
-            $name[] = $model->name_ky;
-            
-            $city = [$model->city, $model->city_en, $model->city_ky];
-            $address = [$model->address, $model->address_en, $model->address_ky];
+            $model->name = [
+                $request['Objects']['name'] ?? '',
+                $request['Objects']['name_en'] ?? '',
+                $request['Objects']['name_ky'] ?? '',
+            ];
 
-            echo "<pre>";
-            print_r($name);
-            echo "</pre>";
-            die();
+            $model->city = [
+                $request['Objects']['city'] ?? '',
+                $request['Objects']['city_en'] ?? '',
+                $request['Objects']['city_ky'] ?? '',
+            ];
+
+            $model->address = [
+                $request['Objects']['address'] ?? '',
+                $request['Objects']['address_en'] ?? '',
+                $request['Objects']['address_ky'] ?? '',
+            ];
+
+            $model->description = [
+                $request['Objects']['description'] ?? '',
+                $request['Objects']['description_en'] ?? '',
+                $request['Objects']['description_ky'] ?? '',
+            ];
 
 
             if ($bind_model->save()) {
@@ -412,12 +424,12 @@ class ObjectController extends Controller
 
                 $object_arr = [
                     'id' => (int) $model->id,
-                    'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
+                    'name' => $model->name,
                     'type' => (int) $model->type,
                     'reception' => (int) $model->reception,
-                    'city' => [$model->city, $model->city_en, $model->city_ky],
-                    'address' => [$model->address, $model->address_en, $model->address_ky],
-                    'description' => [$model->description, $model->description_en, $model->description_ky],
+                    'city' => $model->city,
+                    'address' => $model->address,
+                    'description' => $model->description,
                     'currency' => $model->currency,
                     'phone' => $model->phone,
                     'site' => $model->site,
