@@ -375,16 +375,16 @@ class ObjectController extends Controller
         // Convert the first result into a model
         $model = new Objects($searchResult);
         $bind_model = Objects::findOne($id);
-        $bind_model->link_id = $id;
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            echo "<pre>";print_r($model);echo "</pre>";die();
             $model->type = (int) $model->type;
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
             $model->user_id = (int) Yii::$app->user->id;
-
             $bind_model->link_id = $id;
+            
             if ($bind_model->save()) {
                 $bind_model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
