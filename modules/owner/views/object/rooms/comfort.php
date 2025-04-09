@@ -28,9 +28,10 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
                 <?php
-                function isComfortChecked($roomComforts, $comfortId)
+                function isComfortChecked($comfortData, $comfortId): bool
                 {
-                    foreach ($roomComforts as $category) {
+                    $comfortId = (string) $comfortId;
+                    foreach ($comfortData as $category) {
                         if (isset($category[$comfortId])) {
                             return true;
                         }
@@ -38,6 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return false;
                 }
                 ?>
+
                 <?php foreach ($list_comfort as $categoryId => $comforts):
                     $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
                     ?>
@@ -58,6 +60,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </fieldset>
                     <br>
                 <?php endforeach; ?>
+
                 <div class="form-group">
                     <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
                 </div>
