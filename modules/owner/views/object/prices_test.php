@@ -3,7 +3,7 @@ use yii\helpers\Html;
 
 $this->title = Yii::t('app','Доступность и цены');
 $this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $title;
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 
