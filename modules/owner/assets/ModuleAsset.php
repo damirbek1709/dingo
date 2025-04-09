@@ -26,6 +26,7 @@ class ModuleAsset extends AssetBundle
     ];
     public $js = [
         'js/app.js',
+        'https://code.jquery.com/jquery-3.6.0.min.js'
         //'js/cats.js',
     ];
     public $jsOptions = [

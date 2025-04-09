@@ -1,18 +1,14 @@
 <?php
 use yii\helpers\Html;
+
+$this->title = Yii::t('app','Доступность и цены');
+$this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
+$this->params['breadcrumbs'][] = $title;
 ?>
-<!DOCTYPE html>
 
 
-<head>
-    <meta charset="UTF-8">
-    <title>Календарь с несколькими комнатами</title>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-</head>
-
-
-<h1><?= Html::encode($title) ?></h1>
+<h1><?= Html::encode($this->title) ?></h1>
 <?php echo $this->render('top_nav', ['model' => $model]); ?>
 <div class="sidebar" id="sidebar">
     <button class="sidebar-close" id="sidebar-close">&times;</button>
