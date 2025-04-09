@@ -123,7 +123,7 @@ class Objects extends \yii\db\ActiveRecord
                     'name_en',
                     'name_ky'
                 ],
-                'required'
+                'safe'
             ],
             [['link_id'], 'integer'],
             [['email'], 'email'], // Validate email format
