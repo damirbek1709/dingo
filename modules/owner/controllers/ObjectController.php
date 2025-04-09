@@ -392,12 +392,12 @@ class ObjectController extends Controller
             $bind_model->link_id = $id;
 
             if ($bind_model->save()) {
-                $model->images = UploadedFile::getInstances($model, 'images');
+                $bind_model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
-                    foreach ($model->images as $image) {
+                    foreach ($bind_model->images as $image) {
                         $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
                         $image->saveAs($path);
-                        $model->attachImage($path, true);
+                        $bind_model->attachImage($path, true);
                         @unlink($path);
                     }
                 }
