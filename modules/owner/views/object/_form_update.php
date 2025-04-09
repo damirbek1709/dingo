@@ -29,6 +29,8 @@ use vova07\imperavi\Widget;
     $name_en = $name_list[1] ? $name_list[1] : "";
     $name_ky = $name_list[2] ? $name_list[2] : "";
 
+    echo "<pre>";print_r($city);echo "</pre>";
+
     $city = $city_list[0] ? $city_list[0] : "";
     $city_en = $city_list[1] ? $city_list[1] : "";
     $city_ky = $city_list[2] ? $city_list[2] : "";
