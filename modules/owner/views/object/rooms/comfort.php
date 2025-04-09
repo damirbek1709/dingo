@@ -27,7 +27,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
+                <pre><?= print_r($room['comfort'], true) ?></pre>
                 <?php
+
+                
                 function isComfortChecked($comfortData, $comfortId): bool
                 {
                     $comfortId = (string) $comfortId;
