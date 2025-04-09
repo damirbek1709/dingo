@@ -9,6 +9,8 @@
 </head>
 
 <body>
+    <h1><?= Html::encode($title) ?></h1>
+    <?php echo $this->render('top_nav', ['model' => $model]); ?>
     <div class="sidebar" id="sidebar">
         <button class="sidebar-close" id="sidebar-close">&times;</button>
         <div class="sidebar-inner">
