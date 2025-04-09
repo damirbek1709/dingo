@@ -383,16 +383,8 @@ class ObjectController extends Controller
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
             $model->user_id = (int) Yii::$app->user->id;
-            $name_arr = [$model->name, $model->name_en, $model->name_ky];
-
-            $description_arr = [$model->description ? $model->description : "", $model->description_en ? $model->description_en : "", $model->description_ky ? $model->description_ky : ""];
-            $model->name = $name_arr;
-            $model->description = $description_arr;
-            $model->city = [$model->city, $model->city_en, $model->city_ky];
-            $model->address = [$model->address, $model->address_en, $model->address_ky];
 
             $bind_model->link_id = $id;
-
             if ($bind_model->save()) {
                 $bind_model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
@@ -406,11 +398,11 @@ class ObjectController extends Controller
 
                 $object_arr = [
                     'id' => (int) $id,
-                    'name' => $model->name,
+                    'name' => [$model->name, $model->name_en, $model->name_ky],
                     'type' => (int) $model->type,
-                    'city' => $model->city,
-                    'address' => $model->address,
-                    'description' => $model->description,
+                    'city' => [$model->city, $model->city_en, $model->city_ky],
+                    'address' => [$model->address, $model->address_en, $model->address_ky],
+                    'description' => [$model->description ? $model->description : "", $model->description_en ? $model->description_en : "", $model->description_ky ? $model->description_ky : ""],
                     'currency' => $model->currency,
                     'phone' => $model->phone,
                     'site' => $model->site,
