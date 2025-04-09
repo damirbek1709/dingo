@@ -172,6 +172,8 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
     <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
 
+    <?php echo $form->errorSummary($model); ?>
+
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
     </div>
