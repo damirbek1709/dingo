@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row">
 
             <div class="col-md-3">
-                <?php echo $this->render('room_nav', ['room_id' => $room_id,'object_id'=>$object_id]); ?>
+                <?php echo $this->render('room_nav', ['room_id' => $room_id, 'object_id' => $object_id]); ?>
             </div>
 
             <div class="col-md-9">
@@ -36,7 +36,11 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="comfort_list_grid">
                             <?php foreach ($comforts as $comfort): ?>
                                 <div>
-                                    <?= Html::checkbox("comforts[]", isset($selectedComforts[$comfort->id]), ['value' => $comfort->id]) ?>
+                                    <?= Html::checkbox(
+                                        "comforts[]",
+                                        isset($selectedComforts[(string) $comfort->id]),
+                                        ['value' => $comfort->id]
+                                    ) ?>
                                     <?= Html::encode($comfort->title) ?>
                                 </div>
                             <?php endforeach; ?>
