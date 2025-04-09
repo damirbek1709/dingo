@@ -396,8 +396,10 @@ class ObjectController extends Controller
                 }
 
                 $object_arr = [
-                    'id' => (int) $id,
-                    'name' => [$model->name, $model->name_en, $model->name_ky], // Remove unnecessary array wrapping
+                    'id' => (int)$model->id,
+                    'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
+                    'type' => (int) $model->type,
+                    'reception' => (int) $model->reception,
                     'city' => [$model->city, $model->city_en, $model->city_ky],
                     'address' => [$model->address, $model->address_en, $model->address_ky],
                     'description' => [$model->description, $model->description_en, $model->description_ky],
@@ -415,7 +417,6 @@ class ObjectController extends Controller
                     'email' => $model->email,
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
-                    'reception' => (int) $model->reception,
                 ];
                 
                 
