@@ -27,21 +27,31 @@ $this->params['breadcrumbs'][] = $this->title;
         ]) ?>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'room_title',
-            'guest_amount',
-            'similar_room_amount',
-            'area',
-            'bathroom',
-            'balcony',
-            'air_cond',
-            'kitchen',
-            'base_price',
-            'img',
-        ],
-    ]) ?>
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-3">
+                <?php echo $this->render('nav', ['model' => $model]); ?>
+            </div>
+            <div class="col-md-9">
+
+                <?= DetailView::widget([
+                    'model' => $model,
+                    'attributes' => [
+                        'id',
+                        'room_title',
+                        'guest_amount',
+                        'similar_room_amount',
+                        'area',
+                        'bathroom',
+                        'balcony',
+                        'air_cond',
+                        'kitchen',
+                        'base_price',
+                        'img',
+                    ],
+                ]) ?>
+            </div>
+        </div>
+    </div>
 
 </div>
