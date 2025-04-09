@@ -378,13 +378,12 @@ class ObjectController extends Controller
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            echo "<pre>";print_r(Yii::$app->request->post());echo "</pre>";die();
             $model->type = (int) $model->type;
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
             $model->user_id = (int) Yii::$app->user->id;
             $bind_model->link_id = $id;
-            
+
             if ($bind_model->save()) {
                 $bind_model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
@@ -398,7 +397,7 @@ class ObjectController extends Controller
 
                 $object_arr = [
                     'id' => (int) $id,
-                    'name' => [$model->name, $model->name_en, $model->name_ky],
+                    'name' => [$model->name ? $model->name : "", $model->name_en ? $model->name_en : "", $model->name_ky ? $model->name_ky : ""],
                     'type' => (int) $model->type,
                     'city' => [$model->city, $model->city_en, $model->city_ky],
                     'address' => [$model->address, $model->address_en, $model->address_ky],
