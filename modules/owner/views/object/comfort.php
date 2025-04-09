@@ -26,6 +26,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенно
 
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
+                <p><?=Yii::t('app','Выберите 5 и более удобств в вашем объекте размещения.')?></p>
                 <?php foreach ($list_comfort as $categoryId => $comforts):
                     $category_name = Comfort::getComfortCategoryTitle(id: $categoryId);
                     $selectedComforts = $model->comfort_list[$categoryId] ?? []; // Get selected comforts for this category
