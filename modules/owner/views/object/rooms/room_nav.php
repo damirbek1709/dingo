@@ -8,7 +8,7 @@ use yii\helpers\Html;
         <?= Html::a(Yii::t('app', 'Информация'), ['view', 'id' => $model->id]); ?>
     </div>
     <div class="owner-nav-item">
-        <?= Html::a(Yii::t('app', 'Услуги и особенности'), ['room-comfort', 'id' => $model->id, 'object_id'=>$model->object_id]); ?>
+        <?= Html::a(Yii::t('app', 'Услуги и особенности'), ['room-comfort', 'id' => $model->id, 'object_id'=>$object_id]); ?>
     </div>
 
    
