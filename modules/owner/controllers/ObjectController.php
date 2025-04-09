@@ -377,7 +377,7 @@ class ObjectController extends Controller
         $bind_model = Objects::findOne($id);
 
         // Handle form submission
-        if ($model->load(Yii::$app->request->post()) && $model->save(false)) {
+        if ($model->load(Yii::$app->request->post())) {
             $model->type = (int) $model->type;
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
