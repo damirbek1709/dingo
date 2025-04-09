@@ -375,7 +375,8 @@ class ObjectController extends Controller
 
         // Convert the first result into a model
         $model = new Objects($searchResult);
-        $model->link_id = $id;
+        $bind_model = Objects::findOne($id);
+        $bind_model->link_id = $id;
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
@@ -388,9 +389,9 @@ class ObjectController extends Controller
 
             $description_arr = [$model->description ? $model->description : "", $model->description_en ? $model->description_en : "", $model->description_ky ? $model->description_ky : ""];
             $model->name = array_values($name_arr);
-            $model->link_id = $id;
+            $bind_model->link_id = $id;
 
-            if ($model->save()) {
+            if ($bind_model->save()) {
                 $model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
                     foreach ($model->images as $image) {
@@ -433,6 +434,7 @@ class ObjectController extends Controller
         return $this->render('update', [
             'model' => $model,
             'id' => $id,
+            'bindModel'=>$bind_model
         ]);
     }
 
