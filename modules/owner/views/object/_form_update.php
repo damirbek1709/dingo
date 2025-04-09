@@ -55,10 +55,7 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_en]) ?>
     <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
 
-    <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
-    <?= $form->field($model, 'lon')->hiddenInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
-    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-    
+
     <?php
     $initial_preview = false;
     if ($model->isImageSet()) {
@@ -200,7 +197,9 @@ use vova07\imperavi\Widget;
     else
         $lon = 74.7661;
     ?>
-  
+    <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
+    <?= $form->field($model, 'lon')->hiddenInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
+    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
     <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
 
     <?php echo $form->errorSummary($model);?>
