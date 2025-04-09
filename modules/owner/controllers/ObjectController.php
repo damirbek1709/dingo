@@ -240,7 +240,8 @@ class ObjectController extends Controller
         }
         return $this->render('prices_test', [
             'rooms' => $rooms,
-            'object_id' => $id
+            'object_id' => $id,
+            'model' => $model,
         ]);
     }
 
