@@ -387,6 +387,10 @@ class ObjectController extends Controller
 
             $description_arr = [$model->description ? $model->description : "", $model->description_en ? $model->description_en : "", $model->description_ky ? $model->description_ky : ""];
             $model->name = array_values($name_arr);
+            $model->description = array_values($description_arr);
+            $model->city = array_values([$model->city, $model->city_en, $model->city_ky]);
+            $model->address = array_values([$model->address, $model->address_en, $model->address_ky]);
+
             $bind_model->link_id = $id;
 
             if ($bind_model->save()) {
@@ -404,9 +408,9 @@ class ObjectController extends Controller
                     'id' => (int) $id,
                     'name' => $model->name,
                     'type' => (int) $model->type,
-                    'city' => [$model->city, $model->city_en, $model->city_ky],
-                    'address' => [$model->address, $model->address_en, $model->address_ky],
-                    'description' => $description_arr,
+                    'city' => $model->city,
+                    'address' => $model->address,
+                    'description' => $model->description,
                     'currency' => $model->currency,
                     'phone' => $model->phone,
                     'site' => $model->site,
