@@ -76,7 +76,7 @@ $this->params['breadcrumbs'][] = $title;
                 </div>
                 <div class="view-img-list" style="margin-top:20px">
                     <?php
-                    if ($bind_model->getImages()) {
+                    if ($model->getImages()) {
                         foreach ($bind_model->getImages() as $image) {
                             echo Html::img($image->getUrl('220x150'), ['class' => 'view-thumbnail-img']);
                         }
