@@ -375,7 +375,6 @@ class ObjectController extends Controller
 
         // Convert the first result into a model
         $model = new Objects($searchResult);
-        $bind_model = Objects::find()->where(['link_id' => $id])->one();
         $model->link_id = $id;
 
         // Handle form submission
@@ -392,7 +391,7 @@ class ObjectController extends Controller
             $model->description = $description_arr;
             $model->link_id = $id;
 
-            if ($bind_model->save(false)) {
+            if ($model->save()) {
                 $model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
                     foreach ($model->images as $image) {
