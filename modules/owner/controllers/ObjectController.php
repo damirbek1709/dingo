@@ -933,23 +933,15 @@ class ObjectController extends Controller
                 ];
             }
 
-            
-            $roomId = (int) $id;
             // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
-                foreach ($object['rooms'] as $roomData) {
-                    // Debug print (optional)
-                    echo "Checking room ID {$roomData['id']} vs target {$roomId}<br>";die();
-            
-                    if (isset($roomData['id']) && (int)$roomData['id'] === $roomId) {
+                echo "room exists";die();
+                foreach ($object['rooms'] as &$roomData) {
+                    if (isset($roomData['id']) && $roomData['id'] == $id) {
+                        $roomData['comfort']= $comfortArr;
                         $room = $roomData;
                         break;
                     }
-                }
-            
-                // If not found, fallback message
-                if (empty($room)) {
-                    Yii::error("Room with ID $roomId not found in object $object_id");
                 }
 
                 // Re-index the entire object with updated rooms
@@ -964,8 +956,6 @@ class ObjectController extends Controller
                 return $this->refresh();
             }
         }
-
-        echo "<pre>";print_r($room);echo "</pre>";die();
 
         return $this->render('rooms/comfort', [
             'object_id' => $object_id,
