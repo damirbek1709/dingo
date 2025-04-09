@@ -378,7 +378,7 @@ class ObjectController extends Controller
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
-            echo "<pre>";print_r($model);echo "</pre>";die();
+            echo "<pre>";print_r(Yii::$app->request->post());echo "</pre>";die();
             $model->type = (int) $model->type;
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
