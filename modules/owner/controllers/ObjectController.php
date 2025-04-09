@@ -397,10 +397,10 @@ class ObjectController extends Controller
 
                 $object_arr = [
                     'id' => (int) $id,
-                    'name' => array_values(array_filter([$model->name, $model->name_en, $model->name_ky])),
-                    'city' => array_values(array_filter([$model->city, $model->city_en, $model->city_ky])),
-                    'address' => array_values(array_filter([$model->address, $model->address_en, $model->address_ky])),
-                    'description' => array_values(array_filter([$model->description, $model->description_en, $model->description_ky])),
+                    'name' => [$model->name, $model->name_en, $model->name_ky], // Remove unnecessary array wrapping
+                    'city' => [$model->city, $model->city_en, $model->city_ky],
+                    'address' => [$model->address, $model->address_en, $model->address_ky],
+                    'description' => [$model->description, $model->description_en, $model->description_ky],
                     'currency' => $model->currency,
                     'phone' => $model->phone,
                     'site' => $model->site,
@@ -417,6 +417,7 @@ class ObjectController extends Controller
                     'images' => $model->getPictures(),
                     'reception' => (int) $model->reception,
                 ];
+                
                 
 
                 $index->updateDocuments($object_arr);
