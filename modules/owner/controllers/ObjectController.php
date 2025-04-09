@@ -287,7 +287,7 @@ class ObjectController extends Controller
         $model->link_id = 1;
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($model->load($this->request->post()) && $model->save(false)) {
                 $model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
                     foreach ($model->images as $image) {
@@ -411,7 +411,7 @@ class ObjectController extends Controller
             ];
 
 
-            if ($bind_model->save()) {
+            if ($bind_model->save(false)) {
                 $bind_model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
                     foreach ($bind_model->images as $image) {

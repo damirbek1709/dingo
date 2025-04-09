@@ -15,7 +15,8 @@ use vova07\imperavi\Widget;
 <div class="oblast-form">
 
     <?php $form = ActiveForm::begin([
-        'enableClientValidation' => false,
+        'enableClientValidation' => true,
+        'enableAjaxValidation' => true,
         'options' => [
             'enctype' => 'multipart/form-data'
         ]
