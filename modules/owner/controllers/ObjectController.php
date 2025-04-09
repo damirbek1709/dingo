@@ -939,7 +939,7 @@ class ObjectController extends Controller
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 foreach ($object['rooms'] as $roomData) {
                     // Debug print (optional)
-                    // echo "Checking room ID {$roomData['id']} vs target {$roomId}<br>";
+                    echo "Checking room ID {$roomData['id']} vs target {$roomId}<br>";die();
             
                     if (isset($roomData['id']) && (int)$roomData['id'] === $roomId) {
                         $room = $roomData;
