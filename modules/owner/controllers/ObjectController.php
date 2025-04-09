@@ -962,6 +962,8 @@ class ObjectController extends Controller
             }
         }
 
+        echo "<pre>";print_r($room);echo "</pre>";die();
+
         return $this->render('rooms/comfort', [
             'object_id' => $object_id,
             'room_id'=>$id,
