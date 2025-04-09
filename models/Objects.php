@@ -111,20 +111,20 @@ class Objects extends \yii\db\ActiveRecord
                 ],
                 'safe'
             ],
-            // [
-            //     [
-            //         'city',
-            //         'city_en',
-            //         'city_ky',
-            //         'address',
-            //         'address_en',
-            //         'address_ky',
-            //         'name',
-            //         'name_en',
-            //         'name_ky'
-            //     ],
-            //     'required'
-            // ],
+            [
+                [
+                    'city',
+                    'city_en',
+                    'city_ky',
+                    'address',
+                    'address_en',
+                    'address_ky',
+                    'name',
+                    'name_en',
+                    'name_ky'
+                ],
+                'required'
+            ],
             [['link_id'], 'integer'],
             [['email'], 'email'], // Validate email format
             [['phone'], 'match', 'pattern' => '/^\+?[0-9 ]{7,15}$/'], // Phone validation
