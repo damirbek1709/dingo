@@ -27,9 +27,19 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
+                <?php
+                function isComfortChecked($roomComforts, $comfortId)
+                {
+                    foreach ($roomComforts as $category) {
+                        if (isset($category[$comfortId])) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+                ?>
                 <?php foreach ($list_comfort as $categoryId => $comforts):
                     $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
-                    $selectedComforts = $room['comfort'][$categoryId] ?? [];
                     ?>
                     <fieldset>
                         <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong></legend>
@@ -38,7 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <div>
                                     <?= Html::checkbox(
                                         "comforts[]",
-                                        isset($selectedComforts[(string) $comfort->id]),
+                                        isComfortChecked($room['comfort'] ?? [], $comfort->id),
                                         ['value' => $comfort->id]
                                     ) ?>
                                     <?= Html::encode($comfort->title) ?>
