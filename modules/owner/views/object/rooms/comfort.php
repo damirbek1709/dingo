@@ -22,7 +22,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row">
 
             <div class="col-md-3">
-                <?php echo $this->render('room_nav', ['room_id' => $room_id,'object_id'=>$object_id]); ?>
+                <?php echo $this->render('room_nav', ['room_id' => $room['id'],'object_id'=>$object_id]); ?>
             </div>
 
             <div class="col-md-9">
