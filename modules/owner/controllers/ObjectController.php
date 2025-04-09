@@ -284,11 +284,10 @@ class ObjectController extends Controller
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $model = new Objects();
-        $last_id = (int) $this->lastIncrement() + 1;
         
 
         if ($this->request->isPost && $model->load($this->request->post())) {
-            $model->link_id = $last_id;
+            $model->link_id = $model->id;
             if ($model->save()) {
                 $model->images = UploadedFile::getInstances($model, 'images');
                 if ($model->images) {
@@ -301,7 +300,7 @@ class ObjectController extends Controller
                 }
 
                 $object_arr = [
-                    'id' => (int) $last_id,
+                    'id' => $model->id,
                     'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
                     'type' => (int) $model->type,
                     'reception' => (int) $model->reception,
@@ -325,7 +324,7 @@ class ObjectController extends Controller
                 ];
 
                 $index->addDocuments($object_arr);
-                return $this->redirect(['view', 'id' => $last_id]);
+                return $this->redirect(['view', 'id' => $model->id]);
             }
         }
 
