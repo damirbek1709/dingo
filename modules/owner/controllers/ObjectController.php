@@ -935,7 +935,6 @@ class ObjectController extends Controller
 
             // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
-                echo "room exists";die();
                 foreach ($object['rooms'] as $index => $roomData) {
                     if (isset($roomData['id']) && $roomData['id'] == $id) {
                         $object['rooms'][$index]['comfort'] = $comfortArr;
