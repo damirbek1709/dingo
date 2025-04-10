@@ -33,16 +33,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     if (empty($comfortData) || !is_array($comfortData)) {
                         return false;
                     }
-                    
-                    $comfortId = (string) $comfortId; // Convert to string to match JSON keys
-                    
+
+                    $comfortId = (int) $comfortId;
+                    $found = false;
+
                     foreach ($comfortData as $categoryId => $comforts) {
-                        if (isset($comforts[$comfortId])) {
-                            return true;
+                        if (array_key_exists($comfortId, $comforts)) {
+                            $found = true;
+                            break;
                         }
                     }
-                    
-                    return false;
+
+                    return $found;
                 }
                 ?>
 
