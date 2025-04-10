@@ -937,10 +937,11 @@ class ObjectController extends Controller
 
             // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
-                foreach ($object['rooms'] as $roomIndex => $roomData) { // Renamed to roomIndex
+                //echo "room exists";die();
+                foreach ($object['rooms'] as &$roomData) {
                     if (isset($roomData['id']) && $roomData['id'] == $id) {
-                        $object['rooms'][$roomIndex]['comfort'] = $comfortArr;
-                        $room = $object['rooms'][$roomIndex];
+                        $roomData['comfort']= $comfortArr;
+                        $room = $roomData;
                         break;
                     }
                 }
@@ -951,7 +952,7 @@ class ObjectController extends Controller
                     'rooms' => $object['rooms']
                 ];
 
-                $meiliIndex->updateDocuments([$meilisearchData]); // Using renamed variable
+                $meiliIndex->updateDocuments([$meilisearchData]); // Must pass array of documents
 
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
