@@ -925,7 +925,7 @@ class ObjectController extends Controller
             // Fetch comfort info from DB
             $comfort_models = RoomComfort::find()->where(['id' => $comfort_list])->all();
             $comfortArr = [];
-            foreach ($comfort_list as $item) {
+            foreach ($comfort_models as $item) {
                 $comfortArr[$item->category_id][$item->id] = [
                     'ru' => $item->title,
                     'en' => $item->title_en,
