@@ -937,6 +937,8 @@ class ObjectController extends Controller
                     }
                 }
 
+                echo "<pre>";print_r($room);echo "</pre>";die();
+
                 // Re-index the entire object with updated rooms
                 $meilisearchData = [
                     'id' => (int) $object_id,
