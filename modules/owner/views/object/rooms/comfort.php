@@ -27,7 +27,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
-                <?php foreach ($list_comfort as $categoryId => $comforts):
+                <?php 
+                echo "<pre>";print_r($room);echo "</pre>";die();
+                foreach ($list_comfort as $categoryId => $comforts):
                     $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
                     $selectedComforts = $room['comfort'][$categoryId] ?? [];
                     ?>
