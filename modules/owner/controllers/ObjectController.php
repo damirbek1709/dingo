@@ -933,6 +933,8 @@ class ObjectController extends Controller
                 ];
             }
 
+            echo "<pre>";print_r($model);echo "</pre>";die();
+
             // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 //echo "room exists";die();
