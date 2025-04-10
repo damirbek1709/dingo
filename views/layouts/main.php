@@ -40,6 +40,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             ['label' => !Yii::$app->user->isGuest ? Yii::$app->user->identity->username : '', 'items' => [
                 ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can(permissionName: 'moderator')],
                 ['label' => 'Панель хоста', 'url' => ['/owner'], 'visible' => Yii::$app->user->can('owner')],
+                ['label' => 'Панель админа', 'url' => ['/admin'], 'visible' => Yii::$app->user->can('admin')],
                 ['label' => 'Выход',
                     'url' => ['/user/logout'],
                     'linkOptions' => ['data-method' => 'post']
