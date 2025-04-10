@@ -10,6 +10,7 @@ use yii\widgets\ActiveForm;
 /** @var app\models\Oblast $model */
 
 $this->title = Yii::t('app', 'Удобства номеров');
+$this->params['breadcrumbs'][] = ['label' => $object_title, 'url' => ['object/view', 'id' => $object_id]];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', ''), 'url' => ['index']];
 //$this->params['breadcrumbs'][] = ['label' => $model->name[0], 'url' => ['view', 'id' => $model_id]];
 $this->params['breadcrumbs'][] = $this->title;

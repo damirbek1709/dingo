@@ -966,6 +966,7 @@ class ObjectController extends Controller
 
         return $this->render('rooms/comfort', [
             'object_id' => $object_id,
+            'object_title'=>$object['name'][0],
             'room_id' => $id,
             'room' => $room,
             'model' => $model
