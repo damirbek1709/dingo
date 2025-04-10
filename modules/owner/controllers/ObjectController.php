@@ -933,6 +933,8 @@ class ObjectController extends Controller
                 ];
             }
 
+            echo "<pre>";print_r($comfortArr);echo "</pre>";die();
+
             // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 foreach ($object['rooms'] as &$roomData) {
