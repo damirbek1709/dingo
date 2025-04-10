@@ -22,54 +22,34 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row">
 
             <div class="col-md-3">
-                <?php echo $this->render('room_nav', ['room_id' => $room_id, 'object_id' => $object_id]); ?>
+                <?php echo $this->render('room_nav', ['room_id' => $room_id,'object_id'=>$object_id]); ?>
             </div>
 
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
-                <?php
-                function isComfortChecked($comfortData, $comfortId): bool
-                {
-                    if (empty($comfortData) || !is_array($comfortData)) {
-                        return false;
-                    }
-
-                    $comfortId = (string) $comfortId;
-
-                    foreach ($comfortData as $categoryComforts) {
-                        if (array_key_exists($comfortId, $categoryComforts)) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                ?>
-
-                <div class="comfort_list_grid">
-                    <?php foreach ($list_comfort as $categoryId => $comforts):
-                        $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
-                        $selectedComforts = $room->comforts[$categoryId] ?? []; // Get selected comforts for this category
-                        ?>
-                        <fieldset>
-                            <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong>
-                            </legend>
+                <?php foreach ($list_comfort as $categoryId => $comforts):
+                    $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
+                    $selectedComforts = $model->comforts[$categoryId] ?? [];
+                    ?>
+                    <fieldset>
+                        <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong></legend>
+                        <div class="comfort_list_grid">
                             <?php foreach ($comforts as $comfort): ?>
                                 <div>
-                                    <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][{$comfort->title}]", isset($selectedComforts[$comfort->id]), ['value' => 1]) ?>
+                                    <?= Html::checkbox("comforts[]", isset($selectedComforts[$comfort->id]), ['value' => $comfort->id]) ?>
                                     <?= Html::encode($comfort->title) ?>
                                 </div>
                             <?php endforeach; ?>
-                        </fieldset>
-                        <br>
-                    <?php endforeach; ?>
-
-
-                    <div class="form-group">
-                        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
-                    </div>
+                        </div>
+                    </fieldset>
+                    <br>
+                <?php endforeach; ?>
+                <div class="form-group">
+                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
                 </div>
             </div>
         </div>
-        <?php ActiveForm::end(); ?>
     </div>
+    <?php ActiveForm::end(); ?>
+
 </div>
