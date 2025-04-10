@@ -910,6 +910,7 @@ class ObjectController extends Controller
         ]);
     }
 
+
     public function actionRoomComfort($id, $object_id)
     {
         $client = Yii::$app->meili->connect();
@@ -957,11 +958,15 @@ class ObjectController extends Controller
 
         return $this->render('rooms/comfort', [
             'object_id' => $object_id,
+            'room_id'=>$id,
             'room' => $room,
-            'model' => $model,
-            'room_id'=>$id
+            'model' => $model
         ]);
     }
+
+
+
+
 
     /**
      * Deletes an existing Event model.
