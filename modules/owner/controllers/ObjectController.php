@@ -910,7 +910,7 @@ class ObjectController extends Controller
         ]);
     }
 
-    
+
 
 
     public function actionRoomComfort($id, $object_id)
@@ -918,32 +918,20 @@ class ObjectController extends Controller
         $client = Yii::$app->meili->connect();
         $meiliIndex = $client->index('object'); // Renamed to avoid conflict
         $comfort_list = Yii::$app->request->post('comforts');
-
-       
         $object = $meiliIndex->getDocument($object_id);
 
         $room = [];
         $model = new Objects($object);
 
         if (!empty($comfort_list)) {
-            echo "<pre>";print_r($comfort_list);echo "</pre>";die();
             // Fetch comfort info from DB
-            $comfort_models = RoomComfort::find()->where(['id' => $comfort_list])->all();
             $comfortArr = [];
-            foreach ($comfort_models as $item) {
-                $comfortArr[$item->category_id][$item->id] = [
-                    'ru' => $item->title,
-                    'en' => $item->title_en,
-                    'ky' => $item->title_ky
-                ];
-            }
 
             // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
-                //echo "room exists";die();
                 foreach ($object['rooms'] as &$roomData) {
                     if (isset($roomData['id']) && $roomData['id'] == $id) {
-                        $roomData['comfort']= $comfortArr;
+                        $roomData['comfort'] = $comfortArr;
                         $room = $roomData;
                         break;
                     }
