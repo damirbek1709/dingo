@@ -27,41 +27,22 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
-                <?php
-                function isComfortChecked($comfortData, $comfortId): bool
-                {
-                    if (empty($comfortData) || !is_array($comfortData)) {
-                        return false;
-                    }
-
-                    $comfortId = (int) $comfortId;
-                    $found = false;
-
-                    foreach ($comfortData as $categoryId => $comforts) {
-                        if (array_key_exists($comfortId, $comforts)) {
-                            $found = true;
-                            break;
-                        }
-                    }
-
-                    return $found;
-                }
-                ?>
-
                 <?php foreach ($list_comfort as $categoryId => $comforts):
                     $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
+                    $selectedComforts = $model->comfort_list[$categoryId] ?? []; // Get selected comforts for this category
                     ?>
                     <fieldset>
                         <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong></legend>
                         <div class="comfort_list_grid">
                             <?php foreach ($comforts as $comfort): ?>
                                 <div>
-                                    <?= Html::checkbox(
-                                        "comforts[]",
-                                        isComfortChecked($room['comfort'] ?? [], $comfort->id),
-                                        ['value' => $comfort->id]
-                                    ) ?>
+                                    <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][selected]", isset($selectedComforts[$comfort->id]), ['value' => 1]) ?>
                                     <?= Html::encode($comfort->title) ?>
+                                    (
+                                    <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][is_paid]", isset($selectedComforts[$comfort->id]['is_paid']) && $selectedComforts[$comfort->id]['is_paid'], ['value' => 1]) ?>
+                                    <label style="font-weight:normal">Платная услуга</label>
+                                    )
+
                                 </div>
                             <?php endforeach; ?>
                         </div>
@@ -77,3 +58,4 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php ActiveForm::end(); ?>
 
     </div>
+</div>
