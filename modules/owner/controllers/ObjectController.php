@@ -921,6 +921,15 @@ class ObjectController extends Controller
         $room = [];
         $model = new Objects($object);
 
+        if (isset($object['rooms']) && is_array($object['rooms'])) {
+            foreach ($object['rooms'] as &$roomData) {
+                if (isset($roomData['id']) && $roomData['id'] == $id) {
+                    $room = $roomData;
+                    break;
+                }
+            }
+        }
+
         if (!empty($comfort_list)) {
             // Fetch comfort info from DB
             $comfort_models = RoomComfort::find()->where(['id' => $comfort_list])->all();
@@ -933,33 +942,20 @@ class ObjectController extends Controller
                 ];
             }
 
-            
-            // Update room inside object
-            if (isset($object['rooms']) && is_array($object['rooms'])) {
-                foreach ($object['rooms'] as &$roomData) {
-                    if (isset($roomData['id']) && $roomData['id'] == $id) {
-                        $roomData['comfort'] = $comfortArr;
-                        $room = $roomData;
-                        break;
-                    }
-                }
-
-                // Re-index the entire object with updated rooms
-                $meilisearchData = [
-                    'id' => (int) $object_id,
-                    'rooms' => $object['rooms']
-                ];
-
-                $index->updateDocuments([$meilisearchData]); // Must pass array of documents
-
-                Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
-                return $this->refresh();
-            }
+            $room['comfort'] = $comfortArr;
+            $meilisearchData = [
+                'id' => (int) $object_id,
+                'rooms' => $object['rooms']
+            ];
+            $index->updateDocuments([$meilisearchData]); // Must pass array of documents
+            Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+            return $this->refresh();
         }
+
 
         return $this->render('rooms/comfort', [
             'object_id' => $object_id,
-            'room_id'=>$id,
+            'room_id' => $id,
             'room' => $room,
             'model' => $model
         ]);
