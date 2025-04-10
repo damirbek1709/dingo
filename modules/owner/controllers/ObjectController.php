@@ -918,12 +918,15 @@ class ObjectController extends Controller
         $client = Yii::$app->meili->connect();
         $meiliIndex = $client->index('object'); // Renamed to avoid conflict
         $comfort_list = Yii::$app->request->post('comforts');
+
+       
         $object = $meiliIndex->getDocument($object_id);
 
         $room = [];
         $model = new Objects($object);
 
         if (!empty($comfort_list)) {
+            echo "<pre>";print_r($comfort_list);echo "</pre>";die();
             // Fetch comfort info from DB
             $comfort_models = RoomComfort::find()->where(['id' => $comfort_list])->all();
             $comfortArr = [];
