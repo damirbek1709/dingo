@@ -28,16 +28,20 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
                 <?php
-
-                
                 function isComfortChecked($comfortData, $comfortId): bool
                 {
-                    $comfortId = (string) $comfortId;
-                    foreach ($comfortData as $category) {
-                        if (isset($category[$comfortId])) {
+                    if (empty($comfortData) || !is_array($comfortData)) {
+                        return false;
+                    }
+                    
+                    $comfortId = (string) $comfortId; // Convert to string to match JSON keys
+                    
+                    foreach ($comfortData as $categoryId => $comforts) {
+                        if (isset($comforts[$comfortId])) {
                             return true;
                         }
                     }
+                    
                     return false;
                 }
                 ?>
@@ -68,7 +72,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 </div>
             </div>
         </div>
-    </div>
-    <?php ActiveForm::end(); ?>
+        <?php ActiveForm::end(); ?>
 
-</div>
+    </div>
