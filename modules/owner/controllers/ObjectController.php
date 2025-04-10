@@ -922,46 +922,23 @@ class ObjectController extends Controller
 
         $room = [];
         $model = new Objects($object);
-
         if (!empty($comfort_list)) {
-            // Fetch comfort info from DB
             $comfortArr = [];
-
-            // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 foreach ($object['rooms'] as &$roomData) {
                     if (isset($roomData['id']) && $roomData['id'] == $id) {
+                        $roomData['comfort'] = $comfortArr;
                         $room = $roomData;
                         break;
                     }
-                    foreach ($comfort_list as $categoryId => $comforts) {
-                        foreach ($comforts as $comfortId => $comfortData) {
-                            $comfort = RoomComfort::findOne($comfortId);
-                            if ($comfort) {
-                                $comfortArr[$categoryId][$comfortId] = [
-                                    'ru' => $comfort->title,
-                                    'en' => $comfort->title_en,
-                                    'ky' => $comfort->title_ky,
-                                    'is_paid' => isset($comfortData['is_paid']) ? 1 : 0,
-                                ];
-                            }
-                        }
-                    }
                 }
 
-                echo "<pre>";print_r($room);echo "</pre>";
-                echo "<pre>";print_r($comfortArr);echo "</pre>";
-                
-                die();
-
-                // Re-index the entire object with updated rooms
                 $meilisearchData = [
                     'id' => (int) $object_id,
                     'rooms' => $object['rooms']
                 ];
 
                 $meiliIndex->updateDocuments([$meilisearchData]); // Must pass array of documents
-
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
             }
