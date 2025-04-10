@@ -910,6 +910,9 @@ class ObjectController extends Controller
         ]);
     }
 
+    
+
+
     public function actionRoomComfort($id, $object_id)
     {
         $client = Yii::$app->meili->connect();
