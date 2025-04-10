@@ -921,8 +921,9 @@ class ObjectController extends Controller
         $room = [];
         $model = new Objects($object);
 
+        // 🔁 Always load the correct room from Meilisearch
         if (isset($object['rooms']) && is_array($object['rooms'])) {
-            foreach ($object['rooms'] as &$roomData) {
+            foreach ($object['rooms'] as $roomData) {
                 if (isset($roomData['id']) && $roomData['id'] == $id) {
                     $room = $roomData;
                     break;
@@ -931,27 +932,37 @@ class ObjectController extends Controller
         }
 
         if (!empty($comfort_list)) {
-            // Fetch comfort info from DB
             $comfort_models = RoomComfort::find()->where(['id' => $comfort_list])->all();
             $comfortArr = [];
+
             foreach ($comfort_models as $item) {
                 $comfortArr[$item->category_id][$item->id] = [
                     'ru' => $item->title,
                     'en' => $item->title_en,
-                    'ky' => $item->title_ky
+                    'ky' => $item->title_ky,
                 ];
             }
 
-            $room['comfort'] = $comfortArr;
+            // 🔄 Update room's comfort info in the rooms list
+            foreach ($object['rooms'] as $i => $roomData) {
+                if (isset($roomData['id']) && $roomData['id'] == $id) {
+                    $object['rooms'][$i]['comfort'] = $comfortArr;
+                    $room = $object['rooms'][$i]; // Refresh local copy
+                    break;
+                }
+            }
+
+            // 🟢 Save back to Meilisearch
             $meilisearchData = [
                 'id' => (int) $object_id,
                 'rooms' => $object['rooms']
             ];
-            $index->updateDocuments([$meilisearchData]); // Must pass array of documents
+
+            $index->updateDocuments([$meilisearchData]);
+
             Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
             return $this->refresh();
         }
-
 
         return $this->render('rooms/comfort', [
             'object_id' => $object_id,
@@ -960,8 +971,6 @@ class ObjectController extends Controller
             'model' => $model
         ]);
     }
-
-
 
 
 
