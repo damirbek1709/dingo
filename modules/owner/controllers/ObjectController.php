@@ -949,7 +949,7 @@ class ObjectController extends Controller
                     'rooms' => $object['rooms']
                 ];
 
-                $index->updateDocuments([$meilisearchData]); // Must pass array of documents
+                $index->updateDocuments($meilisearchData); // Must pass array of documents
 
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
