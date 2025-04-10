@@ -45,7 +45,9 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
                 ?>
 
-                <?php foreach ($list_comfort as $categoryId => $comforts):
+                <?php 
+                echo "<pre>";print_r($list_comfort);echo "</pre>";die();
+                foreach ($list_comfort as $categoryId => $comforts):
                     $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
                     ?>
                     <fieldset>
