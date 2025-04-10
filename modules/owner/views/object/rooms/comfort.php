@@ -27,24 +27,20 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="col-md-9">
                 <h1><?= Html::encode($this->title) ?></h1>
-                <?php
-                function isComfortSelected($room, $categoryId, $comfortId)
-                {
-                    if (empty($room) || !isset($room['comfort'])) {
-                        return false;
-                    }
-
-                    return isset($room['comfort'][$categoryId][$comfortId]);
-                } ?>
                 <?php foreach ($list_comfort as $categoryId => $comforts):
                     $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
+                    $selectedComforts = $room['comfort'][$categoryId] ?? [];
                     ?>
                     <fieldset>
                         <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong></legend>
                         <div class="comfort_list_grid">
                             <?php foreach ($comforts as $comfort): ?>
                                 <div>
-                                    <?= Html::checkbox("comforts[]", isComfortSelected($room, $categoryId, $comfort->id), ['value' => $comfort->id]) ?>
+                                    <?= Html::checkbox(
+                                        "comforts[]",
+                                        isset($selectedComforts[(string) $comfort->id]), // 🟢 handles string keys
+                                        ['value' => $comfort->id]
+                                    ) ?>
                                     <?= Html::encode($comfort->title) ?>
                                 </div>
                             <?php endforeach; ?>
@@ -52,6 +48,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </fieldset>
                     <br>
                 <?php endforeach; ?>
+
                 <div class="form-group">
                     <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
                 </div>
