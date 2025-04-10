@@ -910,20 +910,29 @@ class ObjectController extends Controller
         ]);
     }
 
-
-
-
     public function actionRoomComfort($id, $object_id)
     {
         $client = Yii::$app->meili->connect();
-        $meiliIndex = $client->index('object'); // Renamed to avoid conflict
+        $index = $client->index('object');
         $comfort_list = Yii::$app->request->post('comforts');
-        $object = $meiliIndex->getDocument($object_id);
+        $object = $index->getDocument($object_id);
 
         $room = [];
         $model = new Objects($object);
+
         if (!empty($comfort_list)) {
+            // Fetch comfort info from DB
+            $comfort_models = RoomComfort::find()->where(['id' => $comfort_list])->all();
             $comfortArr = [];
+            foreach ($comfort_models as $item) {
+                $comfortArr[$item->category_id][$item->id] = [
+                    'ru' => $item->title,
+                    'en' => $item->title_en,
+                    'ky' => $item->title_ky
+                ];
+            }
+
+            // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 foreach ($object['rooms'] as &$roomData) {
                     if (isset($roomData['id']) && $roomData['id'] == $id) {
@@ -933,12 +942,14 @@ class ObjectController extends Controller
                     }
                 }
 
+                // Re-index the entire object with updated rooms
                 $meilisearchData = [
                     'id' => (int) $object_id,
                     'rooms' => $object['rooms']
                 ];
 
-                $meiliIndex->updateDocuments([$meilisearchData]); // Must pass array of documents
+                $index->updateDocuments([$meilisearchData]); // Must pass array of documents
+
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
             }
@@ -946,15 +957,10 @@ class ObjectController extends Controller
 
         return $this->render('rooms/comfort', [
             'object_id' => $object_id,
-            'room_id' => $id,
             'room' => $room,
             'model' => $model
         ]);
     }
-
-
-
-
 
     /**
      * Deletes an existing Event model.
