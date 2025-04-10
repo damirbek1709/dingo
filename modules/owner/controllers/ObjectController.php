@@ -914,9 +914,9 @@ class ObjectController extends Controller
     public function actionRoomComfort($id, $object_id)
     {
         $client = Yii::$app->meili->connect();
-        $index = $client->index('object');
+        $meiliIndex = $client->index('object'); // Renamed to avoid conflict
         $comfort_list = Yii::$app->request->post('comforts');
-        $object = $index->getDocument($object_id);
+        $object = $meiliIndex->getDocument($object_id);
 
         $room = [];
         $model = new Objects($object);
@@ -935,10 +935,10 @@ class ObjectController extends Controller
 
             // Update room inside object
             if (isset($object['rooms']) && is_array($object['rooms'])) {
-                foreach ($object['rooms'] as $index => $roomData) {
+                foreach ($object['rooms'] as $roomIndex => $roomData) { // Renamed to roomIndex
                     if (isset($roomData['id']) && $roomData['id'] == $id) {
-                        $object['rooms'][$index]['comfort'] = $comfortArr;
-                        $room = $object['rooms'][$index];
+                        $object['rooms'][$roomIndex]['comfort'] = $comfortArr;
+                        $room = $object['rooms'][$roomIndex];
                         break;
                     }
                 }
@@ -949,7 +949,7 @@ class ObjectController extends Controller
                     'rooms' => $object['rooms']
                 ];
 
-                $index->updateDocuments([$meilisearchData]); // Must pass array of documents
+                $meiliIndex->updateDocuments([$meilisearchData]); // Using renamed variable
 
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
