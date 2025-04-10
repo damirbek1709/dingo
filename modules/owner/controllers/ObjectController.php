@@ -933,26 +933,27 @@ class ObjectController extends Controller
                 ];
             }
 
-            echo "<pre>";print_r($model);echo "</pre>";die();
-
+           
             // Update room inside object
-            if (isset($object['rooms']) && is_array($object['rooms'])) {
-                //echo "room exists";die();
-                foreach ($object['rooms'] as &$roomData) {
+            if (isset($object->rooms) && is_array($object->rooms)) {
+                echo "Test";die();
+                foreach ($object->rooms as &$roomData) {
                     if (isset($roomData['id']) && $roomData['id'] == $id) {
-                        $roomData['comfort']= $comfortArr;
+                        $roomData['comfort'] = $comfortArr;
                         $room = $roomData;
                         break;
                     }
                 }
 
-                // Re-index the entire object with updated rooms
+                // ❗ update the object’s rooms array after editing
+                $object->rooms = $object->rooms;
+
                 $meilisearchData = [
                     'id' => (int) $object_id,
-                    'rooms' => $object['rooms']
+                    'rooms' => $object->rooms
                 ];
 
-                $index->updateDocuments([$meilisearchData]); // Must pass array of documents
+                $index->updateDocuments([$meilisearchData]);
 
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
@@ -961,7 +962,7 @@ class ObjectController extends Controller
 
         return $this->render('rooms/comfort', [
             'object_id' => $object_id,
-            'room_id'=>$id,
+            'room_id' => $id,
             'room' => $room,
             'model' => $model
         ]);
