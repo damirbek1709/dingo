@@ -54,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         <div class="comfort_list_grid">
                             <?php foreach ($list_comfort as $categoryId => $comforts):
                                 $category_name = Comfort::getComfortCategoryTitle(id: $categoryId);
-                                $selectedComforts = $model->comforts[$categoryId] ?? []; // Get selected comforts for this category
+                                $selectedComforts = $room->comforts[$categoryId] ?? []; // Get selected comforts for this category
                                 ?>
                                 <fieldset>
                                     <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong>
