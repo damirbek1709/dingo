@@ -53,13 +53,12 @@ $this->params['breadcrumbs'][] = $this->title;
                         <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong></legend>
                         <div class="comfort_list_grid">
                             <?php foreach ($list_comfort as $categoryId => $comforts):
-                                $category_name = Comfort::getComfortCategoryTitle(id: $categoryId);
+                                $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
                                 $selectedComforts = $room->comforts[$categoryId] ?? []; // Get selected comforts for this category
                                 ?>
                                 <fieldset>
                                     <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong>
                                     </legend>
-                                    <div class="comfort_list_grid">
                                         <?php foreach ($comforts as $comfort): ?>
                                             <div>
                                                 <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][selected]", isset($selectedComforts[$comfort->id]), ['value' => 1]) ?>
@@ -68,7 +67,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
                                             </div>
                                         <?php endforeach; ?>
-                                    </div>
                                 </fieldset>
                                 <br>
                             <?php endforeach; ?>
