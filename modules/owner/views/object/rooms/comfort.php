@@ -45,13 +45,15 @@ $this->params['breadcrumbs'][] = $this->title;
                 }
                 ?>
 
-                <?php
-                foreach ($list_comfort as $categoryId => $comforts):
-                    $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
-                    ?>
-                    <fieldset>
-                        <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong></legend>
-                        <div class="comfort_list_grid">
+                <div class="comfort_list_grid">
+                    <?php
+                    foreach ($list_comfort as $categoryId => $comforts):
+                        $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
+                        ?>
+                        <fieldset>
+                            <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong>
+                            </legend>
+
                             <?php foreach ($list_comfort as $categoryId => $comforts):
                                 $category_name = RoomComfort::getComfortCategoryTitle(id: $categoryId);
                                 $selectedComforts = $room->comforts[$categoryId] ?? []; // Get selected comforts for this category
@@ -59,25 +61,24 @@ $this->params['breadcrumbs'][] = $this->title;
                                 <fieldset>
                                     <legend><strong><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></strong>
                                     </legend>
-                                        <?php foreach ($comforts as $comfort): ?>
-                                            <div>
-                                                <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][selected]", isset($selectedComforts[$comfort->id]), ['value' => 1]) ?>
-                                                <?= Html::encode($comfort->title) ?>
-                                               
+                                    <?php foreach ($comforts as $comfort): ?>
+                                        <div>
+                                            <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][selected]", isset($selectedComforts[$comfort->id]), ['value' => 1]) ?>
+                                            <?= Html::encode($comfort->title) ?>
 
-                                            </div>
-                                        <?php endforeach; ?>
+
+                                        </div>
+                                    <?php endforeach; ?>
                                 </fieldset>
                                 <br>
                             <?php endforeach; ?>
-                        </div>
-                    </fieldset>
-                    <br>
-                <?php endforeach; ?>
+                        </fieldset>
+                    <?php endforeach; ?>
 
 
-                <div class="form-group">
-                    <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+                    <div class="form-group">
+                        <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
+                    </div>
                 </div>
             </div>
         </div>
