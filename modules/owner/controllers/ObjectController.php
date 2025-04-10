@@ -946,16 +946,19 @@ class ObjectController extends Controller
             // 🔄 Update room's comfort info in the rooms list
             foreach ($object['rooms'] as $i => $roomData) {
                 if (isset($roomData['id']) && $roomData['id'] == $id) {
+                    // 🔄 update only the `comfort` of the matched room
                     $object['rooms'][$i]['comfort'] = $comfortArr;
-                    $room = $object['rooms'][$i]; // Refresh local copy
+                    $room = $object['rooms'][$i];
+
+                    // ✅ Stop early
                     break;
                 }
             }
 
-            // 🟢 Save back to Meilisearch
+            // ✅ Save full room list (preserving others)
             $meilisearchData = [
                 'id' => (int) $object_id,
-                'rooms' => $object['rooms']
+                'rooms' => $object['rooms'] // full array intact
             ];
 
             $index->updateDocuments([$meilisearchData]);
@@ -966,7 +969,7 @@ class ObjectController extends Controller
 
         return $this->render('rooms/comfort', [
             'object_id' => $object_id,
-            'object_title'=>$object['name'][0],
+            'object_title' => $object['name'][0],
             'room_id' => $id,
             'room' => $room,
             'model' => $model
