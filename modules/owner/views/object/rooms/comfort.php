@@ -55,7 +55,7 @@ $this->params['breadcrumbs'][] = $this->title;
                             </legend>
                             <?php foreach ($comforts as $comfort): ?>
                                 <div>
-                                    <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][selected]", isset($selectedComforts[$comfort->id]), ['value' => 1]) ?>
+                                    <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][{$comfort->title}]", isset($selectedComforts[$comfort->id]), ['value' => 1]) ?>
                                     <?= Html::encode($comfort->title) ?>
                                 </div>
                             <?php endforeach; ?>
