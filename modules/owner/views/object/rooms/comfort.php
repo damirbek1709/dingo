@@ -34,16 +34,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         return false;
                     }
 
-                    $comfortId = (int) $comfortId; // Convert to integer for comparison
-                
-                    // Loop through each category in the comfort data
-                    foreach ($comfortData as $categoryId => $comforts) {
-                        // Check if this comfort ID is a key in this category
-                        if (array_key_exists($comfortId, $comforts)) {
+                    $comfortId = (string) $comfortId;
+
+                    foreach ($comfortData as $categoryComforts) {
+                        if (array_key_exists($comfortId, $categoryComforts)) {
                             return true;
                         }
                     }
-
                     return false;
                 }
                 ?>
@@ -68,6 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     </fieldset>
                     <br>
                 <?php endforeach; ?>
+
 
                 <div class="form-group">
                     <?= Html::submitButton('Сохранить', ['class' => 'btn btn-success']) ?>
