@@ -449,8 +449,6 @@ class ObjectController extends Controller
                     'images' => $model->getPictures(),
                 ];
 
-
-
                 $index->updateDocuments($object_arr);
                 return $this->redirect(['view', 'id' => $model->id]);
             }

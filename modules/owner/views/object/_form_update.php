@@ -6,6 +6,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use vova07\imperavi\Widget;
+use dosamigos\fileupload\FileUploadUI;
 
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
@@ -47,7 +48,7 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'name_en')->textInput(['maxlength' => true, 'value' => $name_en]) ?>
     <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true, 'value' => $name_ky]) ?>
     <?= $form->field($model, 'type')->dropDownList($model->objectTypeList()) ?>
-    
+
     <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'value' => $city]) ?>
     <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'value' => $city_en]) ?>
     <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'value' => $city_ky]) ?>
@@ -55,6 +56,8 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address]) ?>
     <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_en]) ?>
     <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
+
+
 
 
     <?php
@@ -66,7 +69,11 @@ use vova07\imperavi\Widget;
     echo $form->field($model, 'images[]')->widget(
         \kartik\file\FileInput::class,
         [
-            'options' => ['accept' => 'image/*', 'multiple' => 'true'],
+            'options' => [
+                'accept' => 'image/*',
+                'multiple' => true,
+                'id' => 'input-images-' . uniqid(), // Ensure a unique ID
+            ],
             'pluginOptions' => [
                 'previewFileType' => 'image',
                 'initialPreview' => $initial_preview,
@@ -81,19 +88,19 @@ use vova07\imperavi\Widget;
                 }, $images),
                 'overwriteInitial' => false,
                 'initialPreviewAsData' => true,
-                'initialPreviewFileType' => 'image',
-                'initialPreviewShowDelete' => true,
-                'append' => true,
                 'showRemove' => false,
                 'showUpload' => false,
                 'otherActionButtons' => '
-                                <button type="button" class="kv-cust-btn img-main btn btn-sm" title="Set as main">
-                                    <i class="glyphicon glyphicon-ok"></i>
-                                </button>
-                                ',
+                    <button type="button" class="kv-cust-btn img-main btn btn-sm" title="Set as main">
+                        <i class="glyphicon glyphicon-ok"></i>
+                    </button>
+                ',
                 'fileActionSettings' => [
                     'showZoom' => false,
                 ],
+                'uploadUrl' => false, // No upload URL to prevent automatic upload
+                'uploadAsync' => false,
+                'maxFileCount' => 0, // No file count limit
             ],
         ]
     )->label(Yii::t('app', 'Фотографии')); ?>
@@ -106,7 +113,7 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'check_out')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'reception')->checkbox() ?>
 
-    <?php 
+    <?php
     // $model->description = $model->description[0];
     // echo $form->field($model, 'description')->widget(
     //     Widget::className(),
@@ -132,10 +139,10 @@ use vova07\imperavi\Widget;
     //     ]
     // ); ?>
 
-    <?php 
-    echo $form->field($model, 'description')->textarea(['value'=>$description]);
-    echo $form->field($model, 'description_en')->textarea(['value'=>$description_en]);
-    echo $form->field($model, 'description_ky')->textarea(['value'=>$description_ky]);
+    <?php
+    echo $form->field($model, 'description')->textarea(['value' => $description]);
+    echo $form->field($model, 'description_en')->textarea(['value' => $description_en]);
+    echo $form->field($model, 'description_ky')->textarea(['value' => $description_ky]);
 
     // $model->description_en = $model->description[1];
     // echo $form->field($model, 'description_en')->widget(
@@ -162,7 +169,7 @@ use vova07\imperavi\Widget;
     //     ]
     // ); ?>
 
-    <?php 
+    <?php
     // $model->description_ky = $model->description[2];
     // echo $form->field($model, 'description_ky')->widget(
     //     Widget::className(),
@@ -204,7 +211,7 @@ use vova07\imperavi\Widget;
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
     <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
 
-    <?php echo $form->errorSummary($model);?>
+    <?php echo $form->errorSummary($model); ?>
 
 
 
@@ -255,6 +262,28 @@ use vova07\imperavi\Widget;
         $('.file-preview-thumbnails .file-preview-frame').removeClass('main');
         $('.img-main').removeClass('main');
         $(this).addClass('main');
+    });
+
+    var originalInput = $('#input-id-goes-here');
+
+    // Store all selected files
+    var allFiles = [];
+
+    // Listen for file selection events
+    originalInput.on('fileloaded', function (event, file, previewId, index, reader) {
+        // Add file to our array
+        allFiles.push(file);
+    });
+
+    // When new files are selected
+    originalInput.on('change', function (event) {
+        // Preserve all previously selected files
+        var currentFiles = $(this).get(0).files;
+        if (currentFiles.length > 0) {
+            for (var i = 0; i < currentFiles.length; i++) {
+                allFiles.push(currentFiles[i]);
+            }
+        }
     });
 
 </script>
