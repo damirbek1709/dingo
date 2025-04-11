@@ -111,7 +111,7 @@ class ObjectController extends BaseController
                 'category-comfort-title' => ['GET'],
                 'room-comfort-title' => ['GET'],
                 'room-images' => ['GET'],
-                'exchange'=>['POST']
+                'exchange'=>['GET']
             ],
         ];
 
@@ -1461,7 +1461,7 @@ class ObjectController extends BaseController
 
         try {
             $response = $client->createRequest()
-                ->setMethod('GET')
+                ->setMethod('POST')
                 ->setUrl($url)
                 ->addHeaders(['Authorization' => "Bearer $bearerToken"])
                 ->send();

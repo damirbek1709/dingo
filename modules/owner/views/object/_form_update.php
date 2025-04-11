@@ -83,6 +83,7 @@ use vova07\imperavi\Widget;
                 'initialPreviewAsData' => true,
                 'initialPreviewFileType' => 'image',
                 'initialPreviewShowDelete' => true,
+                'append' => true,
                 'showRemove' => false,
                 'showUpload' => false,
                 'otherActionButtons' => '
