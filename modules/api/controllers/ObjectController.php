@@ -56,7 +56,8 @@ class ObjectController extends BaseController
             'category-comfort-title',
             'search',
             'room-images',
-            'similar'
+            'similar',
+            'exchange'
         ];
 
 
@@ -65,7 +66,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar','room-comfort-title'],
+                    'actions' => ['add', 'category-comfort-title', 'similar','room-comfort-title','exchange'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -110,6 +111,7 @@ class ObjectController extends BaseController
                 'category-comfort-title' => ['GET'],
                 'room-comfort-title' => ['GET'],
                 'room-images' => ['GET'],
+                'exchange'=>['POST']
             ],
         ];
 
@@ -1446,6 +1448,40 @@ class ObjectController extends BaseController
         }
 
         throw new NotFoundHttpException('Избранное не найдено.');
+    }
+
+
+    public function actionExchange()
+    {
+        $url = 'http://data.fx.kg/api/v1/current';
+        $bearerToken = 'axqspIDnS9HscCFcGK6f5WZMnD3DrOcwBMWEsOx957a78122'; // Replace with your actual token
+        $targetId = 2; // The ID you want to filter
+
+        $client = new \yii\httpclient\Client();
+
+        try {
+            $response = $client->createRequest()
+                ->setMethod('GET')
+                ->setUrl($url)
+                ->addHeaders(['Authorization' => "Bearer $bearerToken"])
+                ->send();
+
+            if ($response->isOk) {
+                $data = $response->data; // JSON decoded response
+
+                // Filter to get only the object with id = 2
+                $filteredData = array_filter($data, function ($item) use ($targetId) {
+                    return $item['id'] == $targetId;
+                });
+
+                // Reset array keys and return the first matched object
+                return $this->asJson(array_values($filteredData)[0] ?? ['error' => 'Not found']);
+            } else {
+                return $this->asJson(['error' => 'Failed to fetch data', 'status' => $response->statusCode]);
+            }
+        } catch (\Exception $e) {
+            return $this->asJson(['error' => $e->getMessage()]);
+        }
     }
 
 
