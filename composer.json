@@ -40,7 +40,8 @@
         "http-interop/http-factory-guzzle": "^1.0",
         "yus-ham/yii2-resend": "^1.0",
         "dektrium/yii2-rbac": "1.0.0-alpha@dev",
-        "2amigos/yii2-file-upload-widget": "~1.0"
+        "2amigos/yii2-file-upload-widget": "~1.0",
+        "yii2-starter-kit/yii2-file-kit": "^2.1"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

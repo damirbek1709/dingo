@@ -212,8 +212,6 @@ use vova07\imperavi\Widget;
         $('#longitude').val(placemark.geometry.getCoordinates()[1]);
     }
 
-
-
     var mainImgIdField = $('#object-img');
     $('body').on('click', '.img-main', function () {
         var imgId = $(this).siblings('.kv-file-remove').attr('data-key');

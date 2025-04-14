@@ -1,5 +1,3 @@
-<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
-
 <?php
 
 use yii\helpers\Html;
@@ -7,11 +5,23 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use vova07\imperavi\Widget;
 use dosamigos\fileupload\FileUploadUI;
+use kartik\file\FileInput;
+
 
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
 /** @var yii\widgets\ActiveForm $form */
 ?>
+
+<script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+<!-- FilePond styles and scripts -->
+<link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
+<script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
+
+<!-- FilePond plugins (image preview, validation, etc.) -->
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
+<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet" />
+
 
 <div class="oblast-form">
 
@@ -58,52 +68,69 @@ use dosamigos\fileupload\FileUploadUI;
     <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
 
 
-
-
     <?php
     $initial_preview = false;
     if ($model->isImageSet()) {
         $initial_preview = $model->imagesPreview();
     }
     $images = $model->getImages(); // Get all images
-    echo $form->field($model, 'images[]')->widget(
-        \kartik\file\FileInput::class,
-        [
-            'options' => [
-                'accept' => 'image/*',
-                'multiple' => true,
-                'id' => 'input-images-' . uniqid(), // Ensure a unique ID
-            ],
-            'pluginOptions' => [
-                'previewFileType' => 'image',
-                'initialPreview' => $initial_preview,
-                'initialPreviewConfig' => array_map(function ($image) use ($model) {
-                    return [
-                        'url' => Url::to(['/object/remove-image', 'image_id' => $image->id, 'object_id' => $model->id]),
-                        'key' => $image->id,
-                        'extra' => [
-                            'main' => $image->id,
-                        ],
-                    ];
-                }, $images),
-                'overwriteInitial' => false,
-                'initialPreviewAsData' => true,
-                'showRemove' => false,
-                'showUpload' => false,
-                'otherActionButtons' => '
-                    <button type="button" class="kv-cust-btn img-main btn btn-sm" title="Set as main">
-                        <i class="glyphicon glyphicon-ok"></i>
-                    </button>
-                ',
-                'fileActionSettings' => [
-                    'showZoom' => false,
-                ],
-                'uploadUrl' => false, // No upload URL to prevent automatic upload
-                'uploadAsync' => false,
-                'maxFileCount' => 0, // No file count limit
-            ],
-        ]
-    )->label(Yii::t('app', 'Фотографии')); ?>
+    
+    // echo $form->field($model, 'images[]')->widget(
+    //     \kartik\file\FileInput::class,
+    //     [
+    //         'options' => ['accept' => 'image/*', 'multiple' => true, 'id' => 'object-images',],
+    //         'pluginOptions' => [
+    //             'class' => 'form-control object-image-upload',
+    //             'previewFileType' => 'image',
+    //             'initialPreview' => $initial_preview,
+    //             'initialPreviewConfig' => array_map(function ($image) use ($model) {
+    //                 return [
+    //                     'url' => Url::to(['/object/remove-image', 'image_id' => $image->id, 'object_id' => $model->id]),
+    //                     'key' => $image->id,
+    //                     'extra' => [
+    //                         'main' => $image->id,
+    //                     ],
+    //                 ];
+    //             }, $images),
+    //             'overwriteInitial' => false,
+    //             'initialPreviewAsData' => true,
+    //             'initialPreviewFileType' => 'image',
+    //             'initialPreviewShowDelete' => true,
+    //             'showRemove' => false,
+    //             'showUpload' => false,
+    //             'browseOnZoneClick' => true,
+    //             'initialCaption' => '',
+    //             'fileActionSettings' => [
+    //                 'showZoom' => false,
+    //             ],
+    //             'otherActionButtons' => '
+    //                 <button type="button" class="kv-cust-btn img-main btn btn-sm" title="Set as main">
+    //                     <i class="glyphicon glyphicon-ok"></i>
+    //                 </button>
+    //             ',
+    //         ],
+    //     ]
+    // )->label(Yii::t('app', 'Фотографии'));
+    
+    // echo $form->field($model, 'images[]')->widget(FileInput::classname(), [
+    //     'options' => ['multiple' => true, 'accept' => 'image/*'],
+    //     'pluginOptions' => [
+    //         'previewFileType' => 'image',
+    //         'showUpload' => false,
+    //         'showRemove' => true,
+    //         'overwriteInitial' => false,
+    //         'initialPreviewAsData' => true,
+    //         'dropZoneEnabled' => true,
+    //     ],
+    // ]);
+    
+    ?>
+
+    <?= $form->field($model, 'images[]')->fileInput([
+        'multiple' => true,
+        'class' => 'filepond',
+        'accept' => 'image/*',
+    ])->label(false) ?>
 
 
     <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
@@ -264,28 +291,29 @@ use dosamigos\fileupload\FileUploadUI;
         $(this).addClass('main');
     });
 
-    var originalInput = $('#input-id-goes-here');
+    FilePond.registerPlugin(FilePondPluginImagePreview);
 
-    // Store all selected files
-    var allFiles = [];
-
-    // Listen for file selection events
-    originalInput.on('fileloaded', function (event, file, previewId, index, reader) {
-        // Add file to our array
-        allFiles.push(file);
+    document.addEventListener('DOMContentLoaded', function () {
+        const inputElement = document.querySelector('input.filepond');
+        const pond = FilePond.create(inputElement, {
+            allowMultiple: true,
+            server: {
+                process: {
+                    url: '<?= Url::to(['/owner/object/file-upload', 'model' => $model->id]) ?>',
+                    method: 'POST',
+                    onload: (response) => {
+                        const res = JSON.parse(response);
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'uploaded_files[]';
+                        hiddenInput.value = res.filename;
+                        document.getElementById('filepond-form').appendChild(hiddenInput);
+                        return res.filename;
+                    },
+                },
+            },
+        });
     });
-
-    // When new files are selected
-    originalInput.on('change', function (event) {
-        // Preserve all previously selected files
-        var currentFiles = $(this).get(0).files;
-        if (currentFiles.length > 0) {
-            for (var i = 0; i < currentFiles.length; i++) {
-                allFiles.push(currentFiles[i]);
-            }
-        }
-    });
-
 </script>
 
 <style>

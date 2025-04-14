@@ -36,7 +36,7 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'room', 'view', 'delete', 'comfort', 'index-admin'],
+                    'actions' => ['room-list', 'room', 'view', 'delete', 'comfort', 'index-admin', 'file-upload'],
                     'roles' => ['admin'],
                 ],
                 [
@@ -71,7 +71,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'edit-room', 'delete'],
+                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'edit-room', 'delete', 'file-upload'],
                     'roles' => ['owner'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('id');
@@ -385,7 +385,6 @@ class ObjectController extends Controller
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
             $model->user_id = (int) Yii::$app->user->id;
-            $bind_model->link_id = $id;
 
             $request = Yii::$app->request->post();
 
@@ -975,7 +974,7 @@ class ObjectController extends Controller
     }
 
 
-    
+
 
 
 
@@ -1012,5 +1011,25 @@ class ObjectController extends Controller
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+
+    public function actionFileUpload($id = null)
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $model = Objects::findOne($id);
+        $model->images = UploadedFile::getInstances($model, 'images');
+        if ($model->images) {
+            foreach ($model->images as $image) {
+                $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
+                $image->saveAs($path);
+                $model->attachImage($path, true);
+                @unlink($path);
+            }
+            return ['filename' => $image->name];
+        }
+
+
+        return ['error' => 'No file uploaded'];
+    }
+
 }
 
