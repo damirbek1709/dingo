@@ -302,7 +302,7 @@ use kartik\file\FileInput;
             allowMultiple: true,
             server: {
                 process: {
-                    url: '<?= Url::to(['/owner/object/file-upload', 'model' => $model->id]) ?>',
+                    url: '<?= Url::to(['/owner/object/file-upload', 'id' => $model->id]) ?>',
                     method: 'POST',
                     ondata: (formData) => {
                         formData.append('<?= $csrfParam ?>', '<?= $csrfToken ?>'); // ✅ Add this as well for extra safety

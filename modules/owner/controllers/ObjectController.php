@@ -1014,22 +1014,28 @@ class ObjectController extends Controller
 
     public function actionFileUpload($id = null)
     {
-        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
         $model = Objects::findOne($id);
+        if ($model === null) {
+            return ['error' => 'Object not found'];
+        }
+
         $model->images = UploadedFile::getInstances($model, 'images');
+
         if ($model->images) {
             foreach ($model->images as $image) {
                 $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
                 $image->saveAs($path);
-                $model->attachImage($path, true);
-                @unlink($path);
+                $model->attachImage($path, true); // ✅ save image to model
+                @unlink($path); // clean up temp file
             }
-            return ['filename' => $image->name];
+            return ['filename' => $image->name]; // last uploaded file name
         }
-
 
         return ['error' => 'No file uploaded'];
     }
+
 
 }
 
