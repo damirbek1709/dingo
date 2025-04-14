@@ -312,7 +312,7 @@ use kartik\file\FileInput;
                         const res = JSON.parse(response);
                         const hiddenInput = document.createElement('input');
                         hiddenInput.type = 'hidden';
-                        hiddenInput.name = 'uploaded_files[]';
+                        hiddenInput.name = 'images[]';
                         hiddenInput.value = res.filename;
                         document.getElementById('filepond-form').appendChild(hiddenInput);
                         return res.filename;
