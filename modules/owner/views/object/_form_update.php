@@ -37,6 +37,9 @@ use kartik\file\FileInput;
     $address_list = $model->address;
     $description_list = $model->description;
 
+    $csrfToken = Yii::$app->request->csrfToken;
+    $csrfParam = Yii::$app->request->csrfParam;
+
     $name = $name_list[0] ? $name_list[0] : "";
     $name_en = $name_list[1] ? $name_list[1] : "";
     $name_ky = $name_list[2] ? $name_list[2] : "";
@@ -301,6 +304,10 @@ use kartik\file\FileInput;
                 process: {
                     url: '<?= Url::to(['/owner/object/file-upload', 'model' => $model->id]) ?>',
                     method: 'POST',
+                    ondata: (formData) => {
+                        formData.append('<?= $csrfParam ?>', '<?= $csrfToken ?>'); // ✅ Add this as well for extra safety
+                        return formData;
+                    },
                     onload: (response) => {
                         const res = JSON.parse(response);
                         const hiddenInput = document.createElement('input');
