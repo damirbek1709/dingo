@@ -624,7 +624,6 @@ class ObjectController extends Controller
             ];
             if ($index->updateDocuments($meilisearchData)) {
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
-                $model->save();
                 return $this->redirect(['room', 'id' => $room_id, 'object_id' => $id]);
             }
 

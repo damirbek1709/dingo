@@ -1,7 +1,7 @@
 <?php
 use yii\helpers\Html;
 
-$this->title = Yii::t('app','Доступность и цены');
+$this->title = Yii::t('app', 'Доступность и цены');
 $this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
@@ -19,12 +19,12 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="sidebar_date_grid">
                 <div class="form-group">
                     <label>Заезд</label>
-                    <input type="date" id="checkin" />
+                    <input class="form-control" type="date" id="checkin" />
                 </div>
 
                 <div class="form-group">
                     <label>Выезд</label>
-                    <input type="date" id="checkout" />
+                    <input class="form-control" type="date" id="checkout" />
                 </div>
             </div>
 
@@ -211,7 +211,7 @@ $this->params['breadcrumbs'][] = $this->title;
         let html = `<h4>${room.room_title} (${room.area})</h4>`;
         html += `<div class="form-group">
                             <label>Доступно номеров </label>
-                            <input type="text" id="similar_room_count" value="${room.similar_room_amount}">
+                            <input class="form-control" type="text" id="similar_room_count" value="${room.similar_room_amount}">
                         </div>`;
 
         if (Array.isArray(room.tariff)) {
@@ -270,36 +270,65 @@ $this->params['breadcrumbs'][] = $this->title;
     });
 
     $('.update-tariff').on('click', function (e) {
-        let new_price
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
         let from_date = convertToISO($('#checkin').val());
         let to_date = convertToISO($('#checkout').val());
 
+        let valid = true;
+        let temp_price_map = {};
+
+        if (similiar_room_count === '' || isNaN(similiar_room_count) || parseInt(similiar_room_count) <= 0) {
+            $('#similar_room_count').css('border-color', 'red');
+            valid = false;
+        } else {
+            $('#similar_room_count').css('border-color', '');
+        }
+
         $('.tariff_price').each(function () {
-            const price = parseFloat($(this).val()) || 0;
+            const priceStr = $(this).val().trim();
             const tariffId = parseInt($(this).attr('tariff_id'));
 
-            if (!Array.isArray(tariff_list[tariffId].prices)) {
-                tariff_list[tariffId].prices = [{
-                    price_arr: [],
-                    from_date: from_date,
-                    to_date: to_date
-                }];
+            // Validation: required + numeric
+            if (priceStr === '' || isNaN(priceStr)) {
+                $(this).css('border-color', '#db2a2a');
+                valid = false;
+                return; // skip further processing
+            } else {
+                $(this).css('border-color', ''); // reset
             }
 
-            // Push price into the first price block
-            tariff_list[tariffId].prices[0].price_arr.push(price);
-            tariff_list[tariffId].prices.from_date = checkin;
-            tariff_list[tariffId].prices.to_date = checkout;
+            const price = parseFloat(priceStr);
+
+            if (!temp_price_map[tariffId]) {
+                temp_price_map[tariffId] = [];
+            }
+            temp_price_map[tariffId].push(price);
         });
 
+        if (!valid) {
+            alert('Пожалуйста, заполните все тарифы корректными числами.');
+            return;
+        }
 
+        // Process after validation
+        Object.entries(temp_price_map).forEach(([tariffId, priceArr]) => {
+            tariffId = parseInt(tariffId);
 
-        e.stopImmediatePropagation();
-        e.preventDefault(); // prevent normal form submit
+            if (!Array.isArray(tariff_list[tariffId].prices)) {
+                tariff_list[tariffId].prices = [];
+            }
 
-        var similiar_room_count = $('#similar_room_count').val();
-        var object_id = "<?= $object_id ?>";
+            tariff_list[tariffId].prices.push({
+                price_arr: priceArr,
+                from_date: from_date,
+                to_date: to_date
+            });
+        });
 
+        const similiar_room_count = $('#similar_room_count').val();
+        const object_id = "<?= $object_id ?>";
 
         $.ajax({
             url: '/owner/tariff/edit-tariff',
@@ -308,19 +337,19 @@ $this->params['breadcrumbs'][] = $this->title;
                 object_id: object_id,
                 room_id: roomId,
                 tariff_list: tariff_list,
-                _csrf: $('meta[name="csrf-token"]').attr('content') // Add CSRF token if needed
+                _csrf: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {
-                //console.log(response);
                 alert('Тариф успешно сохранён!');
+                $('#sidebar').fadeOut();
             },
             error: function (xhr, status, error) {
                 alert('Ошибка при сохранении. Попробуйте снова.');
                 console.error('AJAX error:', error);
             }
         });
-
     });
+
 
     function convertToISO(dateStr) {
         const [dd, mm, yyyy] = dateStr.split('-');
@@ -329,3 +358,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 </script>
+
+<style>
+    input:invalid {
+        border-color: #db2a2a;
+        color: red;
+    }
+</style>

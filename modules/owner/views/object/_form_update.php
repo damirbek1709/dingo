@@ -14,14 +14,6 @@ use kartik\file\FileInput;
 ?>
 
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
-<!-- FilePond styles and scripts -->
-<link href="https://unpkg.com/filepond@^4/dist/filepond.css" rel="stylesheet" />
-<script src="https://unpkg.com/filepond@^4/dist/filepond.js"></script>
-
-<!-- FilePond plugins (image preview, validation, etc.) -->
-<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.js"></script>
-<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet" />
-
 
 <div class="oblast-form">
 
@@ -70,6 +62,10 @@ use kartik\file\FileInput;
     <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_en]) ?>
     <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
 
+    <!-- <label class="form__container" id="upload-container">Choose or Drag & Drop Files
+        <?php //$form->field($model, 'images[]')->fileInput(['multiple' => true, 'accept' => 'image/*', 'class' => 'form__file']) ?>
+    </label>
+    <div class="form__files-container" id="files-list-container"></div> -->
 
     <?php
     $initial_preview = false;
@@ -78,43 +74,43 @@ use kartik\file\FileInput;
     }
     $images = $model->getImages(); // Get all images
     
-    // echo $form->field($model, 'images[]')->widget(
-    //     \kartik\file\FileInput::class,
-    //     [
-    //         'options' => ['accept' => 'image/*', 'multiple' => true, 'id' => 'object-images',],
-    //         'pluginOptions' => [
-    //             'class' => 'form-control object-image-upload',
-    //             'previewFileType' => 'image',
-    //             'initialPreview' => $initial_preview,
-    //             'initialPreviewConfig' => array_map(function ($image) use ($model) {
-    //                 return [
-    //                     'url' => Url::to(['/object/remove-image', 'image_id' => $image->id, 'object_id' => $model->id]),
-    //                     'key' => $image->id,
-    //                     'extra' => [
-    //                         'main' => $image->id,
-    //                     ],
-    //                 ];
-    //             }, $images),
-    //             'overwriteInitial' => false,
-    //             'initialPreviewAsData' => true,
-    //             'initialPreviewFileType' => 'image',
-    //             'initialPreviewShowDelete' => true,
-    //             'showRemove' => false,
-    //             'showUpload' => false,
-    //             'browseOnZoneClick' => true,
-    //             'initialCaption' => '',
-    //             'fileActionSettings' => [
-    //                 'showZoom' => false,
-    //             ],
-    //             'otherActionButtons' => '
-    //                 <button type="button" class="kv-cust-btn img-main btn btn-sm" title="Set as main">
-    //                     <i class="glyphicon glyphicon-ok"></i>
-    //                 </button>
-    //             ',
-    //         ],
-    //     ]
-    // )->label(Yii::t('app', 'Фотографии'));
-    
+    echo $form->field($model, 'images[]')->widget(
+        \kartik\file\FileInput::class,
+        [
+            'options' => ['accept' => 'image/*', 'multiple' => true, 'id' => 'object-images',],
+            'pluginOptions' => [
+                'class' => 'form-control object-image-upload',
+                'previewFileType' => 'image',
+                'initialPreview' => $initial_preview,
+                'initialPreviewConfig' => array_map(function ($image) use ($model) {
+                    return [
+                        'url' => Url::to(['/object/remove-image', 'image_id' => $image->id, 'object_id' => $model->id]),
+                        'key' => $image->id,
+                        'extra' => [
+                            'main' => $image->id,
+                        ],
+                    ];
+                }, $images),
+                'overwriteInitial' => false,
+                'initialPreviewAsData' => true,
+                'initialPreviewFileType' => 'image',
+                'initialPreviewShowDelete' => true,
+                'showRemove' => false,
+                'showUpload' => false,
+                'browseOnZoneClick' => true,
+                'initialCaption' => '',
+                'fileActionSettings' => [
+                    'showZoom' => false,
+                ],
+                'otherActionButtons' => '
+                    <button type="button" class="kv-cust-btn img-main btn btn-sm" title="Set as main">
+                        <i class="glyphicon glyphicon-ok"></i>
+                    </button>
+                ',
+            ],
+        ]
+    )->label(Yii::t('app', 'Фотографии'));
+
     // echo $form->field($model, 'images[]')->widget(FileInput::classname(), [
     //     'options' => ['multiple' => true, 'accept' => 'image/*'],
     //     'pluginOptions' => [
@@ -129,12 +125,6 @@ use kartik\file\FileInput;
     
     ?>
 
-    <?= $form->field($model, 'images[]')->fileInput([
-        'multiple' => true,
-        'class' => 'filepond',
-        'accept' => 'image/*',
-    ])->label(false) ?>
-
 
     <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
@@ -142,6 +132,7 @@ use kartik\file\FileInput;
     <?= $form->field($model, 'check_in')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'check_out')->textInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'reception')->checkbox() ?>
+
 
     <?php
     // $model->description = $model->description[0];
@@ -245,6 +236,7 @@ use kartik\file\FileInput;
 
 
 
+
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
     </div>
@@ -293,47 +285,5 @@ use kartik\file\FileInput;
         $('.img-main').removeClass('main');
         $(this).addClass('main');
     });
-
-    FilePond.registerPlugin(FilePondPluginImagePreview);
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const inputElement = document.querySelector('input.filepond');
-        const pond = FilePond.create(inputElement, {
-            allowMultiple: true,
-            server: {
-                process: {
-                    url: '<?= Url::to(['/owner/object/file-upload', 'id' => $model->id]) ?>',
-                    method: 'POST',
-                    ondata: (formData) => {
-                        formData.append('<?= $csrfParam ?>', '<?= $csrfToken ?>'); // ✅ Add this as well for extra safety
-                        return formData;
-                    },
-                    onload: (response) => {
-                        const res = JSON.parse(response);
-                        const hiddenInput = document.createElement('input');
-                        hiddenInput.type = 'hidden';
-                        hiddenInput.name = 'images[]';
-                        hiddenInput.value = res.filename;
-                        document.getElementById('filepond-form').appendChild(hiddenInput);
-                        return res.filename;
-                    },
-                },
-            },
-        });
-    });
 </script>
 
-<style>
-    .main {
-        background-color: green;
-        color: #fff;
-    }
-
-    .img-main:hover,
-    .img-main:focus,
-    .img-main.focus {
-        color: #fff;
-        text-decoration: none;
-        outline: unset;
-    }
-</style>

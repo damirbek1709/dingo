@@ -25,7 +25,7 @@ class ModuleAsset extends AssetBundle
         'css/calendar.css',
     ];
     public $js = [
-        'js/app.js',
+        //'js/app.js',
         'https://code.jquery.com/jquery-3.6.0.min.js'
         //'js/cats.js',
     ];
