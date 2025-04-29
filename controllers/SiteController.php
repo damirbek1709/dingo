@@ -15,7 +15,7 @@ use app\models\Product;
 use app\components\ResendClient;
 class SiteController extends Controller
 {
-
+    public $layout;
 
     /**
      * {@inheritdoc}
@@ -83,11 +83,13 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        if (Yii::$app->user->isGuest) {
-            return $this->redirect(['user/signin']);
-        } else {
-            return $this->redirect(['/owner']);
-        }
+        $this->layout = 'empty';
+        return $this->render('index');
+        // if (Yii::$app->user->isGuest) {
+        //     return $this->redirect(['user/signin']);
+        // } else {
+        //     return $this->redirect(['/owner']);
+        // }
 
         //return $this->render('index');
     }

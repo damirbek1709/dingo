@@ -1,53 +1,287 @@
-<?php
-
-/** @var yii\web\View $this */
-
-$this->title = 'My Yii Application';
-?>
-<div class="site-index">
-
-    <div class="jumbotron text-center bg-transparent mt-5 mb-5">
-        <h1 class="display-4">Congratulations!</h1>
-
-        <p class="lead">You have successfully created your Yii-powered application.</p>
-
-        <p><a class="btn btn-lg btn-success" href="https://www.yiiframework.com">Get started with Yii</a></p>
-    </div>
-
-    <div class="body-content">
-
-        <div class="row">
-            <div class="col-lg-4 mb-3">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="https://www.yiiframework.com/doc/">Yii Documentation &raquo;</a></p>
-            </div>
-            <div class="col-lg-4 mb-3">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="https://www.yiiframework.com/forum/">Yii Forum &raquo;</a></p>
-            </div>
-            <div class="col-lg-4">
-                <h2>Heading</h2>
-
-                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                    fugiat nulla pariatur.</p>
-
-                <p><a class="btn btn-outline-secondary" href="https://www.yiiframework.com/extensions/">Yii Extensions &raquo;</a></p>
+<div id="allrecords" class="t-records t-records_animated t-records_visible" data-hook="blocks-collection-content-node"
+    data-tilda-project-id="13114245" data-tilda-page-id="67959483" data-tilda-page-alias="mainhtml"
+    data-tilda-formskey="f366b3707e250ecc8039182113114245" data-tilda-cookie="no" data-tilda-lazy="yes"
+    data-tilda-root-zone="one">
+    <div id="rec994157411" class="r t-rec" style=" " data-animationappear="off" data-record-type="456">
+        <!-- T456 -->
+        <div id="nav994157411marker"></div>
+        <div id="nav994157411" class="t456 t456__positionstatic " style="background-color: rgba(255,255,255,1); "
+            data-bgcolor-hex="#ffffff" data-bgcolor-rgba="rgba(255,255,255,1)" data-navmarker="nav994157411marker"
+            data-appearoffset="" data-bgopacity-two="90" data-menushadow="" data-menushadow-css="" data-bgopacity="1"
+            data-bgcolor-rgba-afterscroll="rgba(255,255,255,0.90)" data-menu-items-align="right" data-menu="yes">
+            <div class="t456__maincontainer t456__c12collumns" style="">
+                <div class="t456__leftwrapper" style="padding-left:20px;min-width:120px;width:120px;">
+                    <div class="t456__logowrapper" style="display: block;"> <a href="https://google.com/"> <img
+                                class="t456__imglogo t456__imglogomobile" src="./Mobile app2_files/LOGO.png"
+                                imgfield="img" style="max-width: 120px; width: 120px;" alt="Company"> </a> </div>
+                </div>
+                <nav class="t456__rightwrapper t456__menualign_right" style="padding-right:20px;">
+                    <ul role="list" class="t456__list t-menu__list">
+                        <li class="t456__list_item" style="padding:0 15px 0 0;"> <a class="t-menu__link-item"
+                                href="https://dingo.kg/user/signin" data-menu-submenu-hook=""
+                                data-menu-item-number="1">Вход в кабинет</a> </li>
+                        <li class="t456__list_item" style="padding:0 0 0 15px;"> <a class="t-menu__link-item"
+                                href="https://dingo.kg/user/signin" data-menu-submenu-hook=""
+                                data-menu-item-number="2">Стать партнером</a> </li>
+                    </ul>
+                </nav>
             </div>
         </div>
+        <style>
+            @media screen and (max-width:980px) {
+                #rec994157411 .t456__leftcontainer {
+                    padding: 20px;
+                }
+            }
 
+            @media screen and (max-width:980px) {
+                #rec994157411 .t456__imglogo {
+                    padding: 20px 0;
+                }
+            }
+        </style>
+        <script
+            type="text/javascript">t_onReady(function () { t_onFuncLoad('t_menu__highlightActiveLinks', function () { t_menu__highlightActiveLinks('.t456__list_item a'); }); }); t_onReady(function () { t_onFuncLoad('t_menu__setBGcolor', function () { t_menu__setBGcolor('994157411', '.t456'); window.addEventListener('resize', function () { t_menu__setBGcolor('994157411', '.t456'); }); }); t_onFuncLoad('t_menu__interactFromKeyboard', function () { t_menu__interactFromKeyboard('994157411'); }); });</script>
+        <style>
+            #rec994157411 .t-menu__link-item {}
+
+            @supports (overflow:-webkit-marquee) and (justify-content:inherit) {
+
+                #rec994157411 .t-menu__link-item,
+                #rec994157411 .t-menu__link-item.t-active {
+                    opacity: 1 !important;
+                }
+            }
+        </style>
+        <style>
+            #rec994157411 .t456__logowrapper a {
+                color: #ffffff;
+            }
+
+            #rec994157411 a.t-menu__link-item {
+                color: #1d78dd;
+                font-weight: 600;
+            }
+        </style>
+        <style>
+            #rec994157411 .t456__logo {
+                color: #ffffff;
+            }
+        </style>
+        <!--[if IE 8]> <style>#rec994157411 .t456{filter:progid:DXImageTransform.Microsoft.gradient(startColorStr='#D9ffffff',endColorstr='#D9ffffff');}</style> <![endif]-->
+    </div>
+    <div id="rec994212371" class="r t-rec t-rec_pt_30 t-rec_pb_30 r_showed r_anim"
+        style="padding-top:30px;padding-bottom:30px; " data-record-type="170"> <!-- t156 -->
+        <!-- @classes: t-descr t-descr_xxs -->
+        <div class="t156">
+            <div class="t-container">
+                <div class="t-col t-col_12">
+                    <div class="t156__wrapper">
+                        <div class="t156__item" itemscope="" itemtype="http://schema.org/ImageObject"> <img
+                                class="t-img  loaded" imgfield="gi_img__0"
+                                src="./Mobile app2_files/Apple_store.png.webp"
+                                data-original="https://static.tildacdn.info/tild3162-3966-4636-b236-653961386362/Apple_store.png"
+                                data-zoom-target="0" data-zoomable="no"
+                                data-img-zoom-url="https://static.tildacdn.info/tild3162-3966-4636-b236-653961386362/Apple_store.png"
+                                data-img-zoom-descr="" style="width:100%;" data-lazy-rule="skip" alt="">
+                            <meta itemprop="image"
+                                content="https://static.tildacdn.info/tild3162-3966-4636-b236-653961386362/Apple_store.png">
+                        </div>
+                        <div class="t156__item" itemscope="" itemtype="http://schema.org/ImageObject"> <img
+                                class="t-img  loaded" imgfield="gi_img__1"
+                                src="./Mobile app2_files/Apple_store-4.png.webp"
+                                data-original="https://static.tildacdn.info/tild6636-3266-4139-b138-623634373738/Apple_store-4.png"
+                                data-zoom-target="1" data-zoomable="no"
+                                data-img-zoom-url="https://static.tildacdn.info/tild6636-3266-4139-b138-623634373738/Apple_store-4.png"
+                                data-img-zoom-descr="" style="width:100%;" data-lazy-rule="skip" alt="">
+                            <meta itemprop="image"
+                                content="https://static.tildacdn.info/tild6636-3266-4139-b138-623634373738/Apple_store-4.png">
+                        </div>
+                        <div class="t156__item" itemscope="" itemtype="http://schema.org/ImageObject"> <img
+                                class="t-img  loaded" imgfield="gi_img__2"
+                                src="./Mobile app2_files/Apple_store-2.png.webp"
+                                data-original="https://static.tildacdn.info/tild3834-6363-4663-b330-356363396562/Apple_store-2.png"
+                                data-zoom-target="2" data-zoomable="no"
+                                data-img-zoom-url="https://static.tildacdn.info/tild3834-6363-4663-b330-356363396562/Apple_store-2.png"
+                                data-img-zoom-descr="" style="width:100%;" data-lazy-rule="skip" alt="">
+                            <meta itemprop="image"
+                                content="https://static.tildacdn.info/tild3834-6363-4663-b330-356363396562/Apple_store-2.png">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="rec994261221" class="r t-rec t-rec_pt_45 t-rec_pb_0"
+        style="padding-top:45px;padding-bottom:0px;background-color:#ffffff; " data-record-type="472"
+        data-bg-color="#ffffff" data-animationappear="off"> <!-- T472 -->
+        <div class="t472">
+            <div class="t-container t-align_center">
+                <div class="t-col t-col_8 t-prefix_2">
+                    <div class="t472__title t-section__title t-title t-title_md t-margin_auto" field="title">Жилье
+                        мечты - по вкусной цене</div>
+                    <div class="t472__descr t-section__descr t-descr t-descr_xxl t-margin_auto" field="descr">
+                        Отдыхайте, работайте, путешествуйте — идеальное жилье ждёт вас в любом месте</div>
+                </div>
+                <div class="t-row t-clear"> </div>
+            </div>
+        </div>
+    </div>
+    <div id="rec994302066" class="r t-rec t-rec_pt_0 t-rec_pb_75 r_anim r_showed"
+        style="padding-top:0px;padding-bottom:75px; " data-record-type="3"> <!-- T107 -->
+        <div class="t107">
+            <div class="t-align_center" itemscope="" itemtype="http://schema.org/ImageObject">
+                <meta itemprop="image"
+                    content="https://static.tildacdn.info/tild3034-6639-4365-b233-333936626137/Screenshot_2025-04-2.png">
+                <img class="t-img t-width t107__width t-width_6 loaded"
+                    src="./Mobile app2_files/Screenshot_2025-04-2.png.webp"
+                    data-original="https://static.tildacdn.info/tild3034-6639-4365-b233-333936626137/Screenshot_2025-04-2.png"
+                    imgfield="img" alt="">
+            </div>
+        </div>
+    </div>
+    <div id="rec994339811" class="r t-rec t-rec_pt_0 t-rec_pb_0 r_anim r_showed"
+        style="padding-top:0px;padding-bottom:0px; " data-record-type="363"> <!-- T029 20 -->
+        <div class="t029">
+            <div class="t029__container t-container">
+                <div class="t029__col t-col t-col_8">
+                    <div class="t029__linewrapper" style="opacity:0.2;">
+                        <div class="t029__opacity t029__opacity_left"
+                            style="background-image: -moz-linear-gradient(right, #000000, rgba(0,0,0, 0)); background-image: -webkit-linear-gradient(right, #000000, rgba(0,0,0, 0)); background-image: -o-linear-gradient(right, #000000, rgba(0,0,0, 0)); background-image: -ms-linear-gradient(right, #000000, rgba(0,0,0, 0));">
+                        </div>
+                        <div class="t-divider t029__line" style="background: #000000;"></div>
+                        <div class="t029__opacity t029__opacity_right"
+                            style="background-image: -moz-linear-gradient(left, #000000, rgba(0,0,0, 0)); background-image: -webkit-linear-gradient(left, #000000, rgba(0,0,0, 0)); background-image: -o-linear-gradient(left, #000000, rgba(0,0,0, 0)); background-image: -ms-linear-gradient(left, #000000, rgba(0,0,0, 0));">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="rec994312611" class="r t-rec t-rec_pt_30 t-rec_pb_0"
+        style="padding-top:30px;padding-bottom:0px;background-color:#ffffff; " data-record-type="472"
+        data-bg-color="#ffffff" data-animationappear="off"> <!-- T472 -->
+        <div class="t472">
+            <div class="t-container t-align_center">
+                <div class="t-col t-col_8 t-prefix_2">
+                    <div class="t472__title t-section__title t-title t-title_md t-margin_auto" field="title"><span
+                            style="color: rgb(29, 120, 221);">Разместите жилье</span></div>
+                    <div class="t472__descr t-section__descr t-descr t-descr_xxl t-margin_auto" field="descr"><span
+                            style="color: rgb(51, 51, 51);">и получите доступ к тысячи гостям ежемесячно</span>
+                    </div>
+                </div>
+                <div class="t-row t-clear"> </div>
+            </div>
+        </div>
+    </div>
+    <div id="rec994325996" class="r t-rec t-rec_pt_0 t-rec_pb_45 r_anim r_showed"
+        style="padding-top:0px;padding-bottom:45px; " data-record-type="3"> <!-- T107 -->
+        <div class="t107">
+            <div class="t-align_center" itemscope="" itemtype="http://schema.org/ImageObject">
+                <meta itemprop="image"
+                    content="https://static.tildacdn.info/tild3265-6333-4662-a366-343933653634/Screenshot_2025-04-2.png">
+                <img class="t-img t-width t107__width t-width_12 loaded"
+                    src="./Mobile app2_files/Screenshot_2025-04-2(1).png.webp"
+                    data-original="https://static.tildacdn.info/tild3265-6333-4662-a366-343933653634/Screenshot_2025-04-2.png"
+                    imgfield="img" alt="">
+            </div>
+        </div>
+    </div>
+    <div id="rec994341611" class="r t-rec t-rec_pt_0 t-rec_pb_90 r_anim r_showed"
+        style="padding-top:0px;padding-bottom:90px; " data-record-type="191"> <!-- T142 -->
+        <div class="t142">
+            <div class="t-container_100">
+                <div class="t142__wrapone">
+                    <div class="t142__wraptwo"> <a class="t-btn t142__submit t-btn_md"
+                            href="https://dingo.kg/user/signin" target=""
+                            style="color:#ffffff;border:3px solid #1d78dd;background-color:#1d78dd;"
+                            data-buttonfieldset="button"> <span class="t142__text">Зарегистрироваться</span> </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>t_onReady(function () { t_onFuncLoad('t142_checkSize', function () { t142_checkSize('994341611'); }); }); window.addEventListener('load', function () { t_onFuncLoad('t142_checkSize', function () { t142_checkSize('994341611'); }); });</script>
+    </div>
+    <div id="rec994366531" class="r t-rec t-rec_pt_45 t-rec_pb_45"
+        style="padding-top:45px;padding-bottom:45px;background-color:#1d78dd; " data-record-type="463"
+        data-bg-color="#1d78dd" data-animationappear="off"> <!-- T463 -->
+        <div class="t463" id="t-footer_994366531">
+            <div class="t463__maincontainer ">
+                <div class="t463__content" style="">
+                    <div class="t463__colwrapper">
+                        <div class="t463__col"> <a class="t463__link" href="http://dingo-kg.tilda.ws/"> <img
+                                    class="t463__logo t463__img t-img loaded" src="./Mobile app2_files/LOGO.png.webp"
+                                    data-original="https://static.tildacdn.info/tild3336-6266-4665-a366-313266323365/LOGO.png"
+                                    imgfield="img" alt=""> </a> </div>
+                        <div class="t463__col t463__col_center t-align_center">
+                            <div class="t463__typo t463__copyright t-name t-name_xs" field="text">© Все права
+                                защищены</div>
+                        </div>
+                        <div class="t463__col t-align_right">
+                            <div class="t-sociallinks">
+                                <ul role="list" class="t-sociallinks__wrapper" aria-label="Social media links">
+                                    <!-- new soclinks -->
+                                    <li class="t-sociallinks__item t-sociallinks__item_facebook"><a
+                                            href="https://google.com/" target="_blank" rel="nofollow noopener"
+                                            aria-label="facebook" style="width: 30px; height: 30px;"><svg
+                                                class="t-sociallinks__svg" role="presentation" width="30px"
+                                                height="30px" viewBox="0 0 100 100" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M50 100c27.6142 0 50-22.3858 50-50S77.6142 0 50 0 0 22.3858 0 50s22.3858 50 50 50Zm3.431-73.9854c-2.5161.0701-5.171.6758-7.0464 2.4577-1.5488 1.4326-2.329 3.5177-2.5044 5.602-.0534 1.4908-.0458 2.9855-.0382 4.4796.0058 1.1205.0115 2.2407-.0085 3.3587-.6888.005-1.3797.0036-2.0709.0021-.9218-.0019-1.8441-.0038-2.7626.0096 0 .8921.0013 1.7855.0026 2.6797.0026 1.791.0052 3.5853-.0026 5.3799.9185.0134 1.8409.0115 2.7627.0096.6912-.0015 1.382-.0029 2.0708.0021.0155 3.5565.0127 7.1128.0098 10.669-.0036 4.4452-.0072 8.8903.0252 13.3354 1.8903-.0134 3.7765-.0115 5.6633-.0095 1.4152.0014 2.8306.0028 4.2484-.0022.0117-4.0009.0088-7.9986.0058-11.9963-.0029-3.9979-.0058-7.9957.0059-11.9964.9533-.005 1.9067-.0036 2.86-.0021 1.2713.0019 2.5425.0038 3.8137-.0096.396-2.679.7335-5.3814.9198-8.0947-1.2576-.0058-2.5155-.0058-3.7734-.0058-1.2578 0-2.5157 0-3.7734-.0059 0-.4689-.0007-.9378-.0014-1.4066-.0022-1.4063-.0044-2.8123.0131-4.2188.198-1.0834 1.3158-1.9104 2.3992-1.8403h5.1476c.0117-2.8069.0117-5.602 0-8.4089-.6636 0-1.3273-.0007-1.9911-.0014-1.9915-.0022-3.9832-.0044-5.975.0131Z"
+                                                    fill="#ffffff"></path>
+                                            </svg></a></li>&nbsp;<li
+                                        class="t-sociallinks__item t-sociallinks__item_twitter"><a
+                                            href="https://google.com/" target="_blank" rel="nofollow noopener"
+                                            aria-label="twitter" style="width: 30px; height: 30px;"><svg
+                                                class="t-sociallinks__svg" role="presentation"
+                                                xmlns="http://www.w3.org/2000/svg" width="30px" height="30px"
+                                                viewBox="0 0 48 48">
+                                                <g clip-path="url(#clip0_3697_102)">
+                                                    <path fill-rule="evenodd" clip-rule="evenodd"
+                                                        d="M24 48C37.2548 48 48 37.2548 48 24C48 10.7452 37.2548 0 24 0C10.7452 0 0 10.7452 0 24C0 37.2548 10.7452 48 24 48ZM33.3482 14L25.9027 22.4686H25.9023L34 34H28.0445L22.5915 26.2348L15.7644 34H14L21.8082 25.1193L14 14H19.9555L25.119 21.3532L31.5838 14H33.3482ZM22.695 24.1101L23.4861 25.2173V25.2177L28.8746 32.7594H31.5847L24.9813 23.5172L24.1902 22.4099L19.1103 15.2997H16.4002L22.695 24.1101Z"
+                                                        fill="#ffffff"></path>
+                                                </g>
+                                                <defs>
+                                                    <clippath id="clip0_3697_102">
+                                                        <rect width="48" height="48" fill="white"></rect>
+                                                    </clippath>
+                                                </defs>
+                                            </svg></a></li>&nbsp;<li
+                                        class="t-sociallinks__item t-sociallinks__item_linkedin"><a
+                                            href="https://google.com/" target="_blank" rel="nofollow noopener"
+                                            aria-label="linkedin" style="width: 30px; height: 30px;"><svg
+                                                class="t-sociallinks__svg" role="presentation" width="30px"
+                                                height="30px" viewBox="0 0 100 100" fill="none"
+                                                xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd"
+                                                    d="M50 100c27.6142 0 50-22.3858 50-50S77.6142 0 50 0 0 22.3858 0 50s22.3858 50 50 50Zm23-31.0002V52.363c0-8.9114-4.7586-13.0586-11.1079-13.0586-5.1234 0-7.4123 2.8199-8.6942 4.7942v-4.1124h-9.6468c.1297 2.7235 0 29.0136 0 29.0136h9.6484v-16.203c0-.8675.0657-1.731.3203-2.3513.6981-1.7351 2.284-3.5286 4.9491-3.5286 3.4905 0 4.8859 2.6611 4.8859 6.5602v15.5227H73ZM53.1979 44.0986v.094h-.0632c.0069-.0111.0148-.0228.0229-.0346.0137-.0198.0281-.0401.0403-.0594ZM28 31.0123C28 28.1648 30.1583 26 33.4591 26c3.3016 0 5.3302 2.1648 5.3934 5.0123 0 2.7851-2.0918 5.0156-5.4567 5.0156h-.064c-3.2351 0-5.3318-2.2305-5.3318-5.0156Zm10.2177 37.9875h-9.6445V39.9862h9.6445v29.0136Z"
+                                                    fill="#ffffff"></path>
+                                            </svg></a></li><!-- /new soclinks -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <style>
+            #rec994366531 .t463__copyright {
+                color: #ffffff;
+            }
+        </style>
+        <style>
+            #rec994366531 .t463__link {
+                font-size: 20px;
+                color: #ffffff;
+                font-weight: 600;
+            }
+
+            #rec994366531 .t463__logo {
+                font-size: 20px;
+                color: #ffffff;
+                font-weight: 600;
+            }
+        </style>
     </div>
 </div>
