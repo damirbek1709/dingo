@@ -47,9 +47,9 @@ use yii\widgets\ActiveForm;
         <a href="#" class="resend-link" id="resend-code">Отправить еще раз</a>
     </div>
 
-    <!-- <div class="form-group submit-container">
-        <?php // Html::submitButton('Подтвердить', ['class' => 'btn btn-success btn-block']) ?>
-    </div> -->
+    <div class="form-group submit-container">
+        <?php echo Html::submitButton('Подтвердить', ['class' => 'btn btn-success btn-block']) ?>
+    </div>
 
     <?php ActiveForm::end(); ?>
 </div>
