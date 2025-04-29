@@ -32,8 +32,8 @@ class Meili extends Component
 
     public function connect($content = null)
     {
-        $server = $_SERVER['REQUEST_URI'];
-        if ($server !== 'https://dingo.kg') {
+        $server = $_SERVER['SERVER_NAME'];
+        if ($server != 'https://dingo.kg') {
             try {
                 $client = new Client(
                     'http://host.docker.internal:7700',  // This should work on Mac
