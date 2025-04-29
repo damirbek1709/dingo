@@ -11,14 +11,16 @@ $this->title = Yii::t('app', 'Добавить номер');
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="oblast-update">
-    <?php echo $this->render('../top_nav', ['model' => $model]); ?>
-    <div class="col-md-12" style="padding:20px 15px">
-        <div class="card">
-            <!-- <h1 class="general_title"><?//= Html::encode($this->title) ?></h1> -->
-            <?= $this->render('_form', [
-                'model' => $model,
-                'id' => $id
-            ]) ?>
+    <?php //echo $this->render('../top_nav', ['model' => $model]); ?>
+    <div class="row">
+        <div class="col-md-12" style="padding:20px 15px">
+            <div class="card">
+                <!-- <h1 class="general_title"><?//= Html::encode($this->title) ?></h1> -->
+                <?= $this->render('_form', [
+                    'model' => $model,
+                    'id' => $id
+                ]) ?>
+            </div>
         </div>
     </div>
 </div>
