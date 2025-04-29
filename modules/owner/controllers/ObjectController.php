@@ -378,7 +378,7 @@ class ObjectController extends Controller
                 ];
 
                 $index->addDocuments($object_arr);
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['view', 'object_id' => $model->id]);
             }
 
         }
@@ -530,7 +530,7 @@ class ObjectController extends Controller
                 ];
 
                 $index->updateDocuments($object_arr);
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['view', 'object_id' => $model->id]);
             }
         }
 

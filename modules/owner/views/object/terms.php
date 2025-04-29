@@ -14,6 +14,7 @@ use yii\widgets\ActiveForm;
 // $this->params['breadcrumbs'][] = Yii::t('app', 'Условия');
 ?>
 <div class="oblast-update">
+<?php echo $this->render('top_nav', ['model' => $model]); ?>
     <?php
     $form = ActiveForm::begin();
     $meal_list = Objects::mealList();
