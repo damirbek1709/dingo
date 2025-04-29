@@ -10,17 +10,15 @@ $this->title = Yii::t('app', 'Добавить номер');
 //$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Room Categories'), 'url' => ['index']];
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="room-create">
-    <div class="oblast_update">
-        <?php echo $this->render('../top_nav', ['model' => $model]); ?>
-        <div class="col-md-12" style="padding:20px 15px">
-            <div class="card">
-                <!-- <h1 class="general_title"><?//= Html::encode($this->title) ?></h1> -->
-                <?= $this->render('_form', [
-                    'model' => $model,
-                    'id' => $id
-                ]) ?>
-            </div>
+<div class="oblast-update">
+    <?php echo $this->render('../top_nav', ['model' => $model]); ?>
+    <div class="col-md-12" style="padding:20px 15px">
+        <div class="card">
+            <!-- <h1 class="general_title"><?//= Html::encode($this->title) ?></h1> -->
+            <?= $this->render('_form', [
+                'model' => $model,
+                'id' => $id
+            ]) ?>
         </div>
     </div>
 </div>
