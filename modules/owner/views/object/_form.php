@@ -15,7 +15,7 @@ use vova07\imperavi\Widget;
 <div class="object-form-container">
     <?php $form = ActiveForm::begin([
         'enableClientValidation' => false,
-        'enableAjaxValidation' => true,
+        'enableAjaxValidation' => false,
         'options' => [
             'enctype' => 'multipart/form-data',
             'class' => 'styled-form'

@@ -13,8 +13,8 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin([
         'id' => 'confirm-number-form',
-        'enableAjaxValidation' => true,
-        'enableClientValidation' => true,
+        'enableAjaxValidation' => false,
+        'enableClientValidation' => false,
         'options' => ['class' => 'otp-form'],
     ]); ?>
 
