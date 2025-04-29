@@ -9,6 +9,7 @@ $config = [
     'language' => 'ru',
     'name' => 'Dingo.kg',
     'basePath' => dirname(__DIR__),
+    'defaultController' => 'user/signin',
     'bootstrap' => ['log', 'languageSwitcher'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
