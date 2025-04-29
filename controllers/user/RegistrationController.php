@@ -247,7 +247,7 @@ class RegistrationController extends BaseRegistrationController
                         $auth->assign($role, $user->id);
                     }
                     if (Yii::$app->user->login($user)) {
-                        return $this->redirect('/owner');
+                        return $this->redirect('/owner/object/create');
                     }
                 }
                 else{
