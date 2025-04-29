@@ -11,7 +11,8 @@ $this->title = Yii::t('app', 'Update Room Category') . " " . $model->room_title;
 //$this->params['breadcrumbs'][] = ['label' => $model->room_title, 'url' => ['room', 'id' => $model->id, 'object_id' => $object_id]];
 //$this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
-<div class="oblasr-update">
+<div class="oblast-update">
+    <?php echo $this->render('../top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
     <div class="col-md-12" style="padding:20px 15px">
         <div class="row">
             <div class="col-md-3">
@@ -75,6 +76,7 @@ $this->title = Yii::t('app', 'Update Room Category') . " " . $model->room_title;
         outline: none;
         border-color: #007bff;
     }
+
     .help-block {
         color: #dc3545;
         font-size: 14px;

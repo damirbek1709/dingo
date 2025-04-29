@@ -731,7 +731,7 @@ class ObjectController extends Controller
 
             // Update documents in Meilisearch
             if ($index->updateDocuments($meilisearchData)) {
-                Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+                //Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->redirect(['room', 'id' => $model->id, 'object_id' => $id]);
             }
         } else {
