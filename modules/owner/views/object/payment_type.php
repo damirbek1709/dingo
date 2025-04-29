@@ -14,6 +14,7 @@ $this->title = Yii::t('app', 'Способы оплаты в апартамен�
 // $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенности');
 ?>
 <div class="oblast-update">
+    <?php echo $this->render('top_nav', ['model' => $model]); ?>
     <?php
     $form = ActiveForm::begin();
     ?>
@@ -40,7 +41,7 @@ $this->title = Yii::t('app', 'Способы оплаты в апартамен�
                                         'class' => 'payment-checkbox',
                                         'label' => false
                                     ]) ?>
-                                    
+
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -57,5 +58,5 @@ $this->title = Yii::t('app', 'Способы оплаты в апартамен�
 </div>
 
 <style>
-    
+
 </style>
