@@ -974,6 +974,8 @@ class ObjectController extends Controller
         $object_title = $object['name'][0];
 
         if ($this->request->isPost) {
+
+            echo "<pre>";print_r($this->request->post()['Tariff']['room_list']);echo "</pre>";die();
             if ($model->load($this->request->post()) && $model->save()) {
                 $room_list = $this->request->post()['Tariff']['room_list'][0];
                 $room_list = $this->stringToNumericArray($room_list);

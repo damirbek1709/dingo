@@ -27,35 +27,6 @@ $meal_title = $model->getMealTitle($model->meal_type);
                         <?php echo $meal_title['label']; ?>
                     </span>
 
-                    <span class="tariff-dropdown">
-                        <button class="dropdown-btn"><?= Yii::t('app', 'Привязанные номера') ?> <span
-                                class="tariff-label"></span></button>
-                        <div class="dropdown-menu">
-                            <?php
-                            //$objectId = (int) $val['id'];
-                            
-                            $client = Yii::$app->meili->connect();
-                            $object = $client->index('object')->getDocument($object_id);
-                            $room_list = $object['rooms'] ?? []; 
-                            //  foreach ($room_list as $tariff):
-                            //      $checked = "";
-                            //      if (array_key_exists('tariff', $val)) {
-                            //          if ($tariff->isTariffBinded($val['tariff'])) {
-                            //              $checked = "checked";
-                            //          }
-                            //      }
-
-                            foreach ($room_list as $room):?>
-                             <label> 
-                                <input type="checkbox" <?php //echo $checked; ?> name="tariff" value="<?php echo $room['id'] ?>"
-                                         object_id="<?php echo $object_id ?>" room_id="<?php echo $model->id ?>" class="tariff-bind">
-                                     <?php echo $room['room_title']; ?>
-                            </label>
-                            
-                            <?php endforeach; ?>
-                        </div>
-                    </span>
-
                     <div class="room-card-options">
                         <button class="options-btn"></button>
                         <div class="options-menu">
@@ -71,6 +42,38 @@ $meal_title = $model->getMealTitle($model->meal_type);
                     </div>
                 </div>
             </div>
+
         </div>
+        <span class="tariff-dropdown">
+            <button class="dropdown-btn"><?= Yii::t('app', 'Привязанные номера') ?> <span
+                    class="tariff-label"></span></button>
+            <div class="dropdown-menu">
+                <?php
+                //$objectId = (int) $val['id'];
+                
+                $client = Yii::$app->meili->connect();
+                $object = $client->index('object')->getDocument($object_id);
+                $room_list = $object['rooms'] ?? [];
+
+                foreach ($room_list as $room):
+                    $checked = "";
+                    if (array_key_exists('tariff', $room)) {
+                        foreach ($room['tariff'] as $item) {
+                            if ($item['id'] == $model->id) {
+                                $checked = "checked";
+                            }
+                        }
+                    }
+                    ?>
+                    <label>
+                        <input type="checkbox" <?php echo $checked; ?> name="room" value="<?php echo $room['id'] ?>"
+                            object_id="<?php echo $object_id ?>" tariff_id="<?= $model->id ?>"
+                            room_id="<?php echo $room['id'] ?>" class="room-bind">
+                        <?php echo $room['room_title']; ?>
+                    </label>
+
+                <?php endforeach; ?>
+            </div>
+        </span>
     </div>
 </div>

@@ -80,5 +80,38 @@ use yii\widgets\ListView;
                 $('.tariff-dropdown').removeClass('active');
             }
         });
+
+
+        $('.room-bind').on('change', function () {
+            var tariffId = $(this).attr('tariff_id');  // Get the tariff ID
+            var room_id = $(this).attr('room_id');
+            var isChecked = $(this).prop('checked');  // Check if the checkbox is checked
+            var object_id = $(this).attr('object_id');  // Check if the checkbox is checked
+
+            // Send AJAX request to the backend
+            $.ajax({
+                url: "<?= Yii::$app->urlManager->createUrl('/owner/tariff/bind-room') ?>", // Your action URL
+                type: 'POST',
+                data: {
+                    tariff_id: tariffId,  // Send the tariff ID
+                    checked: isChecked,
+                    room_id: room_id,   // Send the checked state
+                    object_id: object_id,   // Send the checked state
+                    _csrf: $('meta[name="csrf-token"]').attr('content')  // CSRF token for security (if needed)
+                },
+                success: function (response) {
+                    if (response.success) {
+                        console.log('Tariff successfully updated');
+                    } else {
+                        console.log('Failed to update tariff');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log('AJAX error: ' + status + ' ' + error);
+                }
+            });
+        });
+
+
     });
 </script>

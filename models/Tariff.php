@@ -135,7 +135,7 @@ class Tariff extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'payment_on_book' => Yii::t('app', 'Оплата при бронировании'),
+            'payment_on_book' => Yii::t('app', 'Оплата онлайн во время бронирования'),
             'payment_on_reception' => Yii::t('app', 'Оплата при заселении'),
             'cancellation' => Yii::t('app', 'Отмена'),
             'meal_type' => Yii::t('app', 'Meal Type'),
