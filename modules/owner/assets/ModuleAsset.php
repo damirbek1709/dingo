@@ -21,6 +21,7 @@ class ModuleAsset extends AssetBundle
     public $baseUrl = '@web/owner';
     public $css = [
         'css/main.css',
+        'css/room.css',
         'css/navbar.css',
         'css/calendar.css',
     ];

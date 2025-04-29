@@ -6,17 +6,90 @@ use yii\helpers\Html;
 /** @var app\models\RoomCat $model */
 
 $this->title = Yii::t('app', 'Добавить номер');
-$this->params['breadcrumbs'][] = ['label' => $object_title, 'url' => ['view', 'id' => $object_id]];
+//$this->params['breadcrumbs'][] = ['label' => $object_title, 'url' => ['view', 'id' => $object_id]];
 //$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Room Categories'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+//$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="room-cat-create">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <?= $this->render('_form', [
-        'model' => $model,
-        'id'=> $id
-    ]) ?>
-
+<div class="room-create">
+    <div class="col-md-12" style="padding:20px 15px">
+        <div class="card">
+            <!-- <h1 class="general_title"><?//= Html::encode($this->title) ?></h1> -->
+            <?= $this->render('_form', [
+                'model' => $model,
+                'id' => $id
+            ]) ?>
+        </div>
+    </div>
 </div>
+
+<style>
+    .main {
+        background-color: green;
+        color: #fff;
+    }
+
+    .img-main:hover,
+    .img-main:focus,
+    .img-main.focus {
+        color: #fff;
+        text-decoration: none;
+        outline: unset;
+    }
+
+    .object-form-container {
+        max-width: 800px;
+    }
+
+    .form-group .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: normal;
+        margin-bottom: 8px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 10px;
+        font-size: 14px;
+        border: 1px solid #e0e0e0;
+        border-radius: 20px;
+        background-color: #fff;
+        color: #333;
+        box-sizing: border-box;
+        margin-bottom: 25px;
+    }
+
+    .form-input::placeholder {
+        color: #c7c7c7;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #007bff;
+    }
+
+    .help-block {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+        padding-left: 20px;
+    }
+
+    select.form-input {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 8.825L1.175 4 2.238 2.938 6 6.7 9.763 2.938 10.825 4z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 20px center;
+        padding-right: 40px;
+    }
+
+    .oblast-update h1 {
+        font-family: 'Inter';
+        font-weight: 600;
+        font-size: 20px;
+        line-height: 24px;
+        letter-spacing: 0px;
+    }
+</style>

@@ -10,7 +10,7 @@ use rico\yii2images\models\Image;
 
 class Objects extends \yii\db\ActiveRecord
 {
-    
+
     public $user_id;
     public $type;
     public $name;
@@ -40,6 +40,7 @@ class Objects extends \yii\db\ActiveRecord
     public $email;
     public $meal_terms;
     public $rooms;
+    public $general_room_count;
     public $terms;
     public $early_check_in;
     public $late_check_in;
@@ -52,6 +53,10 @@ class Objects extends \yii\db\ActiveRecord
     public $images;
     public $img;
     public $children;
+
+    public $status;
+    public $ceo_doc;
+    public $financial_doc;
 
 
 
@@ -121,7 +126,8 @@ class Objects extends \yii\db\ActiveRecord
                     'address_ky',
                     'name',
                     'name_en',
-                    'name_ky'
+                    'name_ky',
+                    'general_room_count'
                 ],
                 'safe'
             ],
@@ -180,6 +186,62 @@ class Objects extends \yii\db\ActiveRecord
 
     }
 
+    public static function objectList()
+    {
+        $lang = Yii::$app->language;
+        $item_arr = [];
+        $general_arr = [];
+        $index = 0;
+        switch ($lang) {
+            case 'ru':
+                $index = 0;
+                break;
+            case 'en':
+                $index = 1;
+                break;
+            case 'ky':
+                $index = 2;
+                break;
+            default:
+                $index = 0;
+                break;
+        }
+
+        if (!Yii::$app->user->isGuest) {
+            $object_id = 0;
+            $label = Yii::t('app', 'Объекты');
+            if (Yii::$app->request->get('object_id')) {
+                $object_id = Yii::$app->request->get('object_id');
+            }
+            $filter_string = "user_id=" . Yii::$app->user->id;
+            $client = Yii::$app->meili->connect();
+            $res = $client->index('object')->search('', [
+                'filter' => [
+                    $filter_string
+                ],
+                'limit' => 10000
+            ])->getHits();
+
+            foreach ($res as $val) {
+                if ($val['id'] == $object_id) {
+                    $label = $val['name'][$index];
+                } else {
+                    $item_arr[] = ['label' => $val['name'][$index], 'url' => ['/owner/object/view', 'object_id' => $val['id']]];
+                }
+            }
+
+            $general_arr = [
+                'label' => $label,
+                'items' => $item_arr,
+                'visible' => Yii::$app->user->can('owner') || Yii::$app->user->can('admin'),
+                'options' => [
+                        'class' => 'owner-nav-item-object',
+                    ],
+            ];
+        }
+        return $general_arr;
+    }
+
     public function objectTypeString()
     {
         $arr = [
@@ -220,6 +282,7 @@ class Objects extends \yii\db\ActiveRecord
             'check_out' => Yii::t('app', 'Выезд'),
             'reception' => Yii::t('app', 'Ресепшн'),
             'description' => Yii::t('app', 'Описание'),
+            'images' => Yii::t('app', 'Фотографии'),
             'lat' => 'Latitude',
             'lon' => 'Longitude',
             'email' => 'E-mail',

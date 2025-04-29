@@ -16,7 +16,6 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
-
     <div class="tariff_payment_block">
         <h3><?= Yii::t('app', 'Модель оплаты'); ?></h3>
         <?= $form->field($model, 'payment_on_book')->checkbox() ?>
@@ -51,7 +50,15 @@ use yii\widgets\ActiveForm;
 
     <div class="tariff_meal_block clear">
         <h3><?= Yii::t('app', 'Питание'); ?></h3>
-        <?= $form->field($model, 'meal_type')->dropDownList([1 => 'Завтрак', 2 => 'Трехразовое питание'])->label('Включено в цену тарифа, указать стоимость можно во вкладке отель'); ?>
+        <?= $form->field($model, 'meal_type')->dropDownList(
+            array_map(function ($item) {
+                return $item['label'];
+            }, $model->getMealList()),
+            [
+                'encode' => false, // Allow HTML rendering for hints
+                'itemOptions' => ['class' => 'cancellation-option'], // Custom class for styling
+            ]
+        ); ?>
     </div>
 
     <div class="tariff_meal_block">
@@ -60,12 +67,14 @@ use yii\widgets\ActiveForm;
         $room_list = $model->getRoomList($object_id);
         ?>
         <div class="tariff-room-list">
-            <?php foreach ($room_list as $room) {
+            <?php
+            foreach ($room_list as $room) {
                 echo Html::beginTag('div', ['class' => 'tariff-room-cover', 'room_id' => $room['id']]);
                 echo Html::tag('div', $room['room_title'], ['class' => 'tariff-room-title']);
-                echo Html::img($room['images'][0]['thumbnailPicture']);
+                //echo Html::img($room['images'][0]['thumbnailPicture']);
                 echo Html::endTag('div');
-            } ?>
+            } 
+            ?>
         </div>
     </div>
 

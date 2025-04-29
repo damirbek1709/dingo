@@ -56,7 +56,7 @@ class Comfort extends \yii\db\ActiveRecord
     public static function getComfortCategoryTitle($id)
     {
         $arr = [
-            self::COMFORT_CAT_SERVICE => Yii::t('app', 'Услуги'),
+            self::COMFORT_CAT_SERVICE => Yii::t('app', 'Услуги и особенности'),
             self::COMFORT_CAT_SPORT => Yii::t('app', 'Спорт и отдых'),
             self::COMFORT_CAT_GENERAL => Yii::t('app', 'Общее'),
             self::COMFORT_CAT_POOL => Yii::t('app', 'Бассейн и пляж'),

@@ -27,6 +27,8 @@ class RoomComfort extends \yii\db\ActiveRecord
     const ROOM_COMFORT_POOL = 9;
     const ROOM_COMFORT_INTERNET = 10;
     const ROOM_COMFORT_BEAUTY = 11;
+
+    public $is_paid;
     /**
      * {@inheritdoc}
      */

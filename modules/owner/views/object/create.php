@@ -5,9 +5,9 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
 
-$this->title = Yii::t('app', 'Create Object') . ' ' . $model->name;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Objects'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = Yii::t('app', 'Создать объект');
+$this->title = Yii::t('app', 'Создание объекта');
+// $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Objects'), 'url' => ['index']];
+// $this->params['breadcrumbs'][] = Yii::t('app', 'Создать объект');
 ?>
 <div class="oblast-update">
 

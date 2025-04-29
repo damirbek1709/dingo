@@ -10,14 +10,27 @@ $name_arr = $model->name;
 $name = $name_arr[$index];
 
 $this->title = Yii::t('app', 'Update Object') . ' ' . $name;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Objects'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = Yii::t('app', 'Update');
+// $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Objects'), 'url' => ['index']];
+// $this->params['breadcrumbs'][] = ['label' => $name, 'url' => ['view', 'id' => $model->id]];
+// $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 <div class="oblast-update">
-    <h1><?= Html::encode($this->title) ?></h1>
-    <?= $this->render('_form_update', [
-        'model' => $model,
-    ]) ?>
-
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="col-md-12">
+                    <div class="row">
+                        <?php echo $this->render('nav', ['model' => $model]); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="card">
+                    <?= $this->render('_form_update', [
+                        'model' => $model,
+                    ]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

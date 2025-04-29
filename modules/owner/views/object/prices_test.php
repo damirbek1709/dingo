@@ -2,55 +2,56 @@
 use yii\helpers\Html;
 
 $this->title = Yii::t('app', 'Доступность и цены');
-$this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+// $this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
+// $this->params['breadcrumbs'][] = $this->title;
 ?>
 
+<div class="oblast-update">
 
+    <?php echo $this->render('top_nav', ['model' => $model]); ?>
+    <div class="sidebar" id="sidebar">
 
-<h1><?= Html::encode($this->title) ?></h1>
-<?php echo $this->render('top_nav', ['model' => $model]); ?>
-<div class="sidebar" id="sidebar">
-    <button class="sidebar-close" id="sidebar-close">&times;</button>
-    <div class="sidebar-inner">
-        <h3>Редактирование</h3>
+        <button class="sidebar-close" id="sidebar-close">&times;</button>
+        <div class="sidebar-inner">
+            <h3>Редактирование</h3>
 
-        <form id="w0" method="post">
-            <div class="sidebar_date_grid">
-                <div class="form-group">
-                    <label>Заезд</label>
-                    <input class="form-control" type="date" id="checkin" />
+            <form id="w0" method="post">
+                <div class="sidebar_date_grid">
+                    <div class="form-group">
+                        <label>Заезд</label>
+                        <input class="form-control" type="date" id="checkin" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Выезд</label>
+                        <input class="form-control" type="date" id="checkout" />
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Выезд</label>
-                    <input class="form-control" type="date" id="checkout" />
+                <div id="sidebar-details"></div>
+                <div class="sidebar_submit">
+                    <div class="btn btn-success update-tariff">Сохранить</div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <div class="card">
+        <div class="calendar-layout">
+            <div class="fixed-column">
+                <div class="month-header-sticky" id="month-header"></div>
+                <div id="fixed-column"></div>
+            </div>
+            <div class="scroll-wrapper" id="scroll-wrapper">
+                <div class="scroll-container">
+                    <div class="days-row" id="day-headers"></div>
+                    <div id="data-rows"></div>
                 </div>
             </div>
-
-            <div id="sidebar-details"></div>
-            <div class="sidebar_submit">
-                <div class="btn btn-success update-tariff">Сохранить</div>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-
-<div class="calendar-layout">
-    <div class="fixed-column">
-        <div class="month-header-sticky" id="month-header"></div>
-        <div id="fixed-column"></div>
-    </div>
-    <div class="scroll-wrapper" id="scroll-wrapper">
-        <div class="scroll-container">
-            <div class="days-row" id="day-headers"></div>
-            <div id="data-rows"></div>
         </div>
     </div>
 </div>
-
 
 
 

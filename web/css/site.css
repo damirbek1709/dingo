@@ -980,8 +980,9 @@ a[aria-expanded=true] .glyph-plus {
 }
 
 .navbar-dark {
-    background-color: #3b3b3b;
+    /* background-color: #3b3b3b; */
     border-radius: 0;
+    margin: auto;
 }
 
 .navbar-dark a {

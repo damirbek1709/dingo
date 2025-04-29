@@ -51,7 +51,7 @@ ModuleAsset::register($this);
                 ['label' => 'Области', 'url' => ['/admin/oblast'], 'visible' => Yii::$app->user->can('admin')],
                 ['label' => !Yii::$app->user->isGuest ? Yii::$app->user->identity->username : '', 'items' => [
                     ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can('moderator')],
-                    ['label' => 'Панель оператора', 'url' => ['/operator'], 'visible' => Yii::$app->user->can('operator')],
+                    ['label' => 'Панель хоста', 'url' => ['/owner'], 'visible' => Yii::$app->user->can('owner')],
                     ['label' => 'Аккаунт', 'url' => ['/user/settings/account'], 'visible' => !Yii::$app->user->isGuest],
                     [
                         'label' => 'Выход',

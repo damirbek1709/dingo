@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="col-md-4">
+<div class="col-md-6">
 
     <div class="oblast_update">
         <?php $form = ActiveForm::begin([
@@ -84,13 +84,14 @@ use yii\widgets\ActiveForm;
 
                     <div class="quantity-input">
                         <button type="button" class="quantity-btn decrease" data-id="<?= $id ?>">−</button>
-                        <?= $form->field($model, "bed_types[{$id}][quantity]")->input('text', [
+
+                        <?= $form->field($model, "bed_types[{$id}][quantity]")->input('number', [
                             'min' => 0,
-                            'value' => 0,
-                            'readonly' => true, // Initially disabled until checkbox is checked
+                            'value' => isset($model->bed_types[$id]) ? $model->bed_types[$id]['quantity'] : 0, // Prepopulate the quantity with saved value
+                            'readonly' => !isset($model->bed_types[$id]) || $model->bed_types[$id]['quantity'] == 0, // If quantity is 0 or not set, make it readonly
                             'class' => 'quantity-display',
                             'id' => "quantity-{$id}", // Unique ID for each input
-                        ])->label(false); ?>
+                        ])->label(false) ?>
 
                         <button type="button" class="quantity-btn increase" data-id="<?= $id ?>">+</button>
                     </div>
@@ -158,38 +159,7 @@ use yii\widgets\ActiveForm;
         //     ]
         // ); ?>
 
-        <div class="drop-zone" id="drop-zone">
-            <div class="drop-icon"></div>
-            <div class="drop-text-top">Нажмите или перетащите файл в эту область для загрузки</div>
-            <div class="drop-text-bottom">Поддержка одиночной или массовой загрузки</div>
-            <?= $form->field($model, 'images[]', [
-                'template' => '{input}', // Hides label and wrapper
-            ])->fileInput([
-                        'multiple' => true,
-                        'style' => 'display: none;',
-                        'id' => 'file-input'
-                    ]) ?>
-        </div>
-
-        <div class="preview-container" id="preview-container">
-            <?php if ($images): ?>
-                <?php foreach ($images as $index => $image): ?>
-                    <?php if ($image && method_exists($image, 'getUrl')): ?>
-                        <div class="preview<?= $index === 0 ? ' main' : '' ?>">
-                            <?php if ($index === 0): ?>
-                                <div class="main-label"><?= Yii::t('app', 'Главная') ?></div>
-                            <?php else: ?>
-                                <button class="make-main" type="button" onclick="makeMain(this.parentElement)" id="<?= $image->id ?>">
-                                    <?= Yii::t('app', 'Сделать главной') ?>
-                                </button>
-                            <?php endif; ?>
-
-                            <?= Html::img($image->getUrl('300x200')) ?>
-                        </div>
-                    <?php endif; ?>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+        
 
         <div class="form-group">
             <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'save-button']) ?>

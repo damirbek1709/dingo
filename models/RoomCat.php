@@ -30,6 +30,16 @@ class RoomCat extends \yii\db\ActiveRecord
     public $room_title;
     public $tariff;
     public $comfort;
+    public $is_paid;
+
+    const BED_TYPE_ONE = 1;
+    const BED_TYPE_TWO = 2;
+    const BED_TYPE_THREE = 3;
+    const BED_TYPE_FOUR = 4;
+    const BED_TYPE_FIVE = 5;
+    const BED_TYPE_SIX = 6;
+
+    public $bed_types;
     /**
      * {@inheritdoc}
      */
@@ -46,6 +56,19 @@ class RoomCat extends \yii\db\ActiveRecord
             ]
         ];
     }
+
+    public function bedTypes()
+    {
+        return [
+            self::BED_TYPE_ONE => ['Односпальная кровать', '2 гостя, ширина 90-130см'],
+            self::BED_TYPE_TWO => ['Двуспальная Queen size', '2 гостя, ширина 151-180см'],
+            self::BED_TYPE_THREE => ['Двуспальная King size', '2 гостя, ширина 181-210см'],
+            self::BED_TYPE_FOUR => ['Двухъярусная кровать', '2 гостя, ширина 90-130см'],
+            self::BED_TYPE_FIVE => ['Диван-кровать', '2 гостя, ширина 131-150см'],
+            self::BED_TYPE_SIX => ['Кресло-кровать', '1 гость, ширина 60-130см'],
+        ];
+    }
+    
 
     public function getPictures()
     {
@@ -76,9 +99,11 @@ class RoomCat extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['guest_amount', 'similar_room_amount', 'area'], 'required'],
-            [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen','type_id'], 'integer'],
-            [['area', 'base_price','title'], 'number'],
+            [['similar_room_amount', 'area'], 'required'],
+            [['bed_types'], 'safe'],
+            [['guest_amount'],'default', 'value'=> 1],
+            [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen', 'type_id'], 'integer'],
+            [['area', 'base_price', 'title'], 'number'],
             [['title', 'title_en', 'title_ky'], 'string', 'max' => 255],
         ];
     }
@@ -102,6 +127,7 @@ class RoomCat extends \yii\db\ActiveRecord
             'kitchen' => Yii::t('app', 'Кухня'),
             'base_price' => Yii::t('app', 'Базовая цена'),
             'img' => Yii::t('app', 'Фото'),
+            'images' => Yii::t('app', 'Фотографии'),
         ];
     }
 

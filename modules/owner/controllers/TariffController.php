@@ -8,6 +8,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
+use yii\filters\AccessControl;
 
 /**
  * TariffController implements the CRUD actions for Tariff model.
@@ -20,17 +21,20 @@ class TariffController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
+        $behaviors = parent::behaviors();
+
+        $behaviors['access'] = [
+            'class' => AccessControl::className(),
+            'rules' => [
+                [
+                    'allow' => true,
+                    'actions' => ['index', 'view', 'update', 'create', 'bind-tariff'],
+                    'roles' => ['owner'],
                 ],
             ]
-        );
+        ];
+
+        return $behaviors;
     }
 
     /**
@@ -42,6 +46,7 @@ class TariffController extends Controller
     {
         $searchModel = new TariffSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -82,6 +87,7 @@ class TariffController extends Controller
 
         return $this->render('create', [
             'model' => $model,
+            'object_id' => $object_id,
         ]);
     }
 
@@ -92,7 +98,7 @@ class TariffController extends Controller
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionUpdate($id)
+    public function actionUpdate($id, $object_id)
     {
         $model = $this->findModel($id);
 
@@ -102,6 +108,7 @@ class TariffController extends Controller
 
         return $this->render('update', [
             'model' => $model,
+            'object_id' => $object_id,
         ]);
     }
 
@@ -164,4 +171,76 @@ class TariffController extends Controller
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+
+    public function actionBindTariff()
+    {
+        if (Yii::$app->request->isAjax) {
+            $tariffId = Yii::$app->request->post('tariff_id');
+            $checked = Yii::$app->request->post('checked'); // 1 if checked, 0 if unchecked
+            $room_id = Yii::$app->request->post('room_id');
+            $object_id = Yii::$app->request->post('object_id');
+
+            $response = ['success' => false];
+            $tariff = Tariff::findOne($tariffId);
+            $client = Yii::$app->meili->connect();
+            $object = $client->index('object')->getDocument($object_id);
+
+            $rooms = $object['rooms'] ?? []; // Get existing rooms
+            $room = null;
+
+            // Find the room with the matching ID
+            foreach ($rooms as &$roomData) {
+                if ($roomData['id'] == $room_id) {
+                    $room = &$roomData;
+                    break;
+                }
+            }
+
+            if (!$room) {
+                throw new NotFoundHttpException('Room not found in Meilisearch.');
+            }
+
+            if ($checked == 'true') {
+                // When checkbox is checked, add the tariff
+                $push_arr = [
+                    "id" => $tariffId,
+                    "title" => $tariff->title,
+                    "payment_on_book" => $tariff->payment_on_book ? 1 : 0,
+                    "payment_on_reception" => $tariff->payment_on_reception ? 1 : 0,
+                    "cancellation" => (int) $tariff->cancellation,
+                    "meal_type" => (int) $tariff->meal_type,
+                    "object_id" => (int) $object_id,
+                    "prices" => [] // Prices can be added here as necessary
+                ];
+                // Add the new tariff to the room's tariffs array
+                $room['tariff'][] = $push_arr;
+            } else {
+                // When checkbox is unchecked, remove the tariff
+                if (isset($room['tariff']) && is_array($room['tariff'])) {
+                    // Filter the tariffs and remove the one with the given tariffId
+                    $room['tariff'] = array_filter($room['tariff'], function ($tariffItem) use ($tariffId) {
+                        return $tariffItem['id'] != $tariffId;
+                    });
+                    // Re-index the array to fix the keys after filtering
+                    $room['tariff'] = array_values($room['tariff']);
+                }
+            }
+
+            // Prepare the data to update in Meilisearch
+            $meilisearchData = [
+                'id' => (int) $object_id,
+                'rooms' => $rooms // Update rooms with modified tariff data
+            ];
+
+            // Update Meilisearch document
+            if ($client->index('object')->updateDocuments($meilisearchData)) {
+                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+                return ['success' => true];
+            }
+        }
+
+        return ['success' => false];
+    }
+
+
 }

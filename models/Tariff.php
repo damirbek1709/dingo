@@ -20,8 +20,12 @@ class Tariff extends \yii\db\ActiveRecord
     const FREE_CANCELLATION_WITH_PENALTY = 2;
     const NO_CANCELLATION = 3;
 
+    const MEAL_TYPE_NO_BREAKFEST = 1;
+    const MEAL_TYPE_INCLUDED_BREAKFEST = 2;
+    const MEAL_TYPE_THREE_TIMES = 3;
+
     public $room_list;
-    
+
     /**
      * {@inheritdoc}
      */
@@ -45,13 +49,67 @@ class Tariff extends \yii\db\ActiveRecord
         return $arr;
     }
 
+    public function getMealList()
+    {
+        $arr = [
+            self::MEAL_TYPE_NO_BREAKFEST => [
+                'label' => Yii::t('app', 'Завтрак не включен'),
+            ],
+            self::MEAL_TYPE_INCLUDED_BREAKFEST => [
+                'label' => Yii::t('app', 'Завтрак включен'),
+            ],
+            self::MEAL_TYPE_THREE_TIMES => [
+                'label' => Yii::t('app', 'Трехразовое питание'),
+            ]
+        ];
+        return $arr;
+    }
+
+    public function getCancellationTitle($id)
+    {
+        $arr = [
+            self::NO_CANCELLATION => [
+                'label' => 'Невозвратный тариф',
+                'class' => 'no-return-tariff',
+                'hint' => 'В случае отмены бронирования с гостя будет удержана полная стоимость бронирования или предоплата.'
+            ],
+            self::FREE_CANCELLATION_WITH_PENALTY => [
+                'label' => 'Бесплатная отмена, а затем отмена со штрафом вплоть до времени заезда',
+                'class' => 'with-penalty-tariff',
+                'hint' => 'В случае отмены до указанного времени, стоимость бронирования или предоплаты будет полностью возвращена гостю. Если бронирование отменено позже указанного времени, вы сможете списать штраф.'
+            ]
+        ];
+        return $arr[$id];
+    }
+
+    public function isTariffBinded($arr)
+    {
+        foreach ($arr as $item) {
+            if ($item['id'] == $this->id) {
+                //echo "yes {$item['id']}";die();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function getMealTitle($id)
+    {
+        $arr = [
+            self::MEAL_TYPE_NO_BREAKFEST => ['label' => Yii::t('app', 'Без завтрака'), 'class' => 'no-breakfast'],
+            self::MEAL_TYPE_INCLUDED_BREAKFEST => ['label' => Yii::t('app', 'Завтрак включен'), 'class' => 'included-brekfast'],
+            self::MEAL_TYPE_THREE_TIMES => ['label' => Yii::t('app', 'Трехразовое питание'), 'class' => 'three_times_meal'],
+        ];
+        return $arr[$id];
+    }
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['payment_on_book', 'payment_on_reception', 'cancellation', 'meal_type', 'object_id','penalty_days'], 'integer'],
+            [['payment_on_book', 'payment_on_reception', 'cancellation', 'meal_type', 'object_id', 'penalty_days'], 'integer'],
             [['cancellation', 'meal_type', 'title'], 'required'],
             [['penalty_sum'], 'number'],
             [['title'], 'string', 'max' => 255],
