@@ -38,7 +38,7 @@ $this->title = $title;
                                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                             </svg>
-                            <?= Html::a('Редактировать', ['update', 'id' => $model->id], ['class' => '']) ?>
+                            <?= Html::a('Редактировать', ['update', 'object_id' => $model->id], ['class' => '']) ?>
 
                         </button>
                     </div>
@@ -116,12 +116,17 @@ $this->title = $title;
                             <div class="photo-grid">
                                 <?php
                                 if (count($model->getImages()) > 1):
+                                    $counter = 0;
                                     foreach ($model->getImages() as $image): ?>
                                         <div class="photo-item">
                                             <?php echo Html::img($image->getUrl('260x180'), ['class' => 'view-thumbnail-img']); ?>
                                             <!-- <div class="main-photo-badge">Главная</div> -->
                                         </div>
                                         <?php
+                                        $counter++;
+                                        if ($counter >= 4) {
+                                            break;
+                                        }
                                     endforeach;
                                 endif;
                                 ?>
@@ -134,9 +139,16 @@ $this->title = $title;
                                         <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                         <polyline points="21 15 16 10 5 21"></polyline>
                                     </svg>
-                                    Все фото
+
+                                    <div class="photo-gallery-button">
+                                        <?= Html::tag('span', Yii::t('app', 'Все фото'), [
+                                            'class' => 'show-all-photos',
+                                            'id' => 'showAllPhotosBtn'
+                                        ]) ?>
+                                    </div>
                                 </button>
                                 <button class="add-btn">+</button>
+                                <?= $this->render('gallery', ['model' => $model]) ?>
                             </div>
                         </div>
                     </div>
