@@ -42,6 +42,7 @@ $config = [
             ],
             'controllerMap' => [
                 'registration' => 'app\controllers\user\RegistrationController',
+                'security' => 'app\controllers\user\SecurityController',
                 // 'admin' => 'app\controllers\user\AdminController',
                 // 'profile' => 'app\controllers\user\ProfileController',
                 // 'settings' => 'app\controllers\user\SettingsController',
