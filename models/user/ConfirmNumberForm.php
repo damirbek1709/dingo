@@ -1,14 +1,9 @@
 <?php
-
 namespace app\models\user;
 
 use Yii;
 use app\models\user\Token;
-use yii\web\Response;
 
-/**
- * @property int $confirmation_code Проверочный код
- */
 class ConfirmNumberForm extends \yii\base\Model
 {
     public $confirmation_code;
@@ -36,16 +31,19 @@ class ConfirmNumberForm extends \yii\base\Model
     }
 
     /**
+     * Validates the confirmation code.
      *
-     * @return type
+     * @param string $attribute the attribute currently being validated
+     * @param array $params additional parameters (if any)
      */
-    
-
     public function validateConfirmationCode($attribute, $params)
     {
         $token = Token::find()->where(['code' => $this->$attribute, 'type' => Token::TYPE_CONFIRMATION])->one();
-        if ($token === null || $token->isExpired || $token->user === null || !$token)  {
+
+        if ($token === null || $token->isExpired || $token->user === null) {
             $this->addError($attribute, 'Проверочный код не найден или устарел');
         }
     }
 }
+
+?>

@@ -232,48 +232,56 @@ class RegistrationController extends BaseRegistrationController
     public function actionConfirmNumber()
     {
         $model = new ConfirmNumberForm();
+
+        // Perform AJAX validation
         $this->performAjaxValidation($model);
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post())) {
-                if ($model->validate()) {
-                    $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
-                    $user = $token->user;
-                    $user->confirmed_at = time();
-                    $user->save();
-                    $token->delete();
-                    $auth = Yii::$app->authManager;
-                    $role = $auth->getPermission('owner'); // Make sure "owner" role exists in RBAC
-                    if ($role) {
-                        $auth->assign($role, $user->id);
-                    }
-                    if (Yii::$app->user->login($user)) {
-                        $filter_string = "user_id=" . Yii::$app->user->id;
-                        $client = Yii::$app->meili->connect();
-                        $res = $client->index('object')->search('', [
-                            'filter' => [
-                                $filter_string
-                            ],
-                            'limit' => 10000
-                        ])->getHits();
-                        if(count($res)){
-                            return $this->redirect('/owner/object/index');
-                        }
-                        else{
-                            return $this->redirect('/owner/object/create');
-                        }
-                        
-                    }
-                } else {
-                    return $model->addError('confirmation_code', 'Неверно введен проверочный код');
+
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            // Validate the form
+            if ($model->validate()) {
+                $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
+                $user = $token->user;
+                $user->confirmed_at = time();
+                $user->save();
+                $token->delete();
+
+                // Assign role to user
+                $auth = Yii::$app->authManager;
+                $role = $auth->getPermission('owner');
+                if ($role) {
+                    $auth->assign($role, $user->id);
                 }
+
+                // Log in the user
+                if (Yii::$app->user->login($user)) {
+                    $filter_string = "user_id=" . Yii::$app->user->id;
+                    $client = Yii::$app->meili->connect();
+                    $res = $client->index('object')->search('', [
+                        'filter' => [
+                            $filter_string
+                        ],
+                        'limit' => 10000
+                    ])->getHits();
+
+                    if (count($res)) {
+                        return $this->redirect('/owner/object/index');
+                    } else {
+                        return $this->redirect('/owner/object/create');
+                    }
+                }
+            } else {
+                // If validation fails, set the error message
+                //Yii::$app->session->setFlash('error', 'Неверно введен проверочный код');
             }
-        } else {
-            return $this->render('confirm-number', [
-                'model' => $model,
-                'module' => $this->module,
-            ]);
         }
+
+        // Render the confirmation page
+        return $this->render('confirm-number', [
+            'model' => $model,
+            'module' => $this->module,
+        ]);
     }
+
 
     private function generateUniqueReferralId()
     {
