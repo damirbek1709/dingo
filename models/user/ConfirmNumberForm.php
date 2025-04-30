@@ -44,7 +44,7 @@ class ConfirmNumberForm extends \yii\base\Model
     public function validateConfirmationCode($attribute, $params)
     {
         $token = Token::find()->where(['code' => $this->$attribute, 'type' => Token::TYPE_CONFIRMATION])->one();
-        if ($token === null || $token->isExpired || $token->user === null) {
+        if ($token === null || $token->isExpired || $token->user === null || !$token)  {
             $this->addError($attribute, 'Проверочный код не найден или устарел');
         }
     }

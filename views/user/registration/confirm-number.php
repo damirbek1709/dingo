@@ -55,8 +55,6 @@ use yii\widgets\ActiveForm;
 </div>
 
 <style>
-   
-
     .opt-wrap {
         width: 100%;
         max-width: 420px;
@@ -178,6 +176,31 @@ use yii\widgets\ActiveForm;
                     otpInputs[index - 1].focus();
                 }
             });
+
+            // Handle paste event - split pasted value into the inputs
+            input.addEventListener('paste', function (e) {
+                // Get the pasted text
+                const paste = e.clipboardData.getData('text');
+                // Ensure the pasted content is numeric and has up to 6 characters
+                const pasteValue = paste.replace(/[^0-9]/g, '').slice(0, 6);
+
+                // Paste the characters into the OTP inputs
+                for (let i = 0; i < pasteValue.length; i++) {
+                    if (otpInputs[i]) {
+                        otpInputs[i].value = pasteValue[i];
+                    }
+                }
+
+                // Update the hidden input field with the pasted value
+                updateHiddenInput();
+
+                // Focus the next empty input field after paste
+                if (pasteValue.length < otpInputs.length) {
+                    otpInputs[pasteValue.length].focus();
+                }
+
+                e.preventDefault();  // Prevent the default paste behavior
+            });
         });
 
         // Handle countdown timer
@@ -227,4 +250,5 @@ use yii\widgets\ActiveForm;
             }
         });
     });
+
 </script>

@@ -31,7 +31,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 <?php $form = ActiveForm::begin([
                     'id' => 'registration-form',
                     'enableAjaxValidation' => true,
-                    'enableClientValidation' => false,
+                    'enableClientValidation' => true,
                 ]); ?>
 
                 <?= $form->errorSummary($model) ?>
