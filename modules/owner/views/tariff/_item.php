@@ -32,7 +32,7 @@ $meal_title = $model->getMealTitle($model->meal_type);
                         <div class="options-menu">
                             <ul>
                                 <li><span class="room-open-icon"></span>
-                                    <?= Html::a(Yii::t('app', 'Редактировать'), ['/owner/tariff/update', 'id' => $model->id, 'object_id' => $object_id], ['class' => '']) ?>
+                                    <?= Html::a(Yii::t('app', 'Редактировать'), ['/owner/object/edit-tariff', 'id' => $model->id, 'object_id' => $object_id], ['class' => '']) ?>
                                 </li>
                                 <li class="room-delete-btn"><span class="room-delete-icon"></span>
                                     <?= Html::a(Yii::t('app', 'Удалить'), ['/owner/tariff/delete', 'id' => $model->id, 'object_id' => $object_id], ['class' => '']) ?>

@@ -49,7 +49,7 @@ use yii\widgets\ActiveForm;
         )->label(false); ?>
         <div class="penalty_block">
             <div class="row">
-                <div class="col-md-6">
+                <div class="">
                     <div class="col-md-6">
                         <?= $form->field($model, 'penalty_sum')->textInput() ?>
                     </div>
@@ -78,20 +78,18 @@ use yii\widgets\ActiveForm;
         <h3><?= Yii::t('app', 'Привязать номер'); ?></h3>
         <?php
         $room_list = $model->getRoomList($object_id);
-        foreach ($room_list as $room): ?>
-            <label>
-                <input type="checkbox" name="Tariff[room_list][]" value="<?php echo $room['id'] ?>"
-                    object_id="<?php echo $object_id ?>" tariff_id="<?= $model->id ?>" room_id="<?php echo $room['id'] ?>"
-                    class="room-bind">
-                <?php echo $room['room_title']; ?>
-            </label>
-        <?php endforeach; ?>
+        $room_list_arr = [];
+        foreach ($room_list as $room) {
+            $room_list_arr[$room['id']] = $room['room_title'];
+        }
+        echo $form->field($model, 'room_list')->checkboxList($room_list_arr)->label(false);
+        ?>
     </div>
 
 
 
     <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'save-button']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

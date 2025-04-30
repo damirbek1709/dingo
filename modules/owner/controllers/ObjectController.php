@@ -94,7 +94,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['room', 'edit-room', 'add-tariff', 'tariff-list', 'room-comfort', 'pictures'],
+                    'actions' => ['room', 'edit-room', 'add-tariff','edit-tariff', 'tariff-list', 'room-comfort', 'pictures'],
                     'roles' => ['owner'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -974,12 +974,8 @@ class ObjectController extends Controller
         $object_title = $object['name'][0];
 
         if ($this->request->isPost) {
-
-            echo "<pre>";print_r($this->request->post()['Tariff']['room_list']);echo "</pre>";die();
             if ($model->load($this->request->post()) && $model->save()) {
-                $room_list = $this->request->post()['Tariff']['room_list'][0];
-                $room_list = $this->stringToNumericArray($room_list);
-
+                $room_list = $model->room_list;
                 try {
                     $rooms = $object['rooms'] ?? [];
                     $updatedRooms = [];
@@ -1033,6 +1029,74 @@ class ObjectController extends Controller
             'object_title' => $object_title
         ]);
     }
+
+    public function actionEditTariff($id, $object_id)
+    {
+        $model = Tariff::findOne($id);
+        $model->object_id = $object_id;
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($object_id);
+        $object_title = $object['name'][0];
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                $room_list = $model->room_list;
+                try {
+                    $rooms = $object['rooms'] ?? [];
+                    $updatedRooms = [];
+                    foreach ($rooms as $roomData) {
+                        if (!is_array($roomData) || !isset($roomData['id'])) {
+                            Yii::warning("Invalid room data: " . json_encode($roomData));
+                            continue;
+                        }
+
+                        $roomData['id'] = (int) $roomData['id'];
+                        if (in_array($roomData['id'], $room_list)) {
+                            $roomData['tariff'] = $roomData['tariff'] ?? [];
+                            $tariff = [
+                                'id' => (int) $model->id,
+                                'payment_on_book' => (int) $model->payment_on_book,
+                                'cancellation' => (int) $model->cancellation,
+                                'meal_type' => (int) $model->meal_type,
+                                'title' => $model->title,
+                                'object_id' => (int) $object_id,
+                                'price' => (float) $roomData['base_price'],
+                                'from_date' => '',
+                                'to_date' => '',
+                                'penalty_sum' => $model->penalty_sum,
+                                'penalty_days' => $model->penalty_days,
+                                'prices' => [],
+                            ];
+
+                            $roomData['tariff'][] = $tariff;
+                        }
+                        $updatedRooms[] = $roomData;
+                    }
+
+                    $meilisearchData = [
+                        'id' => (int) $object_id,
+                        'rooms' => $updatedRooms
+                    ];
+
+                    $index->updateDocuments([$meilisearchData]);
+                    return $this->redirect(['tariff-list', 'object_id' => $object_id]);
+                } catch (\Exception $e) {
+                    Yii::error("Meilisearch operation error: " . $e->getMessage());
+                }
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
+
+        return $this->render('/tariff/update', [
+            'model' => $model,
+            'object_id' => $object_id,
+            'object_title' => $object_title
+        ]);
+    }
+
+
 
     function stringToNumericArray($stringInput)
     {

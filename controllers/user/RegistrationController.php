@@ -247,11 +247,24 @@ class RegistrationController extends BaseRegistrationController
                         $auth->assign($role, $user->id);
                     }
                     if (Yii::$app->user->login($user)) {
-                        return $this->redirect('/owner/object/create');
+                        $filter_string = "user_id=" . Yii::$app->user->id;
+                        $client = Yii::$app->meili->connect();
+                        $res = $client->index('object')->search('', [
+                            'filter' => [
+                                $filter_string
+                            ],
+                            'limit' => 10000
+                        ])->getHits();
+                        if(count($res)){
+                            return $this->redirect('/owner/object/index');
+                        }
+                        else{
+                            return $this->redirect('/owner/object/create');
+                        }
+                        
                     }
-                }
-                else{
-                    return $model->addError('confirmation_code','Неверно введен проверочный код');
+                } else {
+                    return $model->addError('confirmation_code', 'Неверно введен проверочный код');
                 }
             }
         } else {
