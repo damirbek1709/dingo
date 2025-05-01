@@ -11,7 +11,7 @@ use yii\widgets\ActiveForm;
 ?>
 
 <div class="oblast-update">
-
+    <?php echo $this->render('../top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
     <?php $form = ActiveForm::begin([
         'enableClientValidation' => false,
         'options' => [
@@ -19,7 +19,8 @@ use yii\widgets\ActiveForm;
         ]
     ]); ?>
     <div class="col-md-12">
-        <div class="back_link"><?= Html::a(Yii::t('app', 'К списку номеров'), ['room-list', 'object_id' => $object_id]) ?>
+        <div class="back_link">
+            <?= Html::a(Yii::t('app', 'К списку номеров'), ['room-list', 'object_id' => $object_id]) ?>
         </div>
         <div class="row">
             <div class="col-md-3">

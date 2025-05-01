@@ -31,6 +31,21 @@ class TariffController extends Controller
                     'actions' => ['index', 'view', 'update', 'create', 'bind-tariff','bind-room'],
                     'roles' => ['owner'],
                 ],
+
+                [
+                    'allow' => true,
+                    'actions' => ['delete'],
+                    'roles' => ['owner'],
+                    'matchCallback' => function () {
+                        $object_id = Yii::$app->request->get('object_id');
+                        $client = Yii::$app->meili->connect();
+                        $object = $client->index('object')->getDocument($object_id);
+                        if ($object['user_id'] === Yii::$app->user->id) {
+                            return true;
+                        }
+                        return false;
+                    }
+                ],
             ]
         ];
 
@@ -119,11 +134,11 @@ class TariffController extends Controller
      * @return \yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionDelete($id)
+    public function actionDelete($id, $object_id)
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['/owner/object/tariff-list','object_id'=>$object_id]);
     }
 
     public function actionEditTariff()

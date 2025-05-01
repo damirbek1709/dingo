@@ -17,11 +17,14 @@ $this->title = Yii::t('app', 'Удобства номеров');
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="oblast-update">
+    <?php echo $this->render('../top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
     <?php $form = ActiveForm::begin();
     $list_comfort = Objects::roomComfortList();
     ?>
     <div class="col-md-12">
-        <div class="back_link"><?= Html::a(Yii::t('app', 'К списку номеров'), ['room-list', 'object_id' => $object_id]) ?></div>
+        <div class="back_link">
+            <?= Html::a(Yii::t('app', 'К списку номеров'), ['room-list', 'object_id' => $object_id]) ?>
+        </div>
         <div class="row">
             <div class="col-md-3">
                 <?php echo $this->render('room_nav', ['room_id' => $room_id, 'object_id' => $object_id]); ?>
@@ -36,7 +39,9 @@ $this->title = Yii::t('app', 'Удобства номеров');
                         $selectedComforts = $room['comfort'][$categoryId] ?? [];
                         ?>
                         <fieldset>
-                            <h2 class="minor_title"><?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?></h2>
+                            <h2 class="minor_title">
+                                <?= Html::encode($categoryNames[$categoryId] ?? $category_name) ?>
+                            </h2>
                             <div class="comfort_list_grid">
                                 <?php foreach ($comforts as $comfort): ?>
                                     <div class="comfort-item">
@@ -166,5 +171,4 @@ $this->title = Yii::t('app', 'Удобства номеров');
     .card h3 {
         margin-top: 0;
     }
-   
 </style>

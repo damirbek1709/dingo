@@ -13,7 +13,10 @@ $this->title = Yii::t('app', 'Добавить номер');
 <div class="oblast-update">
     <?php echo $this->render('../top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
     <div class="row">
-        <div class="col-md-12" style="padding:20px 15px">
+        <div class="col-md-12">
+            <div class="back_link">
+                <?= Html::a(Yii::t('app', 'К списку номеров'), ['room-list', 'object_id' => $object_id]) ?>
+            </div>
             <div class="card">
                 <!-- <h1 class="general_title"><?//= Html::encode($this->title) ?></h1> -->
                 <?= $this->render('_form', [

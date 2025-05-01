@@ -131,7 +131,8 @@
     padding: 10px 20px;
     border-radius: 15px;
     color: #000;
-    display: block;
+    display: flex;
+    align-items: center;
 }
 .button-container {
         display: flex;
@@ -333,10 +334,10 @@
         display: none;
         position: absolute;
         background-color: white;
-        min-width: 500px;
+        min-width: 250px;
         border-radius: 5px;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        top: 30px;
+        top: 35px;
         left: 0;
         padding: 10px;
         z-index: 1;
@@ -371,4 +372,17 @@
 }
 .dropdown-btn{
     padding: 6px 9px 6px;
+}
+#tariff-room_list label{
+    font-weight:400;
+    display:flex;
+    align-items:center;
+}
+
+#tariff-room_list input{
+    margin:7px 7px 7px 0;
+}
+.active .tariff-label:after{
+    /* filter: brightness(100); */
+    /* opacity: 100%; */
 }

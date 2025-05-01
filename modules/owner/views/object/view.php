@@ -46,7 +46,6 @@ $this->title = $title;
 
                     <div class="col-md-6">
                         <div class="row">
-
                             <div class="section">
                                 <div class="section-label"><?= Yii::t('app', 'Адрес') ?></div>
                                 <div class="section-value"><?= $model->address[0]; ?></div>
@@ -59,31 +58,45 @@ $this->title = $title;
 
                             <div class="section">
                                 <div class="section-label"><?= Yii::t('app', 'Учредительные документы компании') ?>
-                                    <span class="info-icon">i</span>
+                                    <div class="tooltip-container">
+                                        <span class="info-icon"></span>
+                                        <div class="tooltip">
+                                            <?= Yii::t('app', 'Загрузите все документы подтверждающие статус юридического лица (патент, свидетельство, паспорт и тд)'); ?>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button class="upload-btn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="17 8 12 3 7 8"></polyline>
-                                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                                    </svg>
-                                    Загрузка
-                                </button>
+                                <?php $ceo_docs = $model->getCeoDocs();
+                                if ($ceo_docs) {
+                                    foreach ($ceo_docs as $doc) {
+                                        echo Html::beginTag('div', ['class' => 'ceo_doc_cover']);
+                                        echo Html::a($doc['name'], $doc['link'], ['class' => 'ceo_doc']);
+                                        echo Html::tag('span', '', ['class' => 'doc_delete_icon', 'name' => $doc['name'], 'folder' => 'ceo']);
+                                        echo Html::endTag('div');
+                                    }
+                                }
+                                ?>
                             </div>
 
                             <div class="section">
-                                <div class="section-label"><?= Yii::t('app', 'Банковские Реквизиты') ?> <span
-                                        class="info-icon">i</span></div>
-                                <button class="upload-btn">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="17 8 12 3 7 8"></polyline>
-                                        <line x1="12" y1="3" x2="12" y2="15"></line>
-                                    </svg>
-                                    Загрузка
-                                </button>
+                                <div class="section-label"><?= Yii::t('app', 'Банковские Реквизиты') ?>
+                                    <div class="tooltip-container">
+                                        <span class="info-icon"></span>
+                                        <div class="tooltip">
+                                            <?= Yii::t('app', 'Загрузите ваши банковские данные для осуществления выплат на ваш счет'); ?>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <?php $financial_docs = $model->getFinancialDocs();
+                                if ($financial_docs) {
+                                    foreach ($financial_docs as $doc) {
+                                        echo Html::beginTag('div', ['class' => 'ceo_doc_cover']);
+                                        echo Html::a($doc['name'], $doc['link'], ['class' => 'ceo_doc']);
+                                        echo Html::tag('span', '', ['class' => 'doc_delete_icon', 'name' => $doc['name'], 'folder' => 'financial']);
+                                        echo Html::endTag('div');
+                                    }
+                                }
+                                ?>
                             </div>
 
                             <div class="section">
@@ -147,7 +160,7 @@ $this->title = $title;
                                         ]) ?>
                                     </div>
                                 </button>
-                                <button class="add-btn">+</button>
+                                <!-- <button class="add-btn">+</button> -->
                                 <?= $this->render('gallery', ['model' => $model]) ?>
                             </div>
                         </div>
@@ -157,4 +170,34 @@ $this->title = $title;
         </div>
     </div>
 </div>
-</div>
+
+<script>
+    $('.doc_delete_icon').on('click', function () {
+        var name = $(this).attr('name');
+        var folder = $(this).attr('folder');
+        var object_id = "<?= $model->id ?>";
+        var parent = $(this).parent();
+
+        $.ajax({
+            url: "<?= Yii::$app->urlManager->createUrl('/owner/object/remove-file') ?>", // Your action URL
+            type: 'POST',
+            data: {
+                name: name,  // Send the tariff ID
+                folder: folder,
+                object_id: object_id,   // Send the checked state
+                _csrf: $('meta[name="csrf-token"]').attr('content')  // CSRF token for security (if needed)
+            },
+            success: function (response) {
+                if (response == 'true') {
+                    console.log('File was removed');
+                    parent.fadeOut();
+                } else {
+                    console.log('File was not removed');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.log('AJAX error: ' + status + ' ' + error);
+            }
+        });
+    });
+</script>

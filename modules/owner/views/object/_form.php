@@ -1,204 +1,249 @@
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 
 <?php
-
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use vova07\imperavi\Widget;
-
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
-/** @var yii\widgets\ActiveForm $form */
-?>
+/** @var yii\widgets\ActiveForm $form */ ?>
 
-<div class="object-form-container">
-    <?php $form = ActiveForm::begin([
-        'enableClientValidation' => false,
-        'enableAjaxValidation' => false,
-        'options' => [
-            'enctype' => 'multipart/form-data',
-            'class' => 'styled-form'
-        ],
-        'fieldConfig' => [
-            'template' => "{label}\n{input}\n{error}",
-            'labelOptions' => ['class' => 'form-label'],
-            'inputOptions' => ['class' => 'form-input'],
-            'errorOptions' => ['class' => 'help-block'],
-            'options' => ['class' => 'form-group'],
-        ],
-    ]); ?>
-
-    <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите название объекта')]) ?>
-    <?= $form->field($model, 'name_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите название объекта английском')]) ?>
-    <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите название объекта кыргызском')]) ?>
-
-    <?= $form->field($model, 'type')->dropDownList(
-        $model->objectTypeList(),
-        [
-            'prompt' => Yii::t('app', 'Укажите тип объекта'),
-            'class' => 'form-input'
-        ]
-    ) ?>
-
-    <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город')]) ?>
-    <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город английском')]) ?>
-    <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город кыргызском')]) ?>
-
-    <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес')]) ?>
-    <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
-    <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
-
-</div>
-<?php
-$initial_preview = false;
-if ($model->isImageSet()) {
-    $initial_preview = $model->imagesPreview();
-}
-$images = $model->getImages(); // Get all images
-echo $form->field($model, 'images[]')->widget(
-    \kartik\file\FileInput::class,
-    [
-        'options' => ['accept' => 'image/*', 'multiple' => 'true'],
-        'pluginOptions' => [
-            'previewFileType' => 'image',
-            'initialPreview' => $initial_preview,
-            'initialPreviewConfig' => array_map(function ($image) use ($model) {
-                return [
-                    // 'url' => Url::to(['/object/remove-image', 'image_id' => $image->id, 'object_id' => $model->id]),
-                    // 'key' => $image->id,
-                    // 'extra' => [
-                    //     'main' => $image->id,
-                    // ],
-                ];
-            }, $images),
-            'overwriteInitial' => false,
-            'initialPreviewAsData' => true,
-            'initialPreviewFileType' => 'image',
-            'initialPreviewShowDelete' => true,
-            'showRemove' => false,
-            'showUpload' => false,
-            'otherActionButtons' => '
-                                <button type="button" class="kv-cust-btn img-main btn btn-sm" title="Set as main">
-                                    <i class="glyphicon glyphicon-ok"></i>
-                                </button>
-                                ',
-            'fileActionSettings' => [
-                'showZoom' => false,
+<div class="row">
+    <div class="col-md-6">
+        <?php $form = ActiveForm::begin([
+            'enableClientValidation' => false,
+            'enableAjaxValidation' => false,
+            'options' => [
+                'enctype' => 'multipart/form-data',
+                'class' => 'styled-form'
             ],
-        ],
-    ]
-)->label(Yii::t('app', 'Фотографии')); ?>
-
-
-<div class="object-form-container">
-    <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
-    <?= $form->field($model, 'phone')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Номер телефона')]) ?>
-    <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
-    <?= $form->field($model, 'check_in')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Заезд')]) ?>
-    <?= $form->field($model, 'check_out')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Выезд')]) ?>
-    <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')]) ?>
-    <?= $form->field($model, 'reception')->checkbox() ?>
-
-    <?= $form->field($model, 'description')->widget(
-        Widget::className(),
-        [
-            'settings' => [
-                'lang' => 'ru',
-                'minHeight' => 200,
-                'formatting' => ['p', 'blockquote', 'h2'],
-                'imageCaption' => true,
-                'imageUpload' => Url::to(['site/image-upload']),
-                'fileUpload' => Url::to(['site/file-upload']),
-                'plugins' => [
-                    'imagemanager',
-                    'filemanager',
-                    'clips',
-                    'fullscreen',
-                    'table',
-                    'fontsize',
-                    'fontcolor',
-                    'video',
-                ]
+            'fieldConfig' => [
+                'template' => "{label}\n{input}\n{error}",
+                'labelOptions' => ['class' => 'form-label'],
+                'inputOptions' => ['class' => 'form-input'],
+                'errorOptions' => ['class' => 'help-block'],
+                'options' => ['class' => 'form-group'],
             ],
-        ]
-    ); ?>
+        ]); ?>
 
-    <?= $form->field($model, 'description_en')->widget(
-        Widget::className(),
-        [
-            'settings' => [
-                'lang' => 'ru',
-                'minHeight' => 200,
-                'formatting' => ['p', 'blockquote', 'h2'],
-                'imageCaption' => true,
-                'imageUpload' => Url::to(['site/image-upload']),
-                'fileUpload' => Url::to(['site/file-upload']),
-                'plugins' => [
-                    'imagemanager',
-                    'filemanager',
-                    'clips',
-                    'fullscreen',
-                    'table',
-                    'fontsize',
-                    'fontcolor',
-                    'video',
-                ]
-            ],
-        ]
-    ); ?>
+        <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите название объекта')]) ?>
+        <?= $form->field($model, 'name_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите название объекта английском')]) ?>
+        <?= $form->field($model, 'name_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите название объекта кыргызском')]) ?>
 
-    <?= $form->field($model, 'description_ky')->widget(
-        Widget::className(),
-        [
-            'settings' => [
-                'lang' => 'ru',
-                'minHeight' => 200,
-                'formatting' => ['p', 'blockquote', 'h2'],
-                'imageCaption' => true,
-                'imageUpload' => Url::to(['site/image-upload']),
-                'fileUpload' => Url::to(['site/file-upload']),
-                'plugins' => [
-                    'imagemanager',
-                    'filemanager',
-                    'clips',
-                    'fullscreen',
-                    'table',
-                    'fontsize',
-                    'fontcolor',
-                    'video',
-                ]
-            ],
-        ]
-    ); ?>
+        <?= $form->field($model, 'type')->dropDownList(
+            $model->objectTypeList(),
+            [
+                'prompt' => Yii::t('app', 'Укажите тип объекта'),
+                'class' => 'form-input'
+            ]
+        ) ?>
 
-    <div id="map" style="width: 800px; height: 400px;"></div>
-    <?php
-    if ($model->lat)
-        $lat = $model->lat;
-    else
-        $lat = 41.2044;
-    if ($model->lon)
-        $lon = $model->lon;
-    else
-        $lon = 74.7661;
-    ?>
-    <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
-    <?= $form->field($model, 'lon')->hiddenInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
-    <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'E-mail')]) ?>
-    <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
+        <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город')]) ?>
+        <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город английском')]) ?>
+        <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город кыргызском')]) ?>
 
-    <?php echo $form->errorSummary($model); ?>
+        <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес')]) ?>
+        <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
+        <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
 
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
     </div>
 
-    <?php ActiveForm::end(); ?>
+    <div class="col-md-6">
+        <div id="map" style="width: 800px; height: 400px;"></div>
+        <?php
+        if ($model->lat)
+            $lat = $model->lat;
+        else
+            $lat = 41.2044;
+        if ($model->lon)
+            $lon = $model->lon;
+        else
+            $lon = 74.7661;
+        ?>
+        <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
+        <?= $form->field($model, 'lon')->hiddenInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
+    </div>
 
+    <div class="col-md-12">
+        <?php
+        $images = $model->getImages();
+        echo $form->field($model, 'img')->hiddenInput(['class' => 'img_for_main'])->label(false);
+        ?>
+        <div class="drop-zone" id="drop-zone">
+            <div class="drop-icon"></div>
+            <div class="drop-text-top">Нажмите или перетащите файл в эту область для загрузки</div>
+            <div class="drop-text-bottom">Поддержка одиночной или массовой загрузки</div>
+            <?= $form->field($model, 'images[]', [
+                'template' => '{input}', // Hides label and wrapper
+            ])->fileInput([
+                        'multiple' => true,
+                        'style' => 'display: none;',
+                        'id' => 'file-input'
+                    ]) ?>
+        </div>
+
+        <div class="preview-container" id="preview-container">
+            <?php
+            if ($images): ?>
+                <?php foreach ($images as $index => $image): ?>
+                    <?php if ($image && method_exists($image, 'getUrl')): ?>
+                        <div class="preview<?= $index === 0 ? ' main' : '' ?>" id="<?= $image->id; ?>">
+                            <?php if ($index === 0): ?>
+                                <div class="main-label"><?= Yii::t('app', 'Главная') ?></div>
+                            <?php else: ?>
+                                <span class="make-main" type="button" onclick="makeMain(this.parentElement, <?= $image->id ?>)"
+                                    id="<?= $image->id ?>">
+                                    <?= Yii::t('app', 'Сделать главной') ?>
+                                </span>
+
+                                <span class="remove_photo" type="button" image_id="<?= $image->id ?>">
+                                    <span class="remove_icon"></span>
+                                </span>
+                            <?php endif; ?>
+
+                            <?= Html::img($image->getUrl('300x200'), ['image_id' => $image->id]) ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+
+    </div>
+
+    <div>
+
+
+        <div class="object-form-container">
+            <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'phone')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Номер телефона')]) ?>
+            <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
+            <?= $form->field($model, 'check_in')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Заезд')]) ?>
+            <?= $form->field($model, 'check_out')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Выезд')]) ?>
+            <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')]) ?>
+            <?= $form->field($model, 'reception')->checkbox() ?>
+
+            <?php
+            echo $form->field($model, 'description')->textarea();
+            echo $form->field($model, 'description_en')->textarea();
+            echo $form->field($model, 'description_ky')->textarea();
+            ?>
+
+
+            <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'E-mail')]) ?>
+            <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
+
+            <?php echo $form->errorSummary($model); ?>
+
+            <div class="form-group">
+                <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+            </div>
+
+            <?php ActiveForm::end(); ?>
+
+        </div>
+    </div>
 </div>
 
 <script>
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const previewContainer = document.getElementById('preview-container');
+    let mainImageIndex = 0;
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    dropZone.addEventListener('dragover', e => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        handleFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+    function handleFiles(files) {
+        const previewContainer = document.getElementById('preview-container');
+
+        [...files].forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const div = document.createElement('div');
+                div.classList.add('preview');
+
+                if (!document.querySelector('.preview.main')) {
+                    div.classList.add('main');
+                    div.innerHTML += `<div class="main-label">Главная</div>`;
+                } else {
+                    const button = document.createElement('span');
+                    button.className = 'make-main';
+                    button.textContent = 'Сделать главной';
+                    button.onclick = () => makeMain(div, file.name);  // You can replace 'file.name' with the actual image ID
+                    div.appendChild(button);
+                }
+
+                div.innerHTML += `<img src="${e.target.result}" alt="preview">`;
+                previewContainer.appendChild(div);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    $('.remove_photo').on('click', function () {
+        var image_id = $(this).attr('image_id');
+        var object_id = "<?= $model->id ?>";
+        var parent = $(this).parent();
+        $.ajax({
+            method: "POST",
+            url: "<?= Yii::$app->urlManager->createUrl('/owner/object/remove-object-image') ?>",
+            // beforeSend: function(xhr) {
+            //     xhr.setRequestHeader('Authorization', "Bearer " + auth_key);
+            // },
+            data: {
+                image_id: image_id,
+                object_id: object_id,
+                _csrf: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response == "true") {
+                    parent.fadeOut();
+                }
+                //thisOne.removeClass('post-view-fav');
+            }
+        });
+    });
+
+
+    function makeMain(div, image_id) {
+        const previewContainer = document.getElementById('preview-container');
+
+        // Remove 'main' class from all previews and remove 'main-label'
+        [...previewContainer.children].forEach(child => {
+            child.classList.remove('main');
+            const label = child.querySelector('.main-label');
+            if (label) label.remove();
+        });
+
+        // Add 'main' class to the selected preview and insert the 'Главная' label
+        div.classList.add('main');
+        div.insertAdjacentHTML('afterbegin', `<div class="main-label">Главная</div>`);
+
+        // Set the image ID to the hidden input field with id 'objects-img'
+        document.getElementById('objects-img').value = image_id; // This will set the value of the hidden input
+    }
+
+    function save() {
+        alert('Файлы сохранены (логика сохранения не реализована)');
+    }
+
     ymaps.ready(init);
 
     function init() {
@@ -219,24 +264,14 @@ echo $form->field($model, 'images[]')->widget(
         // Update coordinates on drag
         placemark.events.add('dragend', function () {
             const coords = placemark.geometry.getCoordinates();
-            $('#latitude').val(coords[0]);
-            $('#longitude').val(coords[1]);
+            $('#objects-lat').val(coords[0]);
+            $('#objects-lon').val(coords[1]);
         });
 
         // Update coordinates initially
-        $('#latitude').val(placemark.geometry.getCoordinates()[0]);
-        $('#longitude').val(placemark.geometry.getCoordinates()[1]);
+        $('#objects-lat').val(placemark.geometry.getCoordinates()[0]);
+        $('#objects-lon').val(placemark.geometry.getCoordinates()[1]);
     }
-
-    var mainImgIdField = $('#object-img');
-    $('body').on('click', '.img-main', function () {
-        var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
-        mainImgIdField.val(imgId);
-        $('.file-preview-thumbnails .file-preview-frame').removeClass('main');
-        $('.img-main').removeClass('main');
-        $(this).addClass('main');
-    });
-
 </script>
 
 <style>

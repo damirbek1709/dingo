@@ -42,12 +42,13 @@ $this->title = Yii::t('app', 'Список номеров');
 
             foreach ($rooms as $key => $val):
                 $bind_model = RoomCat::findOne($val['id']);
+                $room_id = $val['id'];
                 ?>
                 <div class="room_list clear">
                     <div class="room-card">
-                        <img src="<?= $bind_model->getImage()->getUrl('120x150') ?>" alt="Room Image">
+                        <?php echo Html::a(Html::img($bind_model->getImage()->getUrl('120x150'), ['alt' => "Room Image"]), ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?>
                         <div class="room-card-details">
-                            <h3><?= $val['room_title']; ?></h3>
+                            <h3><?= Html::a($val['room_title'],['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?></h3>
                             <div class="room-info">
                                 <span class="room-area">
                                     <span><?= $val['area'] ?> м2</span>
@@ -78,7 +79,8 @@ $this->title = Yii::t('app', 'Список номеров');
                             <div class="bed-info"><?php //$model['bed_types'] ?></div>
 
                             <div class="tariff-dropdown">
-                                <button class="dropdown-btn"><?=Yii::t('app', 'Привязанные тарифы')?> <span class="tariff-label"></span></button>
+                                <button class="dropdown-btn"><?= Yii::t('app', 'Привязанные тарифы') ?> <span
+                                        class="tariff-label"></span></button>
                                 <div class="dropdown-menu">
                                     <?php
                                     $objectId = (int) $val['id'];
@@ -92,7 +94,7 @@ $this->title = Yii::t('app', 'Список номеров');
                                         }
                                         ?>
                                         <label>
-                                            <input type="checkbox" <?=$checked;?> name="tariff" value="<?= $tariff->id ?>"
+                                            <input type="checkbox" <?= $checked; ?> name="tariff" value="<?= $tariff->id ?>"
                                                 object_id="<?= $object_id ?>" room_id="<?= $val['id'] ?>" class="tariff-bind">
                                             <?php echo $tariff->title; ?>
                                         </label>

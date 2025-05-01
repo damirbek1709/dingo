@@ -3,6 +3,7 @@
 namespace app\modules\owner\controllers;
 
 use app\models\RoomComfort;
+use rico\yii2images\models\Image;
 use Yii;
 use app\models\Objects;
 use app\models\Comfort;
@@ -57,7 +58,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['add-room', 'edit-room','room-beds'],
+                    'actions' => ['add-room', 'edit-room', 'room-beds'],
                     'roles' => ['admin', 'owner'], // Authenticated users
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -94,7 +95,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['room', 'edit-room', 'add-tariff','edit-tariff', 'tariff-list', 'room-comfort', 'pictures'],
+                    'actions' => ['room', 'edit-room', 'add-tariff', 'edit-tariff', 'tariff-list', 'room-comfort', 'pictures'],
                     'roles' => ['owner'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -109,7 +110,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['index', 'create', 'add-tariff', 'prices'],
+                    'actions' => ['index', 'create', 'add-tariff', 'prices', 'remove-object-image', 'remove-file'],
                     'roles' => ['admin', 'owner'],
                 ],
             ],
@@ -129,6 +130,32 @@ class ObjectController extends Controller
      * Lists all Event models.
      * @return mixed
      */
+    public function actionAdmin()
+    {
+        $filter_string = "user_id=" . Yii::$app->user->id;
+        $client = Yii::$app->meili->connect();
+        $res = $client->index('object')->search('', [
+            'filter' => [
+                $filter_string
+            ],
+            'limit' => 10000
+        ]);
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $res->getHits(),
+            'pagination' => [
+                'pageSize' => 12, // Adjust page size as needed
+            ],
+            // 'sort' => [
+            //     'attributes' => ['id', 'name', 'email'], // Sortable attributes
+            // ],
+        ]);
+
+        return $this->render('admin', [
+            'dataProvider' => $dataProvider
+        ]);
+    }
+
     public function actionIndex()
     {
         $filter_string = "user_id=" . Yii::$app->user->id;
@@ -503,6 +530,10 @@ class ObjectController extends Controller
                         @unlink($path);
                     }
                 }
+                if ($model->img) {
+                    $main_img = Image::find()->where(['id' => $model->img])->one();
+                    $bind_model->setMainImage($main_img);
+                }
 
                 $object_arr = [
                     'id' => (int) $model->id,
@@ -679,21 +710,21 @@ class ObjectController extends Controller
                 }
             }
 
-            // Process images if any
-            $model->images = UploadedFile::getInstances($model, 'images');
-            if ($model->images) {
-                foreach ($model->images as $image) {
-                    $path = Yii::getAlias('@webroot/uploads/images/') . $image->name;
-                    $image->saveAs($path);
-                    $model->attachImage($path, true);
-                    @unlink($path);
-                }
-            }
+            // // Process images if any
+            // $model->images = UploadedFile::getInstances($model, 'images');
+            // if ($model->images) {
+            //     foreach ($model->images as $image) {
+            //         $path = Yii::getAlias('@webroot/uploads/images/') . $image->name;
+            //         $image->saveAs($path);
+            //         $model->attachImage($path, true);
+            //         @unlink($path);
+            //     }
+            // }
 
-            $img = "";
-            if ($model->img) {
-                $img = $model->getImageById($model->img);
-            }
+            // $img = "";
+            // if ($model->img) {
+            //     $img = $model->getImageById($model->img);
+            // }
 
             // Generate the room data array for Meilisearch
             $room_id = RoomCat::find()->orderBy(['id' => SORT_DESC])->one()->id;
@@ -715,7 +746,7 @@ class ObjectController extends Controller
                 'air_cond' => (int) $model->air_cond,
                 'kitchen' => (int) $model->kitchen,
                 'base_price' => (int) $model->base_price,
-                'img' => $img,
+                //'img' => $img,
                 //'images' => count($model->getPictures()) > 0 ? $model->getPictures() : "",
                 'bed_types' => $bedTypes // The processed bed_types in the required format
             ];
@@ -731,7 +762,7 @@ class ObjectController extends Controller
 
             // Update documents in Meilisearch
             if ($index->updateDocuments($meilisearchData)) {
-                //Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+                Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->redirect(['room', 'id' => $model->id, 'object_id' => $id]);
             }
         } else {
@@ -816,7 +847,7 @@ class ObjectController extends Controller
             'object_id' => $object_id,
             'object_title' => $object['name'][0],
             'bindModel' => $bind_model,
-            'room_id'=>$id
+            'room_id' => $id
         ]);
     }
 
@@ -862,6 +893,7 @@ class ObjectController extends Controller
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             $model->images = UploadedFile::getInstances($model, 'images');
+
             if ($model->images) {
                 foreach ($model->images as $image) {
                     $path = Yii::getAlias('@webroot/uploads/images/') . $image->name;
@@ -1152,6 +1184,39 @@ class ObjectController extends Controller
         }
     }
 
+    public function actionRemoveObjectImage()
+    {
+        $image_id = Yii::$app->request->post('image_id');
+        $object_id = Yii::$app->request->post('object_id');
+
+        $post = Objects::findOne($object_id);
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $images = $post->getImages();
+        $deleted = 'false';
+
+        foreach ($images as $image) {
+            if ($image->id == $image_id) { // Replace with the actual image ID
+                $post->removeImage($image);
+                $deleted = 'true';
+                break; // Stop after deleting the image
+            }
+        }
+        return $deleted;
+    }
+
+    public function actionRemoveFile()
+    {
+        $folder = Yii::$app->request->post('folder');
+        $name = Yii::$app->request->post('name');
+        $id = Yii::$app->request->post('object_id');
+
+        $path = Yii::getAlias("@webroot/uploads/documents/{$id}/{$folder}") . "/" . $name;
+        if (FileHelper::unlink($path)) {
+            return 'true';
+        }
+        return false;
+    }
+
 
 
     public function actionPayment($object_id)
@@ -1299,6 +1364,7 @@ class ObjectController extends Controller
         return $this->render('rooms/update', [
             'model' => $model,
             'object_id' => $object_id,
+            'room_id' => $id,
             'object_title' => $object['name'][0],
             'bindModel' => $bind_model
         ]);

@@ -230,7 +230,10 @@ use kartik\file\FileInput;
     </div>
 
     <div class="col-md-12">
-        <?php $images = $model->getImages(); ?>
+        <?php
+        $images = $model->getImages();
+        echo $form->field($model, 'img')->hiddenInput(['class' => 'img_for_main'])->label(false);
+        ?>
         <div class="drop-zone" id="drop-zone">
             <div class="drop-icon"></div>
             <div class="drop-text-top">Нажмите или перетащите файл в эту область для загрузки</div>
@@ -246,17 +249,21 @@ use kartik\file\FileInput;
 
         <div class="preview-container" id="preview-container">
             <?php
-            echo $form->field($model, 'img')->hiddenInput(['class' => 'img_for_main'])->label(false);
             if ($images): ?>
                 <?php foreach ($images as $index => $image): ?>
                     <?php if ($image && method_exists($image, 'getUrl')): ?>
-                        <div class="preview<?= $index === 0 ? ' main' : '' ?>">
+                        <div class="preview<?= $index === 0 ? ' main' : '' ?>" id="<?= $image->id; ?>">
                             <?php if ($index === 0): ?>
                                 <div class="main-label"><?= Yii::t('app', 'Главная') ?></div>
                             <?php else: ?>
-                                <button class="make-main" type="button" onclick="makeMain(this.parentElement)" id="<?= $image->id ?>">
+                                <span class="make-main" type="button" onclick="makeMain(this.parentElement, <?= $image->id ?>)"
+                                    id="<?= $image->id ?>">
                                     <?= Yii::t('app', 'Сделать главной') ?>
-                                </button>
+                                </span>
+
+                                <span class="remove_photo" type="button" image_id="<?= $image->id ?>">
+                                    <span class="remove_icon"></span>
+                                </span>
                             <?php endif; ?>
 
                             <?= Html::img($image->getUrl('300x200'), ['image_id' => $image->id]) ?>
@@ -276,18 +283,6 @@ use kartik\file\FileInput;
 </div>
 
 <script>
-    var mainImgIdField = $('#roomcat-img');
-    $('body').on('click', '.img-main', function () {
-        var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
-        mainImgIdField.val(imgId);
-        $('.file-preview-thumbnails .file-preview-frame').removeClass('main');
-        $('.img-main').removeClass('main');
-        $(this).addClass('main');
-    });
-
-
-
-
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const previewContainer = document.getElementById('preview-container');
@@ -313,6 +308,8 @@ use kartik\file\FileInput;
     fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
     function handleFiles(files) {
+        const previewContainer = document.getElementById('preview-container');
+
         [...files].forEach((file, index) => {
             const reader = new FileReader();
             reader.onload = e => {
@@ -323,10 +320,10 @@ use kartik\file\FileInput;
                     div.classList.add('main');
                     div.innerHTML += `<div class="main-label">Главная</div>`;
                 } else {
-                    const button = document.createElement('button');
+                    const button = document.createElement('span');
                     button.className = 'make-main';
                     button.textContent = 'Сделать главной';
-                    button.onclick = () => makeMain(div);
+                    button.onclick = () => makeMain(div, file.name);  // You can replace 'file.name' with the actual image ID
                     div.appendChild(button);
                 }
 
@@ -337,17 +334,47 @@ use kartik\file\FileInput;
         });
     }
 
+    $('.remove_photo').on('click',function() {
+        var image_id = $(this).attr('image_id');
+        var object_id = "<?= $model->id ?>";
+        var parent = $(this).parent();
+        $.ajax({
+            method: "POST",
+            url: "<?= Yii::$app->urlManager->createUrl('/owner/object/remove-object-image') ?>",
+            // beforeSend: function(xhr) {
+            //     xhr.setRequestHeader('Authorization', "Bearer " + auth_key);
+            // },
+            data: {
+                image_id: image_id,
+                object_id: object_id,
+                _csrf: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response == "true") {
+                    parent.fadeOut();
+                }
+                //thisOne.removeClass('post-view-fav');
+            }
+        });
+    });
 
-    function makeMain(div) {
+    
+    function makeMain(div, image_id) {
+        const previewContainer = document.getElementById('preview-container');
+
+        // Remove 'main' class from all previews and remove 'main-label'
         [...previewContainer.children].forEach(child => {
             child.classList.remove('main');
             const label = child.querySelector('.main-label');
             if (label) label.remove();
         });
+
+        // Add 'main' class to the selected preview and insert the 'Главная' label
         div.classList.add('main');
         div.insertAdjacentHTML('afterbegin', `<div class="main-label">Главная</div>`);
-        var image_id = $(this).attr('id');
-        $('#objects-img').val(image_id);
+
+        // Set the image ID to the hidden input field with id 'objects-img'
+        document.getElementById('objects-img').value = image_id; // This will set the value of the hidden input
     }
 
     function save() {
@@ -382,17 +409,6 @@ use kartik\file\FileInput;
         $('#objects-lat').val(placemark.geometry.getCoordinates()[0]);
         $('#objects-lon').val(placemark.geometry.getCoordinates()[1]);
     }
-
-
-
-    var mainImgIdField = $('#object-img');
-    $('body').on('click', '.img-main', function () {
-        var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
-        mainImgIdField.val(imgId);
-        $('.file-preview-thumbnails .file-preview-frame').removeClass('main');
-        $('.img-main').removeClass('main');
-        $(this).addClass('main');
-    });
 </script>
 
 <style>

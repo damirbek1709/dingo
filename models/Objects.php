@@ -8,6 +8,7 @@ use yii\helpers\FileHelper;
 use yii\helpers\Url;
 use rico\yii2images\models\Image;
 
+
 class Objects extends \yii\db\ActiveRecord
 {
 
@@ -144,6 +145,40 @@ class Objects extends \yii\db\ActiveRecord
         return 'object';
     }
 
+    public function getCeoDocs()
+    {
+        $file_array = [];
+        $dir = Yii::getAlias("@webroot/uploads/documents/{$this->id}/ceo");
+        if (is_dir($dir)) {
+            $files = FileHelper::findFiles($dir);
+            $counter = 0;
+            foreach ($files as $file) {
+                $file_array[$counter]['name'] = basename($file);
+                $file_array[$counter]['link'] = Url::base() . "/uploads/documents/{$this->id}/ceo/" . basename($file);
+                $counter++;
+            }
+            return $file_array;
+        }
+        return false;
+    }
+
+    public function getFinancialDocs()
+    {
+        $file_array = [];
+        $dir = Yii::getAlias("@webroot/uploads/documents/{$this->id}/financial");
+        if (is_dir($dir)) {
+            $files = FileHelper::findFiles($dir);
+            $counter = 0;
+            foreach ($files as $file) {
+                $file_array[$counter]['name'] = basename($file);
+                $file_array[$counter]['link'] = Url::base() . "/uploads/documents/{$this->id}/financial/" . basename($file);
+                $counter++;
+            }
+            return $file_array;
+        }
+        return false;
+    }
+
     public function lastIncrement()
     {
         try {
@@ -229,14 +264,15 @@ class Objects extends \yii\db\ActiveRecord
                     $item_arr[] = ['label' => $val['name'][$index], 'url' => ['/owner/object/view', 'object_id' => $val['id']]];
                 }
             }
+            $item_arr[] = ['label' => Yii::t('app', 'Список объектов'), 'url' => ['/owner/object']];
 
             $general_arr = [
                 'label' => $label,
                 'items' => $item_arr,
                 'visible' => Yii::$app->user->can('owner') || Yii::$app->user->can('admin'),
                 'options' => [
-                        'class' => 'owner-nav-item-object',
-                    ],
+                    'class' => 'owner-nav-item-object',
+                ],
             ];
         }
         return $general_arr;

@@ -11,7 +11,7 @@ use yii\widgets\ActiveForm;
 ?>
 
 <div class="oblast-update">
-
+    <?php echo $this->render('../top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
     <?php $form = ActiveForm::begin([
         'enableClientValidation' => false,
         'options' => [
