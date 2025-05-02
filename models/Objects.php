@@ -11,6 +11,12 @@ use rico\yii2images\models\Image;
 
 class Objects extends \yii\db\ActiveRecord
 {
+    const STATUS_NOT_PUBLISHED = 0;
+    const STATUS_READY_FOR_PUBLISH = 1;
+    const STATUS_ON_MODERATION = 2;
+    const STATUS_PUBLISHED = 3;
+    const STATUS_DENIED = 4;
+    const STATUS_DELETED = 5;
 
     public $user_id;
     public $type;
@@ -113,7 +119,8 @@ class Objects extends \yii\db\ActiveRecord
                     'images',
                     'img',
                     'user_id',
-                    'link_id'
+                    'link_id',
+                    'status'
                 ],
                 'safe'
             ],
@@ -208,6 +215,7 @@ class Objects extends \yii\db\ActiveRecord
     public static function objectTypeList()
     {
         return [
+            0 => "",
             self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
             self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
             self::OBJECT_TYPE_RESTBASE => 'База отдыха',
@@ -281,6 +289,7 @@ class Objects extends \yii\db\ActiveRecord
     public function objectTypeString()
     {
         $arr = [
+            0 => '',
             self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
             self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
             self::OBJECT_TYPE_RESTBASE => 'База отдыха',
@@ -444,7 +453,7 @@ class Objects extends \yii\db\ActiveRecord
         return $images;
     }
 
-    
+
 
     public function isImageSet()
     {

@@ -19,11 +19,11 @@ use yii\helpers\Html;
         <?= Html::a(Yii::t('app', 'Условия'), ['terms', 'object_id' => $model->id]); ?>
     </div>
 
-    <div class="owner-nav-item owner-nav-item-crew">
-        <?= Html::a(Yii::t('app', 'Сотрудники'), ['crew', 'object_id' => $model->id]); ?>
+    <!-- <div class="owner-nav-item owner-nav-item-crew">
+        <?php //echo Html::a(Yii::t('app', 'Сотрудники'), ['crew', 'object_id' => $model->id]); ?>
     </div>
 
     <div class="owner-nav-item owner-nav-item-feedback">
-        <?= Html::a(Yii::t('app', 'Отзывы'), ['feedback', 'object_id' => $model->id]); ?>
-    </div>
+        <?php //echo  Html::a(Yii::t('app', 'Отзывы'), ['feedback', 'object_id' => $model->id]); ?>
+    </div> -->
 </div>
