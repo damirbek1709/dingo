@@ -34,7 +34,7 @@ class Meili extends Component
     {
         $server = $_SERVER['SERVER_NAME'];
         try {
-            if ($server == 'dingo.kg') {
+            if ($server == 'partner.dingo.kg') {
                 $client = new Client(
                     'https://meili.selva.kg',
                     'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
