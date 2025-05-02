@@ -9,8 +9,9 @@ use vova07\imperavi\Widget;
 /** @var app\models\Oblast $model */
 /** @var yii\widgets\ActiveForm $form */ ?>
 
-<div class="row">
-    <div class="col-md-6">
+
+<div class="col-md-6">
+    <div class="row">
         <?php $form = ActiveForm::begin([
             'enableClientValidation' => false,
             'enableAjaxValidation' => false,
@@ -47,10 +48,18 @@ use vova07\imperavi\Widget;
         <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
         <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
 
+        <?php
+        echo $form->field($model, 'description')->textarea();
+        echo $form->field($model, 'description_en')->textarea();
+        echo $form->field($model, 'description_ky')->textarea();
+        ?>
     </div>
+</div>
 
-    <div class="col-md-6">
-        <div id="map" style="width: 800px; height: 400px;"></div>
+
+<div class="col-md-6">
+    <div class="col-md-12">
+        <div id="map" style="width: 100%; height: 400px;"></div>
         <?php
         if ($model->lat)
             $lat = $model->lat;
@@ -64,8 +73,10 @@ use vova07\imperavi\Widget;
         <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
         <?= $form->field($model, 'lon')->hiddenInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
     </div>
+</div>
 
-    <div class="col-md-12">
+<div class="col-md-12">
+    <div class="row">
         <?php
         $images = $model->getImages();
         echo $form->field($model, 'img')->hiddenInput(['class' => 'img_for_main'])->label(false);
@@ -108,42 +119,37 @@ use vova07\imperavi\Widget;
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
-
-    </div>
-
-    <div>
-
-
-        <div class="object-form-container">
-            <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($model, 'phone')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Номер телефона')]) ?>
-            <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
-            <?= $form->field($model, 'check_in')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Заезд')]) ?>
-            <?= $form->field($model, 'check_out')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Выезд')]) ?>
-            <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')]) ?>
-            <?= $form->field($model, 'reception')->checkbox() ?>
-
-            <?php
-            echo $form->field($model, 'description')->textarea();
-            echo $form->field($model, 'description_en')->textarea();
-            echo $form->field($model, 'description_ky')->textarea();
-            ?>
-
-
-            <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'E-mail')]) ?>
-            <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
-
-            <?php echo $form->errorSummary($model); ?>
-
-            <div class="form-group">
-                <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
-            </div>
-
-            <?php ActiveForm::end(); ?>
-
-        </div>
     </div>
 </div>
+
+<div class="col-md-6">
+    
+</div>
+
+<div class="col-md-6">
+    <div class="row">
+        <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'phone')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Номер телефона')]) ?>
+        <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
+        <?= $form->field($model, 'check_in')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Заезд')]) ?>
+        <?= $form->field($model, 'check_out')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Выезд')]) ?>
+        <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')]) ?>
+        <?= $form->field($model, 'reception')->checkbox() ?>
+
+        <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'E-mail')]) ?>
+        <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
+
+        <?php echo $form->errorSummary($model); ?>
+
+        <div class="form-group">
+            <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'save-button']) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+    </div>
+</div>
+
+
 
 <script>
     const dropZone = document.getElementById('drop-zone');

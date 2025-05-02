@@ -283,6 +283,16 @@ use kartik\file\FileInput;
 </div>
 
 <script>
+    var mainImgIdField = $('#roomcat-img');
+    $('body').on('click', '.img-main', function () {
+        var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
+        mainImgIdField.val(imgId);
+        $('.file-preview-thumbnails .file-preview-frame').removeClass('main');
+        $('.img-main').removeClass('main');
+        $(this).addClass('main');
+    });
+    
+
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const previewContainer = document.getElementById('preview-container');
@@ -409,6 +419,17 @@ use kartik\file\FileInput;
         $('#objects-lat').val(placemark.geometry.getCoordinates()[0]);
         $('#objects-lon').val(placemark.geometry.getCoordinates()[1]);
     }
+
+
+
+    var mainImgIdField = $('#object-img');
+    $('body').on('click', '.img-main', function () {
+        var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
+        mainImgIdField.val(imgId);
+        $('.file-preview-thumbnails .file-preview-frame').removeClass('main');
+        $('.img-main').removeClass('main');
+        $(this).addClass('main');
+    });
 </script>
 
 <style>

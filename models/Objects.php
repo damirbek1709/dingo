@@ -444,6 +444,8 @@ class Objects extends \yii\db\ActiveRecord
         return $images;
     }
 
+    
+
     public function isImageSet()
     {
         $image = false;

@@ -1084,7 +1084,7 @@ class ObjectController extends Controller
                         }
 
                         $roomData['id'] = (int) $roomData['id'];
-                        if (in_array($roomData['id'], $room_list)) {
+                        if ($room_list && in_array($roomData['id'], $room_list)) {
                             $roomData['tariff'] = $roomData['tariff'] ?? [];
                             $tariff = [
                                 'id' => (int) $model->id,
