@@ -186,7 +186,7 @@ class Objects extends \yii\db\ActiveRecord
         return false;
     }
 
-    public static function currentStatus($id, $status)
+    public static function currentStatus($id, $status = 0)
     {
         $condition_room_tariff = false;
         $model = Objects::findOne($id);
@@ -207,7 +207,7 @@ class Objects extends \yii\db\ActiveRecord
         return $status;
     }
 
-    public static function statusCondition($id, $status)
+    public static function statusCondition($id, $status = 0)
     {
         $condition_room_tariff = false;
         $model = Objects::findOne($id);
@@ -236,7 +236,7 @@ class Objects extends \yii\db\ActiveRecord
         return ['room'=>$room, 'tariff'=>$tariff, 'docs'=>$docs];
     }
 
-    public static function statusData($status)
+    public static function statusData($status = 0)
     {
         $arr = [
             self::STATUS_NOT_PUBLISHED => [
