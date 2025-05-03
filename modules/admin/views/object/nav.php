@@ -45,7 +45,7 @@ use yii\widgets\Pjax;
         <div class="status-description">
             <?= $status_arr['description'] ?>
         </div>
-        <div class="save-button moderate-button" style="width:100%"><?= Yii::t('app', 'Модерировать') ?></div>
+        <div class="save-button" style="width:100%"><?= Yii::t('app', 'Модерировать') ?></div>
 
     </div>
 </div>
@@ -64,8 +64,17 @@ Modal::begin([
         Вы проверили все необходимые данные? Опубликуйте объект и он станет доступен для поиска и бронирования. Либо
         отправьте объект на доработку.
     </div>
-    <button data-send="<?= Objects::STATUS_DENIED; ?>" data-status="<?= $model->status; ?>" class="save-button">Отправить на доработку</button>
-    <button data-send="<?= Objects::STATUS_PUBLISHED; ?>" class="save-button">Одобрить</button>
+    <div class="row">
+        <div class="col-md-6">
+            <button data-send="<?= Objects::STATUS_DENIED; ?>" data-status="<?= $model->status; ?>" style="width:100%;font-size:14px"
+                class="save-button moderate-button moderate-button-white">Отправить на доработку</button>
+        </div>
+
+        <div class="col-md-6">
+            <button style="width:100%;font-size:14px" data-send="<?= Objects::STATUS_PUBLISHED; ?>"
+                class="save-button moderate-button">Одобрить</button>
+        </div>
+    </div>
 </div>
 
 <?php Modal::end();
@@ -73,13 +82,13 @@ Modal::begin([
 
 <script>
     // Use event delegation for elements that might be reloaded with Pjax
-    $(document).on('click', '.moderate-button', function () {
+    $(document).on('click', '.save-button', function () {
         $('#statusModal').modal('show');
     });
 
     var object_id = "<?= $model->id ?>";
 
-    $(document).on('click', '.save-button', function () {
+    $(document).on('click', '.moderate-button', function () {
         if (!$(this).hasClass('dismiss')) {
             var data_status = parseInt($(this).attr('data-send'));
             $.ajax({
@@ -93,6 +102,8 @@ Modal::begin([
                 success: function (response) {
                     if (response) {
                         console.log(response);
+                        $('.dialog-title').text(response.title);
+                        $('.dialog-message').text(response.description);
                         $('.save-button').attr('data-dismiss', "modal").addClass('dismiss');
                     }
                 }
