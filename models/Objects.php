@@ -236,8 +236,11 @@ class Objects extends \yii\db\ActiveRecord
         return ['room'=>$room, 'tariff'=>$tariff, 'docs'=>$docs];
     }
 
-    public static function statusData($status = 0)
+    public static function statusData($status = self::STATUS_NOT_PUBLISHED)
     {
+        if(!$status || $status = ""){
+            $status = self::STATUS_NOT_PUBLISHED;
+        }
         $arr = [
             self::STATUS_NOT_PUBLISHED => [
                 'label' => Yii::t('app', 'Не опубликовано'),
