@@ -1,0 +1,388 @@
+.room-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 0 0px;
+    background-color: #ffffff;
+    /* border-radius: 10px; */
+    width: 100%;
+     /* CSS 2.1 syntax */
+    break-after: always; /* CSS 3 syntax */
+    grid-template-columns: 120px auto;
+    grid-gap: 20px;
+    /* border-bottom: 1px solid #F0F0F0; */
+}
+
+.room-card img {
+    width: 120px;
+    /* Adjust as needed */
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.room-card-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+     /* CSS 2.1 syntax */
+     /* CSS 3 syntax */
+    /* line-height: 30px; */
+}
+
+.room-card-details h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+}
+
+.room-card-details .room-info {
+    font-size: 14px;
+    margin: 12px 0;
+    color: #232323;
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+}
+
+.room-card-details .bed-info {
+    font-size: 14px;
+    color: #555;
+}
+
+.room-card-actions {
+    /* display: flex; */
+    /* align-items: center; */
+    float: left;
+    display: inline-block;
+}
+
+.room-card-actions .button {
+    background-color: #3676BC;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.room-card-actions .button:hover {
+    background-color: #2e59d9;
+}
+
+.room-card-actions .tariff-label {
+    font-size: 14px;
+    color: #333;
+    /* margin-right: 10px; */
+    display: flex;
+}
+.room-area:before{
+    content:'';
+    width:18px;
+    height: 22px;
+    background-image:url('icons.svg');
+    background-position: -151px 0px;
+    display:inline-block;
+    margin-right:10px;
+}
+.room-area{
+    display:inline-flex;
+    align-items: center;
+    margin-right: 30px;
+}
+.room_guest_amount{
+    display: inline-flex;
+    align-items: center;
+    margin-right: 25px;
+}
+.room_guest_amount:before{
+    content:'';
+    width:18px;
+    height: 22px;
+    background-image:url('icons.svg');
+    background-position: -292px 0px;
+    display:inline-block;
+    margin-right:10px;
+}
+.room_bed_type{
+    display: inline-flex;
+    align-items: center;
+}
+.room_bed_type:before{
+    content:'';
+    width: 21px;
+    height: 21px;
+    background-image:url('icons.svg');
+    background-position: -134px -66px;
+    display:inline-block;
+    margin-right:10px;
+}
+.add-room-btn{
+    /* padding-right: 18px; */
+    /* padding-left: 16px; */
+    background-color:#0000000F;
+    font-family: 'Inter';
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 24px;
+    vertical-align: middle;
+    padding: 10px 20px;
+    border-radius: 15px;
+    color: #000;
+    display: flex;
+    align-items: center;
+}
+.button-container {
+        display: flex;
+        gap: 10px;
+        background-color: #f6f6f6;
+        border-radius: 8px;
+        padding: 5px;
+    }
+
+    .button {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 400;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .button-primary {
+        background-color: #fff;
+        color: #333;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .button-secondary {
+        background-color: transparent;
+        color: #999;
+    }
+
+    .button-primary:hover {
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+    }
+
+    .button-secondary:hover {
+        color: #666;
+    }
+
+    .active {
+        color: #333;
+        font-weight: 500;
+        /* background-color: red; */
+        /* width: auto; */
+    }
+.no-breakfast:before{
+    background-position: 65px -2px;
+    height: 25px;
+    width: 22px;
+}
+.no-return-tariff:before{
+    background-position: -245px 0px;
+    height: 25px;
+    width: 22px;
+}
+.included-brekfast:before{
+    background-position: 23px -2px;
+    height: 25px;
+    width: 22px;
+}
+.with-penalty-tariff:before{
+    background-position: 0 5px;
+    height: 25px;
+    width: 22px;
+    background-image: url('more.svg');
+    background-repeat:no-repeat
+}
+.options-btn{
+    background-image:url('icons.svg');
+    width: 26px;
+    height:25px;
+    order: 2;
+    margin-left: auto;
+    background-position: -516px 0px;
+    display: flex;
+    margin-right: 15px;
+}
+.room-card-options {
+    position: relative;
+    margin-left:auto;
+}
+.room-edit-icon{
+    background-image:url('icons.svg');
+    width: 21px;
+    height: 21px;
+    display:inline-block;
+    background-position: -340px -67px;
+    margin-right: 5px;
+}
+.options-menu li{
+    display:flex;
+    align-items:center;
+}
+.room-delete-icon{
+    background-image:url('icons.svg');
+    width: 21px;
+    height: 21px;
+    display:inline-block;
+    background-position: -102px 0px;
+    margin-right: 5px;
+    filter: brightness(0) saturate(100%) invert(27%) 
+                   sepia(100%) saturate(2878%) hue-rotate(346deg) 
+                   brightness(104%) contrast(97%);
+}
+.room-open-icon{
+    width: 21px;
+    height: 21px;
+    display:inline-block;
+    /* background-position: -102px 0px; */
+    margin-right: 5px;
+    background-image: url(icons.svg);
+    background-repeat: no-repeat;
+    background-position: -423px 0px;
+}
+.room-delete-btn a{
+    color: #F5222D;
+}
+.tariff-label:after{
+    background-image:url('icons.svg');
+    background-repeat:no-repeat;
+    content:'';
+    display:inline-block;
+    background-position: -470px -2px;
+    width: 18px;
+    height: 18px;
+}
+
+ .options-btn {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+    }
+
+    .options-menu {
+        display: none;
+        position: absolute;
+        top: 30px;
+        right: 0;
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 150px;
+        z-index: 10;
+    }
+
+    .options-menu ul {
+        list-style: none;
+        margin: 0;
+        padding: 7px 0;
+    }
+
+    .options-menu ul li {
+        padding: 6px 10px;
+        cursor: pointer;
+        color: #333;
+    }
+
+    .options-menu ul li:hover {
+        background-color: #f1f1f1;
+    }
+
+    .options-menu ul li .edit-icon,
+    .options-menu ul li .delete-icon {
+        margin-right: 10px;
+    }
+
+    .options-menu ul li.delete {
+        color: red;
+    }
+
+    /* Style the container for the dropdown */
+    .tariff-dropdown {
+        position: relative;
+        display: inline-block;
+        font-family: Arial, sans-serif;
+    }
+
+/* Style the dropdown button */
+    .dropdown-btn {
+        background-color: transparent;
+        color: #232323;
+        border: none;
+        padding: 0;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+        text-align: left;
+        /* width: 180px; */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .dropdown-btn .arrow {
+        margin-left: 10px;
+    }
+
+    /* Hide the dropdown menu by default */
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: white;
+        min-width: 250px;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        top: 35px;
+        left: 0;
+        padding: 10px;
+        z-index: 1;
+    }
+
+    /* Style the checkboxes */
+    .dropdown-menu label {
+        display: block;
+        margin: 5px 0;
+        font-size: 14px;
+        font-weight: 400;
+        font-family: 'Inter';
+    }
+
+    /* Add spacing between checkboxes */
+    .dropdown-menu input[type="checkbox"] {
+        margin: 0 10px 0 0;
+    }
+
+    /* Style for the arrow when the menu is open */
+    .dropdown-btn.open .arrow {
+        transform: rotate(180deg);
+    }
+
+    /* Open the dropdown when active */
+    .tariff-dropdown.active .dropdown-menu {
+        display: block;
+    }
+.active .dropdown-btn{
+    background-color:#2e59d9;
+    color:#fff;
+}
+.dropdown-btn{
+    padding: 6px 9px 6px;
+}
+#tariff-room_list label{
+    font-weight:400;
+    display:flex;
+    align-items:center;
+}
+
+#tariff-room_list input{
+    margin:7px 7px 7px 0;
+}
+.active .tariff-label:after{
+    /* filter: brightness(100); */
+    /* opacity: 100%; */
+}

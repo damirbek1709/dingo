@@ -110,7 +110,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['index', 'create', 'add-tariff', 'prices', 'remove-object-image', 'remove-file'],
+                    'actions' => ['index', 'create', 'add-tariff', 'prices', 'remove-object-image', 'remove-file','send-to-moderation'],
                     'roles' => ['admin', 'owner'],
                 ],
             ],
@@ -402,6 +402,7 @@ class ObjectController extends Controller
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
                     'general_room_count' => $model->general_room_count,
+                    'status' => 0
                 ];
 
                 $index->addDocuments($object_arr);
@@ -535,6 +536,8 @@ class ObjectController extends Controller
                     $bind_model->setMainImage($main_img);
                 }
 
+                $status = Objects::currentStatus($object_id, $model->status ? $model->status : Objects::STATUS_NOT_PUBLISHED);
+
                 $object_arr = [
                     'id' => (int) $model->id,
                     'name' => $model->name,
@@ -558,6 +561,7 @@ class ObjectController extends Controller
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
                     'general_room_count' => $model->general_room_count,
+                    'status'=>$status
                 ];
 
                 $index->updateDocuments($object_arr);
@@ -682,6 +686,20 @@ class ObjectController extends Controller
         ]);
     }
 
+    public function actionSendToModeration(){
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $id = Yii::$app->request->post('object_id');
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($id);
+       
+        if($index->updateDocuments([
+            'id' => $id,
+            'status' => Objects::STATUS_ON_MODERATION,
+        ])){
+            return "true";
+        }
+    }
 
     public function actionAddRoom($object_id)
     {

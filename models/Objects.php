@@ -186,6 +186,116 @@ class Objects extends \yii\db\ActiveRecord
         return false;
     }
 
+    public static function currentStatus($id, $status)
+    {
+        $condition_room_tariff = false;
+        $model = Objects::findOne($id);
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($id);
+        if (isset($object['rooms']) && is_array($object['rooms'])) {
+            foreach ($object['rooms'] as $index => $roomData) {
+                if (isset($roomData['tariff']) && is_array($roomData['tariff'])) {
+                    $condition_room_tariff = true;
+                    break;
+                }
+            }
+        }
+        if ($condition_room_tariff && $model->getCeoDocs() && $model->getFinancialDocs()) {
+            return self::STATUS_READY_FOR_PUBLISH;
+        }
+        return $status;
+    }
+
+    public static function statusCondition($id, $status)
+    {
+        $condition_room_tariff = false;
+        $model = Objects::findOne($id);
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($id);
+
+        $room = 0;
+        $tariff = 0;
+        $docs = 0;
+        if ($model->getCeoDocs() && $model->getFinancialDocs()) {
+            $docs = 1;
+        }
+        if (isset($object['rooms']) && is_array($object['rooms'])) {
+            $room = 1;
+            foreach ($object['rooms'] as $index => $roomData) {
+                if (isset($roomData['tariff']) && is_array($roomData['tariff'])) {
+                    $tariff = 1;
+                    break;
+                }
+            }
+        }
+        if ($condition_room_tariff && $model->getCeoDocs() && $model->getFinancialDocs()) {
+            return self::STATUS_READY_FOR_PUBLISH;
+        }
+        return ['room'=>$room, 'tariff'=>$tariff, 'docs'=>$docs];
+    }
+
+    public static function statusData($status)
+    {
+        $arr = [
+            self::STATUS_NOT_PUBLISHED => [
+                'label' => Yii::t('app', 'Не опубликовано'),
+                'description' => Yii::t('app', 'Заполните информацию об объекте, номерах, тарифах и ценах, чтобы опубликовать'),
+                'color' => '#232323',
+                'html' => '<div>
+                <p class="info-text">Перед публикацией убедитесь что вся необходимая информация внесена:</p>
+                    <ul>
+                        <li>описание объекта</li>
+                        <li>номера и тарифы</li>
+                        <li>цены и условия бронирования</li>
+                    </ul>
+                    <p class="info-text">Опубликуйте объект и после модерации ваш объект появится в результатах поиска и станет доступен для бронирования клиентами</p>
+                 </div>',
+                'button_text' => Yii::t('app', 'Заполнить информацию'),
+                'title' => Yii::t('app', 'Публикация объекта'),
+            ],
+            self::STATUS_ON_MODERATION => [
+                'label' => Yii::t('app', 'На модерации'),
+                'description' => Yii::t('app', 'Объект отправлен на проверку. Мы рассмотрим его в ближайшее время'),
+                'color' => '#FFBB00',
+                'html' => '<div>Ваш объект отправлен на проверку. Мы постараемся рассмотреть его как можно быстрее. Вы получите уведомление, как только объект будет одобрен</div>',
+                'button_text' => Yii::t('app', 'Понятно'),
+                'title' => Yii::t('app', 'Объект на модерации'),
+            ],
+            self::STATUS_READY_FOR_PUBLISH => [
+                'label' => Yii::t('app', 'Готов к публикации'),
+                'title' => Yii::t('app', 'Объект готов к публикации'),
+                'description' => Yii::t('app', 'Опубликуйте объект - он станет доступен для поиска и бронирования  после проверки'),
+                'color' => '#3676BC',
+                'html' => 'Вы заполнили все необходимые данные. Опубликуйте объект и после проверки он станет доступен для поиска и бронирования',
+                'button_text' => Yii::t('app', 'Опубликовать объект')
+            ],
+            self::STATUS_PUBLISHED => [
+                'label' => Yii::t('app', 'Опубликовано'),
+                'title' => Yii::t('app', 'Поздравляем!  Объект опубликован'),
+                'description' => Yii::t('app', 'Объект прошёл модерацию и доступен для бронирования'),
+                'color' => '#8CC43D',
+                'button_text' => Yii::t('app', 'Снять с публикации'),
+                'html' => '<div>Ваш объект успешно прошёл модерацию и теперь доступен для бронирования!
+                        📌 Советы, как получить больше бронирований:
+                        <li> Добавьте яркие и качественные фото</li>
+                        <li>Проверьте цены — они должны быть конкурентными</li>
+                        <li>Убедитесь, что условия бронирования понятны</li>
+                        </div>'
+            ],
+            self::STATUS_DENIED => [
+                'label' => Yii::t('app', 'Отклонено'),
+                'description' => Yii::t('app', 'Объект не прошёл модерацию. Необходимо внести правки и отправить повторно'),
+                'color' => '#F5222D',
+                'button_text' => Yii::t('app', 'Внести правки'),
+                'title'=>Yii::t('app','Объект отклонён'),
+                'html' => "<div>К сожалению, объект не прошёл модерацию. Проверьте данные и внесите необходимые правки. После этого вы сможете отправить объект на повторную проверку.</div>",
+            ]
+        ];
+        return $arr[$status];
+    }
+
     public function lastIncrement()
     {
         try {
@@ -280,8 +390,8 @@ class Objects extends \yii\db\ActiveRecord
                 'visible' => Yii::$app->user->can('owner') || Yii::$app->user->can('admin'),
                 'options' => [
                     'class' => 'owner-nav-item-object',
-                ],
-            ];
+                ],    
+            ];    
         }
         return $general_arr;
     }

@@ -45,11 +45,11 @@ use yii\widgets\Pjax;
         <div class="status-description">
             <?= $status_arr['description'] ?>
         </div>
+        <div class="save-button moderate-button" style="width:100%"><?= Yii::t('app', 'Модерировать') ?></div>
 
     </div>
 </div>
 <?php Pjax::end(); ?>
-
 
 <?php
 Modal::begin([
@@ -60,9 +60,12 @@ Modal::begin([
 ]); ?>
 
 <div class="dialog-content">
-    <div class="dialog-description"><?= $status_arr['html'] ?></div>
-    <button style="width:100%" data-status="<?= $model->status; ?>"
-        class="save-button"><?= $status_arr['button_text'] ?></button>
+    <div class="dialog-message">
+        Вы проверили все необходимые данные? Опубликуйте объект и он станет доступен для поиска и бронирования. Либо
+        отправьте объект на доработку.
+    </div>
+    <button data-send="<?= Objects::STATUS_DENIED; ?>" data-status="<?= $model->status; ?>" class="save-button">Отправить на доработку</button>
+    <button data-send="<?= Objects::STATUS_PUBLISHED; ?>" class="save-button">Одобрить</button>
 </div>
 
 <?php Modal::end();
@@ -70,7 +73,7 @@ Modal::begin([
 
 <script>
     // Use event delegation for elements that might be reloaded with Pjax
-    $(document).on('click', '.status-block', function () {
+    $(document).on('click', '.moderate-button', function () {
         $('#statusModal').modal('show');
     });
 
@@ -78,43 +81,22 @@ Modal::begin([
 
     $(document).on('click', '.save-button', function () {
         if (!$(this).hasClass('dismiss')) {
-            var data_status = parseInt($(this).attr('data-status'));
-            var status_not_published = "<?= Objects::STATUS_NOT_PUBLISHED ?>";
-            var action = "<?= Yii::$app->urlManager->createUrl('/owner/object/change-status') ?>";
-            if (data_status == "<?= Objects::STATUS_NOT_PUBLISHED ?>") {
-                var docs = "<?= Objects::statusCondition($model->id, $model->status)['docs'] ?>";
-                var room = "<?= Objects::statusCondition($model->id, $model->status)['room'] ?>";
-                var tariff = "<?= Objects::statusCondition($model->id, $model->status)['tariff'] ?>";
-
-                if (docs == 0) {
-                    window.location.href = '<?= Yii::$app->urlManager->createUrl("/owner/object/update?object_id=$model->id") ?>';
-                }
-                if (room == 0) {
-                    window.location.href = '<?= Yii::$app->urlManager->createUrl("owner/object/room-list?object_id=$model->id") ?>';
-                }
-                if (tariff == 0) {
-                    window.location.href = '<?= Yii::$app->urlManager->createUrl("owner/object/tariff-list?object_id=$model->id") ?>';
-                }
-            }
-            else if (data_status == "<?= Objects::STATUS_READY_FOR_PUBLISH ?>") {
-                $.ajax({
-                    method: "POST",
-                    url: "<?= Yii::$app->urlManager->createUrl('/owner/object/send-to-moderation') ?>",
-                    data: {
-                        object_id: object_id,
-                        _csrf: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (response) {
-                        if (response == "true") {
-                            // Update modal content
-                            $('.dialog-title').text("<?= Objects::statusData(Objects::STATUS_ON_MODERATION)['label'] ?>");
-                            $('.dialog-description').text("<?= Objects::statusData(Objects::STATUS_ON_MODERATION)['description'] ?>");
-                            $('.save-button').text("<?= Objects::statusData(Objects::STATUS_ON_MODERATION)['button_text'] ?>");
-                            $('.save-button').attr('data-dismiss', "modal").addClass('dismiss');
-                        }
+            var data_status = parseInt($(this).attr('data-send'));
+            $.ajax({
+                method: "POST",
+                url: "<?= Yii::$app->urlManager->createUrl('/admin/object/send-to-moderation') ?>",
+                data: {
+                    object_id: object_id,
+                    status: data_status
+                    //_csrf: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response) {
+                        console.log(response);
+                        $('.save-button').attr('data-dismiss', "modal").addClass('dismiss');
                     }
-                });
-            }
+                }
+            });
         }
         else {
             $.pjax.reload({ container: '#moderation-status-block' });

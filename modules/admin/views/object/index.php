@@ -9,7 +9,7 @@ use yii\widgets\Pjax;
 /* @var $searchModel app\models\BusinessAccountBridgeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Заявки на пробный бизнес аккаунт');
+$this->title = Yii::t('app', 'Список объектов');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="business-account-bridge-index">
@@ -20,70 +20,65 @@ $this->params['breadcrumbs'][] = $this->title;
     ?>
     <?php Pjax::begin(['id' => 'event_post']); ?>
     <?= GridView::widget([
-        'summary' => false,
         'dataProvider' => $dataProvider,
-        'filterModel' => $searchModel,
         'columns' => [
             'id',
             [
-                'attribute' => 'user_id',
+                'attribute' => 'name',
+                'format' => 'raw',
                 'value' => function ($model) {
-                    return Html::a($model->user->username, ["/user/{$model->user_id}"]);
+                    if (is_array($model['name'])) {
+                        return implode(', ', $model['name']);
+                    }
+                    return $model['name'];
                 },
-                'format' => 'raw'
             ],
+            'email',
             [
-                'attribute' => 'active_until',
-                'value' => function ($model) {
-                    return date('d.m.Y', strtotime($model->active_until));
-                }
-            ],
-            [
-                'attribute' => 'business_account_id',
-                'value' => function ($model) {
-                    return $model->businessAccount->name;
-                }
-            ],
-            [
-                'attribute' => 'status',
-                'value' => function ($model) {
-                    return $model->statusString;
-                }
-            ],
-
-            [
-                'template' => '{approve}{delete}',
                 'class' => 'yii\grid\ActionColumn',
-                'urlCreator' => function ($action, $model, $key, $index, $column) {
-                    return Url::toRoute(["/post/{$action}", 'id' => $model->id]);
-                },
+                'template' => '{view} {update} {delete}',
                 'buttons' => [
-                    'approve' => function ($url, $model, $key) {     // render your custom button
-                        return Html::tag('span', '', ['class' => 'approve', 'title' => 'Одобрить', 'data-id' => $model->id]);
+                    'view' => function ($url, $model) {
+                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['view', 'id' => $model['id']], [
+                            'title' => Yii::t('app', 'View'),
+                        ]);
+                    },
+                    'update' => function ($url, $model) {
+                        return Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['update', 'id' => $model['id']], [
+                            'title' => Yii::t('app', 'Update'),
+                        ]);
+                    },
+                    'delete' => function ($url, $model) {
+                        return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete', 'id' => $model['id']], [
+                            'title' => Yii::t('app', 'Delete'),
+                            'data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                            'data-method' => 'post',
+                        ]);
                     },
                 ]
             ],
+            'status',
         ],
     ]); ?>
-    <?php Pjax::end(); ?>
+
 
 
 </div>
 
 <script>
-    $('.approve').on('click', function() {
+    $('.approve').on('click', function () {
         var id = $(this).attr('data-id');
         var auth_key = $('.top-profile-link').attr('data-user-id');
         $.ajax({
             method: "POST",
             url: "<?= Yii::$app->urlManager->createUrl('/admin/business-account-bridge/approve') ?>",
-            beforeSend: function(xhr) {
+            beforeSend: function (xhr) {
                 xhr.setRequestHeader('Authorization', "Bearer " + auth_key);
             },
             data: {
                 id: id,
             },
-            success: function(response) {
+            success: function (response) {
                 if (response == "true") {
                     alert("Одобрено");
                     $.pjax.reload({
