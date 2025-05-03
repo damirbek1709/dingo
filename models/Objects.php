@@ -238,7 +238,7 @@ class Objects extends \yii\db\ActiveRecord
 
     public static function statusData($status = self::STATUS_NOT_PUBLISHED)
     {
-        if(!$status || $status = ""){
+        if(!$status || $status == ""){
             $status = self::STATUS_NOT_PUBLISHED;
         }
         $arr = [
