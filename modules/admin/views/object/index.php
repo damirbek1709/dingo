@@ -43,11 +43,7 @@ use yii\widgets\Pjax;
                         [
                             'attribute' => 'type',
                             'value' => function ($model) {
-                                                if (array_key_exists('type', $model)) {
-                                                    return Objects::typeString(1);
-                                                } else {
-                                                    return "Не задано";
-                                                }
+                                                return Objects::typeString($model['type']);
                                             },
                             'label' => Yii::t('app', 'Тип объекта'),
                         ],
@@ -55,13 +51,10 @@ use yii\widgets\Pjax;
                             'attribute' => 'address',
                             'format' => 'raw',
                             'value' => function ($model) {
-                                                if (array_key_exists('address', $model)) {
-                                                    if (is_array($model['address']) && array_key_exists(0, $model['address'])) {
-                                                        return is_array($model['address']) ? $model['address'][0] : $model['address'];
-                                                    }
-                                                } else {
-                                                    return "Не задано";
+                                                if (is_array($model['address'])) {
+                                                    return $model['address'][0];
                                                 }
+                                                return $model['address'];
                                             },
                             'label' => Yii::t('app', 'Адрес'),
                         ],
@@ -69,22 +62,14 @@ use yii\widgets\Pjax;
                         [
                             'attribute' => 'phone',
                             'value' => function ($model) {
-                                                if (array_key_exists('address', $model)) {
-                                                    return $model['phone'];
-                                                } else {
-                                                    return "Не задано";
-                                                }
+                                                return $model['phone'];
                                             },
                             'label' => Yii::t('app', 'Контакты'),
                         ],
                         [
                             'attribute' => 'status',
                             'value' => function ($model) {
-                                                if (array_key_exists('status', $model)) {
-                                                    $status_arr = Objects::statusData($model['status']);
-                                                } else {
-                                                    $status_arr = Objects::statusData(Objects::STATUS_NOT_PUBLISHED);
-                                                }
+                                                $status_arr = Objects::statusData($model['status']);
                                                 $color = $status_arr['color'];
                                                 return "<span style='border: 1px solid;padding: 2px 6px;border-radius: 4px;background-color: #00000003;color:$color;'>" . $status_arr['label'] . "</span>";
                                             },
@@ -102,7 +87,7 @@ use yii\widgets\Pjax;
                             'template' => '{view}',
                             'buttons' => [
                                 'view' => function ($url, $model) {
-                                                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['view', 'object_id' => $model['id']], [
+                                                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['view', 'id' => $model['id']], [
                                                         'title' => Yii::t('app', 'View'),
                                                     ]);
                                                 },
