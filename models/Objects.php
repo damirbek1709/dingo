@@ -352,7 +352,6 @@ class Objects extends \yii\db\ActiveRecord
     public static function objectTypeList()
     {
         return [
-            0 => "",
             self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
             self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
             self::OBJECT_TYPE_RESTBASE => 'База отдыха',
