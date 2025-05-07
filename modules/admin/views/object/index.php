@@ -43,7 +43,11 @@ use yii\widgets\Pjax;
                         [
                             'attribute' => 'type',
                             'value' => function ($model) {
-                                                return Objects::typeString($model['type']);
+                                                if (array_key_exists('type', $model)) {
+                                                    return Objects::typeString($model['type']);
+                                                } else {
+                                                    return "Не задано";
+                                                }
                                             },
                             'label' => Yii::t('app', 'Тип объекта'),
                         ],
@@ -80,34 +84,34 @@ use yii\widgets\Pjax;
                             'label' => Yii::t('app', 'Статус'),
                             'format' => 'raw',
                             'filter' => Html::activeDropDownList(
-                                    new \yii\base\DynamicModel(['status' => Yii::$app->request->get('status')]),
-                                    'status',
-                                    Objects::statusList(),
-                                    ['class' => 'form-control', 'prompt' => 'Все']
-                                ),
+                                new \yii\base\DynamicModel(['status' => Yii::$app->request->get('status')]),
+                                'status',
+                                Objects::statusList(),
+                                ['class' => 'form-control', 'prompt' => 'Все']
+                            ),
                         ],
                         [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{view}',
                             'buttons' => [
-                                    'view' => function ($url, $model) {
-                                                        return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['view', 'object_id' => $model['id']], [
-                                                            'title' => Yii::t('app', 'View'),
-                                                        ]);
-                                                    },
-                                    // 'update' => function ($url, $model) {
-                                    //                 return Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['update', 'id' => $model['id']], [
-                                    //                     'title' => Yii::t('app', 'Update'),
-                                    //                 ]);
-                                    //             },
-                                    // 'delete' => function ($url, $model) {
-                                    //                 return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete', 'id' => $model['id']], [
-                                    //                     'title' => Yii::t('app', 'Delete'),
-                                    //                     'data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                                    //                     'data-method' => 'post',
-                                    //                 ]);
-                                    //             },
-                                ]
+                                'view' => function ($url, $model) {
+                                                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['view', 'object_id' => $model['id']], [
+                                                        'title' => Yii::t('app', 'View'),
+                                                    ]);
+                                                },
+                                // 'update' => function ($url, $model) {
+                                //                 return Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['update', 'id' => $model['id']], [
+                                //                     'title' => Yii::t('app', 'Update'),
+                                //                 ]);
+                                //             },
+                                // 'delete' => function ($url, $model) {
+                                //                 return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete', 'id' => $model['id']], [
+                                //                     'title' => Yii::t('app', 'Delete'),
+                                //                     'data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
+                                //                     'data-method' => 'post',
+                                //                 ]);
+                                //             },
+                            ]
                         ],
 
                     ],
