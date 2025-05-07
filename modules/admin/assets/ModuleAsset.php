@@ -20,7 +20,7 @@ class ModuleAsset extends AssetBundle
     public $sourcePath = '@app/modules/admin/assets';
     public $baseUrl = '@web';
     public $css = [
-        'css/main3.css',
+        'css/main34.css',
         'css/navbar.css',
         'css/room.css',
         'css/dingo.css',
