@@ -44,7 +44,7 @@ use yii\widgets\Pjax;
                             'attribute' => 'type',
                             'value' => function ($model) {
                                                 if (array_key_exists('type', $model)) {
-                                                    return Objects::typeString($model['type']);
+                                                    return Objects::typeString(1);
                                                 } else {
                                                     return "Не задано";
                                                 }
