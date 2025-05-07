@@ -56,7 +56,7 @@ use yii\widgets\Pjax;
                             'format' => 'raw',
                             'value' => function ($model) {
                                                 if (array_key_exists('address', $model)) {
-                                                    return array_key_exists(0,$model['address']) ? $model['address'][0] :$model['address'];
+                                                    return is_array($model['address']) ? $model['address'][0] : $model['address'];
                                                 } else {
                                                     return "Не задано";
                                                 }
