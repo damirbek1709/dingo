@@ -55,10 +55,11 @@ use yii\widgets\Pjax;
                             'attribute' => 'address',
                             'format' => 'raw',
                             'value' => function ($model) {
-                                                if (is_array($model['address'])) {
+                                                if (array_key_exists('address', $model)) {
                                                     return $model['address'][0];
+                                                } else {
+                                                    return "Не задано";
                                                 }
-                                                return $model['address'];
                                             },
                             'label' => Yii::t('app', 'Адрес'),
                         ],
@@ -66,7 +67,11 @@ use yii\widgets\Pjax;
                         [
                             'attribute' => 'phone',
                             'value' => function ($model) {
-                                                return $model['phone'];
+                                                if (array_key_exists('address', $model)) {
+                                                    return $model['phone'];
+                                                } else {
+                                                    return "Не задано";
+                                                }
                                             },
                             'label' => Yii::t('app', 'Контакты'),
                         ],
