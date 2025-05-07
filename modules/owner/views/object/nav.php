@@ -61,8 +61,13 @@ Modal::begin([
 
 <div class="dialog-content">
     <div class="dialog-description"><?= $status_arr['html'] ?></div>
-    <button style="width:100%" data-status="<?= $model->status; ?>"
-        class="save-button"><?= $status_arr['button_text'] ?></button>
+    <?php if ($status_arr['current_status'] != Objects::STATUS_ON_MODERATION): ?>
+        <div class="dialog-button-cover">
+            <button style="width:100%" data-status="<?= $model->status; ?>" class="save-button">
+                <?= $status_arr['button_text'] ?>
+            </button>
+        </div>
+    <?php endif; ?>
 </div>
 
 <?php Modal::end();
@@ -75,50 +80,84 @@ Modal::begin([
     });
 
     var object_id = "<?= $model->id ?>";
+    var html = $('.dialog-content').html();
 
     $(document).on('click', '.save-button', function () {
-        if (!$(this).hasClass('dismiss')) {
-            var data_status = parseInt($(this).attr('data-status'));
-            var status_not_published = "<?= Objects::STATUS_NOT_PUBLISHED ?>";
-            var action = "<?= Yii::$app->urlManager->createUrl('/owner/object/change-status') ?>";
-            if (data_status == "<?= Objects::STATUS_NOT_PUBLISHED ?>") {
-                var docs = "<?= Objects::statusCondition($model->id, $model->status)['docs'] ?>";
-                var room = "<?= Objects::statusCondition($model->id, $model->status)['room'] ?>";
-                var tariff = "<?= Objects::statusCondition($model->id, $model->status)['tariff'] ?>";
+        var data_status = parseInt($(this).attr('data-status'));
+        var switcher = false;
+        var status_not_published = "<?= Objects::STATUS_NOT_PUBLISHED ?>";
+        var action = "<?= Yii::$app->urlManager->createUrl('/owner/object/change-status') ?>";
+        if (data_status == "<?= Objects::STATUS_NOT_PUBLISHED ?>") {
+            var docs = "<?= Objects::statusCondition($model->id, $model->status)['docs'] ?>";
+            var room = "<?= Objects::statusCondition($model->id, $model->status)['room'] ?>";
+            var tariff = "<?= Objects::statusCondition($model->id, $model->status)['tariff'] ?>";
 
-                if (docs == 0) {
-                    window.location.href = '<?= Yii::$app->urlManager->createUrl("/owner/object/update?object_id=$model->id") ?>';
-                }
-                if (room == 0) {
-                    window.location.href = '<?= Yii::$app->urlManager->createUrl("owner/object/room-list?object_id=$model->id") ?>';
-                }
-                if (tariff == 0) {
-                    window.location.href = '<?= Yii::$app->urlManager->createUrl("owner/object/tariff-list?object_id=$model->id") ?>';
-                }
+            if (docs == 0) {
+                window.location.href = '<?= Yii::$app->urlManager->createUrl("/owner/object/update?object_id=$model->id") ?>';
             }
-            else if (data_status == "<?= Objects::STATUS_READY_FOR_PUBLISH ?>") {
-                $.ajax({
-                    method: "POST",
-                    url: "<?= Yii::$app->urlManager->createUrl('/owner/object/send-to-moderation') ?>",
-                    data: {
-                        object_id: object_id,
-                        _csrf: $('meta[name="csrf-token"]').attr('content')
-                    },
-                    success: function (response) {
-                        if (response == "true") {
-                            // Update modal content
-                            $('.dialog-title').text("<?= Objects::statusData(Objects::STATUS_ON_MODERATION)['label'] ?>");
-                            $('.dialog-description').text("<?= Objects::statusData(Objects::STATUS_ON_MODERATION)['description'] ?>");
-                            $('.save-button').text("<?= Objects::statusData(Objects::STATUS_ON_MODERATION)['button_text'] ?>");
-                            $('.save-button').attr('data-dismiss', "modal").addClass('dismiss');
-                        }
+            if (room == 0) {
+                window.location.href = '<?= Yii::$app->urlManager->createUrl("owner/object/room-list?object_id=$model->id") ?>';
+            }
+            if (tariff == 0) {
+                window.location.href = '<?= Yii::$app->urlManager->createUrl("owner/object/tariff-list?object_id=$model->id") ?>';
+            }
+        }
+        else if (data_status == "<?= Objects::STATUS_READY_FOR_PUBLISH ?>") {
+            $.ajax({
+                method: "POST",
+                url: "<?= Yii::$app->urlManager->createUrl('/owner/object/send-to-moderation') ?>",
+                data: {
+                    object_id: object_id,
+                    _csrf: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function (response) {
+                    if (response == "true") {
+                        // Update modal content
+                        $('.dialog-title').text("<?= Objects::statusData(Objects::STATUS_ON_MODERATION)['label'] ?>");
+                        $('.dialog-description').text("<?= Objects::statusData(Objects::STATUS_ON_MODERATION)['description'] ?>");
+                        $('.save-button').text("<?= Objects::statusData(Objects::STATUS_ON_MODERATION)['button_text'] ?>").addClass('cancel-button');;
                     }
-                });
+                }
+            });
+        }
+
+        else if (data_status == "<?= Objects::STATUS_PUBLISHED; ?>") {
+            $('.dialog-title').text("<?= Yii::t('app', 'Снятие с публикации') ?>");
+            $('.dialog-description').text("<?= Yii::t('app', 'Ваше объявление снимится с публикации и не будет отображаться на сайте Dingo до момента, когда решите возобновить прием гостей.') ?>");
+            $('.dialog-button-cover').html('<div class="row"><div class="col-md-6"><button style="width:100%" data-status="<?= Objects::STATUS_PUBLISHED; ?>" class="save-button moderate-button-white cancel-button">Отмена</button></div><div class="col-md-6"><button style="width:100%" data-status="<?= Objects::STATUS_PUBLISHED; ?>" class="save-button unpublish-button">Снять с публикации</button></div></div>');
+            switcher = true;
+        }
+    });
+
+    $(document).on('click', '.unpublish-button', function () {
+        $.ajax({
+            method: "POST",
+            url: "<?php echo Yii::$app->urlManager->createUrl('/owner/object/unpublish') ?>",
+            data: {
+                object_id: object_id,
+                _csrf: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response == "true") {
+                    // Update modal content
+                    $('.dialog-title').text("<?php echo Objects::statusData(Objects::STATUS_NOT_PUBLISHED)['label'] ?>");
+                    $('.dialog-description').text("<?php echo Objects::statusData(Objects::STATUS_NOT_PUBLISHED)['description'] ?>");
+                    $.pjax.reload({ container: '#moderation-status-block' });
+                    $('#statusModal').modal('hide');
+                }
             }
-        }
-        else {
-            $.pjax.reload({ container: '#moderation-status-block' });
-        }
+        });
+    });
+
+
+
+    $(document).on('click', '.cancel-button', function () {
+        $('#statusModal').modal('hide');
+    });
+
+    $('#statusModal').on('hide.bs.modal', function (e) {
+        $('.dialog-content').html(html);
+        $.pjax.reload({ container: '#moderation-status-block' });
     });
 
     // Re-initialize event handlers after pjax content is loaded

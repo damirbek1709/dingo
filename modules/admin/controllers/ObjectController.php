@@ -16,7 +16,8 @@ use yii\web\Response;
 /**
  * BusinessAccountBridgeController implements the CRUD actions for BusinessAccountBridge model.
  */
-class ObjectController extends Controller{
+class ObjectController extends Controller
+{
     public function behaviors()
     {
         $behaviors = parent::behaviors();
@@ -26,7 +27,7 @@ class ObjectController extends Controller{
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['index', 'view', 'update', 'create', 'bind-tariff','bind-room','send-to-moderation'],
+                    'actions' => ['index', 'view', 'update', 'create', 'bind-tariff', 'bind-room', 'send-to-moderation'],
                     'roles' => ['admin'],
                 ],
             ]
@@ -38,29 +39,36 @@ class ObjectController extends Controller{
 
     public function actionIndex()
     {
-        $filter_string = "";
+        $statusFilter = Yii::$app->request->get('status');
         $client = Yii::$app->meili->connect();
         $res = $client->index('object')->search('', [
-            'filter' => [
-                $filter_string
-            ],
             'limit' => 10000
         ]);
 
+        $hits = $res->getHits();
+
+        // Manual filtering
+        if (!empty($statusFilter)) {
+            $hits = array_filter($hits, function ($hit) use ($statusFilter) {
+                return $hit['status'] == $statusFilter;
+            });
+        }
+
         $dataProvider = new ArrayDataProvider([
-            'allModels' => $res->getHits(),
+            'allModels' => $hits,
             'pagination' => [
-                'pageSize' => 12, // Adjust page size as needed
+                'pageSize' => 20,
             ],
-            // 'sort' => [
-            //     'attributes' => ['id', 'name', 'email'], // Sortable attributes
-            // ],
+            'sort' => [
+                'attributes' => ['name', 'type', 'address', 'email', 'phone', 'status'],
+            ],
         ]);
 
         return $this->render('index', [
-            'dataProvider' => $dataProvider
+            'dataProvider' => $dataProvider,
         ]);
     }
+
 
     public function actionView($object_id)
     {
@@ -86,20 +94,27 @@ class ObjectController extends Controller{
         ]);
     }
 
-    public function actionSendToModeration(){
+    public function actionSendToModeration()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $id = Yii::$app->request->post('object_id');
         $status = Yii::$app->request->post('status');
+        $reason = Yii::$app->request->post('message');
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $object = $index->getDocument($id);
-       
-        if($index->updateDocuments([
-            'id' => $id,
-            'status' => $status
-        ])){
+
+        if (
+            $index->updateDocuments([
+                'id' => (int) $id,
+                'status' => (int) $status,
+                'deny_reason' => $reason
+            ])
+        ) {
             return Objects::statusData($status);
         }
         return false;
     }
+
+
 }

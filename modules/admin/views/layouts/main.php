@@ -8,8 +8,9 @@ use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
-use app\modules\admin\assets\ModuleAsset;
 use yii\helpers\Url;
+use app\models\Objects;
+use app\modules\owner\assets\ModuleAsset;
 
 ModuleAsset::register($this);
 ?>
@@ -31,6 +32,7 @@ ModuleAsset::register($this);
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
         rel="stylesheet">
+
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
@@ -40,36 +42,49 @@ ModuleAsset::register($this);
 
     <div class="wrap">
         <?php
+
+        $object_arr = Objects::objectList();
+        $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->username, 0, 1) : '';
+
         NavBar::begin([
-            'brandLabel' => Yii::$app->getModule('admin')->name,
-            'brandUrl' => ['/admin/default/index'],
+            'brandLabel' => Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']),
+            'brandUrl' => ['/owner/default/index'],
             'options' => [
-                'class' => 'navbar-default navbar-inverse navbar-fixed-top',
+                'class' => 'navbar-default navbar-inverse navbar-fixed-top navbar-owner',
             ],
             'innerContainerOptions' => ['class' => 'container-fluid'],
         ]);
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => [
-                ['label' => 'Категории номеров', 'url' => ['/admin/room-type'], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => 'Пользователи', 'url' => ['/admin/user'], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => 'Области', 'url' => ['/admin/oblast'], 'visible' => Yii::$app->user->can('admin')],
-                ['label' => !Yii::$app->user->isGuest ? Yii::$app->user->identity->username : '', 'items' => [
-                    ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can('moderator')],
-                    ['label' => 'Панель хоста', 'url' => ['/owner'], 'visible' => Yii::$app->user->can('owner')],
-                    ['label' => 'Аккаунт', 'url' => ['/user/settings/account'], 'visible' => !Yii::$app->user->isGuest],
-                    [
-                        'label' => 'Выход',
-                        'url' => ['/user/logout'],
-                        'linkOptions' => ['data-method' => 'post']
+                
+                [
+                    'label' => $user_string,
+                    'options' => [
+                        'class' => 'user-link-class'
                     ],
-                ], 'visible' => !Yii::$app->user->isGuest],
+                    'items' => [
+                       ['label' => 'Панель управления', 'url' => ['/admin'], 'visible' => Yii::$app->user->can('admin')],
+                        [
+                            'label' => 'Аккаунт',
+                            'url' => ['/user/settings/account'],
+                            'visible' => !Yii::$app->user->isGuest,
+
+                        ],
+                        [
+                            'label' => 'Выход',
+                            'url' => ['/user/logout'],
+                            'linkOptions' => ['data-method' => 'post']
+                        ],
+                    ],
+                    'visible' => !Yii::$app->user->isGuest
+                ],
             ],
         ]);
         NavBar::end();
         ?>
 
-        <div class="container-fluid">
+        <div class="container-fluid gray-content">
             <div style="padding-top: 70px;">
                 <?= Breadcrumbs::widget([
                     'links' => isset($this->params['breadcrumbs']) && Yii::$app->controller->route !== 'user/security/login' ? $this->params['breadcrumbs'] : [],
@@ -82,7 +97,7 @@ ModuleAsset::register($this);
 
     <footer class="footer">
         <div class="container-fluid">
-            <p class="pull-left">&copy; Selva <?= date('Y') ?></p>
+            <p class="pull-left">&copy; dingo.kg <?= date('Y') ?></p>
         </div>
     </footer>
 

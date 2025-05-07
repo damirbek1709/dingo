@@ -64,15 +64,16 @@ Modal::begin([
         Вы проверили все необходимые данные? Опубликуйте объект и он станет доступен для поиска и бронирования. Либо
         отправьте объект на доработку.
     </div>
-    <div class="row">
+    <div class="row action-buttons">
         <div class="col-md-6">
-            <button data-send="<?= Objects::STATUS_DENIED; ?>" data-status="<?= $model->status; ?>" style="width:100%;font-size:14px"
-                class="save-button moderate-button moderate-button-white">Отправить на доработку</button>
+            <button data-send="<?= Objects::STATUS_DENIED; ?>" data-status="<?= $model->status; ?>"
+                style="width:100%;font-size:14px" class="save-button moderate-button moderate-button-white">Отправить на
+                доработку</button>
         </div>
 
         <div class="col-md-6">
             <button style="width:100%;font-size:14px" data-send="<?= Objects::STATUS_PUBLISHED; ?>"
-                class="save-button moderate-button">Одобрить</button>
+                class="save-button moderate-button"><?=Yii::t('app', 'Одобрить')?></button>
         </div>
     </div>
 </div>
@@ -87,32 +88,93 @@ Modal::begin([
     });
 
     var object_id = "<?= $model->id ?>";
+    var html = $('.dialog-content').html();
 
     $(document).on('click', '.moderate-button', function () {
         if (!$(this).hasClass('dismiss')) {
+            var html = $('.dialog-content').html();
             var data_status = parseInt($(this).attr('data-send'));
-            $.ajax({
-                method: "POST",
-                url: "<?= Yii::$app->urlManager->createUrl('/admin/object/send-to-moderation') ?>",
-                data: {
-                    object_id: object_id,
-                    status: data_status
-                    //_csrf: $('meta[name="csrf-token"]').attr('content')
-                },
-                success: function (response) {
-                    if (response) {
-                        console.log(response);
-                        $('.dialog-title').text(response.title);
-                        $('.dialog-message').text(response.description);
-                        $('.save-button').attr('data-dismiss', "modal").addClass('dismiss');
+            if (data_status == "<?php echo Objects::STATUS_DENIED ?>") {
+                $('.dialog-content').html('<div class="dialog-message"><?= Yii::t('app', 'Напишите причину отклонения модерации администратору объекта. Укажите какой информации не хватает для одобрения.') ?>' +
+                    '<h3 class="minor_title"><?= Yii::t('app', 'Сообщение хосту (администратору объекта)') ?></h3>' +
+                    '<textarea type="text" class="deny_reason form-group" rows="6" id="moderation-reason" placeholder="Введите ваше сообщение"></textarea>' +
+                    '</div><div class= "row"><div class="col-md-6">' +
+                    '<button style="width:100%;font-size:14px" class="save-button cancel-button moderate-button-white" data-dismiss="modal"><?= Yii::t('app', 'Отменить') ?></button></div>' +
+                    '<div class="col-md-6"><button style="width:100%;font-size:14px" data-send="3" class="save-button send-for-revision"><?= Yii::t('app', 'Отправить на доработку') ?></button></div></div>');
+
+                var reason = $('.deny_reason').text();
+
+                $(document).on('click', '.send-for-revision', function () {
+                    const message = $('#moderation-reason').val().trim();
+
+                    if (!message) {
+                        alert('Пожалуйста, введите сообщение для администратора.');
+                        return;
                     }
-                }
-            });
+
+                    $.ajax({
+                        url: "<?= Yii::$app->urlManager->createUrl('/admin/object/send-to-moderation') ?>",  // Replace with your actual URL
+                        type: 'POST',
+                        data: {
+                            object_id: <?= $model->id ?>,       // Assuming you're passing model ID
+                            message: message,
+                            status: data_status
+                        },
+                        success: function (response) {
+                            $('.dialog-title').text('Вы отклонили запрос на публикацию объекта');
+                            $('.dialog-content').html('<div class="dialog-message"><?= Yii::t('app', 'Напишите причину отклонения модерации администратору объекта. Укажите какой информации не хватает для одобрения.') ?>' +
+                                '<h3 class="minor_title"><?= Yii::t('app', 'Сообщение хосту (администратору объекта)') ?></h3>' +
+                                '<div class="">' + message + '</div>' +
+                                '<div class= "row"><div class="col-md-6">' +
+                                '<button style="width:100%;font-size:14px" class="save-button cancel-button moderate-button-white" data-dismiss="modal"><?= Yii::t('app', 'Закрыть') ?></button></div></div>');
+                            
+
+                        },
+                        error: function () {
+                            alert('Произошла ошибка при отправке. Попробуйте еще раз.');
+                        }
+                    });
+                });
+
+            }
+            else {
+                $.ajax({
+                    method: "POST",
+                    url: "<?= Yii::$app->urlManager->createUrl('/admin/object/send-to-moderation') ?>",
+                    data: {
+                        object_id: object_id,
+                        status: data_status
+                        //_csrf: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (response) {
+                        if (response) {
+
+                            console.log(response);
+                            $('.dialog-title').text("<?=Yii::t('app','Объект опубликован')?>");
+                            $('.dialog-message').text(response.description);
+                            $('.save-button').attr('data-dismiss', "modal").addClass('cancel-button');
+                            $('.action-buttons').css('display','none');
+
+                        }
+                    }
+                });
+            }
         }
         else {
             $.pjax.reload({ container: '#moderation-status-block' });
         }
     });
+
+    $(document).on('click', '.cancel-button', function () {
+        $('#statusModal').modal('hide');
+    });
+
+    $('#statusModal').on('hide.bs.modal', function (e) {
+        $('.dialog-content').html(html);
+        $.pjax.reload({ container: '#moderation-status-block' });
+    });
+
+
 
     // Re-initialize event handlers after pjax content is loaded
     $(document).on('pjax:complete', function () {

@@ -110,7 +110,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['index', 'create', 'add-tariff', 'prices', 'remove-object-image', 'remove-file','send-to-moderation'],
+                    'actions' => ['index', 'create', 'add-tariff', 'prices', 'remove-object-image', 'remove-file', 'send-to-moderation', 'unpublish'],
                     'roles' => ['admin', 'owner'],
                 ],
             ],
@@ -561,7 +561,7 @@ class ObjectController extends Controller
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
                     'general_room_count' => $model->general_room_count,
-                    'status'=>$status
+                    'status' => $status
                 ];
 
                 $index->updateDocuments($object_arr);
@@ -686,19 +686,41 @@ class ObjectController extends Controller
         ]);
     }
 
-    public function actionSendToModeration(){
+    public function actionSendToModeration()
+    {
         Yii::$app->response->format = Response::FORMAT_JSON;
         $id = Yii::$app->request->post('object_id');
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $object = $index->getDocument($id);
-       
-        if($index->updateDocuments([
-            'id' => $id,
-            'status' => Objects::STATUS_ON_MODERATION,
-        ])){
+
+        if (
+            $index->updateDocuments([
+                'id' => (int)$id,
+                'status' => Objects::STATUS_ON_MODERATION,
+            ])
+        ) {
             return "true";
         }
+    }
+
+    public function actionUnpublish()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $id = Yii::$app->request->post('object_id');
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($id);
+
+        if (
+            $index->updateDocuments([
+                'id' => (int)$id,
+                'status' => Objects::STATUS_READY_FOR_PUBLISH,
+            ])
+        ) {
+            return "true";
+        }
+        return false;
     }
 
     public function actionAddRoom($object_id)
