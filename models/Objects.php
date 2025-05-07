@@ -366,7 +366,7 @@ class Objects extends \yii\db\ActiveRecord
 
     }
 
-    public static function typeString($id){
+    public static function typeString($id = 1){
         $arr = [
             self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
             self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
