@@ -86,10 +86,10 @@ class Booking extends \yii\db\ActiveRecord
 
     public static function pay($data)
     {
-        $booking = Booking::findOne($data['id']);
+        $booking = Booking::findOne($data['booking_id']);
         $booking->transaction_number = $data['transaction_number'];
         $booking->save(false);
-        
+
         $payment = new Payment(self::MERCHANT_ID);
         $payment->setPaymentAmount($data['sum'])->setPaymentCurrency($data['currency']);
         $payment->setPaymentId($data['transaction_number']);
