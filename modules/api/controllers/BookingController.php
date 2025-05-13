@@ -332,7 +332,7 @@ class BookingController extends BaseController
                 'booking_id' => $model->id,
                 'currency' => $currency,
                 'user_id' => Yii::$app->user->id,
-                'transaction_number' => (int) $model->id + 10000000000
+                'transaction_number' => (int) $model->id + 1000000
             ];
             $response['success'] = true;
             $response['message'] = 'Booking added successfully';

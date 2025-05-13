@@ -93,7 +93,7 @@ class Booking extends \yii\db\ActiveRecord
         $payment = new Payment(self::MERCHANT_ID);
         $payment->setPaymentAmount($data['sum'])->setPaymentCurrency($data['currency']);
         $payment->setPaymentId($data['transaction_number']);
-        $payment->setCustomerId($data['user_id']);
+        $payment->setCustomerId("customer_".$data['user_id']);
         $payment->setPaymentDescription('Тестовый платёж');
         $gate = new Gate(self::SECRET_KEY);
         $url = $gate->getPurchasePaymentPageUrl($payment);
