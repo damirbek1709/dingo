@@ -362,7 +362,7 @@ class BookingController extends BaseController
         // Your business logic here...
 
         // Return a response
-        return $this->asJson(['status' => 'success']);
+        return "OK";
     }
 
 }
