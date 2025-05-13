@@ -339,30 +339,26 @@ class BookingController extends BaseController
 
     public function actionWebhook()
     {
-        // Получить "сырой" JSON-текст из тела POST-запроса
-        $data = file_get_contents('php://input');
+        // Get raw POST data
+        $rawPostData = Yii::$app->request->getRawBody();
 
-        $filePath = Yii::getAlias('@app/modules/api/controllers/flash_pay.txt');
+        // Parse JSON
+        $jsonData = json_decode($rawPostData, true);
 
-        // Записываем данные в файл
-        file_put_contents(
-            $filePath,
-            date('Y-m-d H:i:s') . " — RAW: " . $data . PHP_EOL,
-            FILE_APPEND
-        );
+        // Check if JSON was valid
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            Yii::error('Invalid JSON received: ' . $rawPostData, 'webhook');
+            return $this->asJson(['status' => 'error', 'message' => 'Invalid JSON']);
+        }
 
-        // Инициализация Gate
-        $gate = new Gate(FlashPay::SECRET_KEY);
+        // Log the data
+        Yii::info('Webhook data received: ' . print_r($jsonData, true), 'webhook');
 
-        // Парсинг JSON-оповещения
-        $callback = $gate->handleCallback($data);
+        // Process the webhook data
+        // Your business logic here...
 
-
-        // Сделай свою бизнес-логику — обнови заказ, логируй, и т.п.
-        //Yii::info("Webhook received: Order #{$orderId}, Status: {$status}, Amount: {$amount}");
-
-        // Ответ 200 OK (обязательно)
-        return 'OK';
+        // Return a response
+        return $this->asJson(['status' => 'success']);
     }
 
 }

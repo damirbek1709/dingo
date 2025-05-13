@@ -91,7 +91,7 @@ class Booking extends \yii\db\ActiveRecord
         $payment->setPaymentAmount(31415)->setPaymentCurrency('KGS');
         // Сумма (в дробных единицах валюты) и код валюты (в формате ISO-4217 alpha-3)
 
-        $payment->setPaymentId('6756539435672324');
+        $payment->setPaymentId('998877664433');
         // Идентификатор платежа, уникальный в рамках проекта
 
         $payment->setCustomerId('customer_' . Yii::$app->user->id);
