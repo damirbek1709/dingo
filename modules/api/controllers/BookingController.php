@@ -342,8 +342,11 @@ class BookingController extends BaseController
         // Получить "сырой" JSON-текст из тела POST-запроса
         $data = file_get_contents('php://input');
 
+        $filePath = Yii::getAlias('@app/modules/api/controllers/flash_pay.txt');
+
+        // Записываем данные в файл
         file_put_contents(
-            Yii::getAlias('@app/runtime/logs/flashpay_webhook.log'),
+            $filePath,
             date('Y-m-d H:i:s') . " — RAW: " . $data . PHP_EOL,
             FILE_APPEND
         );
