@@ -351,6 +351,10 @@ class BookingController extends BaseController
             return $this->asJson(['status' => 'error', 'message' => 'Invalid JSON']);
         }
 
+        // Add this to your webhook action
+        $logFile = Yii::getAlias('@app/runtime/logs/webhook.log');
+        file_put_contents($logFile, date('[Y-m-d H:i:s] ') . print_r($jsonData, true) . PHP_EOL, FILE_APPEND);
+
         // Log the data
         Yii::info('Webhook data received: ' . print_r($jsonData, true), 'webhook');
 
