@@ -64,7 +64,7 @@ class BookingController extends BaseController
 
                 [
                     'allow' => true,
-                    'actions' => ['list', 'view', 'list2', 'search','webhook'],
+                    'actions' => ['list', 'view', 'list2', 'search', 'webhook'],
                     'roles' => ['@', '?', 'admin', 'owner'],
                 ],
                 [
@@ -320,18 +320,25 @@ class BookingController extends BaseController
         $model->other_guests = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'other_guests');
         $model->status = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'status');
         $model->user_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'user_id');
-        $model->transaction_number = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'transaction_number');
         $model->special_comment = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'special_comment');
         $model->cancellation_type = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_type');
         $model->cancellation_penalty_sum = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_penalty_sum');
-        $model->status = 1;
+        $model->status = Booking::PAID_STATUS_NOT_PAID;
+        $currency = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'currency');
+
         if ($model->save()) {
+            $arr = [
+                'sum' => $model->sum,
+                'booking_id' => $model->id,
+                'curency' => $currency,
+                'user_id' => Yii::$app->user->id,
+                'transaction_number' => (int) $model->id + 10000000000
+            ];
             $response['success'] = true;
             $response['message'] = 'Booking added successfully';
-            $response['url'] = Booking::pay();
+            $response['url'] = Booking::pay($arr);
         } else {
             $response['message'] = $model->errors;
-            $response['url'] = Booking::pay();
         }
 
         return $response;
@@ -339,29 +346,24 @@ class BookingController extends BaseController
 
     public function actionWebhook()
     {
-        // Get raw POST data
         $rawPostData = Yii::$app->request->getRawBody();
-
-        // Parse JSON
         $jsonData = json_decode($rawPostData, true);
-
-        // Check if JSON was valid
         if (json_last_error() !== JSON_ERROR_NONE) {
             Yii::error('Invalid JSON received: ' . $rawPostData, 'webhook');
             return $this->asJson(['status' => 'error', 'message' => 'Invalid JSON']);
         }
 
-        // Add this to your webhook action
         $logFile = Yii::getAlias('@app/runtime/logs/webhook.log');
         file_put_contents($logFile, date('[Y-m-d H:i:s] ') . print_r($jsonData, true) . PHP_EOL, FILE_APPEND);
 
-        // Log the data
+        $status = $jsonData['payment']['status'];
+        if ($status == 'success') {
+            $booking = Booking::find()->where(['transaction_number' => $jsonData['payment']['id']])->one();
+            $booking->status = Booking::PAID_STATUS_PAID;
+            $booking->save(false);
+        }
         Yii::info('Webhook data received: ' . print_r($jsonData, true), 'webhook');
 
-        // Process the webhook data
-        // Your business logic here...
-
-        // Return a response
         return "OK";
     }
 

@@ -32,6 +32,8 @@ class Booking extends \yii\db\ActiveRecord
     const MERCHANT_ID = '144631';
     const SECRET_KEY = '0bf1531b6df88949c9dd24115d6affc67fa04005bc4105f65ac373edbc89a42ab51943838f4552777f3b1d08278d7df144280edc80cd4613d38d4e2256a3601e';
 
+    const PAID_STATUS_NOT_PAID = 0;
+    const PAID_STATUS_PAID = 1;
     /**
      * {@inheritdoc}
      */
@@ -82,28 +84,18 @@ class Booking extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function pay()
+    public static function pay($data)
     {
-        $currency = 'KGS';
+        $booking = Booking::findOne($data['id']);
+        $booking->transaction_number = $data['transaction_number'];
+        $booking->save(false);
+        
         $payment = new Payment(self::MERCHANT_ID);
-        // Идентификатор проекта, полученный от Flashpay при интеграции
-
-        $payment->setPaymentAmount(31415)->setPaymentCurrency('KGS');
-        // Сумма (в дробных единицах валюты) и код валюты (в формате ISO-4217 alpha-3)
-
-        $payment->setPaymentId('88998877664400');
-        // Идентификатор платежа, уникальный в рамках проекта
-
-        $payment->setCustomerId('customer_' . Yii::$app->user->id);
-        // Идентификатор пользователя в рамках проекта
-
+        $payment->setPaymentAmount($data['sum'])->setPaymentCurrency($data['currency']);
+        $payment->setPaymentId($data['transaction_number']);
+        $payment->setCustomerId($data['user_id']);
         $payment->setPaymentDescription('Тестовый платёж');
-        // Описание платежа. Не обязательный, но полезный параметр
-
         $gate = new Gate(self::SECRET_KEY);
-        // Секретный ключ проекта, полученный от Flashpay
-
-        /* Получение URL для вызова платёжной формы */
         $url = $gate->getPurchasePaymentPageUrl($payment);
         return $url;
     }
