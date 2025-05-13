@@ -330,7 +330,7 @@ class BookingController extends BaseController
             $arr = [
                 'sum' => $model->sum,
                 'booking_id' => $model->id,
-                'curency' => $currency,
+                'currency' => $currency,
                 'user_id' => Yii::$app->user->id,
                 'transaction_number' => (int) $model->id + 10000000000
             ];
