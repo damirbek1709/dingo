@@ -1,0 +1,78 @@
+<?php
+
+namespace app\models;
+
+use Yii;
+
+/**
+ * This is the model class for table "booking".
+ *
+ * @property int $id
+ * @property int $object_id
+ * @property int $room_id
+ * @property string $tariff_id
+ * @property float $sum
+ * @property string|null $guest_email
+ * @property string|null $guest_phone
+ * @property string|null $guest_name
+ * @property string|null $speacial_comment
+ * @property string $date_from
+ * @property string $date_to
+ * @property int $status
+ * @property string|null $other_guests
+ * @property string|null $transaction_number
+ * @property int|null $cancellation_type
+ * @property float|null $cancellation_penalty_sum
+ */
+class Booking extends \yii\db\ActiveRecord
+{
+    /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'booking';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rules()
+    {
+        return [
+            [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status'], 'required'],
+            [['object_id', 'room_id', 'status', 'cancellation_type'], 'integer'],
+            [['status'], 'default', 'value' => 1],
+            [['sum', 'cancellation_penalty_sum'], 'number'],
+            [['date_from', 'date_to'], 'safe'],
+            [['tariff_id'], 'string', 'max' => 11],
+            [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number'], 'string', 'max' => 255],
+            [['other_guests'], 'string', 'max' => 500],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => Yii::t('app', 'ID'),
+            'object_id' => Yii::t('app', 'Object ID'),
+            'room_id' => Yii::t('app', 'Room ID'),
+            'tariff_id' => Yii::t('app', 'Tariff ID'),
+            'sum' => Yii::t('app', 'Sum'),
+            'guest_email' => Yii::t('app', 'Guest Email'),
+            'guest_phone' => Yii::t('app', 'Guest Phone'),
+            'guest_name' => Yii::t('app', 'Guest Name'),
+            'special_comment' => Yii::t('app', 'Special Comment'),
+            'date_from' => Yii::t('app', 'Date From'),
+            'date_to' => Yii::t('app', 'Date To'),
+            'status' => Yii::t('app', 'Status'),
+            'other_guests' => Yii::t('app', 'Other Guests'),
+            'transaction_number' => Yii::t('app', 'Transaction Number'),
+            'cancellation_type' => Yii::t('app', 'Cancellation Type'),
+            'cancellation_penalty_sum' => Yii::t('app', 'Cancellation Penalty Sum'),
+        ];
+    }
+}

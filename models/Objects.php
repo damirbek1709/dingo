@@ -61,6 +61,7 @@ class Objects extends \yii\db\ActiveRecord
     public $img;
     public $children;
     public $deny_reason;
+    public $guest_amount;
 
     public $status;
     public $ceo_doc;
@@ -121,7 +122,8 @@ class Objects extends \yii\db\ActiveRecord
                     'img',
                     'user_id',
                     'link_id',
-                    'status'
+                    'status',
+                    'guest_amount'
                 ],
                 'safe'
             ],
@@ -288,14 +290,10 @@ class Objects extends \yii\db\ActiveRecord
                 'button_text' => Yii::t('app', 'Снять с публикации'),
                 'current_status'=>self::STATUS_NOT_PUBLISHED,
                 'html' => '<div>Ваш объект успешно прошёл модерацию и теперь доступен для бронирования!
-                        
                         <p class="dialog-paragraph"> 📌 Советы, как получить больше бронирований:</p>
                         <li> - Добавьте яркие и качественные фото</li>
                         <li> - Проверьте цены — они должны быть конкурентными</li>
-                        <li> - Убедитесь, что условия бронирования понятны</li>
-                        
-                        </div>'
-                        
+                        <li> - Убедитесь, что условия бронирования понятны</li></div>'                        
             ],
             self::STATUS_DENIED => [
                 'label' => Yii::t('app', 'Отклонено'),

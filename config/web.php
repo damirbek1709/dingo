@@ -81,6 +81,12 @@ $config = [
             ],
         ],
 
+        'flashPay' => [
+            'class' => 'app\components\FlashPay',
+            'merchantId' => 'YOUR_MERCHANT_ID',
+            'secretKey' => 'YOUR_SECRET_KEY',
+        ],
+
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'efRqaUcSjyACc0wrv4ogfjbZGizExLfh',

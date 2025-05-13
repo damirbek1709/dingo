@@ -3,16 +3,16 @@
 use yii\db\Migration;
 
 /**
- * Class m250408_121503_add_field_link_id
+ * Class m250513_073526_add_field_booking_table
  */
-class m250408_121503_add_field_link_id extends Migration
+class m250513_073526_add_field_booking_table extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        //$this->addColumn('objects', 'link_id', $this->integer()->notNull());
+        $this->addColumn('booking', 'user_id', $this->integer(11)->null());
     }
 
     /**
@@ -20,7 +20,7 @@ class m250408_121503_add_field_link_id extends Migration
      */
     public function safeDown()
     {
-        echo "m250408_121503_add_field_link_id cannot be reverted.\n";
+        echo "m250513_073526_add_field_booking_table cannot be reverted.\n";
 
         return false;
     }
@@ -34,7 +34,7 @@ class m250408_121503_add_field_link_id extends Migration
 
     public function down()
     {
-        echo "m250408_121503_add_field_link_id cannot be reverted.\n";
+        echo "m250513_073526_add_field_booking_table cannot be reverted.\n";
 
         return false;
     }

@@ -6,7 +6,6 @@
  */
 
 namespace app\modules\admin\assets;
-
 use yii\web\AssetBundle;
 
 /**
@@ -20,7 +19,7 @@ class ModuleAsset extends AssetBundle
     public $sourcePath = '@app/modules/admin/assets';
     public $baseUrl = '@web';
     public $css = [
-        //'css/main34.css',
+        'css/main.css',
         'css/navbar.css',
         'css/room.css',
         'css/dingo.css',

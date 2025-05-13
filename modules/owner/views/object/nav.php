@@ -46,6 +46,9 @@ use yii\widgets\Pjax;
             <?= $status_arr['description'] ?>
         </div>
 
+
+
+
     </div>
 </div>
 <?php Pjax::end(); ?>
@@ -61,6 +64,9 @@ Modal::begin([
 
 <div class="dialog-content">
     <div class="dialog-description"><?= $status_arr['html'] ?></div>
+    <?php if ($model->deny_reason) {
+        echo Html::tag('div', "<strong>".Yii::t('app','Причина отклонения: ')."</strong>" . $model->deny_reason, ['class' => 'deny_reason']);
+    } ?>
     <?php if ($status_arr['current_status'] != Objects::STATUS_ON_MODERATION): ?>
         <div class="dialog-button-cover">
             <button style="width:100%" data-status="<?= $model->status; ?>" class="save-button">

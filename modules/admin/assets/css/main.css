@@ -1605,3 +1605,8 @@ vertical-align: middle;
     background-color:transparent;
     border:none;
 }
+.deny_reason{
+    width:100%;
+    border-radius:5px;
+    padding:8px 10px;
+}

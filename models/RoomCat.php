@@ -32,6 +32,7 @@ class RoomCat extends \yii\db\ActiveRecord
     public $comfort;
     public $is_paid;
 
+
     const BED_TYPE_ONE = 1;
     const BED_TYPE_TWO = 2;
     const BED_TYPE_THREE = 3;
@@ -100,7 +101,7 @@ class RoomCat extends \yii\db\ActiveRecord
     {
         return [
             [['similar_room_amount', 'area'], 'required'],
-            [['bed_types'], 'safe'],
+            [['bed_types','guest_amount'], 'safe'],
             [['guest_amount'],'default', 'value'=> 1],
             [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen', 'type_id'], 'integer'],
             [['area', 'base_price', 'title'], 'number'],

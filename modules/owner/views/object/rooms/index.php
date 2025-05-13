@@ -48,7 +48,8 @@ $this->title = Yii::t('app', 'Список номеров');
                     <div class="room-card">
                         <?php echo Html::a(Html::img($bind_model->getImage()->getUrl('120x150'), ['alt' => "Room Image"]), ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?>
                         <div class="room-card-details">
-                            <h3><?= Html::a($val['room_title'],['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?></h3>
+                            <h3><?= Html::a($val['room_title'], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?>
+                            </h3>
                             <div class="room-info">
                                 <span class="room-area">
                                     <span><?= $val['area'] ?> м2</span>
@@ -57,10 +58,11 @@ $this->title = Yii::t('app', 'Список номеров');
                                 <span class="room_guest_amount"><?= $val['guest_amount'] ?>
                                     <?= Yii::t('app', 'взрослых') ?>
                                 </span>
-
-                                <span class="room_bed_type"><?= $val['bed_types'][0]['title'] ?>
-                                    (<?= $val['bed_types'][0]['quantity'] ?>)
-                                </span>
+                                <?php if (array_key_exists('bed_types', $val) && array_key_exists('0', $val['bed_types'])): ?>
+                                    <span class="room_bed_type"><?= $val['bed_types'][0]['title'] ?>
+                                        (<?= $val['bed_types'][0]['quantity'] ?>)
+                                    </span>
+                                <?php endif; ?>
                                 <div class="room-card-options">
                                     <button class="options-btn"></button>
                                     <div class="options-menu">

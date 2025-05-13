@@ -47,26 +47,39 @@ use yii\widgets\ActiveForm;
                             <?php foreach ($model->bedTypes() as $id => [$label, $info]): ?>
                                 <div class="checkbox-group checkbox-grid">
                                     <!-- Checkbox for bed type selection -->
+                                    <?php
+                                    $value = 0;
+                                    $quantity_disabled = "disabled";
+                                    if (isset($model->bed_types[$id])) {
+                                        $value = $model->bed_types[$id]['quantity'];
+                                        $quantity_disabled = false;
+                                    }
+                                    ?>
                                     <?= $form->field($model, "bed_types[{$id}][checked]")->checkbox([
                                         'label' => false,
                                         'value' => 1,
                                         'uncheck' => 0,
                                         'data-id' => $id,
+                                        'class' => 'bed-types-checkbox'
                                     ])->label(false) ?>
                                     <div>
-                                        <?= $label ?>
-                                        <div class="bed-info"><?= $info ?></div>
+                                        <label for="roomcat-bed_types-<?= $id ?>-checked"><?= $label ?></label>
+                                        <div class="bed-info">
+                                            <?= $info ?>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="quantity-input">
+                                <div class="quantity-input <?= $quantity_disabled; ?>" data-id="<?= $id ?>">
                                     <button type="button" class="quantity-btn decrease" data-id="<?= $id ?>">−</button>
 
                                     <?= $form->field($model, "bed_types[{$id}][quantity]")->input('text', [
                                         'min' => 0,
+                                        'disabled' => $quantity_disabled,
                                         'value' => isset($model->bed_types[$id]) ? $model->bed_types[$id]['quantity'] : 0, // Prepopulate the quantity with saved value
                                         'readonly' => !isset($model->bed_types[$id]) || $model->bed_types[$id]['quantity'] == 0, // If quantity is 0 or not set, make it readonly
                                         'class' => 'quantity-display',
+                                        'data-id' => $id,
                                         'id' => "quantity-{$id}", // Unique ID for each input
                                     ])->label(false) ?>
 
@@ -131,6 +144,13 @@ use yii\widgets\ActiveForm;
 
     document.querySelectorAll('.quantity-btn').forEach(button => {
         button.addEventListener('click', function () {
+            // Find the closest parent with class 'quantity-input'
+            const parent = this.closest('.quantity-input');
+
+            // If parent has class 'disabled', do nothing
+            if (parent && parent.classList.contains('disabled')) return;
+
+            // Continue with logic if not disabled
             const id = this.dataset.id;
             const quantityInput = document.querySelector(`#quantity-${id}`);
             let currentValue = parseInt(quantityInput.value) || 0;
@@ -141,10 +161,21 @@ use yii\widgets\ActiveForm;
                 currentValue--;
             }
 
-            quantityInput.value = currentValue; // Update the quantity field
+            quantityInput.value = currentValue;
         });
     });
 
+    $('.bed-types-checkbox').on('change', function () {
+        var id = $(this).attr('data-id');
+        if ($(this).is(':checked')) {
+            $('.quantity-display[data-id=' + id + ']').val(1).attr('disabled', false);
+            $('.quantity-input[data-id=' + id + ']').removeClass('disabled');
+        }
+        else {
+            $('.quantity-display[data-id=' + id + ']').val(0).attr('disabled', 'disabled');
+            $('.quantity-input[data-id=' + id + ']').addClass('disabled');
+        }
+    });
 </script>
 
 <style>

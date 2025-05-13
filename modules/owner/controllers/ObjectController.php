@@ -80,7 +80,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'delete', 'file-upload'],
+                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'delete', 'file-upload', 'room-beds'],
                     'roles' => ['owner', 'admin'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -696,7 +696,7 @@ class ObjectController extends Controller
 
         if (
             $index->updateDocuments([
-                'id' => (int)$id,
+                'id' => (int) $id,
                 'status' => Objects::STATUS_ON_MODERATION,
             ])
         ) {
@@ -714,7 +714,7 @@ class ObjectController extends Controller
 
         if (
             $index->updateDocuments([
-                'id' => (int)$id,
+                'id' => (int) $id,
                 'status' => Objects::STATUS_READY_FOR_PUBLISH,
             ])
         ) {
@@ -733,8 +733,6 @@ class ObjectController extends Controller
         $resultArr = [];
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-
-            // Process bed_types into the required format
             $bedTypes = [];
             if (isset($model->bed_types) && is_array($model->bed_types)) {
                 foreach ($model->bed_types as $key => $val) {
@@ -750,29 +748,11 @@ class ObjectController extends Controller
                 }
             }
 
-            // // Process images if any
-            // $model->images = UploadedFile::getInstances($model, 'images');
-            // if ($model->images) {
-            //     foreach ($model->images as $image) {
-            //         $path = Yii::getAlias('@webroot/uploads/images/') . $image->name;
-            //         $image->saveAs($path);
-            //         $model->attachImage($path, true);
-            //         @unlink($path);
-            //     }
-            // }
+            $room_id = $model->id; // Use the actual model ID directly
 
-            // $img = "";
-            // if ($model->img) {
-            //     $img = $model->getImageById($model->img);
-            // }
-
-            // Generate the room data array for Meilisearch
-            $room_id = RoomCat::find()->orderBy(['id' => SORT_DESC])->one()->id;
             $meiliRooms = [];
-
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 $meiliRooms = $object['rooms'];
-                $room_id = $model->id;
             }
 
             $rooms_arr = [
@@ -786,22 +766,21 @@ class ObjectController extends Controller
                 'air_cond' => (int) $model->air_cond,
                 'kitchen' => (int) $model->kitchen,
                 'base_price' => (int) $model->base_price,
-                //'img' => $img,
-                //'images' => count($model->getPictures()) > 0 ? $model->getPictures() : "",
-                'bed_types' => $bedTypes // The processed bed_types in the required format
+                'bed_types' => $bedTypes
             ];
 
             $meiliRooms[] = $rooms_arr;
             $meiliRooms = array_values($meiliRooms);
 
-            // Prepare data for Meilisearch
             $meilisearchData = [
                 'id' => (int) $id,
                 'rooms' => $meiliRooms
             ];
 
-            // Update documents in Meilisearch
             if ($index->updateDocuments($meilisearchData)) {
+                // Save the room data in the session to use it in actionRoom
+                Yii::$app->session->set('new_room_data', $rooms_arr);
+
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->redirect(['room', 'id' => $model->id, 'object_id' => $id]);
             }
@@ -826,17 +805,23 @@ class ObjectController extends Controller
             throw new NotFoundHttpException('Room not found.');
         }
 
-        $rooms = $object['rooms'] ?? []; // Get existing rooms
-        $room = null;
-        foreach ($rooms as &$roomData) {
-            if ($roomData['id'] == $id) {
-                $room = &$roomData;
-                break;
+        $new_room_data = Yii::$app->session->get('new_room_data');
+        if ($new_room_data && $new_room_data['id'] == $id) {
+            $room = $new_room_data;
+            Yii::$app->session->remove('new_room_data');
+        } else {
+            $rooms = $object['rooms'] ?? []; // Get existing rooms
+            $room = null;
+            foreach ($rooms as &$roomData) {
+                if ($roomData['id'] == $id) {
+                    $room = &$roomData;
+                    break;
+                }
             }
-        }
 
-        if (!$room) {
-            throw new NotFoundHttpException('Room not found in Meilisearch.');
+            if (!$room) {
+                throw new NotFoundHttpException('Room not found in Meilisearch.');
+            }
         }
 
         $model = new RoomCat($room);
@@ -857,8 +842,9 @@ class ObjectController extends Controller
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             $bedTypes = [];
             if (isset($model->bed_types) && is_array($model->bed_types)) {
+                //echo "<pre>";print_r($model->bed_types);echo "</pre>";die();
                 foreach ($model->bed_types as $key => $val) {
-                    if ($val['checked']) {
+                    if ($val['checked'] == 1) {
                         $bedTypeDetails = $model->bedTypes(); // Get all bed types
                         $bedTypeTitle = isset($bedTypeDetails[$key]) ? $bedTypeDetails[$key][0] : 'Unknown';
                         $bedTypes[] = [
@@ -877,10 +863,12 @@ class ObjectController extends Controller
             ];
 
             if ($index->updateDocuments($meilisearchData)) {
+                Yii::$app->session->set('new_room_data', $room);
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
             }
         }
+
 
         return $this->render('rooms/beds', [
             'model' => $model,
@@ -1323,15 +1311,38 @@ class ObjectController extends Controller
         $rooms = $object['rooms'] ?? []; // Get existing rooms
         $room = null;
 
-        foreach ($rooms as &$roomData) {
-            if ($roomData['id'] == $id) {
-                $room = &$roomData;
-                break;
+        // Check if this is a new room redirect
+        $new_room_data = Yii::$app->session->get('new_room_data');
+        if ($new_room_data && $new_room_data['id'] == $id) {
+            // Use the data from the session
+            $room = $new_room_data;
+            // Clear the session data to avoid reusing it
+            Yii::$app->session->remove('new_room_data');
+        } else {
+            // Find the room in the Meilisearch data
+            foreach ($rooms as &$roomData) {
+                if ($roomData['id'] == $id) {
+                    $room = &$roomData;
+                    break;
+                }
             }
-        }
 
-        if (!$room) {
-            throw new NotFoundHttpException('Room not found in Meilisearch.');
+            if (!$room) {
+                // If room still not found, try to build it from the database model
+                $room = [
+                    'id' => (int) $bind_model->id,
+                    'room_title' => $bind_model->typeTitle($bind_model->type_id),
+                    'guest_amount' => (int) $bind_model->guest_amount,
+                    'similar_room_amount' => (int) $bind_model->similar_room_amount,
+                    'area' => (int) $bind_model->area,
+                    'bathroom' => (int) $bind_model->bathroom,
+                    'balcony' => (int) $bind_model->balcony,
+                    'air_cond' => (int) $bind_model->air_cond,
+                    'kitchen' => (int) $bind_model->kitchen,
+                    'base_price' => (int) $bind_model->base_price,
+                    'bed_types' => [] // Empty array as we don't have this data
+                ];
+            }
         }
 
         $model = new RoomCat($room);
@@ -1341,6 +1352,7 @@ class ObjectController extends Controller
         // Prepopulate bed_types
         $model->bed_types = [];
         if (isset($room['bed_types']) && is_array($room['bed_types'])) {
+            
             foreach ($room['bed_types'] as $bedType) {
                 $model->bed_types[$bedType['id']] = [
                     'checked' => $bedType['quantity'] > 0 ? 1 : 0,  // Set checked if quantity > 0
@@ -1375,7 +1387,6 @@ class ObjectController extends Controller
                 }
             }
 
-            // Update only the existing room data
             $room['room_title'] = $model->typeTitle($model->type_id);
             $room['guest_amount'] = (int) $model->guest_amount;
             $room['similar_room_amount'] = (int) $model->similar_room_amount;
@@ -1386,16 +1397,32 @@ class ObjectController extends Controller
             $room['kitchen'] = (int) $model->kitchen;
             $room['base_price'] = (int) $model->base_price;
             $room['img'] = $model->img;
-            //$room['images'] = $bind_model->getPictures();
-            $room['bed_types'] = $bedTypes; // The processed bed_types in the required format
+            $room['bed_types'] = $bedTypes;
 
-            // Update the document in Meilisearch
+
+            // Update the room in the rooms array if it exists
+            $roomUpdated = false;
+            foreach ($rooms as &$roomData) {
+                if ($roomData['id'] == $id) {
+                    $roomData = $room;
+                    $roomUpdated = true;
+                    break;
+                }
+            }
+
+            // If the room wasn't in the array, add it
+            if (!$roomUpdated) {
+                $rooms[] = $room;
+            }
+
             $meilisearchData = [
                 'id' => (int) $object_id,
-                'rooms' => $rooms // Preserve all rooms
+                'rooms' => $rooms // Updated rooms array
+
             ];
 
             if ($index->updateDocuments($meilisearchData)) {
+                Yii::$app->session->set('new_room_data', $room);
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
             }
@@ -1469,7 +1496,8 @@ class ObjectController extends Controller
             'object_id' => $object_id,
             'object_title' => $object['name'][0],
             'room_id' => $id,
-            'title' => $model->typeTitle($model->type_id)
+            'title' => $model->typeTitle($model->type_id),
+            'picture_list'=>$model->getImages()
         ]);
     }
 

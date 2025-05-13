@@ -37,10 +37,11 @@ use yii\widgets\ActiveForm;
                 for="guest_amount_id"><?= Yii::t('app', 'Максимальное количество гостей') ?></label>
             <div class="increment-input" style="margin-top: 0;">
                 <button type="button" class="decrement decrease">-</button>
-                <?= Html::input('text', 'children', $model->guest_amount ? $model->guest_amount : 0, [
+                <?= Html::input('text', 'RoomCat[guest_amount]', $model->guest_amount ? $model->guest_amount : 1, [
                     'class' => 'form-control children-count',
                     'readonly' => true,
-                    'label' => 'Количество гостей'
+                    'label' => 'Количество гостей',
+                    //'name'=>'RoomCat[guest_amount]'
                 ]); ?>
                 <button type="button" class="increment increase">+</button>
             </div>
@@ -50,52 +51,6 @@ use yii\widgets\ActiveForm;
         <?php //= $form->field($model, 'guest_amount')->textInput() ?>
         <div class="terms_section">
             <?= $form->field($model, 'similar_room_amount')->textInput() ?>
-        </div>
-
-        <div class="form-section form-group">
-            <div class="bed-type-row bed-types-grid">
-                <div>
-                    <label class="form-label"><?= Yii::t('app', 'Тип кровати') ?>
-                        <span class="required_star">*</span>
-                    </label>
-                </div>
-
-                <div>
-                    <label class="form-label"><?= Yii::t('app', 'Количество') ?>
-                        <span class="required_star">*</span>
-                    </label>
-                </div>
-
-
-                <?php foreach ($model->bedTypes() as $id => [$label, $info]): ?>
-                    <div class="checkbox-group checkbox-grid">
-                        <!-- Checkbox for bed type selection -->
-                        <?= $form->field($model, "bed_types[{$id}][checked]")->checkbox([
-                            'label' => false,
-                            'value' => 1,
-                            'uncheck' => 0,
-                            'data-id' => $id,
-                        ])->label(false) ?>
-                        <div>
-                            <?= $label ?>
-                            <div class="bed-info"><?= $info ?></div>
-                        </div>
-                    </div>
-
-                    <div class="quantity-input">
-                        <button type="button" class="quantity-btn decrease" data-id="<?= $id ?>">−</button>
-                        <?= $form->field($model, "bed_types[{$id}][quantity]")->input('text', [
-                            'min' => 0,
-                            'value' => 0,
-                            'readonly' => true, // Initially disabled until checkbox is checked
-                            'class' => 'quantity-display',
-                            'id' => "quantity-{$id}", // Unique ID for each input
-                        ])->label(false); ?>
-
-                        <button type="button" class="quantity-btn increase" data-id="<?= $id ?>">+</button>
-                    </div>
-                <?php endforeach; ?>
-            </div>
         </div>
 
         <?= $form->field($model, 'area')->textInput() ?>

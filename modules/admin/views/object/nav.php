@@ -67,7 +67,7 @@ Modal::begin([
     <div class="row action-buttons">
         <div class="col-md-6">
             <button data-send="<?= Objects::STATUS_DENIED; ?>" data-status="<?= $model->status; ?>"
-                style="width:100%;font-size:14px" class="save-button moderate-button moderate-button-white">Отправить на
+                style="width:100%;font-size:13px" class="save-button moderate-button moderate-button-white">Отправить на
                 доработку</button>
         </div>
 
@@ -97,10 +97,10 @@ Modal::begin([
             if (data_status == "<?php echo Objects::STATUS_DENIED ?>") {
                 $('.dialog-content').html('<div class="dialog-message"><?= Yii::t('app', 'Напишите причину отклонения модерации администратору объекта. Укажите какой информации не хватает для одобрения.') ?>' +
                     '<h3 class="minor_title"><?= Yii::t('app', 'Сообщение хосту (администратору объекта)') ?></h3>' +
-                    '<textarea type="text" class="deny_reason form-group" rows="6" id="moderation-reason" placeholder="Введите ваше сообщение"></textarea>' +
+                    '<textarea type="text" class="deny_reason form-control" rows="6" id="moderation-reason" placeholder="Введите ваше сообщение"></textarea>' +
                     '</div><div class= "row"><div class="col-md-6">' +
                     '<button style="width:100%;font-size:14px" class="save-button cancel-button moderate-button-white" data-dismiss="modal"><?= Yii::t('app', 'Отменить') ?></button></div>' +
-                    '<div class="col-md-6"><button style="width:100%;font-size:14px" data-send="3" class="save-button send-for-revision"><?= Yii::t('app', 'Отправить на доработку') ?></button></div></div>');
+                    '<div class="col-md-6"><button style="width:100%;font-size:13px" data-send="3" class="save-button send-for-revision"><?= Yii::t('app', 'Отправить на доработку') ?></button></div></div>');
 
                 var reason = $('.deny_reason').text();
 
@@ -118,7 +118,8 @@ Modal::begin([
                         data: {
                             object_id: <?= $model->id ?>,       // Assuming you're passing model ID
                             message: message,
-                            status: data_status
+                            status: data_status,
+                            _csrf: $('meta[name="csrf-token"]').attr('content')
                         },
                         success: function (response) {
                             $('.dialog-title').text('Вы отклонили запрос на публикацию объекта');
@@ -143,8 +144,8 @@ Modal::begin([
                     url: "<?= Yii::$app->urlManager->createUrl('/admin/object/send-to-moderation') ?>",
                     data: {
                         object_id: object_id,
-                        status: data_status
-                        //_csrf: $('meta[name="csrf-token"]').attr('content')
+                        status: data_status,
+                        _csrf: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function (response) {
                         if (response) {
