@@ -331,7 +331,7 @@ class BookingController extends BaseController
             $response['url'] = FlashPay::pay();
         } else {
             $response['message'] = $model->errors;
-            $$response['url'] = FlashPay::pay();
+            $response['url'] = FlashPay::pay();
         }
 
         return $response;

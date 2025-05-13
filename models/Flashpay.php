@@ -107,7 +107,7 @@ class Flashpay extends \yii\db\ActiveRecord
         $payment->setPaymentAmount(31415)->setPaymentCurrency('KGS');
         // Сумма (в дробных единицах валюты) и код валюты (в формате ISO-4217 alpha-3)
 
-        $payment->setPaymentId('153943567');
+        $payment->setPaymentId('1539435672324');
         // Идентификатор платежа, уникальный в рамках проекта
 
         $payment->setCustomerId('customer_' . Yii::$app->user->id);
