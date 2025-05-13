@@ -2,7 +2,7 @@
 
 namespace app\modules\api\controllers;
 
-//use app\models\FlashPay;
+use app\models\FlashPay;
 use app\models\Booking;
 use app\models\Comfort;
 use app\models\RoomComfort;
@@ -328,10 +328,10 @@ class BookingController extends BaseController
         if ($model->save()) {
             $response['success'] = true;
             $response['message'] = 'Booking added successfully';
-            $response['url'] = \app\models\FlashPay::pay();
+            $response['url'] = Booking::pay();
         } else {
             $response['message'] = $model->errors;
-            $response['url'] = \app\models\FlashPay::pay();
+            $response['url'] = Booking::pay();
         }
 
         return $response;

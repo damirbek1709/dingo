@@ -3,6 +3,8 @@
 namespace app\models;
 
 use Yii;
+use app\components\flashpay\Payment;
+use app\components\flashpay\Gate;
 
 /**
  * This is the model class for table "booking".
@@ -74,5 +76,31 @@ class Booking extends \yii\db\ActiveRecord
             'cancellation_type' => Yii::t('app', 'Cancellation Type'),
             'cancellation_penalty_sum' => Yii::t('app', 'Cancellation Penalty Sum'),
         ];
+    }
+
+    public static function pay()
+    {
+        $currency = 'KGS';
+        $payment = new Payment(self::MERCHANT_ID);
+        // Идентификатор проекта, полученный от Flashpay при интеграции
+
+        $payment->setPaymentAmount(31415)->setPaymentCurrency('KGS');
+        // Сумма (в дробных единицах валюты) и код валюты (в формате ISO-4217 alpha-3)
+
+        $payment->setPaymentId('1539435672324');
+        // Идентификатор платежа, уникальный в рамках проекта
+
+        $payment->setCustomerId('customer_' . Yii::$app->user->id);
+        // Идентификатор пользователя в рамках проекта
+
+        $payment->setPaymentDescription('Тестовый платёж');
+        // Описание платежа. Не обязательный, но полезный параметр
+
+        $gate = new Gate(self::SECRET_KEY);
+        // Секретный ключ проекта, полученный от Flashpay
+
+        /* Получение URL для вызова платёжной формы */
+        $url = $gate->getPurchasePaymentPageUrl($payment);
+        return $url;
     }
 }
