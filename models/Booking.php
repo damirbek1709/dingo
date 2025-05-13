@@ -28,6 +28,10 @@ use app\components\flashpay\Gate;
  */
 class Booking extends \yii\db\ActiveRecord
 {
+
+    const MERCHANT_ID = '144631';
+    const SECRET_KEY = '0bf1531b6df88949c9dd24115d6affc67fa04005bc4105f65ac373edbc89a42ab51943838f4552777f3b1d08278d7df144280edc80cd4613d38d4e2256a3601e';
+
     /**
      * {@inheritdoc}
      */
