@@ -64,7 +64,7 @@ class BookingController extends BaseController
 
                 [
                     'allow' => true,
-                    'actions' => ['list', 'view', 'list2', 'search'],
+                    'actions' => ['list', 'view', 'list2', 'search','webhook'],
                     'roles' => ['@', '?', 'admin', 'owner'],
                 ],
                 [
