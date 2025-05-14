@@ -48,6 +48,12 @@ $this->title = Yii::t('app', 'Bookings');
                     return $model->sum." ".$model->currency;
                 }
             ],
+            [
+                'attribute'=>'status',
+                'value'=>function($model){
+                    return $model->bookingStatusString();
+                }
+            ],
             //'guest_email:email',
             //'guest_phone',
             //'guest_name',
@@ -61,6 +67,7 @@ $this->title = Yii::t('app', 'Bookings');
             //'special_comment',
             [
                 'class' => ActionColumn::className(),
+                'template'=>'{view}',
                 'urlCreator' => function ($action, Booking $model, $key, $index, $column) {
                         return Url::toRoute([$action, 'id' => $model->id]);
                     }

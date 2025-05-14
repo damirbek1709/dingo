@@ -34,6 +34,7 @@ class Booking extends \yii\db\ActiveRecord
 
     const PAID_STATUS_NOT_PAID = 0;
     const PAID_STATUS_PAID = 1;
+    const PAID_STATUS_CANCELED = 2;
     /**
      * {@inheritdoc}
      */
@@ -48,12 +49,13 @@ class Booking extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status'], 'required'],
+            [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to','created_at', 'status'], 'required'],
             [['object_id', 'room_id', 'status', 'cancellation_type'], 'integer'],
             [['status'], 'default', 'value' => 1],
+            [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
             [['date_from', 'date_to'], 'safe'],
-            [['tariff_id'], 'string', 'max' => 11],
+            [['tariff_id','currency'], 'string', 'max' => 11],
             [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number'], 'string', 'max' => 255],
             [['other_guests'], 'string', 'max' => 500],
         ];
@@ -153,6 +155,22 @@ class Booking extends \yii\db\ActiveRecord
         if ($object)
             $object_title = $object['name'][0];
         return $object_title;
+    }
+    public function bookingStatusString()
+    {
+        $string = Yii::t('app', 'Активный');
+        if ($this->status == self::PAID_STATUS_PAID) {
+            if($this->date_from <= date('Y-m-d')){
+                $string = Yii::t('app', 'Активный');
+            }
+            elseif($this->date_to > date('Y-m-d')){
+                $string = Yii::t('app', 'Завершен');
+            }
+        }
+        elseif($this->status == self::PAID_STATUS_CANCELED){
+            $string = Yii::t('app', 'Отменен');
+        }
+        return $string;
     }
 
 }
