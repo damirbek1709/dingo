@@ -881,9 +881,9 @@ class ObjectController extends BaseController
             $targetPrice = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
         }
 
-        if ($targetPrice === null) {
-            throw new \yii\web\BadRequestHttpException('Target object has no valid price');
-        }
+        // if ($targetPrice === null) {
+        //     throw new \yii\web\BadRequestHttpException('Target object has no valid price');
+        // }
 
         // Step 4: Fetch all other objects
         $searchResults = $index->search('', [
