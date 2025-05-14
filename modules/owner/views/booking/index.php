@@ -18,7 +18,6 @@ $this->title = Yii::t('app', 'Bookings');
     <div class="oblast-update">
         <?= $this->render('top_nav', ['object_id' => $object_id]) ?>
         <div class="booking-index">
-            <h1><?= Html::encode($this->title) ?></h1>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 //'filterModel' => $searchModel,

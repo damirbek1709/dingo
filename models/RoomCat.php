@@ -69,7 +69,7 @@ class RoomCat extends \yii\db\ActiveRecord
             self::BED_TYPE_SIX => ['Кресло-кровать', '1 гость, ширина 60-130см'],
         ];
     }
-    
+
 
     public function getPictures()
     {
@@ -101,8 +101,8 @@ class RoomCat extends \yii\db\ActiveRecord
     {
         return [
             [['similar_room_amount', 'area'], 'required'],
-            [['bed_types','guest_amount'], 'safe'],
-            [['guest_amount'],'default', 'value'=> 1],
+            [['bed_types', 'guest_amount'], 'safe'],
+            [['guest_amount'], 'default', 'value' => 1],
             [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen', 'type_id'], 'integer'],
             [['area', 'base_price', 'title'], 'number'],
             [['title', 'title_en', 'title_ky'], 'string', 'max' => 255],
@@ -139,7 +139,10 @@ class RoomCat extends \yii\db\ActiveRecord
 
     public function typeTitle($id)
     {
-        return RoomType::findOne($id)->title ? RoomType::findOne($id)->title : '';
+        $title = RoomType::findOne($id)->title ? RoomType::findOne($id)->title : '';
+        $title_en = RoomType::findOne($id)->title_en ? RoomType::findOne($id)->title_en : '';
+        $title_ky = RoomType::findOne($id)->title_ky ? RoomType::findOne($id)->title_ky : '';
+        return [$title, $title_en, $title_ky];
     }
 
     public function getWallpaper()

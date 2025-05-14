@@ -252,7 +252,7 @@ class ObjectController extends Controller
                     break;
                 }
             }
-            
+
 
             if (array_key_exists('tariff', $roomData)) {
                 $tariff = $roomData['tariff'];
@@ -1054,7 +1054,7 @@ class ObjectController extends Controller
                                 'payment_on_book' => (int) $model->payment_on_book,
                                 'cancellation' => (int) $model->cancellation,
                                 'meal_type' => (int) $model->meal_type,
-                                'title' => $model->title,
+                                'title' => [$model->title, $model->title_en, $model->title_ky],
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],
                                 'from_date' => '',
@@ -1353,7 +1353,7 @@ class ObjectController extends Controller
         // Prepopulate bed_types
         $model->bed_types = [];
         if (isset($room['bed_types']) && is_array($room['bed_types'])) {
-            
+
             foreach ($room['bed_types'] as $bedType) {
                 $model->bed_types[$bedType['id']] = [
                     'checked' => $bedType['quantity'] > 0 ? 1 : 0,  // Set checked if quantity > 0
@@ -1498,7 +1498,7 @@ class ObjectController extends Controller
             'object_title' => $object['name'][0],
             'room_id' => $id,
             'title' => $model->typeTitle($model->type_id),
-            'picture_list'=>$model->getImages()
+            'picture_list' => $model->getImages()
         ]);
     }
 

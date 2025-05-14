@@ -110,7 +110,7 @@ class Tariff extends \yii\db\ActiveRecord
     {
         return [
             [['payment_on_book', 'payment_on_reception', 'cancellation', 'meal_type', 'object_id', 'penalty_days'], 'integer'],
-            [['cancellation', 'meal_type', 'title'], 'required'],
+            [['cancellation', 'meal_type', 'title','title_en','title_ky'], 'required'],
             [['penalty_sum'], 'number'],
             [['room_list'], 'safe'],
             [['title'], 'string', 'max' => 255],
