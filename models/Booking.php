@@ -5,6 +5,8 @@ namespace app\models;
 use Yii;
 use app\components\flashpay\Payment;
 use app\components\flashpay\Gate;
+use IntlDateFormatter;
+use DateTime;
 
 /**
  * This is the model class for table "booking".
@@ -49,7 +51,7 @@ class Booking extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to','created_at', 'status'], 'required'],
+            [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status'], 'required'],
             [['object_id', 'room_id', 'status', 'cancellation_type'], 'integer'],
             [['status'], 'default', 'value' => 1],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
@@ -68,21 +70,22 @@ class Booking extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'object_id' => Yii::t('app', 'Object ID'),
-            'room_id' => Yii::t('app', 'Room ID'),
-            'tariff_id' => Yii::t('app', 'Tariff ID'),
-            'sum' => Yii::t('app', 'Sum'),
-            'guest_email' => Yii::t('app', 'Guest Email'),
-            'guest_phone' => Yii::t('app', 'Guest Phone'),
-            'guest_name' => Yii::t('app', 'Guest Name'),
-            'special_comment' => Yii::t('app', 'Special Comment'),
-            'date_from' => Yii::t('app', 'Date From'),
-            'date_to' => Yii::t('app', 'Date To'),
-            'status' => Yii::t('app', 'Status'),
-            'other_guests' => Yii::t('app', 'Other Guests'),
-            'transaction_number' => Yii::t('app', 'Transaction Number'),
-            'cancellation_type' => Yii::t('app', 'Cancellation Type'),
-            'cancellation_penalty_sum' => Yii::t('app', 'Cancellation Penalty Sum'),
+            'object_id' => Yii::t('app', 'Объект'),
+            'room_id' => Yii::t('app', 'Номер'),
+            'tariff_id' => Yii::t('app', 'Тариф'),
+            'sum' => Yii::t('app', 'Сумма'),
+            'guest_email' => Yii::t('app', 'E-mail гостя'),
+            'guest_phone' => Yii::t('app', 'Телефон гостя'),
+            'guest_name' => Yii::t('app', 'ФИО'),
+            'special_comment' => Yii::t('app', 'Особое пожелание'),
+            'date_from' => Yii::t('app', 'Заезд'),
+            'date_to' => Yii::t('app', 'Выезд'),
+            'status' => Yii::t('app', 'Статус'),
+            'other_guests' => Yii::t('app', 'Имена других гостей'),
+            'transaction_number' => Yii::t('app', 'Номер транзакции'),
+            'cancellation_type' => Yii::t('app', 'Тип отмены'),
+            'cancellation_penalty_sum' => Yii::t('app', 'Сумма штрафа'),
+            'created_at' => Yii::t('app', 'Дата брони'),
         ];
     }
 
@@ -171,6 +174,19 @@ class Booking extends \yii\db\ActiveRecord
             $string = Yii::t('app', 'Отменен');
         }
         return $string;
+    }
+
+    public function dateFormat($date){
+        if(!$date) $date = date('Y-m-d');
+        $formatter = new IntlDateFormatter(
+            'ru_RU', // Russian locale
+            IntlDateFormatter::LONG,
+            IntlDateFormatter::NONE,
+            'Europe/Moscow', // Optional: timezone
+            null,
+            'd MMMM yyyy' // Format: day full_month_name year
+        );
+        return $formatter->format(new DateTime($date)); 
     }
 
 }

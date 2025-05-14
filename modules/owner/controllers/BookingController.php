@@ -37,14 +37,16 @@ class BookingController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
+    public function actionIndex($object_id)
     {
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'object_id'=>$object_id
         ]);
     }
 
