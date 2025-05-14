@@ -1121,7 +1121,7 @@ class ObjectController extends Controller
                                 'payment_on_book' => (int) $model->payment_on_book,
                                 'cancellation' => (int) $model->cancellation,
                                 'meal_type' => (int) $model->meal_type,
-                                'title' => $model->title,
+                                'title' => [$model->title,$model->title_en,$model->title_ky],
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],
                                 'from_date' => '',
