@@ -59,9 +59,9 @@ $this->title = Yii::t('app', 'Список номеров');
                                     <?= Yii::t('app', 'взрослых') ?>
                                 </span>
                                 <?php if (array_key_exists('bed_types', $val) && array_key_exists('0', $val['bed_types'])): ?>
-                                    <span class="room_bed_type"><?= $val['bed_types'][0]['title'][0] ?>
-                                        (<?= $val['bed_types'][0]['quantity'] ?>)
-                                    </span>
+                                    <!-- <span class="room_bed_type"><?php //echo $val['bed_types'][0]['title'] ?>
+                                        (<?php //echo $val['bed_types'][0]['quantity'] ?>)
+                                    </span> -->
                                 <?php endif; ?>
                                 <div class="room-card-options">
                                     <button class="options-btn"></button>
