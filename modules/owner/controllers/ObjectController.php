@@ -387,7 +387,7 @@ class ObjectController extends Controller
                     'reception' => (int) $model->reception,
                     'city' => [$model->city, $model->city_en, $model->city_ky],
                     'address' => [$model->address, $model->address_en, $model->address_ky],
-                    'description' => [$model->description, $model->description_en, $model->description_ky],
+                    'description' => ["<div>" . $model->description . "</div>", "<div>" . $model->description_en . "</div>", "<div>" . $model->description_ky . "</div>"],
                     'currency' => $model->currency,
                     'phone' => $model->phone,
                     'site' => $model->site,
@@ -402,7 +402,7 @@ class ObjectController extends Controller
                     'email' => $model->email,
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
-                    'general_room_count' => $model->general_room_count,
+                    'general_room_count' => (int) $model->general_room_count,
                     'status' => 0
                 ];
 
@@ -489,9 +489,9 @@ class ObjectController extends Controller
             ];
 
             $model->description = [
-                $request['Objects']['description'] ?? '',
-                $request['Objects']['description_en'] ?? '',
-                $request['Objects']['description_ky'] ?? '',
+                "<div>" . $request['Objects']['description'] . "</div>" ?? '',
+                "<div>" . $request['Objects']['description_en'] . "</div>" ?? '',
+                "<div>" . $request['Objects']['description_ky'] . "</div>" ?? '',
             ];
 
 
@@ -850,7 +850,8 @@ class ObjectController extends Controller
                         $bedTypeTitle = isset($bedTypeDetails[$key]) ? $bedTypeDetails[$key][0] : 'Unknown';
                         $bedTypes[] = [
                             'id' => (int) $key,
-                            'title' => $bedTypeTitle,
+                            'title' => [$bedTypeTitle, $bedTypeTitle, $bedTypeTitle],
+
                             'quantity' => (int) $val['quantity']
                         ];
                     }

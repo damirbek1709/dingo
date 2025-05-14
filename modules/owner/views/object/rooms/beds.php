@@ -63,9 +63,9 @@ use yii\widgets\ActiveForm;
                                         'class' => 'bed-types-checkbox'
                                     ])->label(false) ?>
                                     <div>
-                                        <label for="roomcat-bed_types-<?= $id ?>-checked"><?= $label ?></label>
+                                        <label for="roomcat-bed_types-<?= $id ?>-checked"><?= $label[0] ?></label>
                                         <div class="bed-info">
-                                            <?= $info ?>
+                                            <?= $label[1] ?>
                                         </div>
                                     </div>
                                 </div>

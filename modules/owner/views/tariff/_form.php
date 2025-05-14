@@ -28,6 +28,8 @@ use yii\widgets\ActiveForm;
     ]); ?>
 
     <?= $form->field($model, 'title')->textInput(['maxlength' => true])->label(Yii::t('app', 'Название тарифа')); ?>
+    <?= $form->field($model, 'title_en')->textInput(['maxlength' => true])->label(Yii::t('app', 'Название тарифа на английском')); ?>
+    <?= $form->field($model, 'title_ky')->textInput(['maxlength' => true])->label(Yii::t('app', 'Название тарифа на кыргызском')); ?>
 
     <div class="tariff_payment_block">
         <h3><?= Yii::t('app', 'Модель оплаты'); ?></h3>
@@ -80,7 +82,7 @@ use yii\widgets\ActiveForm;
         $room_list = $model->getRoomList($object_id);
         $room_list_arr = [];
         foreach ($room_list as $room) {
-            $room_list_arr[$room['id']] = $room['room_title'];
+            $room_list_arr[$room['id']] = $room['room_title'][0];
         }
         echo $form->field($model, 'room_list')->checkboxList($room_list_arr)->label(false);
         ?>

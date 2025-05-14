@@ -69,7 +69,7 @@ $meal_title = $model->getMealTitle($model->meal_type);
                         <input type="checkbox" <?php echo $checked; ?> name="room" value="<?php echo $room['id'] ?>"
                             object_id="<?php echo $object_id ?>" tariff_id="<?= $model->id ?>"
                             room_id="<?php echo $room['id'] ?>" class="room-bind">
-                        <?php echo $room['room_title']; ?>
+                        <?php echo $room['room_title'][0]; ?>
                     </label>
 
                 <?php endforeach; ?>

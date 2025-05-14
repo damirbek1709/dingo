@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var app\models\RoomCat $model */
 
-$this->title = $model->room_title;
+$this->title = $model->room_title[0];
 // $this->params['breadcrumbs'][] = ['label' => $object_title, 'url' => ['view', 'id' => $object_id]];
 // $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Список номеров'), 'url' => ['room-list', 'id' => $object_id]];
 //$this->params['breadcrumbs'][] = $this->title;

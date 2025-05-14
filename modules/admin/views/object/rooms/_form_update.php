@@ -77,7 +77,7 @@ use yii\widgets\ActiveForm;
                             'data-id' => $id,
                         ])->label(false) ?>
                         <div>
-                            <?= $label ?>
+                            <?= $label[0] ?>
                             <div class="bed-info"><?= $info ?></div>
                         </div>
                     </div>
