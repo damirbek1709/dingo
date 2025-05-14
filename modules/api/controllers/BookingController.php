@@ -321,6 +321,7 @@ class BookingController extends BaseController
         $model->status = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'status');
         $model->user_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'user_id');
         $model->special_comment = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'special_comment');
+        $model->currency = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'currency');
         $model->cancellation_type = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_type');
         $model->cancellation_penalty_sum = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_penalty_sum');
         $model->status = Booking::PAID_STATUS_NOT_PAID;
@@ -352,10 +353,7 @@ class BookingController extends BaseController
             Yii::error('Invalid JSON received: ' . $rawPostData, 'webhook');
             return $this->asJson(['status' => 'error', 'message' => 'Invalid JSON']);
         }
-
-        $logFile = Yii::getAlias('@app/runtime/logs/webhook.log');
-        file_put_contents($logFile, date('[Y-m-d H:i:s] ') . print_r($jsonData, true) . PHP_EOL, FILE_APPEND);
-
+        
         $status = $jsonData['payment']['status'];
         if ($status == 'success') {
             $booking = Booking::find()->where(['transaction_number' => $jsonData['payment']['id']])->one();

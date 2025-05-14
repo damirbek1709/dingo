@@ -252,6 +252,7 @@ class ObjectController extends Controller
                     break;
                 }
             }
+            
 
             if (array_key_exists('tariff', $roomData)) {
                 $tariff = $roomData['tariff'];

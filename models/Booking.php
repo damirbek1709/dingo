@@ -93,10 +93,66 @@ class Booking extends \yii\db\ActiveRecord
         $payment = new Payment(self::MERCHANT_ID);
         $payment->setPaymentAmount($data['sum'])->setPaymentCurrency($data['currency']);
         $payment->setPaymentId($data['transaction_number']);
-        $payment->setCustomerId("customer_".$data['user_id']);
+        $payment->setCustomerId("customer_" . $data['user_id']);
         $payment->setPaymentDescription('Тестовый платёж');
         $gate = new Gate(self::SECRET_KEY);
         $url = $gate->getPurchasePaymentPageUrl($payment);
         return $url;
     }
+
+    public function bookingRoomTitle()
+    {
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($this->object_id);
+        $room_title = "";
+
+        if (array_key_exists('rooms', $object)) {
+            $roomData = [];
+            foreach ($object['rooms'] as $room) {
+                if ($room['id'] == $this->room_id) {
+                    $room_title = $room['room_title'];
+                    break;
+                }
+            }
+        }
+        return $room_title;
+    }
+
+    public function bookingTariffTitle()
+    {
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($this->object_id);
+        $tariff_title = "";
+
+        if (array_key_exists('rooms', $object)) {
+            $roomData = [];
+            foreach ($object['rooms'] as $room) {
+                if ($room['id'] == $this->room_id) {
+                    $roomData = $room;
+                    break;
+                }
+            }
+
+            if (array_key_exists('tariff', $roomData)) {
+                foreach ($roomData['tariff'] as $tariff) {
+                    if ($tariff['id'] == $this->tariff_id) {
+                        $tariff_title = $tariff['title'];
+                        break;
+                    }
+                }
+            }
+        }
+        return $tariff_title;
+    }
+
+    public function bookingObjectTitle()
+    {
+        $object_title = "";
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($this->object_id);
+        if ($object)
+            $object_title = $object['name'][0];
+        return $object_title;
+    }
+
 }
