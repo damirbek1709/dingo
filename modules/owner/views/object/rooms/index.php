@@ -59,7 +59,7 @@ $this->title = Yii::t('app', 'Список номеров');
                                     <?= Yii::t('app', 'взрослых') ?>
                                 </span>
                                 <?php if (array_key_exists('bed_types', $val) && array_key_exists('0', $val['bed_types'])): ?>
-                                    <span class="room_bed_type"><?= $val['bed_types'][0]['title'] ?>
+                                    <span class="room_bed_type"><?= $val['bed_types'][0]['title'][0] ?>
                                         (<?= $val['bed_types'][0]['quantity'] ?>)
                                     </span>
                                 <?php endif; ?>
