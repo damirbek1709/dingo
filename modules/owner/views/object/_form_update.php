@@ -67,7 +67,7 @@ use kartik\editors\Summernote;
         <div class="form-section document-upload">
             <h2 class="section-title">
                 Учредительные документы компании
-                <span class="info-icon">i</span>
+                <span class="info-icon"></span>
             </h2>
             <?php
             echo $form->field($model, 'ceo_doc')->widget(FileInput::classname(), [
