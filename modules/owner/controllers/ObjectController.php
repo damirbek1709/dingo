@@ -496,33 +496,33 @@ class ObjectController extends Controller
 
             $request = Yii::$app->request->post();
 
-            
+            $model->name = [
+                $request['Objects']['name'] ?? '',
+                $request['Objects']['name_en'] ?? '',
+                $request['Objects']['name_ky'] ?? '',
+            ];
+
+            $model->city = [
+                $request['Objects']['city'] ?? '',
+                $request['Objects']['city_en'] ?? '',
+                $request['Objects']['city_ky'] ?? '',
+            ];
+
+            $model->address = [
+                $request['Objects']['address'] ?? '',
+                $request['Objects']['address_en'] ?? '',
+                $request['Objects']['address_ky'] ?? '',
+            ];
+
+            $model->description = [
+                $request['Objects']['description'] ?? '',
+                $request['Objects']['description_en'] ?? '',
+                $request['Objects']['description_ky'] ?? '',
+            ];
 
 
             if ($bind_model->save(false) && $model->validate()) {
-                $model->name = [
-                    $request['Objects']['name'] ?? '',
-                    $request['Objects']['name_en'] ?? '',
-                    $request['Objects']['name_ky'] ?? '',
-                ];
-    
-                $model->city = [
-                    $request['Objects']['city'] ?? '',
-                    $request['Objects']['city_en'] ?? '',
-                    $request['Objects']['city_ky'] ?? '',
-                ];
-    
-                $model->address = [
-                    $request['Objects']['address'] ?? '',
-                    $request['Objects']['address_en'] ?? '',
-                    $request['Objects']['address_ky'] ?? '',
-                ];
-    
-                $model->description = [
-                    $request['Objects']['description'] ?? '',
-                    $request['Objects']['description_en'] ?? '',
-                    $request['Objects']['description_ky'] ?? '',
-                ];
+                
 
                 $bind_model->ceo_doc = UploadedFile::getInstance($bind_model, 'ceo_doc');
                 $bind_model->financial_doc = UploadedFile::getInstance($bind_model, 'financial_doc');
