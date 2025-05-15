@@ -92,7 +92,7 @@ use kartik\editors\Summernote;
         <div class="form-section">
             <h2 class="section-title">
                 Банковские Реквизиты
-                <span class="info-icon">i</span>
+                <span class="info-icon"></span>
             </h2>
             <?php
             echo $form->field($model, 'financial_doc')->widget(FileInput::classname(), [
