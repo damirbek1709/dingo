@@ -4,7 +4,8 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use vova07\imperavi\Widget;
+use kartik\editors\Summernote;
+use yii\widgets\MaskedInput;
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
 /** @var yii\widgets\ActiveForm $form */ ?>
@@ -48,11 +49,7 @@ use vova07\imperavi\Widget;
         <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
         <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
 
-        <?php
-        echo $form->field($model, 'description')->textarea();
-        echo $form->field($model, 'description_en')->textarea();
-        echo $form->field($model, 'description_ky')->textarea();
-        ?>
+
     </div>
 </div>
 
@@ -72,6 +69,21 @@ use vova07\imperavi\Widget;
         ?>
         <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
         <?= $form->field($model, 'lon')->hiddenInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="row">
+        <?php
+        echo $form->field($model, 'description')->widget(Summernote::class, [
+            'useKrajeePresets' => true,
+        ]);
+        echo $form->field($model, 'description_en')->widget(Summernote::class, [
+            'useKrajeePresets' => true,
+        ]);
+        echo $form->field($model, 'description_ky')->widget(Summernote::class, [
+            'useKrajeePresets' => true,
+        ]); ?>
     </div>
 </div>
 
@@ -129,7 +141,21 @@ use vova07\imperavi\Widget;
 <div class="col-md-6">
     <div class="row">
         <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'phone')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Номер телефона')]) ?>
+        <div class="form-group">
+            <label class="control-label" for="phone">Телефон</label>
+            <div class="input-group">
+                <span class="input-group-text">+996</span>
+                <?= MaskedInput::widget([
+                    'name' => 'Object[phone]',
+                    'value' => $model->phone,
+                    'mask' => '999 99 99 99',
+                    'options' => [
+                        'class' => 'form-input input-phone',
+                        'placeholder' => '___ __ __ __',
+                    ],
+                ]) ?>
+            </div>
+        </div>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
         <?= $form->field($model, 'check_in')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Заезд')]) ?>
         <?= $form->field($model, 'check_out')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Выезд')]) ?>

@@ -30,7 +30,7 @@ use yii\widgets\ActiveForm;
 
             <div class="col-md-9">
                 <div class="card">
-                    <h1 class="general_title"><?= $title ?></h1>
+                    <h1 class="general_title"><?= $title[0] ?></h1>
                     <div class="drop-zone" id="drop-zone">
                         <div class="drop-icon"></div>
                         <div class="drop-text-top">Нажмите или перетащите файл в эту область для загрузки</div>

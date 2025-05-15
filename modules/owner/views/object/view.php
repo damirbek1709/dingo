@@ -6,8 +6,8 @@ use app\models\Objects;
 /* @var $this yii\web\View */
 /* @var $model app\models\MeilisearchModel */
 
-$name_list = $model->name;
-$title = $name_list[0];
+
+$title = $model->name[0];
 $this->title = $title;
 // $this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
 // $this->params['breadcrumbs'][] = $title;
@@ -128,20 +128,18 @@ $this->title = $title;
                         <div class="row" style="padding:0 0 0 15px">
                             <div class="photo-grid">
                                 <?php
-                                if (count($model->getImages()) > 1):
-                                    $counter = 0;
-                                    foreach ($model->getImages() as $image): ?>
-                                        <div class="photo-item">
-                                            <?php echo Html::img($image->getUrl('260x180'), ['class' => 'view-thumbnail-img']); ?>
-                                            <!-- <div class="main-photo-badge">Главная</div> -->
-                                        </div>
-                                        <?php
-                                        $counter++;
-                                        if ($counter >= 4) {
-                                            break;
-                                        }
-                                    endforeach;
-                                endif;
+                                $counter = 0;
+                                foreach ($model->getImages() as $image): ?>
+                                    <div class="photo-item">
+                                        <?php echo Html::img($image->getUrl('260x180'), ['class' => 'view-thumbnail-img']); ?>
+                                        <!-- <div class="main-photo-badge">Главная</div> -->
+                                    </div>
+                                    <?php
+                                    $counter++;
+                                    if ($counter >= 4) {
+                                        break;
+                                    }
+                                endforeach;
                                 ?>
                             </div>
                             <div class="photo-actions">

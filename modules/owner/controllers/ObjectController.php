@@ -311,6 +311,7 @@ class ObjectController extends Controller
         $client = Yii::$app->meili->connect();
         $index = $client->index('object'); // Replace with your actual Meilisearch index
 
+
         // Fetch record from Meilisearch
         $searchResult = $index->getDocument($object_id);
 
@@ -319,7 +320,13 @@ class ObjectController extends Controller
         }
 
         // Convert the result into a Yii2 model
-        $model = new Objects($searchResult);
+        $new_object_data = Yii::$app->session->get('new_object_data');
+        if ($new_object_data && $new_object_data['id'] == $object_id) {
+            $model = $new_object_data;
+            Yii::$app->session->remove('new_object_data');
+        } else {
+            $model = new Objects($searchResult);
+        }
         $bind_model = Objects::find()->where(['id' => $object_id])->one();
 
 
@@ -406,8 +413,10 @@ class ObjectController extends Controller
                     'status' => 0
                 ];
 
-                $index->addDocuments($object_arr);
-                return $this->redirect(['view', 'object_id' => $model->id]);
+                if ($index->addDocuments($object_arr)) {
+                    Yii::$app->session->set('new_object_data', $object_arr);
+                    return $this->redirect(['view', 'object_id' => $model->id]);
+                }
             }
 
         }
@@ -489,9 +498,9 @@ class ObjectController extends Controller
             ];
 
             $model->description = [
-                "<div>" . $request['Objects']['description'] . "</div>" ?? '',
-                "<div>" . $request['Objects']['description_en'] . "</div>" ?? '',
-                "<div>" . $request['Objects']['description_ky'] . "</div>" ?? '',
+                $request['Objects']['description']  ?? '',
+                $request['Objects']['description_en']  ?? '',
+                $request['Objects']['description_ky']  ?? '',
             ];
 
 
@@ -665,14 +674,14 @@ class ObjectController extends Controller
             $meilisearchData = [
                 'id' => $id,
                 'terms' => [
-                    'early_check_in' => (bool) $model->early_check_in,
-                    'late_check_in' => (bool) $model->late_check_in,
-                    'internet_public' => (bool) $model->internet_public,
-                    'animals_allowed' => (bool) $model->animals_allowed,
-                    'meal_terms' => array_values($model->meal_terms),
-                    'meal_purchaise' => (bool) $model->meal_purchaise,
-                    'children' => (int) $model->children,
-                ]
+                        'early_check_in' => (bool) $model->early_check_in,
+                        'late_check_in' => (bool) $model->late_check_in,
+                        'internet_public' => (bool) $model->internet_public,
+                        'animals_allowed' => (bool) $model->animals_allowed,
+                        'meal_terms' => array_values($model->meal_terms),
+                        'meal_purchaise' => (bool) $model->meal_purchaise,
+                        'children' => (int) $model->children,
+                    ]
             ];
 
             if ($index->updateDocuments($meilisearchData)) {
@@ -843,15 +852,13 @@ class ObjectController extends Controller
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             $bedTypes = [];
             if (isset($model->bed_types) && is_array($model->bed_types)) {
-                //echo "<pre>";print_r($model->bed_types);echo "</pre>";die();
+                $bedTypeDetails = $model->bedTypes(); // Only call this once
+
                 foreach ($model->bed_types as $key => $val) {
-                    if ($val['checked'] == 1) {
-                        $bedTypeDetails = $model->bedTypes(); // Get all bed types
-                        $bedTypeTitle = isset($bedTypeDetails[$key]) ? $bedTypeDetails[$key][0] : 'Unknown';
+                    if (!empty($val['checked'])) {
                         $bedTypes[] = [
                             'id' => (int) $key,
-                            'title' => [$bedTypeTitle, $bedTypeTitle, $bedTypeTitle],
-
+                            'title' => $bedTypeDetails[$key] ?? [],
                             'quantity' => (int) $val['quantity']
                         ];
                     }
@@ -1121,7 +1128,7 @@ class ObjectController extends Controller
                                 'payment_on_book' => (int) $model->payment_on_book,
                                 'cancellation' => (int) $model->cancellation,
                                 'meal_type' => (int) $model->meal_type,
-                                'title' => [$model->title,$model->title_en,$model->title_ky],
+                                'title' => [$model->title, $model->title_en, $model->title_ky],
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],
                                 'from_date' => '',

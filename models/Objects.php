@@ -67,6 +67,7 @@ class Objects extends \yii\db\ActiveRecord
     public $ceo_doc;
     public $financial_doc;
     public $from_price;
+    public $phone_code;
 
 
 
