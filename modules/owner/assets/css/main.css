@@ -1578,3 +1578,107 @@ a.desc:after {
 .deny_reason {
     margin-top: 20px;
 }
+.grid-view thead{
+    background-color: #00000005;
+    height: 30px;
+}
+.grid-view tbody{
+     background-color: #fff;
+}
+.grid-view {
+    /* border: 1px solid #F0F0F0; */
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    background-color: #00000005;
+    overflow: hidden;
+}
+.griv-view th{
+    border:none;
+}
+    .table-bordered {
+        margin-bottom:0;
+        /* border-radius: 10px; */
+        /* outline: 1px solid #ccc; */
+        border: none;
+        overflow: hidden;
+        background-color: #fff;
+    }
+    .table-bordered > thead > tr > th, .table-bordered > thead > tr > td{
+        border:none;
+        padding: 15px 12px;
+    }
+    .table-bordered a{
+        color:#000;
+    }
+.table-bordered > tbody > tr > td{
+    /* border-bottom:none; */
+    border-left:none;
+    border-right:none;
+    padding: 15px 12px;
+}
+
+.table-bordered > tbody > thead{
+    padding:10px 8px;
+}
+.table-bordered > thead > tr > th:after{
+    content:'';
+    width: 1px;
+    height: 20px;
+    background-color: #e1e1e1;
+    display:inline-block;
+    float: right;
+}
+
+.table-bordered > thead > tr > th:nth-of-type(7):after,.table-bordered > thead > tr > th:nth-of-type(6 ):after{
+    
+}
+.object-admin-grid{
+    display:grid;
+    grid-template-columns: 300px auto;
+}
+.object-admin-grid .pagination{
+    padding: 0 20px;
+    float:right;
+}
+.object-admin-grid  .pagination > li > a{
+    background-color:transparent;
+    border:none;
+    color:#000
+}
+.object-admin-grid  .pagination > .active > a{
+    border: 1px solid rgba(54, 118, 188, 1);
+    border-radius:4px
+}
+.object-admin-grid .pagination > .disabled > span{
+    background-color:transparent;
+    border:none;
+}
+.booking-index .table-striped > tbody > tr:nth-of-type(odd){
+    background-color:#fff;
+}
+.input-group-text{
+    float: left;
+    padding: 12px 10px;
+    border: 1px solid #e0e0e0;
+    /* height: 34px; */
+    display: flex;
+    align-items: center;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-right: 1px solid #e0e0e0;
+}
+.input-group{
+    display:flex;
+    align-items:center;
+    margin-bottom: 20px;
+}
+.input-group input{
+    display:inline-block;
+    border-left: none;
+    border-bottom-left-radius: unset;
+    border-top-left-radius: unset;
+    margin-bottom: 0;
+}
+.has-error input, .has-error select{
+    border: 1px solid #a94442!important;
+}
