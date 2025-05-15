@@ -5,11 +5,11 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
 
-$index = 0;
-$name_arr = $model->name;
-$name = $name_arr[$index];
+// $index = 0;
+// $name_arr = $model->name;
+// $name = $name_arr[$index];
 
-$this->title = Yii::t('app', 'Update Object') . ' ' . $name;
+$this->title = Yii::t('app', 'Update Object');
 // $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Objects'), 'url' => ['index']];
 // $this->params['breadcrumbs'][] = ['label' => $name, 'url' => ['view', 'id' => $model->id]];
 // $this->params['breadcrumbs'][] = Yii::t('app', 'Update');

@@ -137,6 +137,25 @@ class TariffController extends Controller
     public function actionDelete($id, $object_id)
     {
         $this->findModel($id)->delete();
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($object_id);
+        
+        if (isset($object['rooms']) && is_array($object['rooms'])) {
+            foreach ($object['rooms'] as $index => $roomData) {
+                if (isset($roomData['tariff'])) {
+                    foreach($roomData['tariff'] as $tariff_item){
+                        if($tariff_item['id'] == $id){
+                            array_splice($roomData['tariff'], $tariff_item, 1);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        $client->index('object')->updateDocuments([
+            'id' => $object_id,
+            'rooms' => $object['rooms']
+        ]);
 
         return $this->redirect(['/owner/object/tariff-list','object_id'=>$object_id]);
     }

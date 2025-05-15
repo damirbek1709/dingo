@@ -3,12 +3,14 @@
 use yii\widgets\DetailView;
 use yii\helpers\Html;
 use app\models\Objects;
+use yii\web\NotFoundHttpException;
 /* @var $this yii\web\View */
 /* @var $model app\models\MeilisearchModel */
 
 
-$title = $model->name[0];
-$this->title = $title;
+$title = $model->name;
+
+$this->title = $title[0];
 // $this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
 // $this->params['breadcrumbs'][] = $title;
 ?>
@@ -29,7 +31,7 @@ $this->title = $title;
                     <div class="header">
                         <div>
                             <div class="section-label">Название</div>
-                            <h2 class="section-value"><?= $title; ?></h2>
+                            <h2 class="section-value"><?= $title[0]; ?></h2>
                         </div>
 
                         <button class="edit-btn">

@@ -48,6 +48,16 @@ class Vocabulary extends \yii\db\ActiveRecord
         return $arr;
     }
 
+    // public static function listModel($id)
+    // {
+    //     $arr = [
+    //         self::MODEL_TYPE_MEAL => Yii::t('app', 'Тип Питания'),
+    //         self::MODEL_TYPE_OBJECT => Yii::t('app', 'Тип объекта'),
+    //         self::MODEL_TYPE_ROOM => Yii::t('app', 'Тип номера'),
+    //     ];
+    //     return $arr[$id];
+    // }
+
     /**
      * {@inheritdoc}
      */

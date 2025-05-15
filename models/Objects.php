@@ -107,40 +107,39 @@ class Objects extends \yii\db\ActiveRecord
                     'address',
                     'address_en',
                     'address_ky',
-                    'currency',
-                    'features',
                     'phone',
-                    'site',
                     'check_in',
                     'check_out',
-                    'reception',
                     'description',
-                    'lat',
-                    'lon',
+                    'description_en',
+                    'description_ky',
                     'email',
-                    'uploadImages',
-                    'user_id',
-                    'images',
-                    'img',
-                    'user_id',
-                    'link_id',
-                    'status',
-                    'guest_amount'
-                ],
-                'safe'
-            ],
-            [
-                [
-                    'city',
-                    'city_en',
-                    'city_ky',
-                    'address',
-                    'address_en',
-                    'address_ky',
                     'name',
                     'name_en',
                     'name_ky',
-                    'general_room_count'
+                    'city',
+                    'city_en',
+                    'city_ky',
+                ],
+                'required'
+            ],
+            //['phone', 'match', 'pattern' => '/^\+996\s\d{3}\s\d{2}\s\d{2}\s\d{2}$/', 'message' => Yii::t('app','Введите номер в формате +996 XXX XX XX XX')],
+            [
+                [
+                    'guest_amount',
+                    'status',
+                    'link_id',
+                    'images',
+                    'user_id',
+                    'reception',
+                    'features',
+                    'currency',
+                    'site',
+                    'lat',
+                    'lon',
+                   
+                    'general_room_count',
+                    'img'
                 ],
                 'safe'
             ],
@@ -148,7 +147,7 @@ class Objects extends \yii\db\ActiveRecord
             [['email'], 'email'], // Validate email format
             [['phone'], 'match', 'pattern' => '/^\+?[0-9 ]{7,15}$/'], // Phone validation
             [['lat', 'lon'], 'number'], // Latitude and longitude should be numeric
-            [['description', 'description_en', 'description_ky'], 'string', 'max' => 1000], // Limit description length
+            //[['description', 'description_en', 'description_ky'], 'string', 'max' => 1000], // Limit description length
         ];
     }
 
@@ -214,32 +213,52 @@ class Objects extends \yii\db\ActiveRecord
 
     public static function statusCondition($id, $status = 0)
     {
-        $condition_room_tariff = false;
-        $model = Objects::findOne($id);
-        $client = Yii::$app->meili->connect();
-        $index = $client->index('object');
-        $object = $index->getDocument($id);
-
         $room = 0;
         $tariff = 0;
         $docs = 0;
-        if ($model->getCeoDocs() && $model->getFinancialDocs()) {
-            $docs = 1;
-        }
-        if (isset($object['rooms']) && is_array($object['rooms'])) {
-            $room = 1;
-            foreach ($object['rooms'] as $index => $roomData) {
-                if (isset($roomData['tariff']) && is_array($roomData['tariff'])) {
-                    $tariff = 1;
-                    break;
+        $condition_room_tariff = false;
+
+        
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+
+        try {
+            $object = $index->getDocument($id);
+
+            // Check for uploaded docs
+            if ($model->getCeoDocs() && $model->getFinancialDocs()) {
+                $docs = 1;
+            }
+
+            // Check rooms and tariffs
+            if (isset($object['rooms']) && is_array($object['rooms']) && !empty($object['rooms'])) {
+                $room = 1;
+
+                foreach ($object['rooms'] as $roomData) {
+                    if (isset($roomData['tariff']) && is_array($roomData['tariff']) && !empty($roomData['tariff'])) {
+                        $tariff = 1;
+                        break;
+                    }
                 }
             }
+
+        } catch (\Exception $e) {
+            // Meilisearch document not found or error
+            // Optionally log: Yii::error($e->getMessage(), 'meili');
         }
-        if ($condition_room_tariff && $model->getCeoDocs() && $model->getFinancialDocs()) {
+
+        // Now determine publish condition
+        if ($room && $tariff && $docs) {
             return self::STATUS_READY_FOR_PUBLISH;
         }
-        return ['room'=>$room, 'tariff'=>$tariff, 'docs'=>$docs];
+
+        return [
+            'room' => $room,
+            'tariff' => $tariff,
+            'docs' => $docs
+        ];
     }
+
 
     public static function statusData($status = self::STATUS_NOT_PUBLISHED)
     {
@@ -495,16 +514,33 @@ class Objects extends \yii\db\ActiveRecord
 
             'description_en' => Yii::t('app', 'Описание на английском'),
             'description_ky' => Yii::t('app', 'Описание на кыргызском'),
+            'general_room_count'=>Yii::t('app','Общее количество комнат')
         ];
     }
 
     public static function mealList()
     {
-        return [
-            (int) self::TERM_MEAL_BREAKFEST => Yii::t('app', 'Завтрак'),
-            (int) self::TERM_MEAL_THREE_TIMES => Yii::t('app', 'Трехразовое питание'),
-        ];
+        $title = 'title';
+        switch (Yii::$app->language) {
+            case 'ru':$title = 'title';break;
+            case 'en':$title = 'title_en';break;
+            case 'ky':$title = 'title_ky';break;
+            default:$title = 'title';
+        }
+        return ArrayHelper::map(Vocabulary::find()->where(['model'=>Vocabulary::MODEL_TYPE_MEAL])->all(), 'id', $title);
     }
+
+    public static function mealTypeFull($id){
+        $voc = Vocabulary::find()->where(['id'=>$id,'model'=>Vocabulary::MODEL_TYPE_MEAL])->one();
+        $arr = [
+            $voc->title,
+            $voc->title_en,
+            $voc->title_ky
+        ];
+        return $arr;
+    }
+
+    
 
     public function getPictures()
     {
@@ -513,16 +549,18 @@ class Objects extends \yii\db\ActiveRecord
             $filePath = $image->filePath;
             $thumb = $image->getUrl('220x150');
             $picture = $image->getUrl('500x');
+            $original = $image->getPathToOrigin();
             // Check if the original image was a webp
             if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
-                $img_url = 'https://dingo.kg/uploads/images/store/' . $filePath;
-                $picture = 'https://dingo.kg/uploads/images/store/' . $filePath;
+                $img_url = 'https://partner.dingo.kg/uploads/images/store/' . $filePath;
+                $picture = 'https://partner.dingo.kg/uploads/images/store/' . $filePath;
             }
             $list[] = [
                 'id' => $image->id,
                 'picture' => $picture,
                 'thumbnailPicture' => $thumb,
                 'isMain' => $image->isMain,
+                'orignal'=>Url::base().'/'.$original
             ];
         }
 

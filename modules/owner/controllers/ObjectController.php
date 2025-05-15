@@ -49,6 +49,7 @@ class ObjectController extends Controller
                         $object_id = Yii::$app->request->get('object_id');
                         $client = Yii::$app->meili->connect();
                         $object = $client->index('object')->getDocument($object_id);
+
                         if ($object['user_id'] === Yii::$app->user->id) {
                             return true;
                         }
@@ -80,7 +81,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'delete', 'file-upload', 'room-beds'],
+                    'actions' => ['comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'delete', 'file-upload', 'room-beds'],
                     'roles' => ['owner', 'admin'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -88,6 +89,29 @@ class ObjectController extends Controller
                         $object = $client->index('object')->getDocument($object_id);
                         if ($object['user_id'] === Yii::$app->user->id) {
                             return true;
+                        }
+                        return false;
+                    }
+                ],
+
+                [
+                    'allow' => true,
+                    'actions' => ['view'],
+                    'roles' => ['owner', 'admin'],
+                    'matchCallback' => function () {
+                        $object_id = Yii::$app->request->get('object_id');
+                        $new_object_data = Yii::$app->session->get('new_object_data');
+                        if ($new_object_data) {
+                            $object = $new_object_data;
+                            if ($object['id'] == $object_id) {
+                                return true;
+                            }
+                        } else {
+                            $client = Yii::$app->meili->connect();
+                            $object = $client->index('object')->getDocument($object_id);
+                            if ($object['user_id'] === Yii::$app->user->id) {
+                                return true;
+                            }
                         }
                         return false;
                     }
@@ -299,42 +323,35 @@ class ObjectController extends Controller
     }
 
 
-    /**
-     * Displays a single Event model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     public function actionView($object_id)
     {
-        //$this->layout = 'main';
-        $client = Yii::$app->meili->connect();
-        $index = $client->index('object'); // Replace with your actual Meilisearch index
-
-
-        // Fetch record from Meilisearch
-        $searchResult = $index->getDocument($object_id);
-
-        if (empty($searchResult)) {
-            throw new NotFoundHttpException('Record not found.');
-        }
-
-        // Convert the result into a Yii2 model
         $new_object_data = Yii::$app->session->get('new_object_data');
+
         if ($new_object_data && $new_object_data['id'] == $object_id) {
-            $model = $new_object_data;
+            // ✅ Convert array to model instance
+            $model = new Objects($new_object_data);
             Yii::$app->session->remove('new_object_data');
         } else {
+            $client = Yii::$app->meili->connect();
+            $index = $client->index('object');
+            $searchResult = $index->getDocument($object_id);
+
+            if (empty($searchResult)) {
+                throw new NotFoundHttpException('Record not found.');
+            }
+
+            // ✅ Meilisearch result is an object/array, wrap it too
             $model = new Objects($searchResult);
         }
-        $bind_model = Objects::find()->where(['id' => $object_id])->one();
 
+        $bind_model = Objects::find()->where(['id' => $object_id])->one();
 
         return $this->render('view', [
             'model' => $model,
             'bind_model' => $bind_model
         ]);
     }
+
     /**
      * Creates a new Event model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -348,7 +365,7 @@ class ObjectController extends Controller
         $model->link_id = 1;
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post())) {
+            if ($model->load($this->request->post()) && $model->validate()) {
                 if ($model->save(false)) {
                     $model->images = UploadedFile::getInstances($model, 'images');
                     if ($model->images) {
@@ -477,34 +494,32 @@ class ObjectController extends Controller
             $model->lon = (float) $model->lon;
             $model->user_id = (int) Yii::$app->user->id;
 
-            $request = Yii::$app->request->post();
+            
+            if ($bind_model->save(false) && $model->validate()) {
+                $model->name = [
+                    $model->name,
+                    $model->name_en,
+                    $model->name_ky,
+                ];
 
-            $model->name = [
-                $request['Objects']['name'] ?? '',
-                $request['Objects']['name_en'] ?? '',
-                $request['Objects']['name_ky'] ?? '',
-            ];
+                $model->city = [
+                    $model->city,
+                    $model->city_en,
+                    $model->city_ky,
+                ];
 
-            $model->city = [
-                $request['Objects']['city'] ?? '',
-                $request['Objects']['city_en'] ?? '',
-                $request['Objects']['city_ky'] ?? '',
-            ];
+                $model->address = [
+                    $model->address,
+                    $model->address_en,
+                    $model->address_ky,
+                ];
 
-            $model->address = [
-                $request['Objects']['address'] ?? '',
-                $request['Objects']['address_en'] ?? '',
-                $request['Objects']['address_ky'] ?? '',
-            ];
+                $model->description = [
+                    $model->description,
+                    $model->description_en,
+                    $model->description_ky,
+                ];
 
-            $model->description = [
-                $request['Objects']['description']  ?? '',
-                $request['Objects']['description_en']  ?? '',
-                $request['Objects']['description_ky']  ?? '',
-            ];
-
-
-            if ($bind_model->save(false)) {
                 $bind_model->ceo_doc = UploadedFile::getInstance($bind_model, 'ceo_doc');
                 $bind_model->financial_doc = UploadedFile::getInstance($bind_model, 'financial_doc');
                 if ($bind_model->ceo_doc) {
@@ -640,56 +655,75 @@ class ObjectController extends Controller
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
 
-        // Fetch object from Meilisearch
-        $searchResult = $index->search('', ['filter' => "id = $id"])->getHits();
-        if (empty($searchResult)) {
-            throw new \yii\web\NotFoundHttpException('Record not found.');
-        }
+        $new_term_data = Yii::$app->session->get('new_term_data');
+        if ($new_term_data && $new_term_data['id'] == $object_id) {
+            $model = $new_term_data;
+            Yii::$app->session->remove('new_room_data');
+        } else {
 
-        // Load object data
-        $model = new Objects($searchResult[0]);
-        $data = $searchResult[0];
+            // Fetch object from Meilisearch
+            $searchResult = $index->getDocument($id);
+            if (empty($searchResult)) {
+                throw new \yii\web\NotFoundHttpException('Record not found.');
+            }
 
-        // Assign saved values to model attributes
-        $model->early_check_in = $data['terms']['early_check_in'] ?? false;
-        $model->late_check_in = $data['terms']['late_check_in'] ?? false;
-        $model->internet_public = $data['terms']['internet_public'] ?? false;
-        $model->animals_allowed = $data['terms']['animals_allowed'] ?? false;
-        $model->meal_purchaise = $data['terms']['meal_purchaise'] ?? false;
-        $model->meal_terms = $data['terms']['meal_terms'] ?? [];
-        $model->children = $data['terms']['children'] ?? [];
+            // Load object data
+            $model = new Objects($searchResult);
+            $data = $searchResult;
 
-        
+            // Assign saved values to model attributes
+            $model->early_check_in = $data['terms']['early_check_in'] ?? false;
+            $model->late_check_in = $data['terms']['late_check_in'] ?? false;
+            $model->internet_public = $data['terms']['internet_public'] ?? false;
+            $model->animals_allowed = $data['terms']['animals_allowed'] ?? false;
+            $model->meal_purchaise = $data['terms']['meal_purchaise'] ?? false;
 
+            $model->meal_terms = $data['terms']['meal_terms'] ?? [];
+            $model->children = $data['terms']['children'] ?? [];
 
-        if (Yii::$app->request->isPost) {
-            // Save form data
-            $model->early_check_in = Yii::$app->request->post('early_check_in', 0);
-            $model->late_check_in = Yii::$app->request->post('late_check_in', 0);
-            $model->internet_public = Yii::$app->request->post('internet_public', 0);
-            $model->animals_allowed = Yii::$app->request->post('animals_allowed', 0);
-            $model->meal_terms = Yii::$app->request->post('meal_terms', []);
-            echo "<pre>";print_r($model->meal_terms);echo "</pre>";die();
-            $model->children = Yii::$app->request->post('children', 0);
-            $model->meal_purchaise = Yii::$app->request->post('meal_purchaise', false);
+            if (Yii::$app->request->isPost) {
+                $meal_arr = Yii::$app->request->post('meal_terms', []);
+                $arr = [];
+                if ($meal_arr) {
+                    $counter = 0;
+                    foreach ($meal_arr as $term) {
+                        $temp = Objects::mealTypeFull($term['meal_type']);
+                        $arr[$counter]['meal_type']['meal_title'] = $temp;
+                        $arr[$counter]['meal_type'] = (int) $term['meal_type'];
+                        $arr[$counter]['meal_cost'] = (int) $term['meal_cost'];
+                        $counter++;
+                    }
+                }
 
-            // Store in Meilisearch with correct format
-            $meilisearchData = [
-                'id' => $id,
-                'terms' => [
+                // Save form data
+                $model->early_check_in = Yii::$app->request->post('early_check_in', 0);
+                $model->late_check_in = Yii::$app->request->post('late_check_in', 0);
+                $model->internet_public = Yii::$app->request->post('internet_public', 0);
+                $model->animals_allowed = Yii::$app->request->post('animals_allowed', 0);
+                $model->meal_terms = $meal_arr;
+
+                $model->children = Yii::$app->request->post('children', 0);
+                $model->meal_purchaise = Yii::$app->request->post('meal_purchaise', false);
+
+                // Store in Meilisearch with correct format
+                $meilisearchData = [
+                    'id' => $id,
+                    'terms' => [
                         'early_check_in' => (bool) $model->early_check_in,
                         'late_check_in' => (bool) $model->late_check_in,
                         'internet_public' => (bool) $model->internet_public,
                         'animals_allowed' => (bool) $model->animals_allowed,
-                        'meal_terms' => array_values($model->meal_terms),
+                        'meal_terms' => $arr,
                         'meal_purchaise' => (bool) $model->meal_purchaise,
                         'children' => (int) $model->children,
                     ]
-            ];
+                ];
 
-            if ($index->updateDocuments($meilisearchData)) {
-                Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
-                return $this->refresh();
+                if ($index->updateDocuments($meilisearchData)) {
+                    Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+                    Yii::$app->session->set('new_term_data', $model);
+                    return $this->refresh();
+                }
             }
         }
 
@@ -779,7 +813,8 @@ class ObjectController extends Controller
                 'air_cond' => (int) $model->air_cond,
                 'kitchen' => (int) $model->kitchen,
                 'base_price' => (int) $model->base_price,
-                'bed_types' => $bedTypes
+                'bed_types' => $bedTypes,
+
             ];
 
             $meiliRooms[] = $rooms_arr;
@@ -1060,21 +1095,23 @@ class ObjectController extends Controller
                         $roomData['id'] = (int) $roomData['id'];
                         if (in_array($roomData['id'], $room_list)) {
                             $roomData['tariff'] = $roomData['tariff'] ?? [];
+                            $cancellation_terms = [
+                                'type' => $model->getCancellationType((int) $model->cancellation),
+                                'penalty_sum' => (double) $model->penalty_sum,
+                                'penalty_days' => (int) $model->penalty_days,
+                            ];
                             $tariff = [
                                 'id' => (int) $model->id,
                                 'payment_on_book' => (int) $model->payment_on_book,
-                                'cancellation' => (int) $model->cancellation,
+                                'cancellation' => $cancellation_terms,
                                 'meal_type' => (int) $model->meal_type,
                                 'title' => [$model->title, $model->title_en, $model->title_ky],
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],
                                 'from_date' => '',
                                 'to_date' => '',
-                                'penalty_sum' => $model->penalty_sum,
-                                'penalty_days' => $model->penalty_days,
                                 'prices' => [],
                             ];
-
                             $roomData['tariff'][] = $tariff;
                         }
                         $updatedRooms[] = $roomData;
@@ -1112,7 +1149,9 @@ class ObjectController extends Controller
         $object_title = $object['name'][0];
 
         if ($this->request->isPost) {
+
             if ($model->load($this->request->post()) && $model->save()) {
+                //echo $model->penalty_sum."<br>".$model->penalty_days;die();
                 $room_list = $model->room_list;
                 try {
                     $rooms = $object['rooms'] ?? [];
@@ -1126,22 +1165,32 @@ class ObjectController extends Controller
                         $roomData['id'] = (int) $roomData['id'];
                         if ($room_list && in_array($roomData['id'], $room_list)) {
                             $roomData['tariff'] = $roomData['tariff'] ?? [];
-                            $tariff = [
+                            foreach ($roomData['tariff'] as $tariff_item) {
+                                if ($tariff_item['id'] == $id) {
+                                    unset($roomData['tariff']);
+                                    break;
+                                }
+                            }
+
+                            $cancellation_terms = [
+                                'type' => $model->getCancellationType((int) $model->cancellation),
+                                'penalty_sum' => (double) $model->penalty_sum,
+                                'penalty_days' => (int) $model->penalty_days,
+                            ];
+                            $tariff_data = [
                                 'id' => (int) $model->id,
                                 'payment_on_book' => (int) $model->payment_on_book,
-                                'cancellation' => (int) $model->cancellation,
+                                'cancellation' => $cancellation_terms,
                                 'meal_type' => (int) $model->meal_type,
                                 'title' => [$model->title, $model->title_en, $model->title_ky],
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],
                                 'from_date' => '',
                                 'to_date' => '',
-                                'penalty_sum' => $model->penalty_sum,
-                                'penalty_days' => $model->penalty_days,
                                 'prices' => [],
                             ];
 
-                            $roomData['tariff'][] = $tariff;
+                            $roomData['tariff'][] = $tariff_data;
                         }
                         $updatedRooms[] = $roomData;
                     }

@@ -139,6 +139,7 @@ class RoomCat extends \yii\db\ActiveRecord
             $filePath = $image->filePath;
             $img_url = $image->getUrl('120x');
             $picture = $image->getUrl('500x');
+            $original = $image->getPathToOrigin();
             // Check if the original image was a webp
             // if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
             //     $img_url = 'https://selva.kg/uploads/images/store/' . $filePath;
@@ -148,6 +149,7 @@ class RoomCat extends \yii\db\ActiveRecord
                 'id' => $image->id,
                 'picture' => $picture,
                 'thumbnailPicture' => $img_url,
+                'orignal'=>Url::base().'/'.$original,
                 'isMain' => $image->isMain,
             ];
         }

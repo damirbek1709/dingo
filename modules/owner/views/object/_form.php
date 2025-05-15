@@ -141,21 +141,22 @@ use yii\widgets\MaskedInput;
 <div class="col-md-6">
     <div class="row">
         <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
-        <div class="form-group">
-            <label class="control-label" for="phone">Телефон</label>
-            <div class="input-group">
-                <span class="input-group-text">+996</span>
-                <?= MaskedInput::widget([
-                    'name' => 'Object[phone]',
-                    'value' => $model->phone,
+        <?= $form->field($model, 'phone', [
+            'template' => '
+        <label class="control-label" for="phone">{label}</label>
+        <div class="input-group">
+            <span class="input-group-text">+996</span>
+            {input}
+        </div>
+        {error}
+    '
+        ])->widget(MaskedInput::class, [
                     'mask' => '999 99 99 99',
                     'options' => [
-                        'class' => 'form-input input-phone',
+                        'class' => 'form-input',
                         'placeholder' => '___ __ __ __',
                     ],
                 ]) ?>
-            </div>
-        </div>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
         <?= $form->field($model, 'check_in')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Заезд')]) ?>
         <?= $form->field($model, 'check_out')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Выезд')]) ?>

@@ -18,7 +18,7 @@ use kartik\editors\Summernote;
 <div class="oblast-form">
 
     <?php $form = ActiveForm::begin([
-        'enableClientValidation' => false,
+        'enableClientValidation' => true,
         'enableAjaxValidation' => false,
         'options' => [
             'enctype' => 'multipart/form-data',

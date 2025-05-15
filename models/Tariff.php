@@ -38,15 +38,46 @@ class Tariff extends \yii\db\ActiveRecord
     {
         $arr = [
             self::NO_CANCELLATION => [
-                'label' => 'Невозвратный тариф',
-                'hint' => 'В случае отмены бронирования с гостя будет удержана полная стоимость бронирования или предоплата.'
+                'label' => Yii::t('app', 'Невозвратный тариф'),
+                'hint' => Yii::t('app', 'В случае отмены бронирования с гостя будет удержана полная стоимость бронирования или предоплата.')
             ],
             self::FREE_CANCELLATION_WITH_PENALTY => [
-                'label' => 'Бесплатная отмена, а затем отмена со штрафом вплоть до времени заезда',
-                'hint' => 'В случае отмены до указанного времени, стоимость бронирования или предоплаты будет полностью возвращена гостю. Если бронирование отменено позже указанного времени, вы сможете списать штраф.'
+                'label' => Yii::t('app', 'Бесплатная отмена, а затем отмена со штрафом вплоть до времени заезда'),
+                'hint' => Yii::t('app', 'В случае отмены до указанного времени, стоимость бронирования или предоплаты будет полностью возвращена гостю. Если бронирование отменено позже указанного времени, вы сможете списать штраф.')
             ]
         ];
         return $arr;
+    }
+
+    public function getCancellationType($type)
+    {
+        $arr = [
+            self::NO_CANCELLATION => [
+                'label' => [
+                    Yii::t('app', 'Невозвратный тариф'),
+                    Yii::t('app', 'Non-refundable tariff'),
+                    Yii::t('app', 'Кайтарылбай турган тариф')
+                ],
+                'hint' => [
+                    Yii::t('app', 'В случае отмены бронирования с гостя будет удержана полная стоимость бронирования или предоплата.'),
+                    Yii::t('app', 'In case of cancellation of the reservation, the guest will be charged the full cost of the reservation or the prepayment.'),
+                    Yii::t('app', 'Резерв жокко чыгарылган учурда коноктон резервациянын толук наркы же алдын ала төлөм өндүрүлөт.')
+                ]
+            ],
+            self::FREE_CANCELLATION_WITH_PENALTY => [
+                'label' => [
+                    Yii::t('app', 'Бесплатная отмена, а затем отмена со штрафом вплоть до времени заезда'),
+                    Yii::t('app', 'Free cancellation, then cancellation with penalty up until check-in time'),
+                    Yii::t('app', 'Бекер жокко чыгаруу, андан кийин каттоо убактысына чейин айып менен жокко чыгаруу'),
+                ],
+                'hint' => [
+                    Yii::t('app', 'В случае отмены до указанного времени, стоимость бронирования или предоплаты будет полностью возвращена гостю. Если бронирование отменено позже указанного времени, вы сможете списать штраф.'),
+                    Yii::t('app', 'If you cancel before the specified time, the cost of the reservation or prepayment will be fully refunded to the guest. If the reservation is cancelled after the specified time, you will be able to write off a penalty.'),
+                    Yii::t('app', 'Көрсөтүлгөн мөөнөткө чейин жокко чыгарылган учурда, бронь же алдын ала төлөмдүн баасы конокко толугу менен кайтарылып берилет. Белгиленген убакыттан кийин ээлеп коюуңуз жокко чыгарылса, сизден айып пул алынат.')
+                ]
+            ]
+        ];
+        return $arr[$type];
     }
 
     public function getMealList()
@@ -110,7 +141,7 @@ class Tariff extends \yii\db\ActiveRecord
     {
         return [
             [['payment_on_book', 'payment_on_reception', 'cancellation', 'meal_type', 'object_id', 'penalty_days'], 'integer'],
-            [['cancellation', 'meal_type', 'title','title_en','title_ky'], 'required'],
+            [['cancellation', 'meal_type', 'title', 'title_en', 'title_ky'], 'required'],
             [['penalty_sum'], 'number'],
             [['room_list'], 'safe'],
             [['title'], 'string', 'max' => 255],

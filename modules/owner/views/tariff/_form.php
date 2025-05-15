@@ -49,7 +49,16 @@ use yii\widgets\ActiveForm;
                 'itemOptions' => ['class' => 'cancellation-option'], // Custom class for styling
             ]
         )->label(false); ?>
-        <div class="penalty_block">
+
+
+        <?php 
+        $visible = "none";
+        if($model->cancellation && $model->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY){
+            $visible = "block";
+        }
+
+        ?>
+        <div class="penalty_block" style="display:<?= $visible ?>">
             <div class="row">
                 <div class="">
                     <div class="col-md-6">
@@ -241,7 +250,7 @@ use yii\widgets\ActiveForm;
     }
 
     .penalty_block {
-        display: none;
+        visibility: visible;
     }
 
     .main {
