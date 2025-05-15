@@ -122,7 +122,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
         });
 
         rooms.forEach(room => {
-            $fixed.append(`<div class="fixed-cell"><b>${room.room_title} (${room.area || 'N/A'})</b></div>`);
+            $fixed.append(`<div class="fixed-cell"><b>${room.room_title[0]} (${room.area || 'N/A'})</b></div>`);
             const $titleRow = $('<div>').addClass('data-row');
             allDays.forEach(() => $titleRow.append('<div class="data-cell"></div>'));
             $('#data-rows').append($titleRow);
@@ -146,7 +146,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
                 $('#data-rows').append($row);
             } else {
                 room.tariff.forEach(tariff => {
-                    $fixed.append(`<div class="fixed-cell">${tariff.title}<br>${room.guest_amount} гостя</div>`);
+                    $fixed.append(`<div class="fixed-cell">${tariff.title[0]}<br>${room.guest_amount} гостя</div>`);
                     const $tariffRow = $('<div>').addClass('data-row');
 
                     allDays.forEach(day => {
@@ -280,12 +280,12 @@ $this->title = Yii::t('app', 'Доступность и цены');
         let valid = true;
         let temp_price_map = {};
 
-        if (similiar_room_count === '' || isNaN(similiar_room_count) || parseInt(similiar_room_count) <= 0) {
-            $('#similar_room_count').css('border-color', 'red');
-            valid = false;
-        } else {
-            $('#similar_room_count').css('border-color', '');
-        }
+        // if (similiar_room_count === '' || isNaN(similiar_room_count) || parseInt(similiar_room_count) <= 0) {
+        //     $('#similar_room_count').css('border-color', 'red');
+        //     valid = false;
+        // } else {
+        //     $('#similar_room_count').css('border-color', '');
+        // }
 
         $('.tariff_price').each(function () {
             const priceStr = $(this).val().trim();

@@ -659,6 +659,8 @@ class ObjectController extends Controller
         $model->meal_terms = $data['terms']['meal_terms'] ?? [];
         $model->children = $data['terms']['children'] ?? [];
 
+        
+
 
         if (Yii::$app->request->isPost) {
             // Save form data
@@ -667,6 +669,7 @@ class ObjectController extends Controller
             $model->internet_public = Yii::$app->request->post('internet_public', 0);
             $model->animals_allowed = Yii::$app->request->post('animals_allowed', 0);
             $model->meal_terms = Yii::$app->request->post('meal_terms', []);
+            echo "<pre>";print_r($model->meal_terms);echo "</pre>";die();
             $model->children = Yii::$app->request->post('children', 0);
             $model->meal_purchaise = Yii::$app->request->post('meal_purchaise', false);
 

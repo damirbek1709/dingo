@@ -28,7 +28,7 @@ class TariffController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['index', 'view', 'update', 'create', 'bind-tariff','bind-room'],
+                    'actions' => ['index', 'view', 'update', 'create', 'bind-tariff','bind-room','edit-tariff'],
                     'roles' => ['owner'],
                 ],
 
