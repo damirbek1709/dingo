@@ -494,30 +494,34 @@ class ObjectController extends Controller
             $model->lon = (float) $model->lon;
             $model->user_id = (int) Yii::$app->user->id;
 
+            $request = Yii::$app->request->post();
+
             
+
+
             if ($bind_model->save(false) && $model->validate()) {
                 $model->name = [
-                    $model->name,
-                    $model->name_en,
-                    $model->name_ky,
+                    $request['Objects']['name'] ?? '',
+                    $request['Objects']['name_en'] ?? '',
+                    $request['Objects']['name_ky'] ?? '',
                 ];
-
+    
                 $model->city = [
-                    $model->city,
-                    $model->city_en,
-                    $model->city_ky,
+                    $request['Objects']['city'] ?? '',
+                    $request['Objects']['city_en'] ?? '',
+                    $request['Objects']['city_ky'] ?? '',
                 ];
-
+    
                 $model->address = [
-                    $model->address,
-                    $model->address_en,
-                    $model->address_ky,
+                    $request['Objects']['address'] ?? '',
+                    $request['Objects']['address_en'] ?? '',
+                    $request['Objects']['address_ky'] ?? '',
                 ];
-
+    
                 $model->description = [
-                    $model->description,
-                    $model->description_en,
-                    $model->description_ky,
+                    $request['Objects']['description'] ?? '',
+                    $request['Objects']['description_en'] ?? '',
+                    $request['Objects']['description_ky'] ?? '',
                 ];
 
                 $bind_model->ceo_doc = UploadedFile::getInstance($bind_model, 'ceo_doc');
