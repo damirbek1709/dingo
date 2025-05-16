@@ -1347,18 +1347,29 @@ class ObjectController extends Controller
             throw new \yii\web\NotFoundHttpException('Record not found.');
         }
 
-        $model = new Objects($searchResult[0]);
+        $meiliData = $searchResult[0];
 
-        // Get available payment types from the database
-        $paymentTypes = PaymentType::find()->asArray()->all(); // ['id' => 1, 'name' => 'Visa']
+        // Use session override if available
+        $session = Yii::$app->session;
+        $sessionKey = "object_{$id}_payment_override";
+        $sessionPayment = $session->get($sessionKey);
 
-        // Convert saved data into an array with IDs as keys
+        if ($sessionPayment !== null) {
+            $meiliData['payment'] = $sessionPayment;
+        }
+
+        $model = new Objects($meiliData);
+
+        // Get available payment types from the DB
+        $paymentTypes = PaymentType::find()->asArray()->all();
+
+        // Get current selections
         $selectedPayments = $model->payment ?? [];
 
         if (Yii::$app->request->isPost) {
             $selectedIds = Yii::$app->request->post('payment_type', []);
 
-            // Convert IDs to associative array {id: name}
+            // Convert selected IDs to full associative array
             $payment_arr = [];
             foreach ($paymentTypes as $payment) {
                 if (in_array($payment['id'], $selectedIds)) {
@@ -1366,12 +1377,16 @@ class ObjectController extends Controller
                 }
             }
 
+            // Save to Meilisearch
             $meilisearchData = [
                 'id' => $id,
                 'payment' => $payment_arr
             ];
 
             if ($index->updateDocuments($meilisearchData)) {
+                // ✅ Save override in session
+                $session->set($sessionKey, $payment_arr);
+
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
             }
@@ -1381,9 +1396,10 @@ class ObjectController extends Controller
             'model' => $model,
             'id' => $id,
             'paymentTypes' => $paymentTypes,
-            'selectedPayments' => array_keys($selectedPayments) // Keep only IDs
+            'selectedPayments' => array_keys($selectedPayments)
         ]);
     }
+
 
     public function actionRoom($id, $object_id)
     {
