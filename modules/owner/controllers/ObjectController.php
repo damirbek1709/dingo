@@ -611,12 +611,24 @@ class ObjectController extends Controller
         $index = $client->index('object');
         $comfort_list = Yii::$app->request->post('comforts');
 
+        // Fetch object from Meilisearch
         $searchResult = $index->getDocument($object_id);
         if (empty($searchResult)) {
             throw new \yii\web\NotFoundHttpException('Record not found.');
         }
 
-        $model = new Objects($searchResult);
+        $objectData = $searchResult;
+
+        // Use session override if present
+        $session = Yii::$app->session;
+        $sessionKey = "object_{$object_id}_comfort_override";
+        $sessionComfortList = $session->get($sessionKey);
+
+        if ($sessionComfortList !== null) {
+            $objectData['comfort_list'] = $sessionComfortList;
+        }
+
+        $model = new Objects($objectData);
 
         if (!empty($comfort_list)) {
             $comfortArr = [];
@@ -635,22 +647,30 @@ class ObjectController extends Controller
                 }
             }
 
+            // Update Meilisearch
             $meilisearchData = [
                 'id' => (int) $object_id,
                 'comfort_list' => $comfortArr
             ];
 
             if ($index->updateDocuments($meilisearchData)) {
+                // ✅ Save comfort_list override to session
+                $session->set($sessionKey, $comfortArr);
+
                 Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
                 return $this->refresh();
             }
         }
+
+        // ✅ Remove session override after one render
+        $session->remove($sessionKey);
 
         return $this->render('comfort', [
             'model' => $model,
             'id' => $object_id,
         ]);
     }
+
 
 
     public function actionTerms($object_id)
