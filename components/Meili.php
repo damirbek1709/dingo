@@ -31,46 +31,47 @@ class Meili extends Component
     // }
 
     public function connect($content = null)
-    {
-        $server = $_SERVER['SERVER_NAME'];
-        try {
-            if ($server == 'partner.dingo.kg') {
-                $client = new Client(
-                    'https://ms.dingo.kg',
-                    '2a8b1d5c2fb5dd1007207d12712a26af5da730b5522c1858a5ddfdb3517b8b69',
-                    new GuzzleHttpClient([
-                        'timeout' => 5,
-                        'verify' => false
-                    ])
-                );
-            }
-            elseif ($server == 'dev.dingo.kg') {
-                $client = new Client(
-                    'https://meili.selva.kg',
-                    'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
-                    new GuzzleHttpClient([
-                        'timeout' => 5,
-                        'verify' => false
-                    ])
-                );
-            }
-            
-            else {
-                $client = new Client(
-                    'http://host.docker.internal:7700',  // This should work on Mac
-                    'masterKey',
-                    new GuzzleHttpClient([
-                        'timeout' => 5,
-                        'verify' => false
-                    ])
-                );
-            }
-            return $client;
-        } catch (\Exception $e) {
-            Yii::error("Meilisearch connection error: " . $e->getMessage());
-            throw $e;
+{
+    $server = strtolower($_SERVER['HTTP_HOST'] ?? php_uname('n'));
+
+    try {
+        if ($server === 'partner.dingo.kg') {
+            $client = new Client(
+                'https://ms.dingo.kg',
+                '2a8b1d5c2fb5dd1007207d12712a26af5da730b5522c1858a5ddfdb3517b8b69',
+                new GuzzleHttpClient([
+                    'timeout' => 5,
+                    'verify' => false
+                ])
+            );
+        } elseif ($server === 'dev.dingo.kg') {
+            $client = new Client(
+                'https://meili.selva.kg',
+                'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
+                new GuzzleHttpClient([
+                    'timeout' => 5,
+                    'verify' => false
+                ])
+            );
+        } else {
+            $client = new Client(
+                'http://host.docker.internal:7700',
+                'masterKey',
+                new GuzzleHttpClient([
+                    'timeout' => 5,
+                    'verify' => false
+                ])
+            );
         }
+
+        return $client;
+
+    } catch (\Exception $e) {
+        Yii::error("Meilisearch connection error: " . $e->getMessage());
+        throw $e;
     }
+}
+
 
     public function getClient()
     {
