@@ -2,13 +2,17 @@
 
 namespace app\modules\owner\controllers;
 
+use Yii;
 use yii\filters\AccessControl;
+use yii\data\ArrayDataProvider;
 
 /**
  * Default controller for the `admin` module
  */
 class DefaultController extends BaseController
 {
+
+    public $layout = "main";
     /**
      * {@inheritdoc}
      */
@@ -47,6 +51,27 @@ class DefaultController extends BaseController
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $filter_string = "user_id=" . Yii::$app->user->id;
+        $client = Yii::$app->meili->connect();
+        $res = $client->index('object')->search('', [
+            'filter' => [
+                $filter_string
+            ],
+            'limit' => 10000
+        ]);
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $res->getHits(),
+            'pagination' => [
+                'pageSize' => 12, // Adjust page size as needed
+            ],
+            // 'sort' => [
+            //     'attributes' => ['id', 'name', 'email'], // Sortable attributes
+            // ],
+        ]);
+
+        return $this->render('index', [
+            'dataProvider' => $dataProvider
+        ]);
     }
 }

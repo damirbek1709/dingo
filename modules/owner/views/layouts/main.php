@@ -92,11 +92,11 @@ ModuleAsset::register($this);
 
         <div class="container-fluid gray-content">
             <div style="padding-top: 70px;">
-                <?= Breadcrumbs::widget([
+                <?php /*echo Breadcrumbs::widget([
                     'links' => isset($this->params['breadcrumbs']) && Yii::$app->controller->route !== 'user/security/login' ? $this->params['breadcrumbs'] : [],
-                ]) ?>
+                ]) */?>
             </div>
-            <?= Alert::widget() ?>
+            <?php //echo Alert::widget() ?>
             <?= $content ?>
         </div>
     </div>
