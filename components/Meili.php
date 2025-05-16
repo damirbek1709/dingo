@@ -36,6 +36,16 @@ class Meili extends Component
         try {
             if ($server == 'partner.dingo.kg') {
                 $client = new Client(
+                    'https://ms.dingo.kg',
+                    '2a8b1d5c2fb5dd1007207d12712a26af5da730b5522c1858a5ddfdb3517b8b69',
+                    new GuzzleHttpClient([
+                        'timeout' => 5,
+                        'verify' => false
+                    ])
+                );
+            }
+            elseif ($server == 'dev.dingo.kg') {
+                $client = new Client(
                     'https://meili.selva.kg',
                     'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
                     new GuzzleHttpClient([
@@ -43,7 +53,9 @@ class Meili extends Component
                         'verify' => false
                     ])
                 );
-            } else {
+            }
+            
+            else {
                 $client = new Client(
                     'http://host.docker.internal:7700',  // This should work on Mac
                     'masterKey',
