@@ -33,7 +33,7 @@ class Meili extends Component
     public function connect($content = null)
 {
     $server = strtolower($_SERVER['HTTP_HOST'] ?? php_uname('n'));
-    //echo $server;die();
+    echo $server;die();
 
     try {
         if ($server === 'partner.dingo.kg') {
