@@ -435,7 +435,6 @@ class ObjectController extends Controller
                     return $this->redirect(['view', 'object_id' => $model->id]);
                 }
             }
-
         }
 
         return $this->render('create', [
