@@ -53,8 +53,6 @@ $this->title = Yii::t('app', 'Доступность и цены');
     </div>
 </div>
 
-
-
 <script>
     const rooms = <?php echo json_encode($rooms, JSON_UNESCAPED_UNICODE); ?>;
     console.log(rooms);
@@ -136,7 +134,6 @@ $this->title = Yii::t('app', 'Доступность и цены');
             });
             $('#data-rows').append($availRow);
 
-
             if (!Array.isArray(room.tariff) || room.tariff.length === 0) {
                 $fixed.append(`<div class="fixed-cell">Нет тарифов</div>`);
                 const $row = $('<div>').addClass('data-row');
@@ -153,7 +150,8 @@ $this->title = Yii::t('app', 'Доступность и цены');
                         const $cell = $('<div>')
                             .addClass('data-cell room_cell')
                             .attr('date', day.fullDate)
-                            .attr('room_id', room.id);
+                            .attr('room_id', room.id)
+                            .attr('tariff_id', tariff.id); // ✅ ADDED
 
                         let matched = false;
 
@@ -202,8 +200,9 @@ $this->title = Yii::t('app', 'Доступность и цены');
         tariff_list = {};
         const date = $(this).attr('date');
         roomId = $(this).attr('room_id');
-        const room = rooms.find(r => r.id == roomId);
+        const tariffId = parseInt($(this).attr('tariff_id')); // ✅ NEW
 
+        const room = rooms.find(r => r.id == roomId);
         if (!room) return;
 
         $('#checkin').val(convertToISO(date));
@@ -211,59 +210,51 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
         let html = `<h4>${room.room_title} (${room.area})</h4>`;
         html += `<div class="form-group">
-                            <label>Доступно номеров </label>
-                            <input class="form-control" type="text" id="similar_room_count" value="${room.similar_room_amount}">
-                        </div>`;
+                    <label>Доступно номеров </label>
+                    <input class="form-control" type="text" id="similar_room_count" value="${room.similar_room_amount}">
+                </div>`;
 
-        if (Array.isArray(room.tariff)) {
-            const grouped = {};
-            room.tariff.forEach(t => {
-                if (!grouped[t.title]) grouped[t.title] = [];
-                grouped[t.title].push(t);
-            });
+        const selectedTariff = room.tariff.find(t => parseInt(t.id) === tariffId);
+        if (selectedTariff) {
+            html += `<div class="" style="margin-top: 15px;"><h5>${selectedTariff.title[0]}</h5>
+                <div class="sidebar_tariff_grid">`;
 
-            for (const [title, tariffs] of Object.entries(grouped)) {
-                html += `<div class="" style="margin-top: 15px;"><h5>${title}</h5>
-                    <div class="sidebar_tariff_grid">`;
-                tariffs.forEach(t => {
-                    tariff_list[t.id] = {
-                        id: t.id,
-                        payment_on_book: t.payment_on_book,
-                        payment_on_reception: t.payment_on_reception,
-                        cancellation: t.cancellation,
-                        meal_type: t.meal_type,
-                        title: t.title,
-                        object_id: t.object_id,
-                        prices: {
-                            price_arr: []
-                        }
-                    };
+            tariff_list[selectedTariff.id] = {
+                id: selectedTariff.id,
+                payment_on_book: selectedTariff.payment_on_book,
+                payment_on_reception: selectedTariff.payment_on_reception,
+                cancellation: selectedTariff.cancellation,
+                meal_type: selectedTariff.meal_type,
+                title: selectedTariff.title,
+                object_id: selectedTariff.object_id,
+                prices: {
+                    price_arr: []
+                }
+            };
 
-                    for (i = 0; i < room.guest_amount; i++) {
-                        const priceValue = (t.prices && t.prices[0] && Array.isArray(t.prices[0].price_arr) && t.prices[0].price_arr[i])
-                            ? t.prices[0].price_arr[i]
-                            : '';
+            for (let i = 0; i < room.guest_amount; i++) {
+                const priceValue = (selectedTariff.prices && selectedTariff.prices[0] &&
+                    Array.isArray(selectedTariff.prices[0].price_arr) &&
+                    selectedTariff.prices[0].price_arr[i])
+                    ? selectedTariff.prices[0].price_arr[i]
+                    : '';
 
-                        html += `
-                                <div>
-                                    <div class="form-group">
-                                    <label>${i + 1} гостя</label>
-                                    <input class="tariff_price" type="text" value="${priceValue}" tariff_id="${t.id}">
-                                    </div>
-                                </div>
-                                `;
-                    }
-                });
-                html += `</div></div>`;
+                html += `
+                    <div>
+                        <div class="form-group">
+                        <label>${i + 1} гостя</label>
+                        <input class="tariff_price" type="text" value="${priceValue}" tariff_id="${selectedTariff.id}">
+                        </div>
+                    </div>`;
             }
+
+            html += `</div></div>`;
         } else {
-            html += `<p><i>Нет доступных тарифов</i></p>`;
+            html += `<p><i>Нет данных по выбранному тарифу</i></p>`;
         }
 
         $('#sidebar-details').html(html);
         $('#sidebar').fadeIn().css('display', 'block');
-
-
     });
 
     $('#sidebar-close').on('click', function () {
@@ -280,24 +271,16 @@ $this->title = Yii::t('app', 'Доступность и цены');
         let valid = true;
         let temp_price_map = {};
 
-        // if (similiar_room_count === '' || isNaN(similiar_room_count) || parseInt(similiar_room_count) <= 0) {
-        //     $('#similar_room_count').css('border-color', 'red');
-        //     valid = false;
-        // } else {
-        //     $('#similar_room_count').css('border-color', '');
-        // }
-
         $('.tariff_price').each(function () {
             const priceStr = $(this).val().trim();
             const tariffId = parseInt($(this).attr('tariff_id'));
 
-            // Validation: required + numeric
             if (priceStr === '' || isNaN(priceStr)) {
                 $(this).css('border-color', '#db2a2a');
                 valid = false;
-                return; // skip further processing
+                return;
             } else {
-                $(this).css('border-color', ''); // reset
+                $(this).css('border-color', '');
             }
 
             const price = parseFloat(priceStr);
@@ -313,7 +296,6 @@ $this->title = Yii::t('app', 'Доступность и цены');
             return;
         }
 
-        // Process after validation
         Object.entries(temp_price_map).forEach(([tariffId, priceArr]) => {
             tariffId = parseInt(tariffId);
 
@@ -321,11 +303,22 @@ $this->title = Yii::t('app', 'Доступность и цены');
                 tariff_list[tariffId].prices = [];
             }
 
-            tariff_list[tariffId].prices.push({
-                price_arr: priceArr,
-                from_date: from_date,
-                to_date: to_date
-            });
+            // Update if same date range exists, else add
+            let existing = tariff_list[tariffId].prices.find(p =>
+                p.from_date === from_date && p.to_date === to_date
+            );
+
+            if (existing) {
+                existing.price_arr = priceArr; // ✅ update
+            } else {
+                tariff_list[tariffId].prices.push({
+                    price_arr: priceArr,
+                    from_date: from_date,
+                    to_date: to_date
+                });
+            }
+
+
         });
 
         const similiar_room_count = $('#similar_room_count').val();
@@ -351,14 +344,12 @@ $this->title = Yii::t('app', 'Доступность и цены');
         });
     });
 
-
     function convertToISO(dateStr) {
         const [dd, mm, yyyy] = dateStr.split('-');
         return `${yyyy}-${mm}-${dd}`;
     }
-
-
 </script>
+
 
 <style>
     input:invalid {

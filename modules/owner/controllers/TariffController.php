@@ -28,7 +28,7 @@ class TariffController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['index', 'view', 'update', 'create', 'bind-tariff','bind-room','edit-tariff'],
+                    'actions' => ['index', 'view', 'update', 'create', 'bind-tariff', 'bind-room', 'edit-tariff'],
                     'roles' => ['owner'],
                 ],
 
@@ -139,12 +139,12 @@ class TariffController extends Controller
         $this->findModel($id)->delete();
         $client = Yii::$app->meili->connect();
         $object = $client->index('object')->getDocument($object_id);
-        
+
         if (isset($object['rooms']) && is_array($object['rooms'])) {
             foreach ($object['rooms'] as $index => $roomData) {
                 if (isset($roomData['tariff'])) {
-                    foreach($roomData['tariff'] as $tariff_item){
-                        if($tariff_item['id'] == $id){
+                    foreach ($roomData['tariff'] as $tariff_item) {
+                        if ($tariff_item['id'] == $id) {
                             array_splice($roomData['tariff'], $tariff_item, 1);
                             break;
                         }
@@ -157,7 +157,7 @@ class TariffController extends Controller
             'rooms' => $object['rooms']
         ]);
 
-        return $this->redirect(['/owner/object/tariff-list','object_id'=>$object_id]);
+        return $this->redirect(['/owner/object/tariff-list', 'object_id' => $object_id]);
     }
 
     public function actionEditTariff()
@@ -171,20 +171,75 @@ class TariffController extends Controller
         $client = Yii::$app->meili->connect();
         $object = $client->index('object')->getDocument($object_id);
 
-        if (isset($object['rooms']) && is_array($object['rooms'])) {
-            foreach ($object['rooms'] as $index => $roomData) {
-                if (isset($roomData['id']) && $roomData['id'] == $room_id) {
-                    $object['rooms'][$index]['tariff'] = array_values($tariff_list); // Replace tariffs
-                    break;
+        if (!is_array($tariff_list) || !is_array($object['rooms'])) {
+            return ['error' => 'Invalid data structure'];
+        }
+
+        foreach ($object['rooms'] as $roomIndex => $roomData) {
+            if ((int) $roomData['id'] !== (int) $room_id) {
+                continue;
+            }
+
+            $existingTariffs = $roomData['tariff'] ?? [];
+
+            foreach ($tariff_list as $newTariffId => $newTariffData) {
+                $newTariffId = (int) $newTariffId;
+                $found = false;
+
+                foreach ($existingTariffs as &$existingTariff) {
+                    if ((int) $existingTariff['id'] === $newTariffId) {
+                        $existingTariff['prices'] = $existingTariff['prices'] ?? [];
+                        $existingPrices = $existingTariff['prices'];
+
+                        if (isset($newTariffData['prices']) && is_array($newTariffData['prices'])) {
+                            foreach ($newTariffData['prices'] as $newPriceBlock) {
+                                if (!isset($newPriceBlock['from_date'], $newPriceBlock['to_date'], $newPriceBlock['price_arr'])) {
+                                    continue;
+                                }
+
+                                $merged = false;
+                                foreach ($existingPrices as &$existingBlock) {
+                                    if (
+                                        isset($existingBlock['from_date'], $existingBlock['to_date']) &&
+                                        $existingBlock['from_date'] === $newPriceBlock['from_date'] &&
+                                        $existingBlock['to_date'] === $newPriceBlock['to_date']
+                                    ) {
+                                        $existingBlock['price_arr'] = $newPriceBlock['price_arr'];
+                                        $merged = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!$merged) {
+                                    $existingPrices[] = $newPriceBlock;
+                                }
+                            }
+                        }
+
+                        $existingTariff['prices'] = $existingPrices;
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    // Validate before adding entirely new tariff
+                    if (isset($newTariffData['id']) && isset($newTariffData['prices']) && is_array($newTariffData['prices'])) {
+                        $existingTariffs[] = $newTariffData;
+                    }
                 }
             }
 
-            // ✅ Save updated object
-            $client->index('object')->updateDocuments([
-                'id' => $object_id,
-                'rooms' => $object['rooms']
-            ]);
+            $object['rooms'][$roomIndex]['tariff'] = array_values($existingTariffs);
+            break;
         }
+
+        $client->index('object')->updateDocuments([
+            [
+                'id' => (int) $object_id,
+                'rooms' => $object['rooms']
+            ]
+        ]);
 
         return $tariff_list;
     }
