@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Objects;
 use app\models\Tariff;
 use app\modules\owner\controllers\ObjectController;
 use yii\helpers\Html;
@@ -51,9 +52,9 @@ use yii\widgets\ActiveForm;
         )->label(false); ?>
 
 
-        <?php 
+        <?php
         $visible = "none";
-        if($model->cancellation && $model->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY){
+        if ($model->cancellation && $model->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
             $visible = "block";
         }
 
@@ -74,15 +75,19 @@ use yii\widgets\ActiveForm;
 
     <div class="tariff_meal_block clear">
         <h3><?= Yii::t('app', 'Питание'); ?></h3>
-        <?= $form->field($model, 'meal_type')->dropDownList(
-            array_map(function ($item) {
-                return $item['label'];
-            }, $model->getMealList()),
-            [
-                'encode' => false, // Allow HTML rendering for hints
-                'itemOptions' => ['class' => 'cancellation-option'], // Custom class for styling
-            ]
-        )->label(Yii::t('app', 'Включено в стоимость тарифа, указать стоимость можно во вкладке “Отель”, раздел “Условия”')); ?>
+        <?= $form->field($model, 'meal_type')->dropDownList(Objects::mealList())->label(Yii::t('app', 'Включено в стоимость тарифа, указать стоимость можно во вкладке “Отель”, раздел “Условия”'));
+        ; ?>
+        <?php
+        // echo $form->field($model, 'meal_type')->dropDownList(
+        //     array_map(function ($item) {
+        //         return $item['label'];
+        //     }, $model->getMealList()),
+        //     [
+        //         'encode' => false, // Allow HTML rendering for hints
+        //         'itemOptions' => ['class' => 'cancellation-option'], // Custom class for styling
+        //     ]
+        // )->label(Yii::t('app', 'Включено в стоимость тарифа, указать стоимость можно во вкладке “Отель”, раздел “Условия”')); 
+        // ?>
     </div>
 
     <div class="tariff_meal_block">
@@ -96,6 +101,7 @@ use yii\widgets\ActiveForm;
         echo $form->field($model, 'room_list')->checkboxList($room_list_arr)->label(false);
         ?>
     </div>
+
 
 
 

@@ -522,7 +522,7 @@ class ObjectController extends Controller
 
 
             if ($bind_model->save(false) && $model->validate()) {
-                
+
 
                 $bind_model->ceo_doc = UploadedFile::getInstance($bind_model, 'ceo_doc');
                 $bind_model->financial_doc = UploadedFile::getInstance($bind_model, 'financial_doc');
@@ -1108,7 +1108,7 @@ class ObjectController extends Controller
                                 'id' => (int) $model->id,
                                 'payment_on_book' => (int) $model->payment_on_book,
                                 'cancellation' => $cancellation_terms,
-                                'meal_type' => (int) $model->meal_type,
+                                'meal_type' => [(int) $model->meal_type, Objects::mealTypeFull($model->meal_type)],
                                 'title' => [$model->title, $model->title_en, $model->title_ky],
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],
@@ -1147,19 +1147,37 @@ class ObjectController extends Controller
     {
         $model = Tariff::findOne($id);
         $model->object_id = $object_id;
+
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $object = $index->getDocument($object_id);
         $object_title = $object['name'][0];
 
-        if ($this->request->isPost) {
+        // Get all rooms and assign pre-checked room IDs
+        $rooms = $object['rooms'] ?? [];
 
+        $boundRoomIds = [];
+        foreach ($rooms as $room) {
+            if (!empty($room['tariff'])) {
+                foreach ($room['tariff'] as $tariff) {
+                    if ((int) $tariff['id'] === (int) $model->id) {
+                        $boundRoomIds[] = (int) $room['id'];
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Populate the model's room_list for checkbox pre-selection
+        $model->room_list = $boundRoomIds;
+
+        if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                //echo $model->penalty_sum."<br>".$model->penalty_days;die();
                 $room_list = $model->room_list;
+
                 try {
-                    $rooms = $object['rooms'] ?? [];
                     $updatedRooms = [];
+
                     foreach ($rooms as $roomData) {
                         if (!is_array($roomData) || !isset($roomData['id'])) {
                             Yii::warning("Invalid room data: " . json_encode($roomData));
@@ -1167,25 +1185,26 @@ class ObjectController extends Controller
                         }
 
                         $roomData['id'] = (int) $roomData['id'];
-                        if ($room_list && in_array($roomData['id'], $room_list)) {
-                            $roomData['tariff'] = $roomData['tariff'] ?? [];
-                            foreach ($roomData['tariff'] as $tariff_item) {
-                                if ($tariff_item['id'] == $id) {
-                                    unset($roomData['tariff']);
-                                    break;
-                                }
-                            }
+                        $roomData['tariff'] = $roomData['tariff'] ?? [];
 
+                        // Remove this tariff from all rooms
+                        $roomData['tariff'] = array_filter($roomData['tariff'], function ($t) use ($id) {
+                            return $t['id'] != $id;
+                        });
+
+                        // Re-add updated tariff only to selected rooms
+                        if ($room_list && in_array($roomData['id'], $room_list)) {
                             $cancellation_terms = [
                                 'type' => $model->getCancellationType((int) $model->cancellation),
                                 'penalty_sum' => (double) $model->penalty_sum,
                                 'penalty_days' => (int) $model->penalty_days,
                             ];
+
                             $tariff_data = [
                                 'id' => (int) $model->id,
                                 'payment_on_book' => (int) $model->payment_on_book,
                                 'cancellation' => $cancellation_terms,
-                                'meal_type' => (int) $model->meal_type,
+                                'meal_type' => [(int) $model->meal_type, Objects::mealTypeFull($model->meal_type)],
                                 'title' => [$model->title, $model->title_en, $model->title_ky],
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],
@@ -1196,9 +1215,11 @@ class ObjectController extends Controller
 
                             $roomData['tariff'][] = $tariff_data;
                         }
+
                         $updatedRooms[] = $roomData;
                     }
 
+                    // Update Meilisearch index
                     $meilisearchData = [
                         'id' => (int) $object_id,
                         'rooms' => $updatedRooms
@@ -1220,6 +1241,8 @@ class ObjectController extends Controller
             'object_title' => $object_title
         ]);
     }
+
+
 
 
 
