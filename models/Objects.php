@@ -137,7 +137,7 @@ class Objects extends \yii\db\ActiveRecord
                     'site',
                     'lat',
                     'lon',
-                   
+
                     'general_room_count',
                     'img'
                 ],
@@ -194,16 +194,18 @@ class Objects extends \yii\db\ActiveRecord
     {
         $condition_room_tariff = false;
         $model = Objects::findOne($id);
+        $tariff_exist = Tariff::find()->where(['object_id' => $id])->one();
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $object = $index->getDocument($id);
-        if (isset($object['rooms']) && is_array($object['rooms'])) {
-            foreach ($object['rooms'] as $index => $roomData) {
-                if (isset($roomData['tariff']) && is_array($roomData['tariff'])) {
-                    $condition_room_tariff = true;
-                    break;
-                }
-            }
+        if (isset($object['rooms']) && is_array($object['rooms']) && $tariff_exist) {
+            $condition_room_tariff = true;
+            // foreach ($object['rooms'] as $index => $roomData) {
+            //     if (isset($roomData['tariff']) && is_array($roomData['tariff'])) {
+            //         $condition_room_tariff = true;
+            //         break;
+            //     }
+            // }
         }
         if ($condition_room_tariff && $model->getCeoDocs() && $model->getFinancialDocs()) {
             return self::STATUS_READY_FOR_PUBLISH;
@@ -218,7 +220,7 @@ class Objects extends \yii\db\ActiveRecord
         $docs = 0;
         $condition_room_tariff = false;
 
-        
+
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
 
@@ -262,7 +264,7 @@ class Objects extends \yii\db\ActiveRecord
 
     public static function statusData($status = self::STATUS_NOT_PUBLISHED)
     {
-        if(!$status || $status == ""){
+        if (!$status || $status == "") {
             $status = self::STATUS_NOT_PUBLISHED;
         }
         $arr = [
@@ -282,7 +284,7 @@ class Objects extends \yii\db\ActiveRecord
                  </div>',
                 'button_text' => Yii::t('app', 'Заполнить информацию'),
                 'title' => Yii::t('app', 'Публикация объекта'),
-                'current_status'=>self::STATUS_NOT_PUBLISHED
+                'current_status' => self::STATUS_NOT_PUBLISHED
             ],
             self::STATUS_ON_MODERATION => [
                 'label' => Yii::t('app', 'На модерации'),
@@ -292,7 +294,7 @@ class Objects extends \yii\db\ActiveRecord
                 'html' => '<div>Ваш объект отправлен на проверку. Мы постараемся рассмотреть его как можно быстрее. Вы получите уведомление, как только объект будет одобрен</div>',
                 'button_text' => Yii::t('app', 'Понятно'),
                 'title' => Yii::t('app', 'Объект на модерации'),
-                'current_status'=>self::STATUS_ON_MODERATION
+                'current_status' => self::STATUS_ON_MODERATION
             ],
             self::STATUS_READY_FOR_PUBLISH => [
                 'label' => Yii::t('app', 'Готов к публикации'),
@@ -301,7 +303,7 @@ class Objects extends \yii\db\ActiveRecord
                 'color' => '#3676BC',
                 'html' => 'Вы заполнили все необходимые данные. Опубликуйте объект и после проверки он станет доступен для поиска и бронирования',
                 'button_text' => Yii::t('app', 'Опубликовать объект'),
-                'current_status'=>self::STATUS_READY_FOR_PUBLISH
+                'current_status' => self::STATUS_READY_FOR_PUBLISH
             ],
             self::STATUS_PUBLISHED => [
                 'label' => Yii::t('app', 'Опубликовано'),
@@ -310,7 +312,7 @@ class Objects extends \yii\db\ActiveRecord
                 'color' => '#8CC43D',
                 'button_text' => Yii::t('app', 'Снять с публикации'),
                 'current_status'=>self::STATUS_NOT_PUBLISHED,
-                'html' => '<div>Ваш объект успешно прошёл модерацию и теперь доступен для бронирования!
+                'html' => '<div> Ва ш объект успешно прошёл модерацию и теперь доступен для бронирования!
                         <p class="dialog-paragraph"> 📌 Советы, как получить больше бронирований:</p>
                         <li> - Добавьте яркие и качественные фото</li>
                         <li> - Проверьте цены — они должны быть конкурентными</li>
@@ -323,8 +325,8 @@ class Objects extends \yii\db\ActiveRecord
                 'color' => '#F5222D',
                 'button_text' => Yii::t('app', 'Внести правки'),
                 'title'=>Yii::t('app','Объект отклонён'),
-                'current_status'=>self::STATUS_DENIED,
-                'html' => "<div>К сожалению, объект не прошёл модерацию. Проверьте данные и внесите необходимые правки. После этого вы сможете отправить объект на повторную проверку.</div>",
+                'curren t_ status'=>self ::STATUS_DENIED,
+                'html' => "<div> К  сожалению, объект не прошёл модерацию. Проверьте данные и внесите необходимые правки. После этого вы сможете отправить объект на повторную проверку.</div>",
             ]
         ];
         return $arr[$status];
@@ -334,8 +336,8 @@ class Objects extends \yii\db\ActiveRecord
     {
         $arr = [
             self::STATUS_NOT_PUBLISHED =>  Yii::t('app', 'Не опубликовано'),
-            self::STATUS_ON_MODERATION =>  Yii::t('app', 'На модерации'),
-            self::STATUS_READY_FOR_PUBLISH => Yii::t('app', 'Готов к публикации'),
+            self::STATUS_ON_MODERATION => Yii::t('app', 'На модерации'),
+            self::STATUS_READY_FOR_PUBLISH=> Yii::t('app', 'Готов к публикации'),
             self::STATUS_PUBLISHED => Yii::t('app', 'Опубликовано'),
             self::STATUS_DENIED => Yii::t('app', 'Отклонено')
         ];
@@ -386,6 +388,7 @@ class Objects extends \yii\db\ActiveRecord
 
     public static function typeString($id = 1){
         $arr = [
+    
             self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
             self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
             self::OBJECT_TYPE_RESTBASE => 'База отдыха',
@@ -452,7 +455,7 @@ class Objects extends \yii\db\ActiveRecord
                     'class' => 'owner-nav-item-object',
                 ],    
             ];    
-        }
+            
         return $general_arr;
     }
 
@@ -502,7 +505,7 @@ class Objects extends \yii\db\ActiveRecord
             'lon' => 'Longitude',
             'email' => 'E-mail',
             'phone'=>Yii::t('app', 'Контакты'),
-            'name' => Yii::t('app', 'Название'),
+            'name'  =>  Yii::t('app', 'Название'),
             'name_en' => Yii::t('app', 'Название на английском'),
             'name_ky' => Yii::t('app', 'Название на кыргызском'),
 
@@ -515,7 +518,7 @@ class Objects extends \yii\db\ActiveRecord
             'description_en' => Yii::t('app', 'Описание на английском'),
             'description_ky' => Yii::t('app', 'Описание на кыргызском'),
             'general_room_count'=>Yii::t('app','Общее количество комнат')
-        ];
+        ];   
     }
 
     public static function mealList()
@@ -523,16 +526,24 @@ class Objects extends \yii\db\ActiveRecord
         $title = 'title';
         switch (Yii::$app->language) {
             case 'ru':$title = 'title';break;
-            case 'en':$title = 'title_en';break;
-            case 'ky':$title = 'title_ky';break;
-            default:$title = 'title';
+            case 'en':
+                $title = 'title_e
+                n';break;
+            case 'ky':
+                $title = 'title_ky';
+                break;
+            default:$t
+                itle = 'title';
+                
         }
+                
         return ArrayHelper::map(Vocabulary::find()->where(['model'=>Vocabulary::MODEL_TYPE_MEAL])->all(), 'id', $title);
-    }
+    }  
 
     public static function mealTypeFull($id){
-        $voc = Vocabulary::find()->where(['id'=>$id,'model'=>Vocabulary::MODEL_TYPE_MEAL])->one();
-        $arr = [
+        $voc = Vocabulary::find()->where(['i
+    d'=>$id,'model'=>Vocabulary::MODEL_TYPE_MEAL])->one();
+        $arr = [     
             $voc->title,
             $voc->title_en,
             $voc->title_ky
@@ -542,7 +553,7 @@ class Objects extends \yii\db\ActiveRecord
 
     
 
-    public function getPictures()
+
     {
         $list = [];
         foreach ($this->getImages() as $image) {
@@ -561,7 +572,7 @@ class Objects extends \yii\db\ActiveRecord
                 'thumbnailPicture' => $thumb,
                 'isMain' => $image->isMain,
                 'orignal'=>Url::base().'/'.$original
-            ];
+            ];      
         }
 
         return $list;
