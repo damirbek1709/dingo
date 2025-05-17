@@ -19,15 +19,15 @@ use yii\widgets\Pjax;
     </div>
 
     <div class="owner-nav-item owner-nav-item-terms">
-        <?= Html::a(Yii::t('app', 'Финансы'), ['terms', 'object_id']); ?>
+        <?= Html::a(Yii::t('app', 'Финансы'), '#'); ?>
     </div>
 
     <div class="owner-nav-item owner-nav-item-crew">
-        <?php echo Html::a(Yii::t('app', 'Сотрудники'), ['crew']); ?>
+        <?php echo Html::a(Yii::t('app', 'Сотрудники'), '#'); ?>
     </div>
 
     <div class="owner-nav-item owner-nav-item-feedback">
-        <?php echo  Html::a(Yii::t('app', 'Справочники'), ['feedback']); ?>
+        <?php echo  Html::a(Yii::t('app', 'Справочники'), '#'); ?>
     </div>
 </div>
 

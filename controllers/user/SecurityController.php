@@ -27,7 +27,7 @@ class SecurityController extends BaseSecurityController
         if ($model->load(\Yii::$app->getRequest()->post()) && $model->login()) {
             $this->trigger(self::EVENT_AFTER_LOGIN, $event);
             if(Yii::$app->user->can('admin')){
-                return $this->redirect('/admin');
+                return $this->redirect('/admin/object');
             }
             return $this->goHome();
         }
