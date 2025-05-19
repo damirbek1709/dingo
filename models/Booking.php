@@ -116,7 +116,7 @@ class Booking extends \yii\db\ActiveRecord
             $roomData = [];
             foreach ($object['rooms'] as $room) {
                 if ($room['id'] == $this->room_id) {
-                    $room_title = $room['room_title'];
+                    $room_title = $room['room_title'][0];
                     break;
                 }
             }
@@ -142,7 +142,7 @@ class Booking extends \yii\db\ActiveRecord
             if (array_key_exists('tariff', $roomData)) {
                 foreach ($roomData['tariff'] as $tariff) {
                     if ($tariff['id'] == $this->tariff_id) {
-                        $tariff_title = $tariff['title'];
+                        $tariff_title = $tariff['title'][0];
                         break;
                     }
                 }

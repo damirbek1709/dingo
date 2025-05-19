@@ -8,11 +8,11 @@ use yii\helpers\Html;
     $action = App::getStyle(Yii::$app->controller->action->id);
     $class = "style_" . $action;
     ?>
-    <?= Html::a('Отель', ['view', 'object_id' => $object_id], ['class' => "style_hotel top_nav_title top_nav_title_hotel"]); ?>
-    <?php echo Html::a('Доступность и цены', ['prices', 'object_id' => $object_id], ['class' => "style_prices top_nav_title top_nav_title_prices"]); ?>
-    <?php echo Html::a('Бронирования', ['booking', 'object_id' => $object_id], ['class' => 'style_booking top_nav_title top_nav_title_booking']); ?>
-    <?php echo  Html::a('Номера и тарифы', ['room-list', 'object_id' => $object_id], ['class' => 'style_rooms style_room-list top_nav_title top_nav_title_rooms']); ?>
-    <?php echo  Html::a('Финансы', ['finance', 'object_id' => $object_id], ['class' => 'style_finance top_nav_title top_nav_title_finance']); ?>
+    <?= Html::a('Отель', ['/owner/object/view', 'object_id' => $object_id], ['class' => "style_hotel top_nav_title top_nav_title_hotel"]); ?>
+    <?php echo Html::a('Доступность и цены', ['/owner/object/prices', 'object_id' => $object_id], ['class' => "style_prices top_nav_title top_nav_title_prices"]); ?>
+    <?php echo Html::a('Бронирования', ['/owner/object/booking', 'object_id' => $object_id], ['class' => 'style_booking top_nav_title top_nav_title_booking']); ?>
+    <?php echo  Html::a('Номера и тарифы', ['/owner/object/room-list', 'object_id' => $object_id], ['class' => 'style_rooms style_room-list top_nav_title top_nav_title_rooms']); ?>
+    <?php echo  Html::a('Финансы', ['/owner/object/finance', 'object_id' => $object_id], ['class' => 'style_finance top_nav_title top_nav_title_finance']); ?>
 </div>
 
 <style>

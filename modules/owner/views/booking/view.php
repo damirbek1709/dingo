@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Booking;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -11,41 +12,86 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Bookings'), 'url' =>
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="booking-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+<div class="col-md-12">
 
-    <p>
-        <?= Html::a(Yii::t('app', 'Update'), ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a(Yii::t('app', 'Delete'), ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
+    <div class="oblast-update">
+        <?php //= $this->render('top_nav', ['object_id' => $model->object_id]) ?>
+        <div class="booking-index">
+            <?= DetailView::widget([
+                'model' => $model,
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'object_id',
-            'room_id',
-            'tariff_id',
-            'sum',
-            'guest_email:email',
-            'guest_phone',
-            'guest_name',
-            'date_from',
-            'date_to',
-            'status',
-            'other_guests',
-            'cancellation_type',
-            'cancellation_penalty_sum',
-            'user_id',
-            'special_comment',
-        ],
-    ]) ?>
+                'attributes' => [
+                    'guest_name',
+                    [
+                        'attribute' => 'date_from',
+                        'value' => function ($model) {
+                                        return $model->dateFormat($model->date_from);
+                                    }
+                    ],
+                    [
+                        'attribute' => 'date_to',
+                        'value' => function ($model) {
+                                        return $model->dateFormat($model->date_to);
+                                    }
+                    ],
+                    [
+                        'attribute' => 'room_id',
+                        'value' => function ($model) {
+                                        return $model->bookingRoomTitle();
+                                    }
+                    ],
+                    [
+                        'attribute' => 'object_id',
+                        'value' => function ($model) {
+                                        return $model->bookingObjectTitle();
+                                    }
+                    ],
+                    [
+                        'attribute' => 'tariff_id',
+                        'value' => function ($model) {
+                                        return $model->bookingTariffTitle();
+                                    }
+                    ],
+                    'special_comment',
+                    [
+                        'attribute' => 'created_at',
+                        'value' => function ($model) {
+                                        return $model->dateFormat($model->created_at);
+                                    }
+                    ],
+                    [
+                        'attribute' => 'sum',
+                        'value' => function ($model) {
+                                        return $model->sum . " " . $model->currency;
+                                    }
+                    ],
+                    [
+                        'attribute' => 'status',
+                        'value' => function ($model) {
+                                        return $model->bookingStatusString();
+                                    }
+                    ],
+                    'guest_email:email',
+                    'guest_phone',
+                    'guest_name',
+                    'date_from',
 
+                    'status',
+                    'other_guests',
+                    'cancellation_type',
+                    'cancellation_penalty_sum',
+                    'user_id',
+                    'special_comment',
+                ],
+            ]) ?>
+
+            <div class="margin_30" style="margin-top:30px">
+                <?php
+                if ($model->status == Booking::PAID_STATUS_CANCEL_INQUIRY) {
+                    echo Html::a(Yii::t('app', 'Возврат средств'), ['refund', 'id' => $model->id], ['class' => 'save-button']);
+                } ?>
+            </div>
+        </div>
+    </div>
 </div>
