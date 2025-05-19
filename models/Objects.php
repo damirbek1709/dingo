@@ -459,21 +459,7 @@ class Objects extends \yii\db\ActiveRecord
         return $general_arr;
     }
 
-    public function objectTypeString(){
-        $arr = [
-            0 => '',
-            self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
-            self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
-            self::OBJECT_TYPE_RESTBASE => 'База отдыха',
-            self::OBJECT_TYPE_BUNGALOW => 'Бунгало',
-            self::OBJECT_TYPE_BOUTIQUE_HOTEL => 'Бутик-отель',
-            self::OBJECT_TYPE_VILLA => 'Вилла',
-            self::OBJECT_TYPE_GLAMPING => 'Глэмпинг',
-            self::OBJECT_TYPE_GUESTHOUSE => 'Гостевой дом',
-            self::OBJECT_TYPE_RESIDENTIAL_PREMISES => 'Жилое помещение',
-        ];
-        return $arr[$this->type];
-    }
+    
 
     public function behaviors()
     {
@@ -526,13 +512,11 @@ class Objects extends \yii\db\ActiveRecord
         switch (Yii::$app->language) {
             case 'ru':$title = 'title';break;
             case 'en':
-                $title = 'title_e
-                n';break;
+                $title = 'title_en';break;
             case 'ky':
                 $title = 'title_ky';
                 break;
-            default:$t
-                itle = 'title';
+            default:$title = 'title';
                 
         }
                 
@@ -549,9 +533,26 @@ class Objects extends \yii\db\ActiveRecord
         return $arr;
     }
 
+    public function objectTypeString()
+    {
+        $arr = [
+            0 => '',
+            self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
+            self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
+            self::OBJECT_TYPE_RESTBASE => 'База отдыха',
+            self::OBJECT_TYPE_BUNGALOW => 'Бунгало',
+            self::OBJECT_TYPE_BOUTIQUE_HOTEL => 'Бутик-отель',
+            self::OBJECT_TYPE_VILLA => 'Вилла',
+            self::OBJECT_TYPE_GLAMPING => 'Глэмпинг',
+            self::OBJECT_TYPE_GUESTHOUSE => 'Гостевой дом',
+            self::OBJECT_TYPE_RESIDENTIAL_PREMISES => 'Жилое помещение',
+        ];
+        return $arr[$this->type];
+    }
+
     
 
-
+    public function getPictures()
     {
         $list = [];
         foreach ($this->getImages() as $image) {
