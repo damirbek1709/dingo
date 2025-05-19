@@ -705,13 +705,15 @@ class ObjectController extends Controller
             $model->children = $data['terms']['children'] ?? [];
 
             if (Yii::$app->request->isPost) {
+                
                 $meal_arr = Yii::$app->request->post('meal_terms', []);
+                
                 $arr = [];
                 if ($meal_arr) {
                     $counter = 0;
                     foreach ($meal_arr as $term) {
                         $temp = Objects::mealTypeFull($term['meal_type']);
-                        $arr[$counter]['meal_type']['meal_title'] = $temp;
+                        $arr[$counter]['meal_title'] = $temp;
                         $arr[$counter]['meal_type'] = (int) $term['meal_type'];
                         $arr[$counter]['meal_cost'] = (int) $term['meal_cost'];
                         $counter++;
