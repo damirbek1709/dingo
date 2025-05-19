@@ -294,7 +294,7 @@ class TariffController extends Controller
                 // When checkbox is checked, add the tariff
                 $push_arr = [
                     "id" => $tariffId,
-                    "title" => $tariff->title,
+                    "title" => [$tariff->title, $tariff->title_en, $tariff->title_ky],
                     "payment_on_book" => $tariff->payment_on_book ? 1 : 0,
                     "payment_on_reception" => $tariff->payment_on_reception ? 1 : 0,
                     "cancellation" => (int) $tariff->cancellation,
