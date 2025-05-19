@@ -162,7 +162,7 @@ class BookingController extends BaseController
             $response['success'] = true;
             $response['message'] = 'Booking added successfully';
             $response['url'] = Booking::pay($arr);
-            $response['transaction_number'] = $model->transaction_number;
+            $response['transaction_number'] = (int) $model->id + 1000000;
         } else {
             $response['message'] = $model->errors;
         }
