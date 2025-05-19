@@ -1,5 +1,5 @@
 <?php
-
+use Yii;
 use app\models\Booking;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
