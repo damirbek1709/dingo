@@ -37,6 +37,7 @@ class Booking extends \yii\db\ActiveRecord
     const PAID_STATUS_NOT_PAID = 0;
     const PAID_STATUS_PAID = 1;
     const PAID_STATUS_CANCELED = 2;
+    const PAID_STATUS_CANCEL_INQUIRY = 3;
     /**
      * {@inheritdoc}
      */
@@ -57,7 +58,7 @@ class Booking extends \yii\db\ActiveRecord
             [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
             [['date_from', 'date_to'], 'safe'],
-            [['tariff_id','currency'], 'string', 'max' => 11],
+            [['tariff_id', 'currency'], 'string', 'max' => 11],
             [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number'], 'string', 'max' => 255],
             [['other_guests'], 'string', 'max' => 500],
         ];
@@ -163,21 +164,23 @@ class Booking extends \yii\db\ActiveRecord
     {
         $string = Yii::t('app', 'Активный');
         if ($this->status == self::PAID_STATUS_PAID) {
-            if($this->date_from <= date('Y-m-d')){
+            if ($this->date_from <= date('Y-m-d')) {
                 $string = Yii::t('app', 'Активный');
-            }
-            elseif($this->date_to > date('Y-m-d')){
+            } elseif ($this->date_to > date('Y-m-d')) {
                 $string = Yii::t('app', 'Завершен');
             }
-        }
-        elseif($this->status == self::PAID_STATUS_CANCELED){
+        } elseif ($this->status == self::PAID_STATUS_CANCELED) {
             $string = Yii::t('app', 'Отменен');
+        } elseif ($this->status == self::PAID_STATUS_CANCEL_INQUIRY) {
+            $string = Yii::t('app', 'Заявка на отмену брони');
         }
         return $string;
     }
 
-    public function dateFormat($date){
-        if(!$date) $date = date('Y-m-d');
+    public function dateFormat($date)
+    {
+        if (!$date)
+            $date = date('Y-m-d');
         $formatter = new IntlDateFormatter(
             'ru_RU', // Russian locale
             IntlDateFormatter::LONG,
@@ -186,7 +189,7 @@ class Booking extends \yii\db\ActiveRecord
             null,
             'd MMMM yyyy' // Format: day full_month_name year
         );
-        return $formatter->format(new DateTime($date)); 
+        return $formatter->format(new DateTime($date));
     }
 
 }

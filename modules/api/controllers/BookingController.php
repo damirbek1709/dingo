@@ -7,6 +7,7 @@ use app\models\FlashPay;
 use app\models\Booking;
 use app\models\Comfort;
 use app\models\RoomComfort;
+use app\models\Tariff;
 use app\models\user\User;
 use Yii;
 use yii\filters\AccessControl;
@@ -49,7 +50,6 @@ class BookingController extends BaseController
 
         $behaviors['authenticator']['except'] = [
             'index',
-            'add',
             'webhook',
         ];
 
@@ -59,7 +59,7 @@ class BookingController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange','list'],
+                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'list'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -85,7 +85,7 @@ class BookingController extends BaseController
             'actions' => [
                 'add' => ['POST'],
                 'webhook' => ['POST'],
-                'list'=>['GET']
+                'list' => ['GET']
             ],
         ];
 
@@ -126,7 +126,7 @@ class BookingController extends BaseController
 
 
 
-    
+
 
     public function actionAdd()
     {
@@ -190,22 +190,36 @@ class BookingController extends BaseController
         return "OK";
     }
 
-    public function actionList($finished = false, $future = false ,$canceled= false)
-    {   
+    public function actionList($finished = false, $future = false, $canceled = false)
+    {
 
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
         $current_date = date('Y-m-d');
-        if($finished){
-            $dataProvider->query->andFilterWhere(['>','date_from', $current_date]);
+        if ($finished) {
+            $dataProvider->query->andFilterWhere(['>', 'date_from', $current_date]);
         }
-        if($canceled){
-            $dataProvider->query->andFilterWhere(['status'=>Booking::PAID_STATUS_CANCELED]);
+        if ($canceled) {
+            $dataProvider->query->andFilterWhere(['status' => Booking::PAID_STATUS_CANCELED]);
         }
-        if($future){
-            $dataProvider->query->andFilterWhere(['<','date_to', $current_date]);
+        if ($future) {
+            $dataProvider->query->andFilterWhere(['<', 'date_to', $current_date]);
         }
         return $dataProvider;
+    }
+
+    public function actionCancel($id)
+    {
+        $response['result'] = false;
+        $model = Booking::findOne($id);
+        if ($model) {
+            $model->status = Booking::PAID_STATUS_CANCEL_INQUIRY;
+            if ($model->save(false)) {
+                $response['result'] = true;
+                $response['message']= Yii::t('app','Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');
+            }
+        }
+        return $response;
     }
 
 }
