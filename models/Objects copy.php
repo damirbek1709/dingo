@@ -413,8 +413,7 @@ class Objects extends \yii\db\ActiveRecord {
                 'options' => [
                     'class' => 'owner-nav-item-object',
                 ],    
-            ];   
-        } 
+            ];    
             
         return $general_arr;
     }
