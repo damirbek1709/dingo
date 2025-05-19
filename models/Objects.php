@@ -9,94 +9,43 @@ use yii\helpers\Url;
 use rico\yii2images\models\Image;
 
 
-class Objects extends \yii\db\ActiveRecord
+class Objects extends \yii\db\ActiveRecord 
 {
-    const STATUS_NOT_PUBLISHED = 0;
-    const STATUS_READY_FOR_PUBLISH = 1;
-    const STATUS_ON_MODERATION = 2;
-    const STATUS_PUBLISHED = 3;
-    const STATUS_DENIED = 4;
-    const STATUS_DELETED = 5;
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'type' => Yii::t('app', 'Тип'),
+            'city' => Yii::t('app', 'Город'),
+            'address' => Yii::t('app', 'Адрес'),
+            'currency' => Yii::t('app', 'Валюта'),
+            'features' => Yii::t('app', 'Адрес'),
+            'phone' => Yii::t('app', 'Телефон'),
+            'site' => Yii::t('app', 'Сайт'),
+            'check_in' => Yii::t('app', 'Заезд'),
+            'check_out' => Yii::t('app', 'Выезд'),
+            'reception' => Yii::t('app', 'Ресепшн'),
+            'description' => Yii::t('app', 'Описание'),
+            'images' => Yii::t('app', 'Фотографии'),
+            'lat' => 'Latitude',
+            'lon' => 'Longitude',
+            'email' => 'E-mail',
+            'phone'=>Yii::t('app', 'Контакты'),
+            'name'  =>  Yii::t('app', 'Название'),
+            'name_en' => Yii::t('app', 'Название на английском'),
+            'name_ky' => Yii::t('app', 'Название на кыргызском'),
 
-    public $user_id;
-    public $type;
-    public $name;
-    public $name_en;
-    public $name_ky;
-    public $city_en;
-    public $city_ky;
-    public $city;
-    public $city_id;
-    public $address;
-    public $address_ky;
-    public $address_en;
-    public $currency;
-    public $features;
-    public $phone;
-    public $site;
-    public $check_in;
-    public $check_out;
-    public $object;
-    public $reception;
-    public $description;
-    public $description_en;
-    public $description_ky;
-    public $payment;
-    public $lat;
-    public $lon;
-    public $email;
-    public $meal_terms;
-    public $rooms;
-    public $general_room_count;
-    public $terms;
-    public $early_check_in;
-    public $late_check_in;
-    public $internet_public = false;
-    public $animals_allowed = false;
-    public $meal_purchaise = false;
-    public $meal_type = false;
-    public $meal_cost = false;
-    public $uploadImages;
-    public $images;
-    public $img;
-    public $children;
-    public $deny_reason;
-    public $guest_amount;
+            'city_en' => Yii::t('app', 'Город на английском'),
+            'city_ky' => Yii::t('app', 'Город на кыргызском'),
 
-    public $status;
-    public $ceo_doc;
-    public $financial_doc;
-    public $from_price;
-    public $phone_code;
+            'address_en' => Yii::t('app', 'Адрес на английском'),
+            'address_ky' => Yii::t('app', 'Адрес на кыргызском'),
 
-
-
-
-    const SEARCH_TYPE_CITY = 3;
-    const SEARCH_TYPE_REGION = 1;
-    const SEARCH_TYPE_HOTEL = 2;
-
-    const CURRENCY_KGS = 1;
-    const CURRENCY_USD = 2;
-
-    public $comfort_list;
-
-    const TERM_MEAL_BREAKFEST = 1;
-    const TERM_MEAL_THREE_TIMES = 2;
-
-    const OBJECT_TYPE_APARTHOTEL = 1;
-    const OBJECT_TYPE_APARTMENTS = 2;
-    const OBJECT_TYPE_RESTBASE = 3;
-    const OBJECT_TYPE_BUNGALOW = 4;
-    const OBJECT_TYPE_BOUTIQUE_HOTEL = 5;
-    const OBJECT_TYPE_VILLA = 6;
-    const OBJECT_TYPE_GLAMPING = 7;
-    const OBJECT_TYPE_GUESTHOUSE = 8;
-    const OBJECT_TYPE_RESIDENTIAL_PREMISES = 9;
-
-    //public $primaryKey = 'link_id';
-
-
+            'description_en' => Yii::t('app', 'Описание на английском'),
+            'description_ky' => Yii::t('app', 'Описание на кыргызском'),
+            'general_room_count'=>Yii::t('app','Общее количество комнат')
+        ];   
+    }
 
     public function rules()
     {
@@ -151,11 +100,11 @@ class Objects extends \yii\db\ActiveRecord
         ];
     }
 
+
     public static function tableName()
     {
         return 'object';
     }
-
     public function getCeoDocs()
     {
         $file_array = [];
@@ -333,6 +282,7 @@ class Objects extends \yii\db\ActiveRecord
         return $arr[$status];
     }
 
+
     public static function statusList()
     {
         $arr = [
@@ -386,6 +336,7 @@ class Objects extends \yii\db\ActiveRecord
         ];
 
     }
+
 
     public static function typeString($id = 1){
         $arr = [
@@ -459,8 +410,6 @@ class Objects extends \yii\db\ActiveRecord
         return $general_arr;
     }
 
-    
-
     public function behaviors()
     {
         return [
@@ -468,42 +417,6 @@ class Objects extends \yii\db\ActiveRecord
                 'class' => 'rico\yii2images\behaviors\ImageBehave',
             ]
         ];
-    }
-
-    public function attributeLabels()
-    {
-        return [
-            'id' => 'ID',
-            'type' => Yii::t('app', 'Тип'),
-            'city' => Yii::t('app', 'Город'),
-            'address' => Yii::t('app', 'Адрес'),
-            'currency' => Yii::t('app', 'Валюта'),
-            'features' => Yii::t('app', 'Адрес'),
-            'phone' => Yii::t('app', 'Телефон'),
-            'site' => Yii::t('app', 'Сайт'),
-            'check_in' => Yii::t('app', 'Заезд'),
-            'check_out' => Yii::t('app', 'Выезд'),
-            'reception' => Yii::t('app', 'Ресепшн'),
-            'description' => Yii::t('app', 'Описание'),
-            'images' => Yii::t('app', 'Фотографии'),
-            'lat' => 'Latitude',
-            'lon' => 'Longitude',
-            'email' => 'E-mail',
-            'phone'=>Yii::t('app', 'Контакты'),
-            'name'  =>  Yii::t('app', 'Название'),
-            'name_en' => Yii::t('app', 'Название на английском'),
-            'name_ky' => Yii::t('app', 'Название на кыргызском'),
-
-            'city_en' => Yii::t('app', 'Город на английском'),
-            'city_ky' => Yii::t('app', 'Город на кыргызском'),
-
-            'address_en' => Yii::t('app', 'Адрес на английском'),
-            'address_ky' => Yii::t('app', 'Адрес на кыргызском'),
-
-            'description_en' => Yii::t('app', 'Описание на английском'),
-            'description_ky' => Yii::t('app', 'Описание на кыргызском'),
-            'general_room_count'=>Yii::t('app','Общее количество комнат')
-        ];   
     }
 
     public static function mealList()
