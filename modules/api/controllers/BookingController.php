@@ -190,16 +190,24 @@ class BookingController extends BaseController
         return "OK";
     }
 
-    public function actionList($finished = false, $current = false ,$future= false)
-    {
-
+    public function actionList($finished = false, $future = false ,$canceled= false)
+    {   
 
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+        $current_date = date('Y-m-d');
+        if($finished){
+            $dataProvider->query->andFilterWhere(['>','date_from', $current_date]);
+        }
+        if($canceld){
+            $dataProvider->query->andFilterWhere(['status'=>Booking::PAID_STATUS_CANCELED]);
+        }
+        if($future){
+            $dataProvider->query->andFilterWhere(['<','date_to', $current_date]);
+        }
         
         $dataProvider->query->andFilterWhere()
         return $dataProvider;
-
     }
 
 }
