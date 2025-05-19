@@ -143,7 +143,7 @@ class BookingController extends BaseController
         $model->guest_phone = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'guest_phone');
         $model->other_guests = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'other_guests');
         $model->status = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'status');
-        $model->user_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'user_id');
+        $model->user_id = Yii::$app->user->id;
         $model->special_comment = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'special_comment');
         $model->currency = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'currency');
         $model->cancellation_type = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_type');
