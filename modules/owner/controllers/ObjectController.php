@@ -58,7 +58,8 @@ class ObjectController extends Controller
                 ],
 
                 [
-                    'allow' => true,],
+                    'allow' => true,
+                    'actions' => ['add-room', 'edit-room', 'room-beds'],
                     'roles' => ['admin', 'owner'], // Authenticated users
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
