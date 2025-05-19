@@ -10,6 +10,89 @@ use rico\yii2images\models\Image;
 
 
 class Objects extends \yii\db\ActiveRecord {
+
+    const STATUS_NOT_PUBLISHED = 0;
+    const STATUS_READY_FOR_PUBLISH = 1;
+    const STATUS_ON_MODERATION = 2;
+    const STATUS_PUBLISHED = 3;
+    const STATUS_DENIED = 4;
+    const STATUS_DELETED = 5;
+
+    public $user_id;
+    public $type;
+    public $name;
+    public $name_en;
+    public $name_ky;
+    public $city_en;
+    public $city_ky;
+    public $city;
+    public $city_id;
+    public $address;
+    public $address_ky;
+    public $address_en;
+    public $currency;
+    public $features;
+    public $phone;
+    public $site;
+    public $check_in;
+    public $check_out;
+    public $object;
+    public $reception;
+    public $description;
+    public $description_en;
+    public $description_ky;
+    public $payment;
+    public $lat;
+    public $lon;
+    public $email;
+    public $meal_terms;
+    public $rooms;
+    public $general_room_count;
+    public $terms;
+    public $early_check_in;
+    public $late_check_in;
+    public $internet_public = false;
+    public $animals_allowed = false;
+    public $meal_purchaise = false;
+    public $meal_type = false;
+    public $meal_cost = false;
+    public $uploadImages;
+    public $images;
+    public $img;
+    public $children;
+    public $deny_reason;
+    public $guest_amount;
+
+    public $status;
+    public $ceo_doc;
+    public $financial_doc;
+    public $from_price;
+    public $phone_code;
+
+
+
+
+    const SEARCH_TYPE_CITY = 3;
+    const SEARCH_TYPE_REGION = 1;
+    const SEARCH_TYPE_HOTEL = 2;
+
+    const CURRENCY_KGS = 1;
+    const CURRENCY_USD = 2;
+
+    public $comfort_list;
+
+    const TERM_MEAL_BREAKFEST = 1;
+    const TERM_MEAL_THREE_TIMES = 2;
+
+    const OBJECT_TYPE_APARTHOTEL = 1;
+    const OBJECT_TYPE_APARTMENTS = 2;
+    const OBJECT_TYPE_RESTBASE = 3;
+    const OBJECT_TYPE_BUNGALOW = 4;
+    const OBJECT_TYPE_BOUTIQUE_HOTEL = 5;
+    const OBJECT_TYPE_VILLA = 6;
+    const OBJECT_TYPE_GLAMPING = 7;
+    const OBJECT_TYPE_GUESTHOUSE = 8;
+    const OBJECT_TYPE_RESIDENTIAL_PREMISES = 9;
     public function attributeLabels()
     {
         return [
