@@ -1,7 +1,7 @@
 <?php
 
 namespace app\modules\owner\controllers;
-
+use Yii;
 use app\models\Booking;
 use app\models\BookingSearch;
 use yii\web\Controller;
