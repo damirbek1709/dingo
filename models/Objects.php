@@ -459,8 +459,7 @@ class Objects extends \yii\db\ActiveRecord
         return $general_arr;
     }
 
-    public function objectTypeString()
-    {
+    public function objectTypeString(){
         $arr = [
             0 => '',
             self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
