@@ -9,6 +9,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
 use yii\filters\AccessControl;
+use app\models\Objects;
 
 /**
  * TariffController implements the CRUD actions for Tariff model.
@@ -297,7 +298,7 @@ class TariffController extends Controller
                     "payment_on_book" => $tariff->payment_on_book ? 1 : 0,
                     "payment_on_reception" => $tariff->payment_on_reception ? 1 : 0,
                     "cancellation" => (int) $tariff->cancellation,
-                    "meal_type" => (int) $tariff->meal_type,
+                    'meal_type' => ['id' => (int) $tariff->meal_type, 'name' => Objects::mealTypeFull($tariff->meal_type)],
                     "object_id" => (int) $object_id,
                     "prices" => [] // Prices can be added here as necessary
                 ];
@@ -367,7 +368,7 @@ class TariffController extends Controller
                     "payment_on_book" => $tariff->payment_on_book ? 1 : 0,
                     "payment_on_reception" => $tariff->payment_on_reception ? 1 : 0,
                     "cancellation" => (int) $tariff->cancellation,
-                    "meal_type" => (int) $tariff->meal_type,
+                    'meal_type' => ['id' => (int) $tariff->meal_type, 'name' => Objects::mealTypeFull($tariff->meal_type)],
                     "object_id" => (int) $object_id,
                     "prices" => [] // Prices can be added here as necessary
                 ];

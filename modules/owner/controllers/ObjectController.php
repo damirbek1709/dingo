@@ -134,7 +134,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['index', 'create', 'add-tariff', 'prices', 'remove-object-image', 'remove-file', 'send-to-moderation', 'unpublish'],
+                    'actions' => ['index', 'create', 'add-tariff','edit-tariff', 'prices', 'remove-object-image', 'remove-file', 'send-to-moderation', 'unpublish'],
                     'roles' => ['admin', 'owner'],
                 ],
             ],
@@ -824,6 +824,8 @@ class ObjectController extends Controller
             if (isset($object['rooms']) && is_array($object['rooms'])) {
                 $meiliRooms = $object['rooms'];
             }
+            $status = Objects::currentStatus($object_id, $object['status'] ? $object['status'] : Objects::STATUS_NOT_PUBLISHED);
+
 
             $rooms_arr = [
                 'id' => (int) $room_id,
@@ -845,7 +847,8 @@ class ObjectController extends Controller
 
             $meilisearchData = [
                 'id' => (int) $id,
-                'rooms' => $meiliRooms
+                'rooms' => $meiliRooms,
+                'status' => $status
             ];
 
             if ($index->updateDocuments($meilisearchData)) {
@@ -1127,7 +1130,7 @@ class ObjectController extends Controller
                                 'id' => (int) $model->id,
                                 'payment_on_book' => (int) $model->payment_on_book,
                                 'cancellation' => $cancellation_terms,
-                                'meal_type' => ['id'=>(int) $model->meal_type, 'name' => Objects::mealTypeFull($model->meal_type)],
+                                'meal_type' => ['id' => (int) $model->meal_type, 'name' => Objects::mealTypeFull($model->meal_type)],
                                 'title' => [$model->title, $model->title_en, $model->title_ky],
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],
@@ -1140,9 +1143,13 @@ class ObjectController extends Controller
                         $updatedRooms[] = $roomData;
                     }
 
+                    $status = Objects::currentStatus($object_id, $object['status'] ? $object['status'] : Objects::STATUS_NOT_PUBLISHED);
+
+
                     $meilisearchData = [
                         'id' => (int) $object_id,
-                        'rooms' => $updatedRooms
+                        'rooms' => $updatedRooms,
+                        'status' => $status
                     ];
 
                     $index->updateDocuments([$meilisearchData]);
@@ -1223,7 +1230,7 @@ class ObjectController extends Controller
                                 'id' => (int) $model->id,
                                 'payment_on_book' => (int) $model->payment_on_book,
                                 'cancellation' => $cancellation_terms,
-                                'meal_type' => ['id'=>(int) $model->meal_type, 'name' => Objects::mealTypeFull($model->meal_type)],
+                                'meal_type' => ['id' => (int) $model->meal_type, 'name' => Objects::mealTypeFull($model->meal_type)],
                                 'title' => [$model->title, $model->title_en, $model->title_ky],
                                 'object_id' => (int) $object_id,
                                 'price' => (float) $roomData['base_price'],

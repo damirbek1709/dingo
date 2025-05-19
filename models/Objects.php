@@ -223,6 +223,7 @@ class Objects extends \yii\db\ActiveRecord
 
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
+        $model = new Objects();
 
         try {
             $object = $index->getDocument($id);
@@ -388,7 +389,6 @@ class Objects extends \yii\db\ActiveRecord
 
     public static function typeString($id = 1){
         $arr = [
-    
             self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
             self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
             self::OBJECT_TYPE_RESTBASE => 'База отдыха',
@@ -541,8 +541,7 @@ class Objects extends \yii\db\ActiveRecord
     }  
 
     public static function mealTypeFull($id){
-        $voc = Vocabulary::find()->where(['i
-    d'=>$id,'model'=>Vocabulary::MODEL_TYPE_MEAL])->one();
+        $voc = Vocabulary::find()->where(['id'=>$id,'model'=>Vocabulary::MODEL_TYPE_MEAL])->one();
         $arr = [     
             $voc->title,
             $voc->title_en,
