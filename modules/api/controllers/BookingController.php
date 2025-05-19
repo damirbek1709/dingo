@@ -2,6 +2,7 @@
 
 namespace app\modules\api\controllers;
 
+use app\models\BookingSearch;
 use app\models\FlashPay;
 use app\models\Booking;
 use app\models\Comfort;
@@ -49,7 +50,7 @@ class BookingController extends BaseController
         $behaviors['authenticator']['except'] = [
             'index',
             'add',
-            'webhook'
+            'webhook',
         ];
 
 
@@ -58,7 +59,7 @@ class BookingController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange'],
+                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange','list'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -84,6 +85,7 @@ class BookingController extends BaseController
             'actions' => [
                 'add' => ['POST'],
                 'webhook' => ['POST'],
+                'list'=>['GET']
             ],
         ];
 
@@ -124,185 +126,7 @@ class BookingController extends BaseController
 
 
 
-    public function actionList()
-    {
-        $filters = [];
-        $client = Yii::$app->meili->connect();
-        $index = $client->index('object');
-        $queryWord = Yii::$app->request->get('query_word', '');
-        $fromDate = Yii::$app->request->get('from_date');
-        $toDate = Yii::$app->request->get('to_date');
-        $type = (int) Yii::$app->request->get('type', null);
-        $amount = (int) Yii::$app->request->get('amount', null);
-        $guestAmount = (int) Yii::$app->request->get('guest_amount', 1);
-
-        $user_auth = null;
-        $token = Yii::$app->request->headers->get('Authorization');
-        if ($token && preg_match('/^Bearer\s+(.*?)$/', $token, $matches)) {
-            $user_auth = $matches[1]; // Extract token
-        }
-        if ($type && $user_auth) {
-            $hit = $index->search($queryWord, [
-                'limit' => 1
-            ])->getHits();
-
-            $user = User::find()->where(['auth_key' => $user_auth])->one();
-            $saved_data = $user->search_data ? unserialize($user->search_data) : [];
-            if ($user->search_data === null) {
-                if ($type == Objects::SEARCH_TYPE_REGION) {
-                    $translit_word = isset($hit[0]['region']) ? $hit[0]['region'] : [];
-                    $saved_data[] = [
-                        'name' => $translit_word,
-                        'region' => $queryWord,
-                        'amount' => $amount
-                    ];
-
-                } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
-                    $translit_word = isset($hit[0]['name']) ? $hit[0]['name'] : [];
-                    $saved_data[] = [
-                        'type' => $type,
-                        'name' => $translit_word
-                    ];
-                } elseif ($type == Objects::SEARCH_TYPE_CITY) {
-                    $translit_word = isset($hit[0]['city']) ? $hit[0]['city'] : [];
-                    $saved_data[] = [
-                        'type' => $type,
-                        'name' => $translit_word,
-                        'amount' => $amount
-                    ];
-                }
-
-                $user->search_data = serialize($saved_data);
-            } else {
-                $saved_data = unserialize($user->search_data);
-                if (count($saved_data) > 2) {
-                    array_shift($saved_data);
-                    if ($type == Objects::SEARCH_TYPE_REGION) {
-                        $saved_data[] = [
-                            'type' => $type,
-                            'name' => $queryWord,
-                            'amount' => $amount
-                        ];
-                    } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
-                        $saved_data[] = [
-                            'type' => $type,
-                            'name' => $queryWord
-                        ];
-                    } elseif ($type == Objects::SEARCH_TYPE_CITY) {
-                        $saved_data[] = [
-                            'type' => $type,
-                            'name' => $queryWord,
-                            'amount' => $amount
-                        ];
-                    }
-                } else {
-                    if ($type == Objects::SEARCH_TYPE_REGION) {
-                        $saved_data[] = [
-                            'type' => $type,
-                            'region' => $queryWord,
-                            'amount' => $amount
-                        ];
-                    } elseif ($type == Objects::SEARCH_TYPE_HOTEL) {
-                        $saved_data[] = [
-                            'type' => $type,
-                            'name' => $queryWord
-                        ];
-                    } elseif ($type == Objects::SEARCH_TYPE_CITY) {
-                        $saved_data[] = [
-                            'type' => $type,
-                            'name' => $queryWord,
-                            'amount' => $amount
-                        ];
-                    }
-                }
-                $user->search_data = serialize($saved_data);
-            }
-            $user->save(false);
-        }
-
-        // Base filter: guest amount
-        $filters[] = 'rooms.guest_amount >= ' . $guestAmount;
-
-        // Date availability filtering
-        if ($fromDate && $toDate) {
-            $period = new \DatePeriod(
-                new \DateTime($fromDate),
-                new \DateInterval('P1D'),
-                (new \DateTime($toDate))
-            );
-
-            $searchDates = [];
-            foreach ($period as $date) {
-                $searchDates[] = $date->format('d-m-Y');
-            }
-
-            $filters[] = 'NOT rooms.not_available_dates IN [' .
-                implode(',', array_map(function ($date) {
-                    return '"' . $date . '"';
-                }, $searchDates)) .
-                ']';
-        }
-
-        $pageSize = 10;
-        $page = (int) Yii::$app->request->get('page', 1);
-        $offset = ($page - 1) * $pageSize;
-
-        // Fetch extra results to sort locally
-        $searchResults = $index->search($queryWord, [
-            'filter' => $filters,
-            'limit' => $pageSize * 5,
-            'offset' => 0
-        ]);
-
-        $hits = $searchResults->getHits();
-
-        // Calculate from_price
-        foreach ($hits as &$hit) {
-            $minPrice = PHP_FLOAT_MAX;
-            if (!empty($hit['rooms'])) {
-                foreach ($hit['rooms'] as $room) {
-                    $priceIndex = $guestAmount - 1;
-                    if (isset($room['tariff']) && is_array($room['tariff'])) {
-                        foreach ($room['tariff'] as $tariff) {
-                            if (isset($tariff['prices']) && is_array($tariff['prices'])) {
-                                foreach ($tariff['prices'] as $priceData) {
-                                    if (
-                                        isset($priceData['price_arr']) &&
-                                        is_array($priceData['price_arr']) &&
-                                        isset($priceData['price_arr'][$priceIndex])
-                                    ) {
-                                        $currentPrice = $priceData['price_arr'][$priceIndex];
-                                        if ($currentPrice < $minPrice) {
-                                            $minPrice = $currentPrice;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            $hit['from_price'] = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
-        }
-
-        // Sort by from_price ascending
-        usort($hits, function ($a, $b) {
-            return ($a['from_price'] ?? PHP_FLOAT_MAX) <=> ($b['from_price'] ?? PHP_FLOAT_MAX);
-        });
-
-        // Paginate after sorting
-        $totalCount = count($hits);
-        $paginatedHits = array_slice($hits, $offset, $pageSize);
-
-        $arr = [
-            'pageSize' => $pageSize,
-            'totalCount' => $totalCount,
-            'page' => $page,
-            'data' => $paginatedHits,
-        ];
-
-        return $arr;
-    }
+    
 
     public function actionAdd()
     {
@@ -338,6 +162,7 @@ class BookingController extends BaseController
             $response['success'] = true;
             $response['message'] = 'Booking added successfully';
             $response['url'] = Booking::pay($arr);
+            $response['transaction_number'] = $model->transaction_number
         } else {
             $response['message'] = $model->errors;
         }
@@ -353,7 +178,7 @@ class BookingController extends BaseController
             Yii::error('Invalid JSON received: ' . $rawPostData, 'webhook');
             return $this->asJson(['status' => 'error', 'message' => 'Invalid JSON']);
         }
-        
+
         $status = $jsonData['payment']['status'];
         if ($status == 'success') {
             $booking = Booking::find()->where(['transaction_number' => $jsonData['payment']['id']])->one();
@@ -363,6 +188,18 @@ class BookingController extends BaseController
         Yii::info('Webhook data received: ' . print_r($jsonData, true), 'webhook');
 
         return "OK";
+    }
+
+    public function actionList($finished = false, $current = false ,$future= false)
+    {
+
+
+        $searchModel = new BookingSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
+        
+        $dataProvider->query->andFilterWhere()
+        return $dataProvider;
+
     }
 
 }
