@@ -75,6 +75,7 @@ use yii\widgets\Pjax;
                                             },
                             'label' => Yii::t('app', 'Статус'),
                             'format' => 'raw',
+                            'contentOptions' => ['style' => 'min-width: 190px;'],
                             'filter' => Html::activeDropDownList(
                                 new \yii\base\DynamicModel(['status' => Yii::$app->request->get('status')]),
                                 'status',
