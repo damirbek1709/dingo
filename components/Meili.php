@@ -34,18 +34,42 @@ class Meili extends Component
     {
         $server = strtolower($_SERVER['HTTP_HOST'] ?? php_uname('n'));
 
-        $client = new Client(
-            'https://ms.dingo.kg',
-            '7b08753993c0f7b17894547cb57ca3fc810b728ca15262fdec3e267dc470e748',
-            new GuzzleHttpClient([
-                'timeout' => 5,
-                'verify' => false
-            ])
-        );
+        try {
+            if ($server === 'partner.dingo.kg') {
+                $client = new Client(
+                    'https://ms.dingo.kg',
+                    'e4ed3a1359dc6afb1760a335f7559f0373e74ea9df88c1a7ebe1f3e14150592a',
+                    new GuzzleHttpClient([
+                        'timeout' => 5,
+                        'verify' => false
+                    ])
+                );
+            } elseif ($server === 'dev.dingo.kg') {
+                $client = new Client(
+                    'https://meili.selva.kg',
+                    'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
+                    new GuzzleHttpClient([
+                        'timeout' => 5,
+                        'verify' => false
+                    ])
+                );
+            } else {
+                $client = new Client(
+                    'http://host.docker.internal:7700',
+                    'masterKey',
+                    new GuzzleHttpClient([
+                        'timeout' => 5,
+                        'verify' => false
+                    ])
+                );
+            }
 
-        return $client;
+            return $client;
 
-
+        } catch (\Exception $e) {
+            Yii::error("Meilisearch connection error: " . $e->getMessage());
+            throw $e;
+        }
     }
 
 
