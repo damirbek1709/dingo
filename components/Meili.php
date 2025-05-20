@@ -56,7 +56,7 @@ class Meili extends Component
             } else {
                 $client = new Client(
                     'http://host.docker.internal:7700',
-                    '82b2a9e6050c7ab37db11bb8ac2e7a99f94500695f0a36a4c68bbf0c6cebff73',
+                    'e4ed3a1359dc6afb1760a335f7559f0373e74ea9df88c1a7ebe1f3e14150592a',
                     new GuzzleHttpClient([
                         'timeout' => 5,
                         'verify' => false
