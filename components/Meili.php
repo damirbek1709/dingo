@@ -38,7 +38,7 @@ class Meili extends Component
             if ($server === 'partner.dingo.kg') {
                 $client = new Client(
                     'https://ms.dingo.kg',
-                    'e4ed3a1359dc6afb1760a335f7559f0373e74ea9df88c1a7ebe1f3e14150592a',
+                    'XYgN9akmwIizAMP6Z1zRAE8qryqcjZY1XQBT-qLUG3g',
                     new GuzzleHttpClient([
                         'timeout' => 5,
                         'verify' => false
