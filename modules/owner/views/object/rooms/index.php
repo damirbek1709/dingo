@@ -51,7 +51,7 @@ $this->title = Yii::t('app', 'Список номеров');
                             echo Html::a(Html::img($bind_model->getImage()->getUrl('120x150'), ['alt' => "Room Image"]), ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]);
 
                         } else {
-                            if ($val['images']) {
+                            if (array_key_exists($val['images'], $val)) {
                                 echo Html::a($val['images']['picture'], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]);
                             }
 
