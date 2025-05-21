@@ -46,8 +46,16 @@ $this->title = Yii::t('app', 'Список номеров');
                 ?>
                 <div class="room_list clear">
                     <div class="room-card">
-                        <?php echo Html::a(Html::img($bind_model->getImage()->getUrl('120x150'), ['alt' => "Room Image"]), ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?>
-                        <div class="room-card-details">
+                        <?php 
+                        if($bind_model){
+                            echo Html::a(Html::img($bind_model->getImage()->getUrl('120x150'), ['alt' => "Room Image"]), ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); 
+                        
+                        }
+                        else{
+                            echo Html::a($val['images']['picture'], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); 
+                        
+                        }?>
+                       <div class="room-card-details">
                             <h3><?= Html::a($val['room_title'][0], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?>
                             </h3>
                             <div class="room-info">
