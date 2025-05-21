@@ -839,7 +839,7 @@ class ObjectController extends Controller
                 'balcony' => (int) $model->balcony,
                 'air_cond' => (int) $model->air_cond,
                 'kitchen' => (int) $model->kitchen,
-                'base_price' => (int) $model->base_price,
+                'base_price' => (float) $model->base_price,
                 'bed_types' => $bedTypes,
 
             ];
@@ -1030,7 +1030,7 @@ class ObjectController extends Controller
             $room['balcony'] = (int) $model->balcony;
             $room['air_cond'] = (int) $model->air_cond;
             $room['kitchen'] = (int) $model->kitchen;
-            $room['base_price'] = (int) $model->base_price;
+            $room['base_price'] = (float) $model->base_price;
             $room['img'] = $model->img;
             //$room['images'] = $bind_model->getPictures();
             $room['bed_types'] = $bedTypes; // The processed bed_types in the required format
@@ -1125,7 +1125,7 @@ class ObjectController extends Controller
                             $roomData['tariff'] = $roomData['tariff'] ?? [];
                             $cancellation_terms = [
                                 'type' => $model->getCancellationType((int) $model->cancellation),
-                                'penalty_sum' => (double) $model->penalty_sum,
+                                'penalty_percent' => (double) $model->penalty_sum,
                                 'penalty_days' => (int) $model->penalty_days,
                             ];
                             $tariff = [
@@ -1224,7 +1224,7 @@ class ObjectController extends Controller
                         if ($room_list && in_array($roomData['id'], $room_list)) {
                             $cancellation_terms = [
                                 'type' => $model->getCancellationType((int) $model->cancellation),
-                                'penalty_sum' => (double) $model->penalty_sum,
+                                'penalty_percent' => (double) $model->penalty_sum,
                                 'penalty_days' => (int) $model->penalty_days,
                             ];
 

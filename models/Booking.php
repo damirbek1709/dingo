@@ -124,6 +124,82 @@ class Booking extends \yii\db\ActiveRecord
         return $room_title;
     }
 
+    public static function getRoomList($object_id)
+    {
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($object_id);
+        $room_title = "";
+
+        $lang_index = 0;
+        switch (Yii::$app->language) {
+            case 'ru':
+                $lang_index = 0;
+                break;
+            case 'en':
+                $lang_index = 1;
+                break;
+            case 'ky':
+                $lang_index = 2;
+                break;
+            default:
+                $lang_index = 0;
+        }
+
+        if (array_key_exists('rooms', $object)) {
+            $roomData = [];
+            $tariffData = [];
+            foreach ($object['rooms'] as $room) {
+                $roomData[$room['id']] = $room['room_title'][$lang_index];
+                if (array_key_exists('tariff', $room)) {
+                    foreach ($room['tariff'] as $tariff) {
+                        $tariffData[$tariff['id']] = $tariff['title'][$lang_index];
+                    }
+                }
+            }
+        }
+        return $roomData;
+    }
+
+    public static function tariffList($object_id, $room_id)
+    {
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($object_id);
+
+        $lang_index = 0;
+        switch (Yii::$app->language) {
+            case 'ru':
+                $lang_index = 0;
+                break;
+            case 'en':
+                $lang_index = 1;
+                break;
+            case 'ky':
+                $lang_index = 2;
+                break;
+            default:
+                $lang_index = 0;
+        }
+        $roomData = [];
+        $tariffData = [];
+
+        if (array_key_exists('rooms', $object)) {
+            foreach ($object['rooms'] as $room) {
+                if ($room['id'] == $room_id) {
+                    $roomData = $room;
+                    break;
+                }
+            }
+
+            if (array_key_exists('tariff', $roomData)) {
+                foreach ($room['tariff'] as $tariff) {
+                    $tariffData[$tariff['id']] = $tariff['title'][$lang_index];
+                }
+            }
+        }
+
+        return $tariffData;
+    }
+
     public function bookingTariffTitle()
     {
         $client = Yii::$app->meili->connect();

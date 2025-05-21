@@ -5,6 +5,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
 /** @var app\models\BookingSearch $searchModel */
@@ -17,6 +18,37 @@ $this->title = Yii::t('app', 'Bookings');
 
     <div class="oblast-update">
         <?= $this->render('top_nav', ['object_id' => $object_id]) ?>
+        <div class="search-filter-bar">
+            <?php $form = ActiveForm::begin([
+                'action' => ['booking/index', 'object_id' => $object_id],
+                'method' => 'get',
+                'options' => ['class' => 'search-filter-form'],
+            ]); ?>
+            <div class="search-box">
+                <?= Html::textInput('guest_name', $guest_name, [
+                    'placeholder' => 'Поиск по имени гостя',
+                    'class' => 'guest-input'
+                ]) ?>
+                <button type="submit" class="search-icon"></button>
+            </div>
+            <?php $form->end(); ?>
+
+            <div class="status-tabs">
+                <button
+                    class="future_active"><?= Html::a(Yii::t('app', 'Предстоящие'), ['/owner/booking', 'object_id' => $object_id, 'status' => 'future']) ?></button>
+                <button
+                    class="cancel_active"><?= Html::a(Yii::t('app', 'Отмененные'), ['/owner/booking', 'object_id' => $object_id, 'status' => 'canceled']) ?></button>
+                <button
+                    class="past_active"><?= Html::a(Yii::t('app', 'Завершенные'), ['/owner/booking', 'object_id' => $object_id, 'status' => 'past']) ?></button>
+                <button
+                    class="all_active"><?= Html::a(Yii::t('app', 'Все'), ['/owner/booking/index', 'object_id' => $object_id]) ?></button>
+            </div>
+
+            <button class="filter-button" id="open-filters">
+                <?= Yii::t('app', 'Фильтры') ?>
+            </button>
+        </div>
+
         <div class="booking-index">
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
@@ -27,51 +59,51 @@ $this->title = Yii::t('app', 'Bookings');
                     [
                         'attribute' => 'date_from',
                         'value' => function ($model) {
-                                        return $model->dateFormat($model->date_from);
-                                    }
+                        return $model->dateFormat($model->date_from);
+                    }
                     ],
                     [
                         'attribute' => 'date_to',
                         'value' => function ($model) {
-                                        return $model->dateFormat($model->date_to);
-                                    }
+                        return $model->dateFormat($model->date_to);
+                    }
                     ],
                     [
                         'attribute' => 'room_id',
                         'value' => function ($model) {
-                                        return $model->bookingRoomTitle();
-                                    }
+                        return $model->bookingRoomTitle();
+                    }
                     ],
                     [
                         'attribute' => 'object_id',
                         'value' => function ($model) {
-                                        return $model->bookingObjectTitle();
-                                    }
+                        return $model->bookingObjectTitle();
+                    }
                     ],
                     [
                         'attribute' => 'tariff_id',
                         'value' => function ($model) {
-                                        return $model->bookingTariffTitle();
-                                    }
+                        return $model->bookingTariffTitle();
+                    }
                     ],
                     'special_comment',
                     [
                         'attribute' => 'created_at',
                         'value' => function ($model) {
-                                        return $model->dateFormat($model->created_at);
-                                    }
+                        return $model->dateFormat($model->created_at);
+                    }
                     ],
                     [
                         'attribute' => 'sum',
                         'value' => function ($model) {
-                                        return $model->sum . " " . $model->currency;
-                                    }
+                        return $model->sum . " " . $model->currency;
+                    }
                     ],
                     [
                         'attribute' => 'status',
                         'value' => function ($model) {
-                                        return $model->bookingStatusString();
-                                    }
+                        return $model->bookingStatusString();
+                    }
                     ],
                     //'guest_email:email',
                     //'guest_phone',
@@ -88,8 +120,8 @@ $this->title = Yii::t('app', 'Bookings');
                         'class' => ActionColumn::className(),
                         'template' => '{view}',
                         'urlCreator' => function ($action, Booking $model, $key, $index, $column) {
-                                        return Url::toRoute([$action, 'id' => $model->id]);
-                                    }
+                        return Url::toRoute([$action, 'id' => $model->id]);
+                    }
                     ],
                 ],
             ]); ?>
@@ -97,105 +129,369 @@ $this->title = Yii::t('app', 'Bookings');
         </div>
     </div>
 </div>
+
+<?php $form = ActiveForm::begin([
+    'action' => ['booking/index', 'object_id' => $object_id],
+    'method' => 'get',
+    'options' => ['class' => 'search-filter-form'],
+]);
+$room_list = Booking::getRoomList($object_id);
+?>
+<div class="filter-drawer" id="filterDrawer">
+    <div class="filter-header">
+        <span class="close-filters" id="closeFilters">&times;</span>
+        <h3><?php echo Yii::t('app', 'Фильтры') ?></h3>
+    </div>
+
+
+    <div class="filter-body">
+        <label><?= Yii::t('app', 'Номер') ?></label>
+        <?= Html::dropDownList('room_id', $room_id, $room_list, [
+            'prompt' => 'Выберите номер',
+            'class' => 'filter-input',
+            'id' => 'room-select',
+            'data-object' => $object_id
+        ]) ?>
+
+        <label><?= Yii::t('app', 'Тариф') ?></label>
+        <?php
+        if ($room_id) {
+            echo Html::dropDownList('tariff_id', $tariff_id, Booking::tariffList($object_id, $room_id), [
+                'prompt' => 'Выберите тариф',
+                'class' => 'filter-input',
+                'id' => 'tariff-select',
+                'disabled' => false
+            ]);
+        } else {
+            echo Html::dropDownList('tariff_id', $tariff_id, [], [
+                'prompt' => 'Выберите тариф',
+                'class' => 'filter-input',
+                'id' => 'tariff-select',
+                'disabled' => true
+            ]);
+        }
+        ?>
+
+        <!-- <label><?php //echo Yii::t('app', 'Статус') ?></label> -->
+        <?php
+        // $statusOptions = [
+        //     'active' => Yii::t('app', 'Активный'),
+        //     'future' => Yii::t('app', 'Предстоящий'),
+        //     'finished' => Yii::t('app', 'Завершен'),
+        //     'canceled' => Yii::t('app', 'Отменен'),
+        // ];
+        ?>
+
+        <!-- <?php //$selectedStatuses = Yii::$app->request->get('status', []); ?>
+
+        <div class="status-tags">
+            <?php //foreach ($statusOptions as $value => $label): ?>
+                <label class="status-toggle">
+                    <input type="checkbox" name="status[]" value="<?//= $value ?>" style="display: none;"
+                        class="status-checkbox" <?//= in_array($value, $selectedStatuses) ? 'checked' : '' ?>>
+                    <span class="status-button<?//= in_array($value, $selectedStatuses) ? ' active' : '' ?>">
+                        <?//= $label ?>
+                    </span>
+                </label>
+            <?php //endforeach; ?>
+        </div> -->
+
+        <label><?php echo Yii::t('app', 'Дата прибытия') ?></label>
+        <input type="date" name="date_from" value="<?= $date_from ?>" class="filter-input" />
+
+        <label><?php echo Yii::t('app', 'Дата выезда') ?></label>
+        <input type="date" name="date_to" value="<?= $date_to ?>" class="filter-input" />
+
+        <label><?php echo Yii::t('app', 'Дата бронирования') ?></label>
+        <input type="date" name="book_date" value="<?= $date_book ?>" class="filter-input" />
+
+        <div class="reset-filters">
+            <button type="submit" class="save-button"
+                style="margin:0 20px 0 0"><?php echo Yii::t('app', 'Применить') ?></button>
+
+            <a href="#" class="reset-filter-link"><?php echo Yii::t('app', 'Сбросить все фильтры') ?></a>
+        </div>
+    </div>
+</div>
+
+<?php $form->end(); ?>
+
 <style>
-    .search-container {
-        position: relative;
-        flex: 0 1 400px;
-    }
-
-    .search-input {
+    .search-filter-form {
         width: 100%;
-        padding: 0.75rem 1rem 0.75rem 2.5rem;
-        border: 1px solid var(--border-color);
-        border-radius: 9999px;
-        font-size: 0.875rem;
-        color: var(--text-gray);
-        background-color: var(--bg-white);
-        outline: none;
-        transition: all 0.2s ease;
     }
 
-    .search-input:focus {
-        box-shadow: 0 0 0 3px var(--focus-ring);
+    .search-filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 25px;
+        background: #f9f9f9;
+        font-family: sans-serif;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 40px 10px 16px;
+        border: 1px solid #ddd;
+        border-radius: 24px;
+        font-size: 14px;
+        outline: none;
     }
 
     .search-icon {
         position: absolute;
-        left: 0.75rem;
+        right: 12px;
         top: 50%;
         transform: translateY(-50%);
-        color: var(--text-gray);
-        width: 1rem;
-        height: 1rem;
-        pointer-events: none;
+        color: #aaa;
+        font-size: 16px;
     }
 
-    /* Tab navigation */
-    .tabs {
+    .status-tabs {
         display: flex;
-        align-items: center;
-        gap: 1.5rem;
+        background: rgba(245, 245, 245, 1);
+        border-radius: 24px;
+        overflow: hidden;
+        width: 720px;
     }
 
-    .tab {
-        padding: 0.5rem 0;
-        font-size: 0.875rem;
-        color: var(--inactive-tab);
-        border-bottom: 2px solid transparent;
+    .status-tabs button {
+        background: transparent;
+        border: none;
+        padding: 12px 16px;
+        font-size: 14px;
         cursor: pointer;
-        transition: all 0.2s ease;
-        white-space: nowrap;
+        color: #666;
     }
 
-    .tab:hover {
-        color: var(--active-tab);
-    }
-
-    .tab.active {
-        color: var(--active-tab);
-        border-bottom-color: var(--active-tab);
-        font-weight: 500;
-    }
-
-    /* Filter button */
     .filter-button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        background-color: var(--primary-blue);
+        background-color: rgba(54, 118, 188, 1);
         color: white;
         border: none;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 24px;
+        font-size: 14px;
         cursor: pointer;
-        transition: background-color 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
-    .filter-button:hover {
-        background-color: #2563eb;
+
+
+    .status-tabs a {
+        color: #333333;
     }
 
-    .filter-icon {
-        width: 1rem;
-        height: 1rem;
+    .<?= $active ?> {
+        background: white !important;
+        border-radius: 24px !important;
+        color: black !important;
     }
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .container {
-            flex-direction: column;
-            gap: 1rem;
-        }
+    .filter-drawer {
+        position: fixed;
+        top: 70px;
+        right: -500px;
+        width: 500px;
+        height: 100vh;
+        background: white;
+        box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+        padding: 24px;
+        transition: right 0.3s ease;
+        z-index: 1000;
+    }
 
-        .search-container {
-            width: 100%;
-            flex: 1;
-        }
+    .filter-drawer.open {
+        right: 0;
+    }
 
-        .tabs {
-            width: 100%;
-            justify-content: space-between;
-        }
+    .filter-header {
+        display: flex;
+        align-items: center;
+    }
+
+    .filter-header h3 {
+        margin: 0;
+        font-size: 20px;
+    }
+
+    .close-filters {
+        font-size: 24px;
+        cursor: pointer;
+        color: #888;
+        margin-right: 10px;
+    }
+
+    .filter-body {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .filter-input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 12px;
+        font-size: 14px;
+    }
+
+    .status-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .status-tags button {
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        background: white;
+        border-radius: 16px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .status-tags .active {
+        background: #2563eb;
+        color: white;
+        border-color: #2563eb;
+    }
+
+    .reset-filters {
+        margin-top: 12px;
+        align-items: center;
+        display: flex;
+    }
+
+    .reset-filters a {
+        color: #2563eb;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .filter-body label {
+        font-weight: normal;
+        font-size: 16px;
+        margin-bottom: 0;
+    }
+
+    .status-tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .status-toggle {
+        display: inline-block;
+        position: relative;
+    }
+
+    .status-button {
+        padding: 6px 14px;
+        border: 1px solid #ccc;
+        border-radius: 16px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #444;
+        background: #fff;
+        user-select: none;
+    }
+
+    .status-toggle input:checked+.status-button {
+        background: #2563eb;
+        color: #fff;
+        border-color: #2563eb;
+    }
 </style>
+
+<script>
+    $(document).ready(function () {
+        $('#open-filters').on('click', function () {
+            $('#filterDrawer').addClass('open');
+        });
+
+        $('#closeFilters').on('click', function () {
+            $('#filterDrawer').removeClass('open');
+        });
+
+        $('.status-tags button').on('click', function () {
+            $(this).toggleClass('active');
+        });
+
+        $('#room-select').on('change', function () {
+            let roomId = $(this).val();
+            let objectId = $(this).data('object');
+
+            if (roomId) {
+                $('#tariff-select').attr('disabled', false);
+                $.ajax({
+                    url: "<?= Yii::$app->urlManager->createUrl('/owner/booking/get-tariffs'); ?>", // adjust if your route differs
+                    type: 'GET',
+                    data: {
+                        room_id: roomId,
+                        object_id: objectId
+                    },
+                    success: function (data) {
+                        let $tariff = $('#tariff-select');
+                        $tariff.empty();
+                        $tariff.append('<option value="">Выберите тариф</option>');
+
+                        $.each(data, function (key, value) {
+                            $tariff.append('<option value="' + key + '">' + value + '</option>');
+                        });
+                    },
+                    error: function () {
+                        alert('Ошибка при загрузке тарифов');
+                    }
+                });
+            } else {
+                $('#tariff-select').html('<option value="">Выберите тариф</option>');
+            }
+        });
+
+        $(document).on('click', '.status-button', function (e) {
+            e.preventDefault(); // prevents unwanted form submission on accidental button clicks
+            const $checkbox = $(this).siblings('input[type=checkbox]');
+            const isChecked = $checkbox.prop('checked');
+
+            $checkbox.prop('checked', !isChecked);
+            $(this).toggleClass('active', !isChecked);
+        });
+
+        $('.reset-filter-link').on('click', function (e) {
+            e.preventDefault();
+
+            const $form = $(this).closest('form');
+
+            // Reset all inputs
+            $form.find('input[type="text"], input[type="date"], select').val('');
+            // Uncheck all checkboxes and remove visual state
+            $form.find('input[type="checkbox"]').each(function () {
+                $(this).prop('checked', false);
+            });
+            // Remove active class from status buttons
+            $form.find('.status-button').removeClass('active');
+            // Reset tariff dropdown
+            $('#tariff-select').html('<option value="">Выберите тариф</option>');
+        });
+
+        $(document).on('mouseup', function (e) {
+            const $drawer = $('#filterDrawer');
+            const $button = $('#open-filters');
+
+            // If click is outside the drawer AND not the "open filters" button
+            if (!$drawer.is(e.target) && $drawer.has(e.target).length === 0 &&
+                !$button.is(e.target) && $button.has(e.target).length === 0) {
+                $drawer.removeClass('open');
+            }
+        });
+    });
+</script>

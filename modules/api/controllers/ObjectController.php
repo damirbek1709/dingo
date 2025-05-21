@@ -365,6 +365,7 @@ class ObjectController extends BaseController
         $toDate = Yii::$app->request->get('to_date');
         $type = (int) Yii::$app->request->get('type', null);
         $amount = (int) Yii::$app->request->get('amount', null);
+        $status = Objects::STATUS_PUBLISHED;
         $guestAmount = (int) Yii::$app->request->get('guest_amount', 1);
 
         $user_auth = null;
@@ -453,6 +454,7 @@ class ObjectController extends BaseController
 
         // Base filter: guest amount
         $filters[] = 'rooms.guest_amount >= ' . $guestAmount;
+        $filters[] = 'status = ' . $status;
 
         // Date availability filtering
         if ($fromDate && $toDate) {

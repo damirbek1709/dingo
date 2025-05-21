@@ -16,7 +16,7 @@ use yii\helpers\Html;
 </div>
 
 <style>
-    .style_<?php echo $action ?> {
+    .style_booking {
         border-bottom: 2px solid #3676BC;
     }
 </style>
