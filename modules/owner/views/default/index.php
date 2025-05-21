@@ -24,6 +24,7 @@ use app\models\Objects;
             <?php
             foreach ($dataProvider->getModels() as $model):
                 $bind_model = Objects::findOne($model['id']);
+                if($bind_model):
                 ?>
                 <a href="<?= Url::to(['/owner/object/view', 'object_id' => $bind_model->id]) ?>">
                     <div class="property-card">
@@ -51,7 +52,7 @@ use app\models\Objects;
                         </div>
                     </div>
                 </a>
-            <?php endforeach; ?>
+            <?php endif;endforeach; ?>
         </div>
     </div>
 </div>
