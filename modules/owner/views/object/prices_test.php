@@ -8,7 +8,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
 <div class="oblast-update">
 
-    <?php echo $this->render('top_nav', ['model' => $model]); ?>
+    <?php echo $this->render('top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
     <div class="sidebar" id="sidebar">
 
         <button class="sidebar-close" id="sidebar-close">&times;</button>
@@ -265,8 +265,12 @@ $this->title = Yii::t('app', 'Доступность и цены');
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        let from_date = convertToISO($('#checkin').val());
-        let to_date = convertToISO($('#checkout').val());
+        let from_date = $('#checkin').val();
+        let to_date = $('#checkout').val();
+
+        // Convert to ISO format for comparison and storage
+        let from_date_iso = convertToISO(from_date);
+        let to_date_iso = convertToISO(to_date);
 
         let valid = true;
         let temp_price_map = {};
@@ -296,33 +300,66 @@ $this->title = Yii::t('app', 'Доступность и цены');
             return;
         }
 
+        // Create a fresh copy of tariff_list to work with
+        let updatedTariffList = JSON.parse(JSON.stringify(tariff_list));
+
         Object.entries(temp_price_map).forEach(([tariffId, priceArr]) => {
             tariffId = parseInt(tariffId);
 
-            if (!Array.isArray(tariff_list[tariffId].prices)) {
-                tariff_list[tariffId].prices = [];
+            if (!updatedTariffList[tariffId]) {
+                console.error("Missing tariff ID in tariff_list:", tariffId);
+                return;
             }
 
-            // Update if same date range exists, else add
-            let existing = tariff_list[tariffId].prices.find(p =>
-                p.from_date === from_date && p.to_date === to_date
-            );
+            if (!Array.isArray(updatedTariffList[tariffId].prices)) {
+                updatedTariffList[tariffId].prices = [];
+            }
 
-            if (existing) {
-                existing.price_arr = priceArr; // ✅ update
-            } else {
-                tariff_list[tariffId].prices.push({
-                    price_arr: priceArr,
-                    from_date: from_date,
-                    to_date: to_date
+            const newDateRange = {
+                from_date: from_date,
+                to_date: to_date,
+                price_arr: priceArr
+            };
+
+            // Check if the new date range overlaps with any existing ranges
+            const overlappingRanges = [];
+            const nonOverlappingRanges = [];
+
+            if (Array.isArray(updatedTariffList[tariffId].prices)) {
+                updatedTariffList[tariffId].prices.forEach(existingRange => {
+                    if (dateRangesOverlap(newDateRange, existingRange)) {
+                        overlappingRanges.push(existingRange);
+                    } else {
+                        nonOverlappingRanges.push(existingRange);
+                    }
                 });
             }
 
+            // If we have overlapping ranges, we need to process them
+            if (overlappingRanges.length > 0) {
+                // Process the overlaps and create new segments
+                const newSegments = processOverlappingDateRanges(newDateRange, overlappingRanges);
 
+                // Replace the existing prices array with our new combined segments
+                updatedTariffList[tariffId].prices = [...nonOverlappingRanges, ...newSegments];
+            } else {
+                // No overlaps, just add the new range
+                updatedTariffList[tariffId].prices.push(newDateRange);
+            }
+
+            // Sort ranges by date for better readability and consistency
+            updatedTariffList[tariffId].prices.sort((a, b) => {
+                return parseDate(a.from_date) - parseDate(b.from_date);
+            });
         });
 
-        const similiar_room_count = $('#similar_room_count').val();
+        // Replace the original tariff_list with our updated version
+        tariff_list = updatedTariffList;
+
+        const similar_room_count = $('#similar_room_count').val();
         const object_id = "<?= $object_id ?>";
+
+        console.log("Saving tariff_list:", tariff_list);
 
         $.ajax({
             url: '/owner/tariff/edit-tariff',
@@ -336,6 +373,8 @@ $this->title = Yii::t('app', 'Доступность и цены');
             success: function (response) {
                 alert('Тариф успешно сохранён!');
                 $('#sidebar').fadeOut();
+                // Reload to show updated data
+                location.reload();
             },
             error: function (xhr, status, error) {
                 alert('Ошибка при сохранении. Попробуйте снова.');
@@ -344,6 +383,190 @@ $this->title = Yii::t('app', 'Доступность и цены');
         });
     });
 
+    // Helper function to convert date strings between formats
+    function convertToISO(dateStr) {
+        // Check if already in ISO format
+        if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
+            return dateStr;
+        }
+
+        const [dd, mm, yyyy] = dateStr.split('-');
+        return `${yyyy}-${mm}-${dd}`;
+    }
+
+    // Helper function to convert from ISO to DD-MM-YYYY
+    function convertFromISO(isoDateStr) {
+        const [yyyy, mm, dd] = isoDateStr.split('-');
+        return `${dd}-${mm}-${yyyy}`;
+    }
+
+    // Helper function to check if two date ranges overlap
+    function dateRangesOverlap(range1, range2) {
+        // Convert all dates to ISO for comparison
+        const from1 = convertToISO(range1.from_date);
+        const to1 = convertToISO(range1.to_date);
+        const from2 = convertToISO(range2.from_date);
+        const to2 = convertToISO(range2.to_date);
+
+        return (from1 <= to2 && from2 <= to1);
+    }
+
+    // Helper function to parse date strings and convert to Date objects
+    function parseDate(dateStr) {
+        // Ensure date is in ISO format for parsing
+        const isoDate = convertToISO(dateStr);
+        return new Date(isoDate);
+    }
+
+    // Helper function to get date string in DD-MM-YYYY format from Date object
+    function formatDate(date) {
+        const dd = String(date.getDate()).padStart(2, '0');
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const yyyy = date.getFullYear();
+        return `${dd}-${mm}-${yyyy}`;
+    }
+
+    // Helper function to add days to a date
+    function addDays(dateStr, days) {
+        const date = parseDate(dateStr);
+        date.setDate(date.getDate() + days);
+        return formatDate(date);
+    }
+
+    // Helper function to subtract days from a date
+    function subtractDays(dateStr, days) {
+        return addDays(dateStr, -days);
+    }
+
+    // Helper function to stringify dates for debug logging
+    function formatRangeForLog(range) {
+        return `${range.from_date} to ${range.to_date} [${range.price_arr.join(',')}]`;
+    }
+
+    // Process overlapping date ranges and return the new segmented ranges
+    function processOverlappingDateRanges(newRange, overlappingRanges) {
+        console.log("Processing new range:", formatRangeForLog(newRange));
+        console.log("Overlapping ranges:", overlappingRanges.map(formatRangeForLog));
+
+        if (overlappingRanges.length === 0) {
+            return [newRange]; // No overlaps, just return the new range
+        }
+
+        // Sort all dates and create timeline segments
+        let timeline = [];
+
+        // Add all dates from overlapping ranges
+        overlappingRanges.forEach(range => {
+            timeline.push({
+                date: range.from_date,
+                type: 'start',
+                range: range
+            });
+            // One day after end date as exclusive end point
+            timeline.push({
+                date: addDays(range.to_date, 1),
+                type: 'end',
+                range: range
+            });
+        });
+
+        // Add the new range dates
+        timeline.push({
+            date: newRange.from_date,
+            type: 'new-start',
+            range: newRange
+        });
+        timeline.push({
+            date: addDays(newRange.to_date, 1), // One day after end date
+            type: 'new-end',
+            range: newRange
+        });
+
+        // Sort the timeline by date
+        timeline.sort((a, b) => {
+            const dateA = parseDate(a.date);
+            const dateB = parseDate(b.date);
+            if (dateA.getTime() === dateB.getTime()) {
+                // For events on the same day, prioritize:
+                // 1. end events before start events (to handle adjacent ranges properly)
+                // 2. new range events over existing ones
+                if (a.type.includes('end') && !b.type.includes('end')) return -1;
+                if (!a.type.includes('end') && b.type.includes('end')) return 1;
+                if (a.type.includes('new') && !b.type.includes('new')) return -1;
+                if (!a.type.includes('new') && b.type.includes('new')) return 1;
+            }
+            return dateA - dateB;
+        });
+
+        // Process the timeline to create new segments
+        const segments = [];
+        let currentSegment = null;
+        let activeRanges = new Set();
+        let isNewRangeActive = false;
+
+        console.log("Processed timeline:", timeline);
+
+        for (let i = 0; i < timeline.length; i++) {
+            const event = timeline[i];
+            const eventDate = parseDate(event.date);
+
+            console.log(`Processing event: ${event.date} ${event.type}`);
+
+            if (event.type === 'start') {
+                activeRanges.add(event.range);
+            } else if (event.type === 'end') {
+                activeRanges.delete(event.range);
+            } else if (event.type === 'new-start') {
+                isNewRangeActive = true;
+            } else if (event.type === 'new-end') {
+                isNewRangeActive = false;
+            }
+
+            // Close current segment if we have one
+            if (currentSegment && i > 0) {
+                currentSegment.to_date = subtractDays(event.date, 1);
+
+                // Only add valid segments (from_date <= to_date)
+                if (parseDate(currentSegment.from_date) <= parseDate(currentSegment.to_date)) {
+                    segments.push(currentSegment);
+                    console.log(`Added segment: ${formatRangeForLog(currentSegment)}`);
+                } else {
+                    console.log(`Skipped invalid segment: ${currentSegment.from_date} to ${currentSegment.to_date}`);
+                }
+
+                currentSegment = null;
+            }
+
+            // Start a new segment if needed and not at the end of timeline
+            if (i < timeline.length - 1) {
+                let priceArr;
+
+                if (isNewRangeActive) {
+                    // If new range is active, use its price
+                    priceArr = [...newRange.price_arr];
+                } else if (activeRanges.size > 0) {
+                    // Otherwise use the price from an active range
+                    priceArr = [...Array.from(activeRanges)[0].price_arr];
+                } else {
+                    // No active ranges at this point
+                    console.log(`No active ranges at ${event.date}, skipping segment creation`);
+                    continue;
+                }
+
+                currentSegment = {
+                    from_date: event.date,
+                    to_date: null, // Will be set on next iteration
+                    price_arr: priceArr
+                };
+
+                console.log(`Started new segment from ${event.date} with prices [${priceArr}]`);
+            }
+        }
+
+        console.log("Final segments:", segments.map(formatRangeForLog));
+        return segments;
+    }
+    
     function convertToISO(dateStr) {
         const [dd, mm, yyyy] = dateStr.split('-');
         return `${yyyy}-${mm}-${dd}`;

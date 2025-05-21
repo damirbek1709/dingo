@@ -133,6 +133,7 @@ class BookingController extends BaseController
         $response['success'] = false;
         $model = new Booking();
         $model->object_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'object_id');
+        $model->owner_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'owner_id');
         $model->room_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'room_id');
         $model->sum = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'sum');
         $model->tariff_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'tariff_id');

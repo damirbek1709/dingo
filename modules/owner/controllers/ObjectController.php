@@ -20,6 +20,8 @@ use yii\web\Response;
 use yii\filters\AccessControl;
 use app\models\Tariff;
 use app\models\TariffSearch;
+use app\models\Booking;
+use app\models\BookingSearch;
 /**
  * EventController implements the CRUD actions for Event model.
  */
@@ -38,13 +40,13 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'room', 'view', 'delete', 'comfort', 'index-admin', 'file-upload'],
+                    'actions' => ['room-list', 'tariff-list','room', 'view', 'delete', 'comfort', 'index-admin', 'file-upload', 'finances'],
                     'roles' => ['admin'],
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'edit-room', 'add-room', 'delete', 'delete-room'],
-                    'roles' => ['admin', 'owner'], // Authenticated users
+                    'actions' => ['room-list', 'edit-room', 'add-room', 'delete', 'delete-room', 'finances'],
+                    'roles' => ['owner'], // Authenticated users
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
                         $client = Yii::$app->meili->connect();
@@ -74,7 +76,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['view', 'comfort', 'payment', 'terms','room-beds'],
+                    'actions' => ['view', 'comfort', 'payment', 'terms', 'room-beds'],
                     'roles' => ['admin'], // Authenticated users
 
                 ],
@@ -134,7 +136,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['index', 'create', 'add-tariff','edit-tariff', 'prices', 'remove-object-image', 'remove-file', 'send-to-moderation', 'unpublish'],
+                    'actions' => ['index', 'create', 'add-tariff', 'edit-tariff', 'prices', 'remove-object-image', 'remove-file', 'send-to-moderation', 'unpublish'],
                     'roles' => ['admin', 'owner'],
                 ],
             ],
@@ -255,7 +257,7 @@ class ObjectController extends Controller
             'dataProvider' => $dataProvider,
             'model' => $model,
             'rooms' => $rooms,
-            'object_id' => $id,
+            'object_id' => $object_id,
             'object_title' => $object['name'][0],
         ]);
     }
@@ -286,6 +288,7 @@ class ObjectController extends Controller
         return $this->render('/tariff/index', [
             'list' => $tariff,
             'object_title' => $object['name'][0],
+            'object_id' => $object_id
         ]);
     }
 
@@ -300,7 +303,8 @@ class ObjectController extends Controller
         return $this->render('/tariff/index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'model' => $model
+            'model' => $model,
+            'object_id'=>$object_id
         ]);
     }
 
@@ -348,7 +352,8 @@ class ObjectController extends Controller
 
         return $this->render('view', [
             'model' => $model,
-            'bind_model' => $bind_model
+            'bind_model' => $bind_model,
+            'object_id'=>$object_id
         ]);
     }
 
@@ -705,9 +710,9 @@ class ObjectController extends Controller
             $model->children = $data['terms']['children'] ?? [];
 
             if (Yii::$app->request->isPost) {
-                
+
                 $meal_arr = Yii::$app->request->post('meal_terms', []);
-                
+
                 $arr = [];
                 if ($meal_arr) {
                     $counter = 0;
@@ -1702,12 +1707,6 @@ class ObjectController extends Controller
         ]);
     }
 
-
-
-
-
-
-
     /**
      * Deletes an existing Event model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -1763,6 +1762,32 @@ class ObjectController extends Controller
         }
 
         return ['error' => 'No file uploaded'];
+    }
+
+    public function actionFinances($object_id)
+    {
+        $searchModel = new BookingSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
+        $active = "all_active";
+
+        $date_from = Yii::$app->request->get('date_from') ? Yii::$app->request->get('date_from') : null;
+        if ($date_from) {
+            $dataProvider->query->andFilterWhere(['>=', 'date_from', $date_from]);
+        }
+
+        $date_to = Yii::$app->request->get('date_to') ? Yii::$app->request->get('date_to') : null;
+        if ($date_to) {
+            $dataProvider->query->andFilterWhere(['<', 'date_to', $date_to]);
+        }
+        return $this->render('finances', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'object_id' => $object_id,
+            'active' => $active,
+            'date_from' => $date_from,
+            'date_to' => $date_to,
+        ]);
     }
 
 

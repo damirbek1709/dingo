@@ -16,7 +16,7 @@ use yii\widgets\ListView;
 ?>
 <div class="oblast-update">
     <!-- <h1><?php //echo Html::encode($object_title) ?></h1> -->
-    <?php echo $this->render('../../views/object/top_nav', ['model' => $model]); ?>
+    <?php echo $this->render('../../views/object/top_nav', ['model' => $model,'object_id'=>$object_id]); ?>
 
     <div class="card">
         <div>

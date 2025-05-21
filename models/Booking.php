@@ -52,7 +52,7 @@ class Booking extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status'], 'required'],
+            [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status','owner_id'], 'required'],
             [['object_id', 'room_id', 'status', 'cancellation_type'], 'integer'],
             [['status'], 'default', 'value' => 1],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
@@ -87,6 +87,7 @@ class Booking extends \yii\db\ActiveRecord
             'cancellation_type' => Yii::t('app', 'Тип отмены'),
             'cancellation_penalty_sum' => Yii::t('app', 'Сумма штрафа'),
             'created_at' => Yii::t('app', 'Дата брони'),
+            'owner_id' => Yii::t('app', 'Хост'),
         ];
     }
 

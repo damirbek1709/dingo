@@ -23,9 +23,7 @@ $this->title = $title;
                 <?php echo $this->render('nav', ['model' => $model]); ?>
             </div>
             <div class="col-md-9">
-
                 <div class="card">
-
                     <div class="header">
                         <div>
                             <div class="section-label">Название</div>

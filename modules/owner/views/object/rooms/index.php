@@ -20,7 +20,7 @@ $this->title = Yii::t('app', 'Список номеров');
 <link href="<?= Url::base() ?>/modules/owner/assets/css/room.css" rel="stylesheet">
 <div class="oblast-update">
     <!-- <h1><?php //echo Html::encode($object_title) ?></h1> -->
-    <?php echo $this->render('../top_nav', ['model' => $model]); ?>
+    <?php echo $this->render('../top_nav', ['model' => $model,'object_id'=>$object_id]); ?>
 
     <div class="clear">
         <div class="card">

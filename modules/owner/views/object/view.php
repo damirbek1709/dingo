@@ -17,7 +17,7 @@ $this->title = $title[0];
 
 <div class="oblast-update">
 
-    <?php echo $this->render('top_nav', ['model' => $model]); ?>
+    <?php echo $this->render('top_nav', ['model' => $model,'object_id'=>$object_id]); ?>
 
     <div class="col-md-12">
         <div class="row">

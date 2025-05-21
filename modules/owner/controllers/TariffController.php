@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use yii\web\Response;
 use yii\filters\AccessControl;
 use app\models\Objects;
+use DateTime;
 
 /**
  * TariffController implements the CRUD actions for Tariff model.
@@ -198,22 +199,70 @@ class TariffController extends Controller
                                     continue;
                                 }
 
-                                $merged = false;
-                                foreach ($existingPrices as &$existingBlock) {
-                                    if (
-                                        isset($existingBlock['from_date'], $existingBlock['to_date']) &&
-                                        $existingBlock['from_date'] === $newPriceBlock['from_date'] &&
-                                        $existingBlock['to_date'] === $newPriceBlock['to_date']
-                                    ) {
-                                        $existingBlock['price_arr'] = $newPriceBlock['price_arr'];
-                                        $merged = true;
-                                        break;
-                                    }
+                                $newFrom = DateTime::createFromFormat('Y-m-d', $newPriceBlock['from_date']);
+                                $newTo = DateTime::createFromFormat('Y-m-d', $newPriceBlock['to_date']);
+
+                                if (!$newFrom || !$newTo) {
+                                    continue;
                                 }
 
-                                if (!$merged) {
-                                    $existingPrices[] = $newPriceBlock;
+                                $newFromStr = $newFrom->format('d-m-Y');
+                                $newToStr = $newTo->format('d-m-Y');
+                                $newPriceArr = $newPriceBlock['price_arr'];
+                                $updatedBlocks = [];
+
+                                foreach ($existingPrices as $existingBlock) {
+                                    if (!isset($existingBlock['from_date'], $existingBlock['to_date'], $existingBlock['price_arr'])) {
+                                        continue;
+                                    }
+
+                                    $existFrom = DateTime::createFromFormat('d-m-Y', $existingBlock['from_date']);
+                                    $existTo = DateTime::createFromFormat('d-m-Y', $existingBlock['to_date']);
+
+                                    if (!$existFrom || !$existTo) {
+                                        continue;
+                                    }
+
+                                    // No overlap
+                                    if ($existTo < $newFrom || $existFrom > $newTo) {
+                                        $updatedBlocks[] = $existingBlock;
+                                        continue;
+                                    }
+
+                                    // Part before the overlap
+                                    if ($existFrom < $newFrom) {
+                                        $updatedBlocks[] = [
+                                            'from_date' => $existFrom->format('d-m-Y'),
+                                            'to_date' => (clone $newFrom)->modify('-1 day')->format('d-m-Y'),
+                                            'price_arr' => $existingBlock['price_arr']
+                                        ];
+                                    }
+
+                                    // Part after the overlap
+                                    if ($existTo > $newTo) {
+                                        $updatedBlocks[] = [
+                                            'from_date' => (clone $newTo)->modify('+1 day')->format('d-m-Y'),
+                                            'to_date' => $existTo->format('d-m-Y'),
+                                            'price_arr' => $existingBlock['price_arr']
+                                        ];
+                                    }
+
+                                    // Overlapping portion is skipped — replaced below
                                 }
+
+                                // Add the new price block
+                                $updatedBlocks[] = [
+                                    'from_date' => $newFromStr,
+                                    'to_date' => $newToStr,
+                                    'price_arr' => $newPriceArr
+                                ];
+
+                                // Sort final result by from_date
+                                usort($updatedBlocks, function ($a, $b) {
+                                    return strtotime(str_replace('-', '/', $a['from_date'])) - strtotime(str_replace('-', '/', $b['from_date']));
+                                });
+
+                                $existingPrices = $updatedBlocks;
                             }
                         }
 
@@ -224,7 +273,6 @@ class TariffController extends Controller
                 }
 
                 if (!$found) {
-                    // Validate before adding entirely new tariff
                     if (isset($newTariffData['id']) && isset($newTariffData['prices']) && is_array($newTariffData['prices'])) {
                         $existingTariffs[] = $newTariffData;
                     }
@@ -235,15 +283,11 @@ class TariffController extends Controller
             break;
         }
 
-        $client->index('object')->updateDocuments([
-            [
-                'id' => (int) $object_id,
-                'rooms' => $object['rooms']
-            ]
-        ]);
+        $client->index('object')->updateDocuments([$object]);
 
         return $tariff_list;
     }
+
 
 
     /**
