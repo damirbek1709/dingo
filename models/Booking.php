@@ -166,6 +166,16 @@ class Booking extends \yii\db\ActiveRecord
         $object = Objects::findOne($this->object_id);
         $room = [];
 
+        
+
+        $arr['name'] = $result['name'];
+        $arr['image'] = $object->getImage()->getUrl('200x');
+        $arr['address'] = $result['address'];
+        $arr['check_in'] = $result['check_in'];
+        $arr['check_out'] = $result['check_out'];
+        $arr['is_returnable'] = false;
+
+
         if (array_key_exists('rooms', $result)) {
             foreach ($result['rooms'] as $roomData) {
                 if ($this->room_id == $roomData['id']) {
@@ -187,13 +197,6 @@ class Booking extends \yii\db\ActiveRecord
             }
 
         }
-
-        $arr['name'] = $result['name'];
-        $arr['image'] = $object->getImage()->getUrl('200x');
-        $arr['address'] = $result['address'];
-        $arr['check_in'] = $result['check_in'];
-        $arr['check_out'] = $result['check_out'];
-        $arr['is_returnable'] = false;
         if ($this->cancel_reason_id == Tariff::NO_CANCELLATION) {
             $arr['is_returnable'] = false;
         } elseif ($this->cancel_reason_id == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
