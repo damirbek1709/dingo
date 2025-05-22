@@ -250,12 +250,17 @@ class BookingController extends BaseController
 
     public function actionList($finished = false, $future = false, $canceled = false)
     {
-
         $searchModel = new BookingSearch();
-
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
-        $dataProvider->pagination->pageSize=10;
+        
+        // Configure pagination
+        $dataProvider->pagination = [
+            'pageSize' => Yii::$app->request->get('per-page', 20), // Default to 20 items per page
+            'pageSizeLimit' => [1, 100], // Allow between 1 and 100 items per page
+        ];
+        
         $current_date = date('Y-m-d');
+        
         if ($finished) {
             $dataProvider->query->andFilterWhere(['>', 'date_from', $current_date]);
         }
@@ -265,7 +270,7 @@ class BookingController extends BaseController
         if ($future) {
             $dataProvider->query->andFilterWhere(['<', 'date_to', $current_date]);
         }
-
+    
         return $dataProvider;
     }
 
