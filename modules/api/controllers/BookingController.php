@@ -253,9 +253,7 @@ class BookingController extends BaseController
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
 
-        $pageSize = (int) Yii::$app->request->get('per-page', 20);
-
-        // Configure pagination
+        $pageSize = (int) Yii::$app->request->get('per-page', 10);
         $dataProvider->pagination = [
             'page' => $page - 1, // DataProvider uses 0-based indexing
             'pageSize' => $pageSize,
