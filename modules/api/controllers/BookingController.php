@@ -191,6 +191,16 @@ class BookingController extends BaseController
         return "OK";
     }
 
+    public function actionCheckstatus($transaction_number){
+        $response['result'] = false;
+        $booking = Booking::find()->where(['transaction_number' => $transaction_number])->one();
+        if($booking->status == Booking::PAID_STATUS_PAID){
+            $response['result'] = true;
+            $response['message'] = Yii::t('app','Оплата произведена');
+        }
+        return $response;
+    }
+
     public function actionList($finished = false, $future = false, $canceled = false)
     {
 
@@ -214,7 +224,7 @@ class BookingController extends BaseController
         $response['result'] = false;
         $model = Booking::findOne($id);
         if ($model) {
-            $model->status = Booking::PAID_STATUS_CANCEL_INQUIRY;
+            $model->status = Booking::PAID_STATUS_CANCELED;
             if ($model->save(false)) {
                 $response['result'] = true;
                 $response['message']= Yii::t('app','Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');

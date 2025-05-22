@@ -300,6 +300,7 @@ class ObjectController extends BaseController
         }
         return $response;
     }
+    
 
     public function actionEdit()
     {
