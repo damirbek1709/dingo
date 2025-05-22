@@ -3,16 +3,16 @@
 use yii\db\Migration;
 
 /**
- * Class m250521_071854_add_field_booking_owner_id
+ * Class m250522_070101_add_field_cancel_booking_reason
  */
-class m250521_071854_add_field_booking_owner_id extends Migration
+class m250522_070101_add_field_cancel_booking_reason extends Migration
 {
     /**
      * {@inheritdoc}
      */
     public function safeUp()
     {
-        $this->addColumn('booking', 'owner_id', $this->integer(22)->notNull());
+        $this->addColumn('booking', 'cancel_reason', $this->string(500)->null());
     }
 
     /**
@@ -20,7 +20,7 @@ class m250521_071854_add_field_booking_owner_id extends Migration
      */
     public function safeDown()
     {
-        echo "m250521_071854_add_field_booking_owner_id cannot be reverted.\n";
+        echo "m250522_070101_add_field_cancel_booking_reason cannot be reverted.\n";
 
         return false;
     }
@@ -34,7 +34,7 @@ class m250521_071854_add_field_booking_owner_id extends Migration
 
     public function down()
     {
-        echo "m250521_071854_add_field_booking_owner_id cannot be reverted.\n";
+        echo "m250522_070101_add_field_cancel_booking_reason cannot be reverted.\n";
 
         return false;
     }
