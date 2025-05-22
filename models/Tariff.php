@@ -93,7 +93,7 @@ class Tariff extends \yii\db\ActiveRecord
                     Yii::t('app', 'В случае отмены бронирования с гостя будет удержана полная стоимость бронирования или предоплата.'),
                     Yii::t('app', 'In case of cancellation of the reservation, the guest will be charged the full cost of the reservation or the prepayment.'),
                     Yii::t('app', 'Резерв жокко чыгарылган учурда коноктон резервациянын толук наркы же алдын ала төлөм өндүрүлөт.')
-                ]
+                ],
             ],
             self::FREE_CANCELLATION_WITH_PENALTY => [
                 'label' => [
