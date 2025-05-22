@@ -300,6 +300,9 @@ class BookingController extends BaseController
                 $response['sucess'] = true;
                 $response['message'] = Yii::t('app', 'Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');
             }
+            else{
+                $response['message']=$model->errors;
+            }
             $response['data'] = $model->getObjectDetails();
         }
 
