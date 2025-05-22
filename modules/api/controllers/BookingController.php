@@ -254,6 +254,7 @@ class BookingController extends BaseController
         $searchModel = new BookingSearch();
 
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
+        $dataProvider->pagination->pageSize=10;
         $current_date = date('Y-m-d');
         if ($finished) {
             $dataProvider->query->andFilterWhere(['>', 'date_from', $current_date]);
