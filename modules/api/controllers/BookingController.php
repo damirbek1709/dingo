@@ -248,15 +248,18 @@ class BookingController extends BaseController
         ];
     }
 
-    public function actionList($finished = false, $future = false, $canceled = false)
+    public function actionList($finished = false, $future = false, $canceled = false, $page = 0)
     {
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
 
+        $pageSize = (int) Yii::$app->request->get('per-page', 20);
+
         // Configure pagination
         $dataProvider->pagination = [
-            'pageSize' => Yii::$app->request->get('per-page', 1), // Default to 20 items per page
-            'pageSizeLimit' => [1, 100], // Allow between 1 and 100 items per page
+            'page' => $page - 1, // DataProvider uses 0-based indexing
+            'pageSize' => $pageSize,
+            'pageSizeLimit' => [1, 100],
         ];
 
         $current_date = date('Y-m-d');
@@ -273,8 +276,8 @@ class BookingController extends BaseController
 
         return [
             'pageSize' => $dataProvider->pagination->pageSize,
-            'totalCount'=>$dataProvider->totalCount,
-            'page'=>$dataProvider->pagination->page,
+            'totalCount' => $dataProvider->totalCount,
+            'page' => $dataProvider->pagination->page,
             'data' => $dataProvider
         ];
     }
