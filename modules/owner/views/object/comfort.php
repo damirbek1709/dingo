@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 // $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенности');
 ?>
 <div class="oblast-update">
-<?php echo $this->render('top_nav', ['model' => $model]); ?>
+<?php echo $this->render('top_nav', ['model' => $model,'object_id'=>$object_id]); ?>
     <?php $form = ActiveForm::begin();
     $list_comfort = Objects::сomfortList();
     ?>
