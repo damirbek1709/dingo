@@ -199,7 +199,7 @@ class Booking extends \yii\db\ActiveRecord
                 } elseif ($this->cancel_reason_id == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
                     $current_date = date('Y-m-d');
                     $date_checkin = date('Y-m-d', strtotime($this->date_from));
-                    $penalty_days = $tariff['penalty_days'] ? $tariff['penalty_days'] : 0;
+                    $penalty_days = array_key_exists($tariff['penalty_days'],$tariff) ? $tariff['penalty_days'] : 0;
                     $days_left = $current_date - $date_checkin;
                     if ($days_left >= $penalty_days) {
                         $sum_to_return = $this->sum;
