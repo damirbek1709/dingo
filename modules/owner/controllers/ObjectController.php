@@ -40,7 +40,7 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'tariff-list','room', 'view', 'delete', 'comfort', 'index-admin', 'file-upload', 'finances'],
+                    'actions' => ['room-list', 'tariff-list', 'room', 'view', 'delete', 'comfort', 'index-admin', 'file-upload', 'finances'],
                     'roles' => ['admin'],
                 ],
                 [
@@ -304,7 +304,7 @@ class ObjectController extends Controller
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'model' => $model,
-            'object_id'=>$object_id
+            'object_id' => $object_id
         ]);
     }
 
@@ -353,7 +353,7 @@ class ObjectController extends Controller
         return $this->render('view', [
             'model' => $model,
             'bind_model' => $bind_model,
-            'object_id'=>$object_id
+            'object_id' => $object_id
         ]);
     }
 
@@ -1131,10 +1131,9 @@ class ObjectController extends Controller
                             $roomData['tariff'] = $roomData['tariff'] ?? [];
 
                             $is_returnable = null;
-                            if($model->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY){
+                            if ($model->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
                                 $is_returnable = true;
-                            }
-                            elseif($model->cancellation == Tariff::NO_CANCELLATION){
+                            } elseif ($model->cancellation == Tariff::NO_CANCELLATION) {
                                 $is_returnable = false;
                             }
                             $cancellation_terms = [
@@ -1142,7 +1141,6 @@ class ObjectController extends Controller
                                 'penalty_percent' => (double) $model->penalty_sum,
                                 'penalty_days' => (int) $model->penalty_days,
                                 'is_returnable' => $is_returnable,
-
                             ];
                             $tariff = [
                                 'id' => (int) $model->id,
@@ -1238,12 +1236,18 @@ class ObjectController extends Controller
 
                         // Re-add updated tariff only to selected rooms
                         if ($room_list && in_array($roomData['id'], $room_list)) {
+                            $is_returnable = null;
+                            if ($model->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
+                                $is_returnable = true;
+                            } elseif ($model->cancellation == Tariff::NO_CANCELLATION) {
+                                $is_returnable = false;
+                            }
                             $cancellation_terms = [
                                 'type' => $model->getCancellationType((int) $model->cancellation),
                                 'penalty_percent' => (double) $model->penalty_sum,
                                 'penalty_days' => (int) $model->penalty_days,
+                                'is_returnable' => $is_returnable,
                             ];
-
                             $tariff_data = [
                                 'id' => (int) $model->id,
                                 'payment_on_book' => (int) $model->payment_on_book,
