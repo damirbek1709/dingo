@@ -222,8 +222,9 @@ class BookingController extends BaseController
             ],
             Booking::CANCEL_REASON_BETTER_OPTION => [
                 'Я нашел более выгодное предложение',
+                'I found a better deal',
                 'Мен жакшыраак келишим таптым',
-                'I found a better deal'
+                
             ],
 
             Booking::CANCEL_REASON_UNPREDICTED_SITUATION => [
