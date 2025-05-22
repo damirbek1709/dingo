@@ -107,7 +107,11 @@ class Booking extends \yii\db\ActiveRecord
             ],
         ];
 
-        return $arr[$this->cancel_reason_id];
+        if($this->cancel_reason_id){
+            return $arr[$this->cancel_reason_id];
+        }
+        return false;
+        
     }
 
     
