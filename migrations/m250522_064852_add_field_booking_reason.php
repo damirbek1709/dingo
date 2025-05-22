@@ -7,6 +7,7 @@ use yii\db\Migration;
  */
 class m250522_064852_add_field_booking_reason extends Migration
 {
+    
     /**
      * {@inheritdoc}
      */
