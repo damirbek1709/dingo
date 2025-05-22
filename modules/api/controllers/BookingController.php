@@ -269,12 +269,12 @@ class BookingController extends BaseController
     public function actionCancel()
     {
         $id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'id');
-        $cancel_reason = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancel_reason');
+        $reason_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'reason_id');
         $response['result'] = false;
         $model = Booking::findOne($id);
         if ($model) {
             $model->status = Booking::PAID_STATUS_CANCELED;
-            $model->cancel_reason = $cancel_reason;
+            $model->cancel_reason_id = $reason_id;
             if ($model->save(false)) {
                 $response['result'] = true;
                 $response['message'] = Yii::t('app', 'Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');

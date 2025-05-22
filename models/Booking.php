@@ -61,14 +61,14 @@ class Booking extends \yii\db\ActiveRecord
     {
         return [
             [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status','owner_id'], 'required'],
-            [['object_id', 'room_id', 'status', 'cancellation_type'], 'integer'],
+            [['object_id', 'room_id', 'status', 'cancellation_type','cancel_reason_id'], 'integer'],
             [['status'], 'default', 'value' => 1],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
             [['date_from', 'date_to'], 'safe'],
             [['tariff_id', 'currency'], 'string', 'max' => 11],
             [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number'], 'string', 'max' => 255],
-            [['other_guests','cancel_reason'], 'string', 'max' => 500],
+            [['other_guests'], 'string', 'max' => 500],
         ];
     }
 
@@ -98,7 +98,7 @@ class Booking extends \yii\db\ActiveRecord
             'cancellation_penalty_sum' => Yii::t('app', 'Сумма штрафа'),
             'created_at' => Yii::t('app', 'Дата брони'),
             'owner_id' => Yii::t('app', 'Хост'),
-            'cancel_reason' => Yii::t('app', 'Причина отмены'),
+            'cancel_reason_id' => Yii::t('app', 'Причина отмены'),
         ];
     }
 
