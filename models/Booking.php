@@ -72,7 +72,7 @@ class Booking extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getCancelResasonArray(){
+    public function getCancelReasonArray(){
         $arr = [
             self::CANCEL_REASON_PLANS_CHANGED => [
                 'Мои планы изменились',
