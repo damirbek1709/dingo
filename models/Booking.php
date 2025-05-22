@@ -177,7 +177,6 @@ class Booking extends \yii\db\ActiveRecord
         } elseif ($this->cancel_reason_id == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
             $arr['is_returnable'] = true;
         }
-        $arr['cancellation'] = Tariff::staticCancellationType($this->cancellation_type);
         return $arr;
     }
 
