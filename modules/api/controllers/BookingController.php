@@ -86,7 +86,8 @@ class BookingController extends BaseController
                 'add' => ['POST'],
                 'webhook' => ['POST'],
                 'list' => ['GET'],
-                'check-status' => ['GET']
+                'check-status' => ['GET'],
+                'cancel' => ['GET'],
             ],
         ];
 
