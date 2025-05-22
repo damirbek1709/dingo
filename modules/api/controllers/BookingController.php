@@ -286,16 +286,16 @@ class BookingController extends BaseController
     {
         $id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'id');
         $reason_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'reason_id');
-        $response['result'] = false;
+        $response['success'] = false;
         $model = Booking::findOne($id);
         if ($model) {
             $model->status = Booking::PAID_STATUS_CANCELED;
             $model->cancel_reason_id = $reason_id;
             if ($model->save(false)) {
-                $response['result'] = true;
+                $response['sucess'] = true;
                 $response['message'] = Yii::t('app', 'Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');
             }
-            $response['data'] = $model;
+            $response['data'] = $model->getObjectDetails();
         }
 
         return $response;
