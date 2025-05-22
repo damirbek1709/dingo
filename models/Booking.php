@@ -177,7 +177,7 @@ class Booking extends \yii\db\ActiveRecord
             $arr['bed_types'] = $room['bed_types'];
             $tariff = [];
             if (array_key_exists('tariff', $room)) {
-                foreach ($result['tariff'] as $tariffData) {
+                foreach ($room['tariff'] as $tariffData) {
                     if ($this->tariff_id == $tariffData['id']) {
                         $tariff = $tariffData;
                         break;
