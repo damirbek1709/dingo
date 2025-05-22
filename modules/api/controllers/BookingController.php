@@ -154,9 +154,14 @@ class BookingController extends BaseController
         $model->cancel_reason = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancel_reason');
         $model->currency = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'currency');
         $model->cancellation_type = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_type');
-        $model->cancellation_penalty_sum = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_penalty_sum');
+        //$model->cancellation_penalty_sum = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_penalty_sum');
         $model->status = Booking::PAID_STATUS_NOT_PAID;
         $currency = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'currency');
+
+        $tariff = Tariff::findOne($model->tariff_id);
+        $model->cancellation_penalty_sum = $model->sum / 100 * $tariff->penalty_sum;
+
+
 
         if ($model->save()) {
             $arr = [
@@ -165,7 +170,7 @@ class BookingController extends BaseController
                 'currency' => $currency,
                 'user_id' => Yii::$app->user->id,
                 'transaction_number' => (int) $model->id + 1000000,
-                'salt'=>rand(10000000, 50000000)
+                'salt' => rand(10000000, 50000000)
             ];
             $response['success'] = true;
             $response['message'] = 'Booking added successfully';
@@ -224,7 +229,7 @@ class BookingController extends BaseController
                 'Я нашел более выгодное предложение',
                 'I found a better deal',
                 'Мен жакшыраак келишим таптым',
-                
+
             ],
 
             Booking::CANCEL_REASON_UNPREDICTED_SITUATION => [

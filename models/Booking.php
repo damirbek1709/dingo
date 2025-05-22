@@ -166,7 +166,7 @@ class Booking extends \yii\db\ActiveRecord
         $object = Objects::findOne($this->object_id);
         $room = [];
 
-        
+
 
         $arr['name'] = $result['name'];
         $arr['image'] = $object->getImage()->getUrl('200x');
@@ -194,13 +194,23 @@ class Booking extends \yii\db\ActiveRecord
                     }
                 }
                 $arr['meal_type'] = $tariff['meal_type'];
+                if ($this->cancel_reason_id == Tariff::NO_CANCELLATION) {
+                    $arr['is_returnable'] = false;
+                } elseif ($this->cancel_reason_id == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
+                    $current_date = date('Y-m-d');
+                    $date_checkin = date('Y-m-d', strtotime($this->date_from));
+                    $penalty_days = $tariff['penalty_days'];
+                    $days_left = $current_date - $date_checkin;
+                    if ($days_left >= $penalty_days) {
+                        $sum_to_return = $this->sum;
+                    } else {
+                        $sum_to_return = $this->sum - $this->cancellation_penalty_sum;
+                    }
+                    $arr['is_returnable'] = true;
+                    $arr['sum_to_return'] = $sum_to_return;
+                    $arr['days_left'] = $days_left;
+                }
             }
-
-        }
-        if ($this->cancel_reason_id == Tariff::NO_CANCELLATION) {
-            $arr['is_returnable'] = false;
-        } elseif ($this->cancel_reason_id == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
-            $arr['is_returnable'] = true;
         }
 
         return $arr;
