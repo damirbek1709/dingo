@@ -87,7 +87,7 @@ class BookingController extends BaseController
                 'webhook' => ['POST'],
                 'list' => ['GET'],
                 'check-status' => ['GET'],
-                'cancel' => ['GET'],
+                'cancel' => ['POST'],
             ],
         ];
 
@@ -222,12 +222,15 @@ class BookingController extends BaseController
         return $dataProvider;
     }
 
-    public function actionCancel($id)
+    public function actionCancel()
     {
+        $id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'id');
+        $cancel_reason = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancel_reason');
         $response['result'] = false;
         $model = Booking::findOne($id);
         if ($model) {
             $model->status = Booking::PAID_STATUS_CANCELED;
+            $model->cancel_reason = $cancel_reason;
             if ($model->save(false)) {
                 $response['result'] = true;
                 $response['message']= Yii::t('app','Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');
