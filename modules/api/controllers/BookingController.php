@@ -59,7 +59,7 @@ class BookingController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'list'],
+                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'list','check-status'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -85,7 +85,8 @@ class BookingController extends BaseController
             'actions' => [
                 'add' => ['POST'],
                 'webhook' => ['POST'],
-                'list' => ['GET']
+                'list' => ['GET'],
+                'check-status' => ['GET']
             ],
         ];
 
