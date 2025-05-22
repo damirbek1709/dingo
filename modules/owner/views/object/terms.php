@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 // $this->params['breadcrumbs'][] = Yii::t('app', 'Условия');
 ?>
 <div class="oblast-update">
-<?php echo $this->render('top_nav', ['model' => $model]); ?>
+    <?php echo $this->render('top_nav', ['model' => $model, 'object_id' => $model->id]); ?>
     <?php
     $form = ActiveForm::begin();
     $meal_list = Objects::mealList();
@@ -76,7 +76,7 @@ use yii\widgets\ActiveForm;
                                     <label><?= Yii::t('app', 'Стоимость') ?></label>
                                     <?= Html::input('text', "meal_terms[0][meal_cost]", '', ['class' => 'form-control', 'placeholder' => Yii::t('app', 'Укажите стоимость питание')]) ?>
                                 </div>
-                                
+
                                 <button type="button" class="btn remove-meal"></button>
                             </div>
                         <?php endif; ?>
@@ -188,7 +188,6 @@ $this->registerJs($script);
 ?>
 
 <style>
-
     .toggle-switch-container {
         display: flex;
         align-items: center;
