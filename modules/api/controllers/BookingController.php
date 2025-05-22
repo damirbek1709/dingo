@@ -51,7 +51,8 @@ class BookingController extends BaseController
         $behaviors['authenticator']['except'] = [
             'index',
             'webhook',
-            'check-status'
+            'check-status',
+            'cancel-reason-list'
         ];
 
 
@@ -60,13 +61,13 @@ class BookingController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'list','check-status','cancel'],
+                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'list', 'check-status', 'cancel','cancel-reason-list'],
                     'roles' => ['@', '?'],
                 ],
 
                 [
                     'allow' => true,
-                    'actions' => ['list', 'view', 'list2', 'search', 'webhook'],
+                    'actions' => ['list', 'view', 'list2', 'search', 'webhook','cancel-reason-list'],
                     'roles' => ['@', '?', 'admin', 'owner'],
                 ],
                 [
@@ -89,6 +90,7 @@ class BookingController extends BaseController
                 'list' => ['GET'],
                 'check-status' => ['GET'],
                 'cancel' => ['POST'],
+                'cancel-reason-list' => ['POST'],
             ],
         ];
 
@@ -195,22 +197,55 @@ class BookingController extends BaseController
         return "OK";
     }
 
-    public function actionCheckStatus($transaction_number){
+    public function actionCheckStatus($transaction_number)
+    {
         $response['success'] = false;
         $booking = Booking::find()->where(['transaction_number' => $transaction_number])->one();
-        if($booking->status == Booking::PAID_STATUS_PAID){
+        if ($booking->status == Booking::PAID_STATUS_PAID) {
             $response['success'] = true;
-            $response['message'] = Yii::t('app','Оплата произведена');
-        }
-        else{
+            $response['message'] = Yii::t('app', 'Оплата произведена');
+        } else {
             $response['success'] = false;
-            $response['message'] = Yii::t('app','Возникла ошибка при оплате');
+            $response['message'] = Yii::t('app', 'Возникла ошибка при оплате');
         }
         return $response;
     }
 
-    public function actionCancelReasonList(){
+    public function actionCancelReasonList()
+    {
+        return [
+            Booking::CANCEL_REASON_PLANS_CHANGED => [
+                'Мои планы изменились',
+                'My planse are changed',
+                'Менин пландарым өзгөрдү'
+            ],
+            Booking::CANCEL_REASON_BETTER_OPTION => [
+                'Я нашел более выгодное предложение',
+                'Мен жакшыраак келишим таптым',
+                'I found a better deal'
+            ],
 
+            Booking::CANCEL_REASON_UNPREDICTED_SITUATION => [
+                'Непредвиденная ситуация с поездкой (отмена рейса, проблемы с визой и т. д.)',
+                'Unforeseen travel situation (flight cancellation, visa problems, etc.)',
+                'Күтүлбөгөн саякат кырдаалы (учууну жокко чыгаруу, виза көйгөйлөрү ж.б.)'
+            ],
+            Booking::CANCEL_REASON_MISTAKE => [
+                'Я допустил ошибку в датах или деталях бронирования',
+                'I made a mistake in the dates or booking details',
+                'Даталарда же ээлөө деталдарында ката кетирдим'
+            ],
+            Booking::CANCEL_REASON_NO_RESPONSE => [
+                'Отель не отвечает на запросы или изменил условия',
+                'The hotel does not respond to inquiries or has changed its terms',
+                'Мейманкана суроо-талаптарга жооп бербейт же шарттарын өзгөрттү'
+            ],
+            Booking::CANCEL_REASON_OTHER => [
+                'Другое',
+                'Other',
+                'Башка'
+            ],
+        ];
     }
 
     public function actionList($finished = false, $future = false, $canceled = false)
@@ -242,7 +277,7 @@ class BookingController extends BaseController
             $model->cancel_reason = $cancel_reason;
             if ($model->save(false)) {
                 $response['result'] = true;
-                $response['message']= Yii::t('app','Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');
+                $response['message'] = Yii::t('app', 'Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');
             }
             $response['data'] = $model;
         }

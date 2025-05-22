@@ -42,9 +42,10 @@ class Booking extends \yii\db\ActiveRecord
 
     const CANCEL_REASON_PLANS_CHANGED = 1;
     const CANCEL_REASON_BETTER_OPTION = 2;
-    const CANCEL_REASON_MISTAKE = 3;
-    const CANCEL_REASON_NO_RESPONSE = 4;
-    const CANCEL_REASON_OTHER = 5;
+    const CANCEL_REASON_UNPREDICTED_SITUATION = 3;
+    const CANCEL_REASON_MISTAKE = 4;
+    const CANCEL_REASON_NO_RESPONSE = 5;
+    const CANCEL_REASON_OTHER = 6;
     /**
      * {@inheritdoc}
      */
