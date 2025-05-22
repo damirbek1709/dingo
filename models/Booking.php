@@ -161,7 +161,7 @@ class Booking extends \yii\db\ActiveRecord
         $index = $client->index('object');
         $result = $index->getDocument($this->object_id);
         $arr[] = $result['name'];
-        return $result;
+        return $arr;
     }
 
     public static function pay($data)
