@@ -48,11 +48,13 @@ $this->title = Yii::t('app', 'Список номеров');
                     <div class="room-card">
                         <?php
                         if ($bind_model) {
-                            echo Html::a(Html::img($bind_model->getImage()->getUrl('130x150'), ['alt' => "Room Image"]), ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]);
+                            echo Html::a(Html::img($bind_model->getImage()->getUrl('120x150'), ['alt' => "Room Image"]), ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]);
 
                         } else {
                             if (array_key_exists('images', $val)) {
-                                echo Html::a($val['images']['picture'], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]);
+                                if (array_key_exists('thumbnailPicture', $$val['images'])) {
+                                    echo Html::a($val['images']['thumbnailPicture'], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]);
+                                }
                             }
 
                         } ?>
