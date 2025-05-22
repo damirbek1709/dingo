@@ -255,7 +255,7 @@ class BookingController extends BaseController
         
         // Configure pagination
         $dataProvider->pagination = [
-            'pageSize' => Yii::$app->request->get('per-page', 20), // Default to 20 items per page
+            'pageSize' => Yii::$app->request->get('per-page', 2), // Default to 20 items per page
             'pageSizeLimit' => [1, 100], // Allow between 1 and 100 items per page
         ];
         
