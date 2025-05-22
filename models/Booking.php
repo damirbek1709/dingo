@@ -172,9 +172,9 @@ class Booking extends \yii\db\ActiveRecord
         $arr['check_in'] = $result['check_in'];
         $arr['check_out'] = $result['check_out'];
         $arr['is_returnable'] = false;
-        if ($this->cancellation == Tariff::NO_CANCELLATION) {
+        if ($this->cancel_reason_id == Tariff::NO_CANCELLATION) {
             $arr['is_returnable'] = false;
-        } elseif ($this->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
+        } elseif ($this->cancel_reason_id == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
             $arr['is_returnable'] = true;
         }
         $arr['cancellation'] = Tariff::staticCancellationType($this->cancellation_type);
