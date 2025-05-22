@@ -201,6 +201,10 @@ class BookingController extends BaseController
             $response['result'] = true;
             $response['message'] = Yii::t('app','Оплата произведена');
         }
+        else{
+            $response['result'] = true;
+            $response['message'] = Yii::t('app','Возникла ошибка при оплате');
+        }
         return $response;
     }
 

@@ -7,6 +7,7 @@ use app\components\flashpay\Payment;
 use app\components\flashpay\Gate;
 use IntlDateFormatter;
 use DateTime;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "booking".
@@ -90,6 +91,23 @@ class Booking extends \yii\db\ActiveRecord
             'owner_id' => Yii::t('app', 'Хост'),
             'cancel_reason' => Yii::t('app', 'Причина отмены'),
         ];
+    }
+
+    public function fields()
+    {
+        $parent = parent::fields();
+
+
+        return ArrayHelper::merge($parent, [
+            'objectDetails'
+        ]);
+    }
+
+    public function getObjectDetails(){
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $result = $index->getDocument($this->id);
+        return $result;
     }
 
     public static function pay($data)
