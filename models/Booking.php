@@ -60,8 +60,8 @@ class Booking extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status','owner_id'], 'required'],
-            [['object_id', 'room_id', 'status', 'cancellation_type','cancel_reason_id'], 'integer'],
+            [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status', 'owner_id'], 'required'],
+            [['object_id', 'room_id', 'status', 'cancellation_type', 'cancel_reason_id'], 'integer'],
             [['status'], 'default', 'value' => 1],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
@@ -72,7 +72,8 @@ class Booking extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getCancelReasonArray(){
+    public function getCancelReasonArray()
+    {
         $arr = [
             self::CANCEL_REASON_PLANS_CHANGED => [
                 'Мои планы изменились',
@@ -83,7 +84,7 @@ class Booking extends \yii\db\ActiveRecord
                 'Я нашел более выгодное предложение',
                 'I found a better deal',
                 'Мен жакшыраак келишим таптым'
-                
+
             ],
 
             self::CANCEL_REASON_UNPREDICTED_SITUATION => [
@@ -108,14 +109,14 @@ class Booking extends \yii\db\ActiveRecord
             ],
         ];
 
-        if($this->cancel_reason_id){
+        if ($this->cancel_reason_id) {
             return $arr[$this->cancel_reason_id];
         }
         return false;
-        
+
     }
 
-    
+
 
     /**
      * {@inheritdoc}
@@ -155,12 +156,22 @@ class Booking extends \yii\db\ActiveRecord
         ]);
     }
 
-    public function getObjectDetails(){
+    public function getObjectDetails()
+    {
         $arr = [];
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $result = $index->getDocument($this->object_id);
-        $arr[] = $result['name'];
+
+        $object = Objects::findOne($this->object_id);
+
+        $arr['name'] = $result['name'];
+        $arr['image'] = $object->getImage()->getUrl('200x');
+        $arr['address'] = $result['address'];
+        $arr['email'] = $result['email'];
+        $arr['checkin'] = $result['checkin'];
+        $arr['checkout'] = $result['checkout'];
+        $arr['cancellation'] = Tariff::staticCancellationType($this->cancellation_type);
         return $arr;
     }
 
@@ -274,9 +285,7 @@ class Booking extends \yii\db\ActiveRecord
         return $tariffData;
     }
 
-     public function getReasonList(){
 
-     }
 
     public function bookingTariffTitle()
     {
