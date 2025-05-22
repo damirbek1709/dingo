@@ -51,6 +51,7 @@ class BookingController extends BaseController
         $behaviors['authenticator']['except'] = [
             'index',
             'webhook',
+            'check-status'
         ];
 
 
@@ -194,7 +195,7 @@ class BookingController extends BaseController
         return "OK";
     }
 
-    public function actionCheckstatus($transaction_number){
+    public function actionCheckStatus($transaction_number){
         $response['result'] = false;
         $booking = Booking::find()->where(['transaction_number' => $transaction_number])->one();
         if($booking->status == Booking::PAID_STATUS_PAID){
@@ -209,7 +210,7 @@ class BookingController extends BaseController
     }
 
     public function actionCancelReasonList(){
-        
+
     }
 
     public function actionList($finished = false, $future = false, $canceled = false)
