@@ -198,6 +198,8 @@ class Booking extends \yii\db\ActiveRecord
                 $arr['meal_type'] = $tariff['meal_type'];
                 if ($this->cancel_reason_id == Tariff::NO_CANCELLATION) {
                     $arr['is_returnable'] = false;
+                    $arr['penalty_days'] = null;
+                    $arr['penalty_percent'] = null;
                 }
                  elseif ($this->cancel_reason_id == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
                     $arr['penalty_days'] = $tariff_model->penalty_days;
