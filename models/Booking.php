@@ -97,7 +97,6 @@ class Booking extends \yii\db\ActiveRecord
     {
         $parent = parent::fields();
 
-
         return ArrayHelper::merge($parent, [
             'objectDetails'
         ]);
@@ -106,7 +105,7 @@ class Booking extends \yii\db\ActiveRecord
     public function getObjectDetails(){
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-        $result = $index->getDocument($this->id);
+        $result = $index->getDocument($this->object_id);
         return $result;
     }
 
