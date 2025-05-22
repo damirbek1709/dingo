@@ -15,7 +15,7 @@ $this->title = Yii::t('app', 'Update Object');
 // $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 <div class="oblast-update">
-    <?php echo $this->render('top_nav', ['model' => $model]); ?>
+    <?php echo $this->render('top_nav', ['model' => $model,'object_id'=>$model->id]); ?>
     <div class="col-md-12">
         <div class="row">
             <div class="col-md-3">

@@ -81,8 +81,9 @@ class Booking extends \yii\db\ActiveRecord
             ],
             self::CANCEL_REASON_BETTER_OPTION => [
                 'Я нашел более выгодное предложение',
-                'Мен жакшыраак келишим таптым',
-                'I found a better deal'
+                'I found a better deal',
+                'Мен жакшыраак келишим таптым'
+                
             ],
 
             self::CANCEL_REASON_UNPREDICTED_SITUATION => [
