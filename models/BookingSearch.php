@@ -47,6 +47,7 @@ class BookingSearch extends Booking
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
+            
         ]);
 
         $this->load($params);

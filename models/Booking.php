@@ -156,9 +156,11 @@ class Booking extends \yii\db\ActiveRecord
     }
 
     public function getObjectDetails(){
+        $arr = [];
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $result = $index->getDocument($this->object_id);
+        $arr[] = $result['name'];
         return $result;
     }
 
