@@ -24,11 +24,17 @@ use app\models\Objects;
             <?php
             foreach ($dataProvider->getModels() as $model):
                 $bind_model = Objects::findOne($model['id']);
+                $image = "";
+                if(array_key_exists('images', $model)){
+                    if(array_key_exists('picture', $model['images'])){
+                        $image = $model['images']['picture'];
+                    }
+                }
                 ?>
-                <a href="<?= Url::to(['/owner/object/view', 'object_id' => $bind_model->id]) ?>">
+                <a href="<?= Url::to(['/owner/object/view', 'object_id' => $model['id']]) ?>">
                     <div class="property-card">
                         <div class="property-image">
-                            <?= Html::img($bind_model->getImage()->getUrl('370x220'), ['alt' => $model['name'][0]]); ?>
+                            <?= Html::img($image, ['alt' => $model['name'][0]]); ?>
                             <div class="status-badge not-published">
                                 <span class="dot"></span>
                                 Не Опубликован
