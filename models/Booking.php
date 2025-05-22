@@ -39,6 +39,12 @@ class Booking extends \yii\db\ActiveRecord
     const PAID_STATUS_PAID = 1;
     const PAID_STATUS_CANCELED = 2;
     const PAID_STATUS_CANCEL_INQUIRY = 3;
+
+    const CANCEL_REASON_PLANS_CHANGED = 1;
+    const CANCEL_REASON_BETTER_OPTION = 2;
+    const CANCEL_REASON_MISTAKE = 3;
+    const CANCEL_REASON_NO_RESPONSE = 4;
+    const CANCEL_REASON_OTHER = 5;
     /**
      * {@inheritdoc}
      */
@@ -64,6 +70,8 @@ class Booking extends \yii\db\ActiveRecord
             [['other_guests','cancel_reason'], 'string', 'max' => 500],
         ];
     }
+
+    
 
     /**
      * {@inheritdoc}
@@ -218,6 +226,10 @@ class Booking extends \yii\db\ActiveRecord
 
         return $tariffData;
     }
+
+     public function getReasonList(){
+
+     }
 
     public function bookingTariffTitle()
     {

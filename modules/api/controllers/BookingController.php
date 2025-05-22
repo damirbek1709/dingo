@@ -208,6 +208,10 @@ class BookingController extends BaseController
         return $response;
     }
 
+    public function actionCancelReasonList(){
+        
+    }
+
     public function actionList($finished = false, $future = false, $canceled = false)
     {
 

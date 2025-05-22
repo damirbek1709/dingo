@@ -1129,10 +1129,20 @@ class ObjectController extends Controller
                         $roomData['id'] = (int) $roomData['id'];
                         if (in_array($roomData['id'], $room_list)) {
                             $roomData['tariff'] = $roomData['tariff'] ?? [];
+
+                            $is_returnable = null;
+                            if($model->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY){
+                                $is_returnable = true;
+                            }
+                            elseif($model->cancellation == Tariff::NO_CANCELLATION){
+                                $is_returnable = false;
+                            }
                             $cancellation_terms = [
                                 'type' => $model->getCancellationType((int) $model->cancellation),
                                 'penalty_percent' => (double) $model->penalty_sum,
                                 'penalty_days' => (int) $model->penalty_days,
+                                'is_returnable' => $is_returnable,
+
                             ];
                             $tariff = [
                                 'id' => (int) $model->id,
