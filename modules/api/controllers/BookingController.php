@@ -61,13 +61,13 @@ class BookingController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'list', 'check-status', 'cancel','cancel-reason-list'],
+                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'list', 'check-status', 'cancel', 'cancel-reason-list'],
                     'roles' => ['@', '?'],
                 ],
 
                 [
                     'allow' => true,
-                    'actions' => ['list', 'view', 'list2', 'search', 'webhook','cancel-reason-list'],
+                    'actions' => ['list', 'view', 'list2', 'search', 'webhook', 'cancel-reason-list'],
                     'roles' => ['@', '?', 'admin', 'owner'],
                 ],
                 [
@@ -252,15 +252,15 @@ class BookingController extends BaseController
     {
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
-        
+
         // Configure pagination
         $dataProvider->pagination = [
-            'pageSize' => Yii::$app->request->get('per-page', 2), // Default to 20 items per page
+            'pageSize' => Yii::$app->request->get('per-page', 1), // Default to 20 items per page
             'pageSizeLimit' => [1, 100], // Allow between 1 and 100 items per page
         ];
-        
+
         $current_date = date('Y-m-d');
-        
+
         if ($finished) {
             $dataProvider->query->andFilterWhere(['>', 'date_from', $current_date]);
         }
@@ -270,8 +270,13 @@ class BookingController extends BaseController
         if ($future) {
             $dataProvider->query->andFilterWhere(['<', 'date_to', $current_date]);
         }
-    
-        return $dataProvider;
+
+        return [
+            'pageSize' => $dataProvider->pagination->pageSize,
+            'totalCount'=>$dataProvider->totalCount,
+            'page'=>$dataProvider->pagination->page,
+            'data' => $dataProvider
+        ];
     }
 
     public function actionCancel()
