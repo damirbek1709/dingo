@@ -196,14 +196,14 @@ class BookingController extends BaseController
     }
 
     public function actionCheckStatus($transaction_number){
-        $response['result'] = false;
+        $response['success'] = false;
         $booking = Booking::find()->where(['transaction_number' => $transaction_number])->one();
         if($booking->status == Booking::PAID_STATUS_PAID){
-            $response['result'] = true;
+            $response['success'] = true;
             $response['message'] = Yii::t('app','Оплата произведена');
         }
         else{
-            $response['result'] = true;
+            $response['success'] = false;
             $response['message'] = Yii::t('app','Возникла ошибка при оплате');
         }
         return $response;
