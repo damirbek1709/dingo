@@ -275,7 +275,7 @@ class BookingController extends BaseController
         return [
             'pageSize' => $dataProvider->pagination->pageSize,
             'totalCount' => $dataProvider->totalCount,
-            'page' => $dataProvider->pagination->page,
+            'page' => $page,
             'data' => $dataProvider
         ];
     }
