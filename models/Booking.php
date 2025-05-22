@@ -72,6 +72,44 @@ class Booking extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getCancelResasonArray(){
+        $arr = [
+            self::CANCEL_REASON_PLANS_CHANGED => [
+                'Мои планы изменились',
+                'My planse are changed',
+                'Менин пландарым өзгөрдү'
+            ],
+            self::CANCEL_REASON_BETTER_OPTION => [
+                'Я нашел более выгодное предложение',
+                'Мен жакшыраак келишим таптым',
+                'I found a better deal'
+            ],
+
+            self::CANCEL_REASON_UNPREDICTED_SITUATION => [
+                'Непредвиденная ситуация с поездкой (отмена рейса, проблемы с визой и т. д.)',
+                'Unforeseen travel situation (flight cancellation, visa problems, etc.)',
+                'Күтүлбөгөн саякат кырдаалы (учууну жокко чыгаруу, виза көйгөйлөрү ж.б.)'
+            ],
+            self::CANCEL_REASON_MISTAKE => [
+                'Я допустил ошибку в датах или деталях бронирования',
+                'I made a mistake in the dates or booking details',
+                'Даталарда же ээлөө деталдарында ката кетирдим'
+            ],
+            self::CANCEL_REASON_NO_RESPONSE => [
+                'Отель не отвечает на запросы или изменил условия',
+                'The hotel does not respond to inquiries or has changed its terms',
+                'Мейманкана суроо-талаптарга жооп бербейт же шарттарын өзгөрттү'
+            ],
+            self::CANCEL_REASON_OTHER => [
+                'Другое',
+                'Other',
+                'Башка'
+            ],
+        ];
+
+        return $arr[$this->cancel_reason_id];
+    }
+
     
 
     /**
@@ -107,7 +145,8 @@ class Booking extends \yii\db\ActiveRecord
         $parent = parent::fields();
 
         return ArrayHelper::merge($parent, [
-            'objectDetails'
+            'objectDetails',
+            'cancelReasonArray'
         ]);
     }
 
