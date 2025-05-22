@@ -14,7 +14,7 @@ $this->title = Yii::t('app', 'Способы оплаты в апартамен�
 // $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенности');
 ?>
 <div class="oblast-update">
-    <?php echo $this->render('top_nav', ['model' => $model]); ?>
+    <?php echo $this->render('top_nav', ['model' => $model,'object_id'=>$model->id]); ?>
     <?php
     $form = ActiveForm::begin();
     ?>
