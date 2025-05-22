@@ -297,7 +297,7 @@ class BookingController extends BaseController
             $model->status = Booking::PAID_STATUS_CANCELED;
             $model->cancel_reason_id = $reason_id;
             if ($model->save(false)) {
-                $response['sucess'] = true;
+                $response['success'] = true;
                 $response['message'] = Yii::t('app', 'Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');
             }
             else{
