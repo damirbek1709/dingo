@@ -169,8 +169,8 @@ class Booking extends \yii\db\ActiveRecord
         $arr['image'] = $object->getImage()->getUrl('200x');
         $arr['address'] = $result['address'];
         $arr['email'] = $result['email'];
-        $arr['checkin'] = $result['checkin'];
-        $arr['checkout'] = $result['checkout'];
+        $arr['check_in'] = $result['check_in'];
+        $arr['check_out'] = $result['check_out'];
         $arr['cancellation'] = Tariff::staticCancellationType($this->cancellation_type);
         return $arr;
     }
