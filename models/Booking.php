@@ -202,7 +202,10 @@ class Booking extends \yii\db\ActiveRecord
                     $current_date = date('Y-m-d');
                     $date_checkin = date('Y-m-d', strtotime($this->date_from));
                     $penalty_days = $tariff_model->penalty_days;
-                    $days_left = $current_date - $date_checkin;
+
+                    // Calculate days left until check-in (positive = future, negative = past)
+                    $days_left = (strtotime($date_checkin) - strtotime($current_date)) / (60 * 60 * 24);
+
                     if ($days_left >= $penalty_days) {
                         $sum_to_return = $this->sum;
                     } else {
