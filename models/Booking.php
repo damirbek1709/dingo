@@ -171,6 +171,8 @@ class Booking extends \yii\db\ActiveRecord
         $arr['name'] = $result['name'];
         $arr['image'] = $object->getImage()->getUrl('200x');
         $arr['address'] = $result['address'];
+        $arr['phone'] = $this->guest_phone;
+        $arr['email'] = $this->guest_email;
         $arr['check_in'] = $result['check_in'];
         $arr['check_out'] = $result['check_out'];
         $arr['is_returnable'] = false;
@@ -222,8 +224,7 @@ class Booking extends \yii\db\ActiveRecord
                 }
             }
         }
-        $arr['guest_phone'] = $this->guest_phone;
-        $arr['guest_email'] = $this->guest_email;
+        
 
         return $arr;
     }
