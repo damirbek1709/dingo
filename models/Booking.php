@@ -222,6 +222,8 @@ class Booking extends \yii\db\ActiveRecord
                 }
             }
         }
+        $arr['guest_phone'] = $this->guest_phone;
+        $arr['guest_email'] = $this->guest_email;
 
         return $arr;
     }
