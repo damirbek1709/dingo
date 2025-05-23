@@ -66,9 +66,24 @@ use kartik\editors\Summernote;
 
         <div class="form-section document-upload">
             <h2 class="section-title">
-                Учредительные документы компании
-                <span class="info-icon"></span>
+                <?= Yii::t('app', 'Учредительные документы компании') ?>
+                <div class="tooltip-container">
+                    <span class="info-icon"></span>
+                    <div class="tooltip">
+                        <?= Yii::t('app', 'Загрузите все документы подтверждающие статус юридического лица (патент, свидетельство, паспорт и тд)'); ?>
+                    </div>
+                </div>
             </h2>
+            <?php $ceo_docs = $model->getCeoDocs();
+            if ($ceo_docs) {
+                foreach ($ceo_docs as $doc) {
+                    echo Html::beginTag('div', ['class' => 'ceo_doc_cover']);
+                    echo Html::a($doc['name'], $doc['link'], ['class' => 'ceo_doc']);
+                    echo Html::tag('span', '', ['class' => 'doc_delete_icon', 'name' => $doc['name'], 'folder' => 'ceo']);
+                    echo Html::endTag('div');
+                }
+            }
+            ?>
             <?php
             echo $form->field($model, 'ceo_doc')->widget(FileInput::classname(), [
                 'options' => [],
@@ -91,8 +106,23 @@ use kartik\editors\Summernote;
 
         <div class="form-section">
             <h2 class="section-title">
-                Банковские Реквизиты
-                <span class="info-icon"></span>
+                <?= Yii::t('app', 'Банковские Реквизиты') ?>
+                <div class="tooltip-container">
+                    <span class="info-icon"></span>
+                    <div class="tooltip">
+                        <?= Yii::t('app', 'Загрузите ваши банковские данные для осуществления выплат на ваш счет'); ?>
+                    </div>
+                </div>
+                <?php $financial_docs = $model->getFinancialDocs();
+                if ($financial_docs) {
+                    foreach ($financial_docs as $doc) {
+                        echo Html::beginTag('div', ['class' => 'ceo_doc_cover']);
+                        echo Html::a($doc['name'], $doc['link'], ['class' => 'ceo_doc']);
+                        echo Html::tag('span', '', ['class' => 'doc_delete_icon', 'name' => $doc['name'], 'folder' => 'financial']);
+                        echo Html::endTag('div');
+                    }
+                }
+                ?>
             </h2>
             <?php
             echo $form->field($model, 'financial_doc')->widget(FileInput::classname(), [

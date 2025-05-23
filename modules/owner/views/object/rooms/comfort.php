@@ -46,16 +46,21 @@ $this->title = Yii::t('app', 'Удобства номеров');
                                 <?php foreach ($comforts as $comfort): ?>
                                     <div class="comfort-item">
                                         <?= Html::checkbox(
-                                            "comforts[]",
-                                            isset($selectedComforts[(string) $comfort->id]), // 🟢 handles string keys
-                                            ['value' => $comfort->id]
+                                            "comforts[$categoryId][$comfort->id][selected]",
+                                            isset($selectedComforts[$comfort->id]), // check if selected
+                                            ['value' => 1]
                                         ) ?>
+
+                                        <input type="hidden" name="comforts[<?= $categoryId ?>][<?= $comfort->id ?>][id]"
+                                            value="<?= $comfort->id ?>">
+
                                         <?= Html::encode($comfort->title) ?>
                                         <div class="toggle-switch-container">
                                             <label class="toggle-switch">
                                                 <input type="checkbox"
                                                     name="comforts[<?= $categoryId ?>][<?= $comfort->id ?>][is_paid]" value="1"
                                                     <?= (isset($selectedComforts[$comfort->id]['is_paid']) && $selectedComforts[$comfort->id]['is_paid']) ? 'checked' : '' ?>>
+
                                                 <span class="slider round"></span>
                                             </label>
                                             <span class="toggle-label">платно</span>

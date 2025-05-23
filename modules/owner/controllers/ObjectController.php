@@ -1658,14 +1658,13 @@ class ObjectController extends Controller
     {
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
-        $comfort_list = Yii::$app->request->post('comforts');
+        $comforts_post = Yii::$app->request->post('comforts');
 
         $object = $index->getDocument($object_id);
-
         $room = [];
         $model = new Objects($object);
 
-        // 🔁 Always load the correct room from Meilisearch
+        // 🔁 Load the correct room from Meilisearch
         if (isset($object['rooms']) && is_array($object['rooms'])) {
             foreach ($object['rooms'] as $roomData) {
                 if (isset($roomData['id']) && $roomData['id'] == $id) {
@@ -1675,41 +1674,68 @@ class ObjectController extends Controller
             }
         }
 
-        if (!empty($comfort_list)) {
-            //echo "<pre>";print_r($comfort_list);echo "</pre>";die();
-            $comfort_models = RoomComfort::find()->where(['id' => $comfort_list])->all();
+        // 🔄 Use updated room data from session if exists
+        $sessionKey = 'updated_room_' . $id;
+        if (Yii::$app->session->has($sessionKey)) {
+            $room = Yii::$app->session->get($sessionKey);
+            Yii::$app->session->remove($sessionKey);
+        }
+
+        // ✅ Process form submission
+        if (!empty($comforts_post)) {
+            $comfort_ids = [];
+
+            // 🧠 Extract selected comfort IDs
+            foreach ($comforts_post as $cat => $comfortsInCat) {
+                foreach ($comfortsInCat as $comfortId => $data) {
+                    if (isset($data['selected'])) {
+                        $comfort_ids[] = $comfortId;
+                    }
+                }
+            }
+
+            // 🗃 Fetch comforts from DB
+            $comfort_models = RoomComfort::find()->where(['id' => $comfort_ids])->all();
             $comfortArr = [];
 
             foreach ($comfort_models as $item) {
-                $comfortArr[$item->category_id][$item->id] = [
-                    'ru' => $item->title,
-                    'en' => $item->title_en,
-                    'ky' => $item->title_ky,
-                    'is_paid' => isset($item->is_paid) ? $item->is_paid : 0,
-                ];
+                $catId = $item->category_id;
+                $itemId = $item->id;
+
+                // 🏷 Check if this comfort was selected
+                if (isset($comforts_post[$catId][$itemId]['selected'])) {
+                    $isPaid = isset($comforts_post[$catId][$itemId]['is_paid']) ? 1 : 0;
+
+                    $comfortArr[$catId][$itemId] = [
+                        'ru' => $item->title,
+                        'en' => $item->title_en,
+                        'ky' => $item->title_ky,
+                        'is_paid' => $isPaid,
+                    ];
+                }
             }
 
-            // 🔄 Update room's comfort info in the rooms list
+            // 🔄 Update the correct room in Meilisearch object
             foreach ($object['rooms'] as $i => $roomData) {
                 if (isset($roomData['id']) && $roomData['id'] == $id) {
-                    // 🔄 update only the `comfort` of the matched room
                     $object['rooms'][$i]['comfort'] = $comfortArr;
                     $room = $object['rooms'][$i];
-
-                    // ✅ Stop early
                     break;
                 }
             }
 
-            // ✅ Save full room list (preserving others)
-            $meilisearchData = [
-                'id' => (int) $object_id,
-                'rooms' => $object['rooms'] // full array intact
-            ];
+            // 💾 Send update to Meilisearch
+            $index->updateDocuments([
+                [
+                    'id' => (int) $object_id,
+                    'rooms' => $object['rooms']
+                ]
+            ]);
 
-            $index->updateDocuments([$meilisearchData]);
-
+            // 💡 Save updated room to session for immediate feedback
+            Yii::$app->session->set($sessionKey, $room);
             Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+
             return $this->refresh();
         }
 
@@ -1718,9 +1744,10 @@ class ObjectController extends Controller
             'object_title' => $object['name'][0],
             'room_id' => $id,
             'room' => $room,
-            'model' => $model
+            'model' => $model,
         ]);
     }
+
 
     /**
      * Deletes an existing Event model.

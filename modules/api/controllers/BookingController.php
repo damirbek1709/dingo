@@ -165,7 +165,7 @@ class BookingController extends BaseController
 
         if ($model->save()) {
             $arr = [
-                'sum' => $model->sum,
+                'sum' => $model->sum * 100,
                 'booking_id' => $model->id,
                 'currency' => $currency,
                 'user_id' => Yii::$app->user->id,
