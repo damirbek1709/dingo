@@ -108,7 +108,7 @@ $this->title = $title[0];
 
                             <div class="section">
                                 <div class="section-label"><?= Yii::t('app', 'Валюта') ?></div>
-                                <div class="section-value"><?= $model->currency; ?></div>
+                                <div class="section-value"><?= $model->currency ? $model->currency : 'KGS'; ?></div>
                             </div>
 
                             <div class="section">
@@ -127,6 +127,25 @@ $this->title = $title[0];
                                         <div class="section-value"><?= $model->check_out ?></div>
                                     </div>
                                 </div>
+                            </div>
+
+                            <div class="section">
+                                <legend><?=Yii::t('app', 'Контактная информация')?></legend>
+                                <div class="check-in-out">
+                                    <div class="time-section">
+                                        <div class="section-label"><?= Yii::t('app', 'Контактный телефон') ?></div>
+                                        <div class="section-value"><?= $model->phone; ?></div>
+                                    </div>
+                                    <div class="time-section">
+                                        <div class="section-label"><?= Yii::t('app', 'E-mail') ?></div>
+                                        <div class="section-value"><?= $model->email ?></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section">
+                                <div class="section-label"><?= Yii::t('app', 'Сайт объекта') ?></div>
+                                <div class="section-value"><?=$model->site; ?></div>
                             </div>
                         </div>
                     </div>

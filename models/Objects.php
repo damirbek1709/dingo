@@ -9,7 +9,8 @@ use yii\helpers\Url;
 use rico\yii2images\models\Image;
 
 
-class Objects extends \yii\db\ActiveRecord {
+class Objects extends \yii\db\ActiveRecord
+{
 
     const STATUS_NOT_PUBLISHED = 0;
     const STATUS_READY_FOR_PUBLISH = 1;
@@ -112,8 +113,8 @@ class Objects extends \yii\db\ActiveRecord {
             'lat' => 'Latitude',
             'lon' => 'Longitude',
             'email' => 'E-mail',
-            'phone'=>Yii::t('app', 'Контакты'),
-            'name'  =>  Yii::t('app', 'Название'),
+            'phone' => Yii::t('app', 'Контакты'),
+            'name' => Yii::t('app', 'Название'),
             'name_en' => Yii::t('app', 'Название на английском'),
             'name_ky' => Yii::t('app', 'Название на кыргызском'),
 
@@ -125,8 +126,8 @@ class Objects extends \yii\db\ActiveRecord {
 
             'description_en' => Yii::t('app', 'Описание на английском'),
             'description_ky' => Yii::t('app', 'Описание на кыргызском'),
-            'general_room_count'=>Yii::t('app','Общее количество комнат')
-        ];   
+            'general_room_count' => Yii::t('app', 'Общее количество комнат')
+        ];
     }
 
     public function behaviors()
@@ -138,7 +139,8 @@ class Objects extends \yii\db\ActiveRecord {
         ];
     }
 
-    public static function attributeIndexed($attr){
+    public static function attributeIndexed($attr)
+    {
         $lang_index = 0;
         switch (Yii::$app->language) {
             case 'ru':
@@ -370,12 +372,12 @@ class Objects extends \yii\db\ActiveRecord {
                 'description' => Yii::t('app', 'Объект прошёл модерацию и доступен для бронирования'),
                 'color' => '#8CC43D',
                 'button_text' => Yii::t('app', 'Снять с публикации'),
-                'current_status'=>self::STATUS_NOT_PUBLISHED,
+                'current_status' => self::STATUS_NOT_PUBLISHED,
                 'html' => '<div> Ва ш объект успешно прошёл модерацию и теперь доступен для бронирования!
                         <p class="dialog-paragraph"> 📌 Советы, как получить больше бронирований:</p>
                         <li> - Добавьте яркие и качественные фото</li>
                         <li> - Проверьте цены — они должны быть конкурентными</li>
-                        <li> - Убедитесь, что условия бронирования понятны</li></div>'                        
+                        <li> - Убедитесь, что условия бронирования понятны</li></div>'
             ],
             self::STATUS_DENIED => [
                 'label' => Yii::t('app', 'Отклонено'),
@@ -383,8 +385,8 @@ class Objects extends \yii\db\ActiveRecord {
                 'description' => Yii::t('app', 'Объект не прошёл модерацию. Необходимо внести правки и отправить повторно'),
                 'color' => '#F5222D',
                 'button_text' => Yii::t('app', 'Внести правки'),
-                'title'=>Yii::t('app','Объект отклонён'),
-                'curren t_ status'=>self ::STATUS_DENIED,
+                'title' => Yii::t('app', 'Объект отклонён'),
+                'curren t_ status' => self::STATUS_DENIED,
                 'html' => "<div> К  сожалению, объект не прошёл модерацию. Проверьте данные и внесите необходимые правки. После этого вы сможете отправить объект на повторную проверку.</div>",
             ]
         ];
@@ -395,9 +397,9 @@ class Objects extends \yii\db\ActiveRecord {
     public static function statusList()
     {
         $arr = [
-            self::STATUS_NOT_PUBLISHED =>  Yii::t('app', 'Не опубликовано'),
+            self::STATUS_NOT_PUBLISHED => Yii::t('app', 'Не опубликовано'),
             self::STATUS_ON_MODERATION => Yii::t('app', 'На модерации'),
-            self::STATUS_READY_FOR_PUBLISH=> Yii::t('app', 'Готов к публикации'),
+            self::STATUS_READY_FOR_PUBLISH => Yii::t('app', 'Готов к публикации'),
             self::STATUS_PUBLISHED => Yii::t('app', 'Опубликовано'),
             self::STATUS_DENIED => Yii::t('app', 'Отклонено')
         ];
@@ -447,7 +449,8 @@ class Objects extends \yii\db\ActiveRecord {
     }
 
 
-    public static function typeString($id = 1){
+    public static function typeString($id = 1)
+    {
         $arr = [
             self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
             self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
@@ -513,10 +516,10 @@ class Objects extends \yii\db\ActiveRecord {
                 'visible' => Yii::$app->user->can('owner') || Yii::$app->user->can('admin'),
                 'options' => [
                     'class' => 'owner-nav-item-object',
-                ],    
-            ];    
+                ],
+            ];
         }
-            
+
         return $general_arr;
     }
 
@@ -524,22 +527,27 @@ class Objects extends \yii\db\ActiveRecord {
     {
         $title = 'title';
         switch (Yii::$app->language) {
-            case 'ru':$title = 'title';break;
+            case 'ru':
+                $title = 'title';
+                break;
             case 'en':
-                $title = 'title_en';break;
+                $title = 'title_en';
+                break;
             case 'ky':
                 $title = 'title_ky';
                 break;
-            default:$title = 'title';
-                
-        }
-                
-        return ArrayHelper::map(Vocabulary::find()->where(['model'=>Vocabulary::MODEL_TYPE_MEAL])->all(), 'id', $title);
-    }  
+            default:
+                $title = 'title';
 
-    public static function mealTypeFull($id){
-        $voc = Vocabulary::find()->where(['id'=>$id,'model'=>Vocabulary::MODEL_TYPE_MEAL])->one();
-        $arr = [     
+        }
+
+        return ArrayHelper::map(Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_MEAL])->all(), 'id', $title);
+    }
+
+    public static function mealTypeFull($id)
+    {
+        $voc = Vocabulary::find()->where(['id' => $id, 'model' => Vocabulary::MODEL_TYPE_MEAL])->one();
+        $arr = [
             $voc->title,
             $voc->title_en,
             $voc->title_ky
@@ -564,7 +572,7 @@ class Objects extends \yii\db\ActiveRecord {
         return $arr[$this->type];
     }
 
-    
+
 
     public function getPictures()
     {
@@ -574,18 +582,14 @@ class Objects extends \yii\db\ActiveRecord {
             $thumb = $image->getUrl('220x150');
             $picture = $image->getUrl('500x');
             $original = $image->getPathToOrigin();
-            // Check if the original image was a webp
-            if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
-                $img_url = 'https://partner.dingo.kg/uploads/images/store/' . $filePath;
-                $picture = 'https://partner.dingo.kg/uploads/images/store/' . $filePath;
-            }
+
             $list[] = [
                 'id' => $image->id,
                 'picture' => $picture,
                 'thumbnailPicture' => $thumb,
                 'isMain' => $image->isMain,
-                'orignal'=>Url::base().'/'.$original
-            ];      
+                'orignal' => Url::base() . '/' . $original
+            ];
         }
 
         return $list;
@@ -596,11 +600,9 @@ class Objects extends \yii\db\ActiveRecord {
         $image = $this->getImage();
         $filePath = $image->filePath;
         // Check if the original image was a webp
-        if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
-            return 'https://dingo.kg/uploads/images/store/' . $filePath;
-        } else {
-            return $this->getImage()->getUrl();
-        }
+
+        return $this->getImage()->getUrl();
+
     }
 
     public static function сomfortList()
