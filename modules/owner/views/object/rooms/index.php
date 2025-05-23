@@ -155,35 +155,40 @@ $this->title = Yii::t('app', 'Список номеров');
         });
 
 
-        $('.tariff-bind').on('change', function () {
-            var tariffId = $(this).val();  // Get the tariff ID
-            var room_id = $(this).attr('room_id');
-            var isChecked = $(this).prop('checked');  // Check if the checkbox is checked
-            var object_id = $(this).attr('object_id');  // Check if the checkbox is checked
+        let debounce = false;
 
-            // Send AJAX request to the backend
+        $('.tariff-bind').on('change', function () {
+            if (debounce) return;
+            debounce = true;
+
+            const checkbox = $(this);
+            const tariffId = checkbox.val();
+            const room_id = checkbox.attr('room_id');
+            const object_id = checkbox.attr('object_id');
+            const isChecked = checkbox.prop('checked') ? 'true' : 'false';
+
             $.ajax({
-                url: "<?= Yii::$app->urlManager->createUrl('/owner/tariff/bind-tariff') ?>", // Your action URL
+                url: "<?= Yii::$app->urlManager->createUrl('/owner/tariff/bind-tariff') ?>",
                 type: 'POST',
                 data: {
-                    tariff_id: tariffId,  // Send the tariff ID
+                    tariff_id: tariffId,
                     checked: isChecked,
-                    room_id: room_id,   // Send the checked state
-                    object_id: object_id,   // Send the checked state
-                    _csrf: $('meta[name="csrf-token"]').attr('content')  // CSRF token for security (if needed)
+                    room_id: room_id,
+                    object_id: object_id,
+                    _csrf: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (response) {
-                    if (response.success) {
-                        console.log('Tariff successfully updated');
-                    } else {
-                        console.log('Failed to update tariff');
-                    }
+                    console.log(response.success ? 'Tariff successfully updated' : 'Failed to update tariff');
                 },
                 error: function (xhr, status, error) {
                     console.log('AJAX error: ' + status + ' ' + error);
+                },
+                complete: function () {
+                    debounce = false;
                 }
             });
         });
+
     });
 
 </script>
