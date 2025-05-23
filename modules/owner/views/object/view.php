@@ -112,6 +112,11 @@ $this->title = $title[0];
                             </div>
 
                             <div class="section">
+                                <div class="section-label"><?= Yii::t('app', 'Описание') ?></div>
+                                <div class="section-value"><?= Objects::attributeIndexed($model->description); ?></div>
+                            </div>
+
+                            <div class="section">
                                 <div class="check-in-out">
                                     <div class="time-section">
                                         <div class="section-label"><?= Yii::t('app', 'Заезд') ?></div>

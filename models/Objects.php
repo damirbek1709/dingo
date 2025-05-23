@@ -138,6 +138,24 @@ class Objects extends \yii\db\ActiveRecord {
         ];
     }
 
+    public static function attributeIndexed($attr){
+        $lang_index = 0;
+        switch (Yii::$app->language) {
+            case 'ru':
+                $lang_index = 0;
+                break;
+            case 'en':
+                $lang_index = 1;
+                break;
+            case 'ky':
+                $lang_index = 2;
+                break;
+            default:
+                $lang_index = 0;
+        }
+        return $attr[$lang_index];
+    }
+
     public function rules()
     {
         return [
