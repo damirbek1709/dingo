@@ -122,12 +122,6 @@ $this->title = Yii::t('app', 'Список номеров');
         </div>
     </div>
 </div>
-
-<script>
-</script>
-
-
-
 <script>
     $(document).ready(function () {
         // When any of the options button is clicked, toggle its corresponding menu
@@ -148,9 +142,6 @@ $this->title = Yii::t('app', 'Список номеров');
                 $('.room-card-options .options-menu').slideUp();
             }
         });
-
-
-
 
         $('.dropdown-btn').on('click', function () {
             $(this).parent().toggleClass('active');

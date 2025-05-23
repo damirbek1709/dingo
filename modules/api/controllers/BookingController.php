@@ -210,9 +210,11 @@ class BookingController extends BaseController
         if ($booking->status == Booking::PAID_STATUS_PAID) {
             $response['success'] = true;
             $response['message'] = Yii::t('app', 'Оплата произведена');
+            $response['booking_id'] = $booking->id;
         } else {
             $response['success'] = false;
             $response['message'] = Yii::t('app', 'Возникла ошибка при оплате');
+            $response['booking_id'] = $booking->id;
         }
         return $response;
     }
@@ -270,13 +272,13 @@ class BookingController extends BaseController
         $current_date = date('Y-m-d');
 
         if ($finished) {
-            $dataProvider->query->andFilterWhere(['>', 'date_from', $current_date]);
+            $dataProvider->query->andFilterWhere(['>', 'date_to', $current_date]);
         }
         if ($canceled) {
             $dataProvider->query->andFilterWhere(['status' => Booking::PAID_STATUS_CANCELED]);
         }
         if ($future) {
-            $dataProvider->query->andFilterWhere(['<', 'date_to', $current_date]);
+            $dataProvider->query->andFilterWhere(['<', 'date_from', $current_date]);
         }
 
         return [
@@ -299,9 +301,8 @@ class BookingController extends BaseController
             if ($model->save(false)) {
                 $response['success'] = true;
                 $response['message'] = Yii::t('app', 'Ваша заявка на отмену брони принята. Администрация свяжется с вами в ближайшее время');
-            }
-            else{
-                $response['message']=$model->errors;
+            } else {
+                $response['message'] = $model->errors;
             }
             $response['data'] = $model->getObjectDetails();
         }

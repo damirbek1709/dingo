@@ -11,6 +11,7 @@ use yii\web\Response;
 use yii\filters\AccessControl;
 use app\models\Objects;
 use DateTime;
+use Exception;
 
 /**
  * TariffController implements the CRUD actions for Tariff model.
@@ -147,7 +148,7 @@ class TariffController extends Controller
                 if (isset($roomData['tariff'])) {
                     foreach ($roomData['tariff'] as $tariff_item) {
                         if ($tariff_item['id'] == $id) {
-                            array_splice($roomData['tariff'], $tariff_item, 1);
+                            array_splice($roomData['tariff'], $tariff_item['id'], 1);
                             break;
                         }
                     }
@@ -308,81 +309,117 @@ class TariffController extends Controller
 
     public function actionBindTariff()
     {
-        if (Yii::$app->request->isAjax) {
-            $tariffId = Yii::$app->request->post('tariff_id');
-            $checked = Yii::$app->request->post('checked'); // 1 if checked, 0 if unchecked
-            $room_id = Yii::$app->request->post('room_id');
-            $object_id = Yii::$app->request->post('object_id');
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-            $response = ['success' => false];
-            $tariff = Tariff::findOne($tariffId);
-            $client = Yii::$app->meili->connect();
-            $object = $client->index('object')->getDocument($object_id);
+        if (!Yii::$app->request->isAjax) {
+            return ['success' => false, 'error' => 'Invalid request type'];
+        }
 
-            $rooms = $object['rooms'] ?? []; // Get existing rooms
-            $room = null;
+        $tariffId = (int) Yii::$app->request->post('tariff_id');
+        $checked = Yii::$app->request->post('checked') === 'true';
+        $room_id = (int) Yii::$app->request->post('room_id');
+        $object_id = (int) Yii::$app->request->post('object_id');
 
-            // Find the room with the matching ID
-            foreach ($rooms as &$roomData) {
-                if ($roomData['id'] == $room_id) {
-                    $room = &$roomData;
-                    break;
-                }
-            }
+        if (!$tariffId || !$room_id || !$object_id) {
+            return ['success' => false, 'error' => 'Missing required parameters'];
+        }
 
-            if (!$room) {
-                throw new NotFoundHttpException('Room not found in Meilisearch.');
-            }
+        $tariff = Tariff::findOne($tariffId);
+        if (!$tariff) {
+            return ['success' => false, 'error' => 'Tariff not found'];
+        }
 
-            if ($checked == 'true') {
-                // When checkbox is checked, add the tariff
-                $push_arr = [
-                    "id" => $tariffId,
-                    "title" => [$tariff->title, $tariff->title_en, $tariff->title_ky],
-                    "payment_on_book" => $tariff->payment_on_book ? 1 : 0,
-                    "payment_on_reception" => $tariff->payment_on_reception ? 1 : 0,
-                    "cancellation" => (int) $tariff->cancellation,
-                    'meal_type' => ['id' => (int) $tariff->meal_type, 'name' => Objects::mealTypeFull($tariff->meal_type)],
-                    "object_id" => (int) $object_id,
-                    "prices" => [] // Prices can be added here as necessary
-                ];
-                // Add the new tariff to the room's tariffs array
-                $room['tariff'][] = $push_arr;
-            } else {
-                // When checkbox is unchecked, remove the tariff
-                if (isset($room['tariff']) && is_array($room['tariff'])) {
-                    // Filter the tariffs and remove the one with the given tariffId
-                    $room['tariff'] = array_filter($room['tariff'], function ($tariffItem) use ($tariffId) {
-                        return $tariffItem['id'] != $tariffId;
-                    });
-                    // Re-index the array to fix the keys after filtering
-                    $room['tariff'] = array_values($room['tariff']);
-                }
-            }
+        $client = Yii::$app->meili->connect();
+        $object = $client->index('object')->getDocument($object_id);
+        $rooms = $object['rooms'] ?? [];
 
-            // Prepare the data to update in Meilisearch
-            $meilisearchData = [
-                'id' => (int) $object_id,
-                'rooms' => $rooms // Update rooms with modified tariff data
-            ];
-
-            // Update Meilisearch document
-            if ($client->index('object')->updateDocuments($meilisearchData)) {
-                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-                return ['success' => true];
+        // Locate room index
+        $roomIndex = null;
+        foreach ($rooms as $index => $roomData) {
+            if ((int) $roomData['id'] === $room_id) {
+                $roomIndex = $index;
+                break;
             }
         }
 
-        return ['success' => false];
+        if ($roomIndex === null) {
+            return ['success' => false, 'error' => 'Room not found in Meilisearch'];
+        }
+
+        if ($checked) {
+            // Add tariff
+            $newTariff = [
+                "id" => $tariffId,
+                "title" => [$tariff->title, $tariff->title_en, $tariff->title_ky],
+                "payment_on_book" => $tariff->payment_on_book ? 1 : 0,
+                "payment_on_reception" => $tariff->payment_on_reception ? 1 : 0,
+                "cancellation" => (int) $tariff->cancellation,
+                "meal_type" => [
+                    'id' => (int) $tariff->meal_type,
+                    'name' => Objects::mealTypeFull($tariff->meal_type)
+                ],
+                "object_id" => $object_id,
+                "prices" => []
+            ];
+
+            // Ensure tariffs array exists
+            if (!isset($rooms[$roomIndex]['tariff']) || !is_array($rooms[$roomIndex]['tariff'])) {
+                $rooms[$roomIndex]['tariff'] = [];
+            }
+
+            // Prevent duplicates
+            $exists = array_filter($rooms[$roomIndex]['tariff'], function ($item) use ($tariffId) {
+                return (int) $item['id'] === $tariffId;
+            });
+
+            if (empty($exists)) {
+                $rooms[$roomIndex]['tariff'][] = $newTariff;
+            }
+        } else {
+            // Remove tariff
+            if (isset($rooms[$roomIndex]['tariff']) && is_array($rooms[$roomIndex]['tariff'])) {
+                $rooms[$roomIndex]['tariff'] = array_values(array_filter(
+                    $rooms[$roomIndex]['tariff'],
+                    fn($item) => (int) $item['id'] !== $tariffId
+                ));
+
+                // If empty, remove the key
+                if (empty($rooms[$roomIndex]['tariff'])) {
+                    unset($rooms[$roomIndex]['tariff']);
+                }
+            }
+        }
+
+        foreach ($rooms as &$room) {
+            if (isset($room['tariff']) && empty($room['tariff'])) {
+                unset($room['tariff']);
+            }
+        }
+        $object['rooms'] = $rooms;
+        
+
+        try {
+            $response = $client->index('object')->updateDocuments([$object]);
+            if (isset($response['taskUid'])) {
+                return ['success' => true, 'task' => $response['taskUid']];
+            } else {
+                return ['success' => false, 'error' => 'Update sent but no task returned'];
+            }
+        } catch (\Throwable $e) {
+            Yii::error("Meilisearch update failed: " . $e->getMessage(), __METHOD__);
+            return ['success' => false, 'error' => 'Exception: ' . $e->getMessage()];
+        }
     }
+
+
 
     public function actionBindRoom()
     {
         if (Yii::$app->request->isAjax) {
-            $tariffId = Yii::$app->request->post('tariff_id');
+            $tariffId = (int) Yii::$app->request->post('tariff_id');
             $checked = Yii::$app->request->post('checked'); // 1 if checked, 0 if unchecked
-            $room_id = Yii::$app->request->post('room_id');
-            $object_id = Yii::$app->request->post('object_id');
+            $room_id = (int) Yii::$app->request->post('room_id');
+            $object_id = (int) Yii::$app->request->post('object_id');
 
             $response = ['success' => false];
             $tariff = Tariff::findOne($tariffId);
@@ -405,6 +442,7 @@ class TariffController extends Controller
             }
 
             if ($checked == 'true') {
+                return "CHECK";
                 // When checkbox is checked, add the tariff
                 $push_arr = [
                     "id" => $tariffId,
@@ -421,12 +459,13 @@ class TariffController extends Controller
             } else {
                 // When checkbox is unchecked, remove the tariff
                 if (isset($room['tariff']) && is_array($room['tariff'])) {
-                    // Filter the tariffs and remove the one with the given tariffId
-                    $room['tariff'] = array_filter($room['tariff'], function ($tariffItem) use ($tariffId) {
+                    $room['tariff'] = array_values(array_filter($room['tariff'], function ($tariffItem) use ($tariffId) {
                         return $tariffItem['id'] != $tariffId;
-                    });
-                    // Re-index the array to fix the keys after filtering
-                    $room['tariff'] = array_values($room['tariff']);
+                    }));
+
+                    if (empty($room['tariff'])) {
+                        unset($room['tariff']); // or $room['tariff'] = null;
+                    }
                 }
             }
 
