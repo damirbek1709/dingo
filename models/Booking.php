@@ -176,6 +176,7 @@ class Booking extends \yii\db\ActiveRecord
         $arr['check_in'] = $result['check_in'];
         $arr['check_out'] = $result['check_out'];
         $arr['is_returnable'] = false;
+        $arr['other_guests']=$this->other_guests;
 
         $tariff_model = Tariff::findOne($this->tariff_id);
         $arr['terms'] = [];
