@@ -178,6 +178,7 @@ class Booking extends \yii\db\ActiveRecord
         $arr['is_returnable'] = false;
 
         $tariff_model = Tariff::findOne($this->tariff_id);
+        $arr['terms'] = [];
         if (array_key_exists('terms', $result)) {
             $arr['terms'] = $result['terms'];
         }
