@@ -200,8 +200,9 @@ use yii\web\JsExpression;
             </div>
         </div>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'check_in')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'check_out')->textInput(['maxlength' => true]) ?>
+        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд')]) ?>
+        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд')]) ?>
+        
         <?= $form->field($model, 'reception')->checkbox() ?>
         <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')])->label(Yii::t('app', 'Общее количество комнат')); ?>
         <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>

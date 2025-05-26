@@ -211,20 +211,6 @@ $model->city_id = $model->city ? $model->city[0] : "";
     </div>
 </div>
 
-<?php 
-$this->registerJs("
-    const checkIn = document.getElementById('" . Html::getInputId($model, 'check_in') . "');
-    const checkOut = document.getElementById('" . Html::getInputId($model, 'check_out') . "');
-
-    [checkIn, checkOut].forEach(function(input) {
-        input.addEventListener('click', function() {
-            this.focus();
-            // Optionally trigger input click again for better browser support
-            this.click();
-        });
-    });
-");
-?>
 
 
 
