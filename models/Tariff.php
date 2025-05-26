@@ -204,7 +204,7 @@ class Tariff extends \yii\db\ActiveRecord
             'meal_type' => Yii::t('app', 'Meal Type'),
             'title' => Yii::t('app', 'Title'),
             'object_id' => Yii::t('app', 'Объект'),
-            'penalty_sum' => Yii::t('app', 'Процент штрафа от общей суммы %'),
+            'penalty_sum' => Yii::t('app', 'Размер штрафа (% от стоимости)'),
             'penalty_days' => Yii::t('app', 'Количество дней до заезда'),
         ];
     }

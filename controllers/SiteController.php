@@ -99,7 +99,27 @@ class SiteController extends Controller
 
     public function actionAbout()
     {
-        return $this->render('page', ['id' => 2]);
+
+        $data = [
+            "id"=>23,
+            "name" => "Бишкек",
+            "name_ru" => "Бишкек",
+            "name_en" => "Bishkek",
+            "name_kg" => "Бишкек",
+            "old_name" => "Фрунзе",
+            "region" => "Бишкек",
+            "place" => "city",
+            "country" => "KG",
+            "geo_data" => [
+                42.8777895,
+                74.6066926
+            ]
+        ];
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('region');
+        if ($index->addDocuments([$data])) {
+            echo "added";die();
+        }
     }
 
     public function actionPayment()

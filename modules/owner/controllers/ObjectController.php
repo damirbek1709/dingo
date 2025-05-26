@@ -22,6 +22,7 @@ use app\models\Tariff;
 use app\models\TariffSearch;
 use app\models\Booking;
 use app\models\BookingSearch;
+use yii\helpers\Json;
 /**
  * EventController implements the CRUD actions for Event model.
  */
@@ -83,7 +84,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'delete', 'file-upload', 'room-beds'],
+                    'actions' => ['comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'delete', 'file-upload', 'room-beds','search-regions'],
                     'roles' => ['owner', 'admin'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -295,18 +296,22 @@ class ObjectController extends Controller
     public function actionTariffList($object_id)
     {
         $this->layout = "main";
+
         $searchModel = new TariffSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
         $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
+
+        // Load the object from the database
         $model = Objects::findOne($object_id);
 
         return $this->render('/tariff/index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'model' => $model,
-            'object_id' => $object_id
+            'object_id' => $object_id,
         ]);
     }
+
 
     public function actionPrices($object_id)
     {
@@ -324,6 +329,23 @@ class ObjectController extends Controller
             'object_id' => $id,
             'model' => $model,
         ]);
+    }
+
+    public function actionSearchRegions()
+    {
+        $query = Yii::$app->request->get('q');
+        $client = Yii::$app->meili->connect();
+        $results= $client->index('regions')->search($query);
+
+        $data = array_map(function ($item) {
+            return [
+                'name' => $item['name'],
+                'name_en' => $item['name_en'],
+                'name_ky' => $item['name_ky'],
+            ];
+        }, $results['hits']);
+
+        return Json::encode($data);
     }
 
 
@@ -1109,6 +1131,7 @@ class ObjectController extends Controller
     {
         $model = new Tariff();
         $model->object_id = $object_id;
+
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $object = $index->getDocument($object_id);
@@ -1120,6 +1143,7 @@ class ObjectController extends Controller
                 try {
                     $rooms = $object['rooms'] ?? [];
                     $updatedRooms = [];
+
                     foreach ($rooms as $roomData) {
                         if (!is_array($roomData) || !isset($roomData['id'])) {
                             Yii::warning("Invalid room data: " . json_encode($roomData));
@@ -1136,40 +1160,51 @@ class ObjectController extends Controller
                             } elseif ($model->cancellation == Tariff::NO_CANCELLATION) {
                                 $is_returnable = false;
                             }
+
                             $cancellation_terms = [
                                 'type' => $model->getCancellationType((int) $model->cancellation),
                                 'penalty_percent' => (double) $model->penalty_sum,
                                 'penalty_days' => (int) $model->penalty_days,
                                 'is_returnable' => $is_returnable,
                             ];
+
                             $tariff = [
                                 'id' => (int) $model->id,
                                 'payment_on_book' => (int) $model->payment_on_book,
                                 'cancellation' => $cancellation_terms,
-                                'meal_type' => ['id' => (int) $model->meal_type, 'name' => Objects::mealTypeFull($model->meal_type)],
+                                'meal_type' => [
+                                    'id' => (int) $model->meal_type,
+                                    'name' => Objects::mealTypeFull($model->meal_type)
+                                ],
                                 'title' => [$model->title, $model->title_en, $model->title_ky],
                                 'object_id' => (int) $object_id,
-                                'price' => (float) $roomData['base_price'],
+                                'price' => (float) ($roomData['base_price'] ?? 0),
                                 'from_date' => '',
                                 'to_date' => '',
                                 'prices' => [],
                             ];
+
                             $roomData['tariff'][] = $tariff;
                         }
+
                         $updatedRooms[] = $roomData;
                     }
 
-                    $status = Objects::currentStatus($object_id, $object['status'] ? $object['status'] : Objects::STATUS_NOT_PUBLISHED);
+                    $status = Objects::currentStatus($object_id, $object['status'] ?? Objects::STATUS_NOT_PUBLISHED);
 
-
+                    // ✅ Save to Meilisearch
                     $meilisearchData = [
                         'id' => (int) $object_id,
                         'rooms' => $updatedRooms,
                         'status' => $status
                     ];
-
                     $index->updateDocuments([$meilisearchData]);
+
+
+                    Yii::$app->session->set('updated_rooms_' . $object_id, $updatedRooms);
+
                     return $this->redirect(['tariff-list', 'object_id' => $object_id]);
+
                 } catch (\Exception $e) {
                     Yii::error("Meilisearch operation error: " . $e->getMessage());
                 }
@@ -1184,6 +1219,7 @@ class ObjectController extends Controller
             'object_title' => $object_title
         ]);
     }
+
 
     public function actionEditTariff($id, $object_id)
     {

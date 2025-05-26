@@ -5,6 +5,9 @@ $this->title = Yii::t('app', 'Доступность и цены');
 // $this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
 // $this->params['breadcrumbs'][] = $this->title;
 ?>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <div class="oblast-update">
 
@@ -13,31 +16,28 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
         <button class="sidebar-close" id="sidebar-close">&times;</button>
         <div class="sidebar-inner">
-            <h3>Редактирование</h3>
+            <h3><?=Yii::t('app','Редактирование')?></h3>
 
             <form id="w0" method="post">
-                <div class="sidebar_date_grid">
-                    <div class="form-group">
-                        <label>Заезд</label>
-                        <input class="form-control" type="date" id="checkin" />
-                    </div>
-
-                    <div class="form-group">
-                        <label>Выезд</label>
-                        <input class="form-control" type="date" id="checkout" />
+                <div class="date-range-container" style="margin-top: 20px;">
+                    <div class="date-range-label"><?=Yii::t('app','Заезд и выезд')?></div>
+                    <div class="date-range-inputs">
+                        <input type="date" id="checkin" class="date-input" placeholder="От">
+                        <span class="date-separator">→</span>
+                        <input type="date" id="checkout" class="date-input" placeholder="До">
+                        <span class="calendar-icon">📅</span>
                     </div>
                 </div>
-
                 <div id="sidebar-details"></div>
                 <div class="sidebar_submit">
-                    <div class="btn btn-success update-tariff">Сохранить</div>
+                    <div style="display:inline-block;float:right" class="save-button update-tariff"><?=Yii::t('app','Сохранить')?></div>
                 </div>
             </form>
         </div>
     </div>
 
 
-    <div class="card">
+    <div class="calendar-cover">
         <div class="calendar-layout">
             <div class="fixed-column">
                 <div class="month-header-sticky" id="month-header"></div>
@@ -128,7 +128,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
             $fixed.append(`<div class="fixed-cell">Доступно номеров<br>(из ${room.similar_room_amount})</div>`);
             const $availRow = $('<div>').addClass('data-row');
             allDays.forEach(day => {
-                const $cell = $('<div>').addClass('data-cell').text(room.similar_room_amount);
+                const $cell = $('<div>').addClass('data-cell').addClass('data_room_amount').text(room.similar_room_amount);
                 if (day.isToday) $cell.addClass('today');
                 $availRow.append($cell);
             });
@@ -138,7 +138,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
                 $fixed.append(`<div class="fixed-cell">Нет тарифов</div>`);
                 const $row = $('<div>').addClass('data-row');
                 allDays.forEach(() => {
-                    $row.append('<div class="data-cell">❗</div>');
+                    $row.append('<div class="data-cell"><span class=icon_no_price></span></div>');
                 });
                 $('#data-rows').append($row);
             } else {
@@ -159,17 +159,16 @@ $this->title = Yii::t('app', 'Доступность и цены');
                             tariff.prices.forEach(priceBlock => {
                                 if (isDateInRange(day.fullDate, priceBlock.from_date, priceBlock.to_date)) {
                                     const displayPrice = Array.isArray(priceBlock.price_arr) && priceBlock.price_arr.length > 0
-                                        ? parseFloat(priceBlock.price_arr[0])
-                                        : '❗';
+                                        ? $cell.text(parseFloat(priceBlock.price_arr[0])).addClass('data_price_set')
+                                        : $cell.html('<span class=icon_no_price></span>');
 
-                                    $cell.text(displayPrice);
                                     $cell.attr('title', priceBlock.price_arr.join(' / '));
                                     matched = true;
                                 }
                             });
                         }
                         if (!matched) {
-                            $cell.append('❗');
+                            $cell.append('<span class=icon_no_price></span>');
                         }
                         if (day.isToday) $cell.addClass('today');
                         $tariffRow.append($cell);
@@ -197,6 +196,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
     });
 
     $('#data-rows').on('click', '.room_cell', function () {
+        $('.sidebar_title').remove();
         tariff_list = {};
         const date = $(this).attr('date');
         roomId = $(this).attr('room_id');
@@ -208,8 +208,8 @@ $this->title = Yii::t('app', 'Доступность и цены');
         $('#checkin').val(convertToISO(date));
         $('#checkout').val(convertToISO(date));
 
-        let html = `<h4>${room.room_title} (${room.area})</h4>`;
-        html += `<div class="form-group">
+        let sidebar_title = `<h4 class="sidebar_title">${room.room_title[0]} </h4>`;
+        let  html = `<div class="form-group">
                     <label>Доступно номеров </label>
                     <input class="form-control" type="text" id="similar_room_count" value="${room.similar_room_amount}">
                 </div>`;
@@ -253,6 +253,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
             html += `<p><i>Нет данных по выбранному тарифу</i></p>`;
         }
 
+        $('.date-range-container').before(sidebar_title);
         $('#sidebar-details').html(html);
         $('#sidebar').fadeIn().css('display', 'block');
     });
@@ -566,11 +567,28 @@ $this->title = Yii::t('app', 'Доступность и цены');
         console.log("Final segments:", segments.map(formatRangeForLog));
         return segments;
     }
-    
+
     function convertToISO(dateStr) {
         const [dd, mm, yyyy] = dateStr.split('-');
         return `${yyyy}-${mm}-${dd}`;
     }
+
+    flatpickr("#checkin", {
+        dateFormat: "Y-m-d",
+        locale: "ru",
+        minDate: "today", // ⛔ Prevent past dates
+        onChange: function (selectedDates, dateStr, instance) {
+            checkoutCalendar.set('minDate', dateStr); // ✅ Set checkout min date
+        }
+    });
+
+    const checkoutCalendar = flatpickr("#checkout", {
+        dateFormat: "Y-m-d",
+        locale: "ru",
+        minDate: "today" // ⛔ Prevent past dates
+    });
+
+
 </script>
 
 
@@ -578,5 +596,50 @@ $this->title = Yii::t('app', 'Доступность и цены');
     input:invalid {
         border-color: #db2a2a;
         color: red;
+    }
+
+    <style>.date-range-container {
+        font-family: sans-serif;
+        max-width: 400px;
+    }
+
+    .date-range-label {
+        margin-bottom: 8px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .date-range-inputs {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        padding: 8px 12px;
+        background: #fff;
+    }
+
+    .date-input {
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 14px;
+        color: #555;
+        width: 100%;
+    }
+
+    .date-separator {
+        margin: 0 8px;
+        color: #999;
+        font-size: 16px;
+    }
+
+    .calendar-icon {
+        margin-left: 8px;
+        color: #aaa;
+        font-size: 16px;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 0;
     }
 </style>

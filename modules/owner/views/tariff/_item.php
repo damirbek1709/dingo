@@ -49,11 +49,14 @@ $meal_title = $model->getMealTitle($model->meal_type);
                     class="tariff-label"></span></button>
             <div class="dropdown-menu">
                 <?php
-                //$objectId = (int) $val['id'];
-                
-                $client = Yii::$app->meili->connect();
-                $object = $client->index('object')->getDocument($object_id);
-                $room_list = $object['rooms'] ?? [];
+                if ($room_list_session) {
+                    $room_list = $room_list_session;
+                } else {
+                    $client = Yii::$app->meili->connect();
+                    $object = $client->index('object')->getDocument($object_id);
+                    $room_list = $object['rooms'] ?? $room_list_session;
+                }
+
 
                 foreach ($room_list as $room):
                     $checked = "";
