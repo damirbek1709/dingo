@@ -30,9 +30,8 @@ use app\models\Objects;
                     <div class="property-card">
                         <div class="property-image">
                             <?= Html::img($bind_model->getImage()->getUrl('370x220'), ['alt' => $model['name'][0]]); ?>
-                            <div class="status-badge not-published">
+                            <div class="status-badge not-published" style="color:<?=$status['color']?>">
                                 <span class="dot"></span>
-                                Не Опубликован
                                 <?=$status['label']?>
                             </div>
                         </div>
