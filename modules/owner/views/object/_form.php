@@ -71,16 +71,19 @@ $model->city_id = $model->city ? $model->city[0] : "";
             ],
         ])->label(Yii::t('app', 'Город или село'));
         ?>
-        
+
         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес')]) ?>
-       <div class="address_hint"><b>Пример:</b> Кыргызстан, Иссык-кульская область, город Чолпон-Ата, улица Комсомольская 27.</div>
-        
-       <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
-       <div class="address_hint"><b>Пример:</b> Кыргызстан, Ыссык-Кол облусу, Чолпон-Ата шаары, Комсомольская 27 кочосу.</div>
-       
-       <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
-       <div class="address_hint"><b>Пример:</b> 27 Komsomolskaya street, Cholpon-Ata city, issyk-Kul region, Kyrgyz Republic</div>
-       
+        <div class="address_hint"><b>Пример:</b> Кыргызстан, Иссык-кульская область, город Чолпон-Ата, улица
+            Комсомольская 27.</div>
+
+        <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
+        <div class="address_hint"><b>Пример:</b> Кыргызстан, Ыссык-Кол облусу, Чолпон-Ата шаары, Комсомольская 27
+            кочосу.</div>
+
+        <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
+        <div class="address_hint"><b>Пример:</b> 27 Komsomolskaya street, Cholpon-Ata city, issyk-Kul region, Kyrgyz
+            Republic</div>
+
 
     </div>
 </div>
@@ -190,7 +193,29 @@ $model->city_id = $model->city ? $model->city[0] : "";
                     ],
                 ]) ?>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
-        <?= $form->field($model, 'check_in')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Заезд')]) ?>
+        <div class="time-input-container">
+            <div class="time-label">Select Time (24-hour format)</div>
+
+            <div class="time-input-wrapper">
+                <div class="time-scroll-container">
+                    <div class="time-scroll" id="hoursScroll">
+                        <!-- Hours will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <div class="time-separator">:</div>
+
+                <div class="time-scroll-container">
+                    <div class="time-scroll" id="minutesScroll">
+                        <!-- Minutes will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="selected-time" id="selectedTime">14:00</div>
+        </div>
+
+
         <?= $form->field($model, 'check_out')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Выезд')]) ?>
         <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')]) ?>
         <?= $form->field($model, 'reception')->checkbox() ?>
@@ -337,6 +362,172 @@ $model->city_id = $model->city ? $model->city[0] : "";
         $('#objects-lat').val(placemark.geometry.getCoordinates()[0]);
         $('#objects-lon').val(placemark.geometry.getCoordinates()[1]);
     }
+
+    class ScrollableTimeInput {
+        constructor() {
+            this.hoursScroll = document.getElementById('hoursScroll');
+            this.minutesScroll = document.getElementById('minutesScroll');
+            this.selectedTimeEl = document.getElementById('selectedTime');
+
+            this.selectedHour = 14;
+            this.selectedMinute = 0;
+
+            this.init();
+        }
+
+        init() {
+            this.populateHours();
+            this.populateMinutes();
+            this.setupEventListeners();
+            this.updateSelectedTime();
+
+            // Set initial scroll position
+            setTimeout(() => {
+                this.scrollToHour(14);
+                this.scrollToMinute(0);
+            }, 100);
+        }
+
+        populateHours() {
+            for (let i = 0; i < 24; i++) {
+                const hourEl = document.createElement('div');
+                hourEl.className = 'time-option';
+                hourEl.textContent = i.toString().padStart(2, '0');
+                hourEl.dataset.value = i;
+                this.hoursScroll.appendChild(hourEl);
+            }
+        }
+
+        populateMinutes() {
+            for (let i = 0; i < 60; i++) {
+                const minuteEl = document.createElement('div');
+                minuteEl.className = 'time-option';
+                minuteEl.textContent = i.toString().padStart(2, '0');
+                minuteEl.dataset.value = i;
+                this.minutesScroll.appendChild(minuteEl);
+            }
+        }
+
+        setupEventListeners() {
+            // Hour selection
+            this.hoursScroll.addEventListener('scroll', this.debounce(() => {
+                this.updateHourSelection();
+            }, 100));
+
+            this.hoursScroll.addEventListener('click', (e) => {
+                if (e.target.classList.contains('time-option')) {
+                    const hour = parseInt(e.target.dataset.value);
+                    this.scrollToHour(hour);
+                }
+            });
+
+            // Minute selection
+            this.minutesScroll.addEventListener('scroll', this.debounce(() => {
+                this.updateMinuteSelection();
+            }, 100));
+
+            this.minutesScroll.addEventListener('click', (e) => {
+                if (e.target.classList.contains('time-option')) {
+                    const minute = parseInt(e.target.dataset.value);
+                    this.scrollToMinute(minute);
+                }
+            });
+        }
+
+        updateHourSelection() {
+            const scrollTop = this.hoursScroll.scrollTop;
+            const itemHeight = 40;
+            const selectedIndex = Math.round(scrollTop / itemHeight);
+
+            if (selectedIndex >= 0 && selectedIndex < 24) {
+                this.selectedHour = selectedIndex;
+                this.updateHourHighlight();
+                this.updateSelectedTime();
+            }
+        }
+
+        updateMinuteSelection() {
+            const scrollTop = this.minutesScroll.scrollTop;
+            const itemHeight = 40;
+            const selectedIndex = Math.round(scrollTop / itemHeight);
+
+            if (selectedIndex >= 0 && selectedIndex < 60) {
+                this.selectedMinute = selectedIndex;
+                this.updateMinuteHighlight();
+                this.updateSelectedTime();
+            }
+        }
+
+        updateHourHighlight() {
+            const hours = this.hoursScroll.querySelectorAll('.time-option');
+            hours.forEach((hour, index) => {
+                hour.classList.toggle('selected', index === this.selectedHour);
+            });
+        }
+
+        updateMinuteHighlight() {
+            const minutes = this.minutesScroll.querySelectorAll('.time-option');
+            minutes.forEach((minute, index) => {
+                minute.classList.toggle('selected', index === this.selectedMinute);
+            });
+        }
+
+        scrollToHour(hour) {
+            const scrollTop = hour * 40;
+            this.hoursScroll.scrollTop = scrollTop;
+            this.selectedHour = hour;
+            this.updateHourHighlight();
+            this.updateSelectedTime();
+        }
+
+        scrollToMinute(minute) {
+            const scrollTop = minute * 40;
+            this.minutesScroll.scrollTop = scrollTop;
+            this.selectedMinute = minute;
+            this.updateMinuteHighlight();
+            this.updateSelectedTime();
+        }
+
+        updateSelectedTime() {
+            const formattedTime = `${this.selectedHour.toString().padStart(2, '0')}:${this.selectedMinute.toString().padStart(2, '0')}`;
+            this.selectedTimeEl.textContent = formattedTime;
+        }
+
+        debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Public method to get selected time
+        getSelectedTime() {
+            return {
+                hour: this.selectedHour,
+                minute: this.selectedMinute,
+                formatted: `${this.selectedHour.toString().padStart(2, '0')}:${this.selectedMinute.toString().padStart(2, '0')}`
+            };
+        }
+
+        // Public method to set time
+        setTime(hour, minute) {
+            if (hour >= 0 && hour < 24 && minute >= 0 && minute < 60) {
+                this.scrollToHour(hour);
+                this.scrollToMinute(minute);
+            }
+        }
+    }
+
+    // Initialize the time input
+    const timeInput = new ScrollableTimeInput();
+
+    // Example of how to use the component
+    console.log('Initial time:', timeInput.getSelectedTime());
 </script>
 
 <style>
@@ -422,7 +613,160 @@ $model->city_id = $model->city ? $model->city[0] : "";
     }
 
     .address_hint {
-    margin-bottom: 30px;
-    margin-top: -20px;
-}
+        margin-bottom: 30px;
+        margin-top: -20px;
+    }
+
+    .time-input-container {
+        max-width: 300px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .time-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .time-scroll-container {
+        position: relative;
+        width: 60px;
+        height: 120px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+        transition: border-color 0.3s ease;
+    }
+
+    .time-scroll-container:hover {
+        border-color: #007acc;
+    }
+
+    .time-scroll-container:focus-within {
+        border-color: #007acc;
+        box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.1);
+    }
+
+    .time-scroll {
+        height: 100%;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+        padding: 40px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .time-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .time-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .time-scroll::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 2px;
+    }
+
+    .time-scroll::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+
+    .time-option {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 500;
+        color: #666;
+        cursor: pointer;
+        scroll-snap-align: center;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .time-option:hover {
+        background: #f0f8ff;
+        color: #007acc;
+    }
+
+    .time-option.selected {
+        color: #007acc;
+        font-weight: 600;
+        background: #f0f8ff;
+        transform: scale(1.05);
+    }
+
+    .time-separator {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 5px;
+    }
+
+    .time-label {
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .selected-time {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .time-scroll-container::before,
+    .time-scroll-container::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 40px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .time-scroll-container::before {
+        top: 0;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), transparent);
+    }
+
+    .time-scroll-container::after {
+        bottom: 0;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent);
+    }
+
+    @media (max-width: 480px) {
+        .time-input-container {
+            margin: 0 10px;
+            padding: 15px;
+        }
+
+        .time-scroll-container {
+            width: 50px;
+            height: 100px;
+        }
+
+        .time-option {
+            height: 35px;
+            font-size: 14px;
+        }
+    }
 </style>
