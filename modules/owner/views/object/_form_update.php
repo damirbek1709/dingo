@@ -170,9 +170,17 @@ use yii\web\JsExpression;
             ],
         ])->label(Yii::t('app', 'Город или село'));
         ?>
-         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address]) ?>
+        <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address]) ?>
+        <div class="address_hint"><b>Пример:</b> Кыргызстан, Иссык-кульская область, город Чолпон-Ата, улица
+            Комсомольская 27.</div>
+
         <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_en]) ?>
+        <div class="address_hint"><b>Пример:</b> Кыргызстан, Ыссык-Кол облусу, Чолпон-Ата шаары, Комсомольская 27
+            кочосу.</div>
+
         <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
+        <div class="address_hint"><b>Пример:</b> 27 Komsomolskaya street, Cholpon-Ata city, issyk-Kul region, Kyrgyz
+            Republic</div>
 
 
         <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
@@ -472,4 +480,9 @@ use yii\web\JsExpression;
         display: flex !important;
         align-items: center !important;
     }
+
+    .address_hint {
+    margin-bottom: 30px;
+    margin-top: -20px;
+}
 </style>
