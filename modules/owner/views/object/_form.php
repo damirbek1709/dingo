@@ -193,8 +193,9 @@ $model->city_id = $model->city ? $model->city[0] : "";
                     ],
                 ]) ?>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
-        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд')]) ?>
-        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд')]) ?>
+        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд'),'style'=>'width:150px']) ?>
+        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд'),'style'=>'width:150px']) ?>
+
         <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')]) ?>
         <?= $form->field($model, 'reception')->checkbox() ?>
 

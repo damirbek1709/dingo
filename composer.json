@@ -42,7 +42,8 @@
         "dektrium/yii2-rbac": "1.0.0-alpha@dev",
         "2amigos/yii2-file-upload-widget": "~1.0",
         "yii2-starter-kit/yii2-file-kit": "^2.1",
-        "kartik-v/yii2-editors": "dev-master"
+        "kartik-v/yii2-editors": "dev-master",
+        "kartik-v/yii2-widget-timepicker": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
