@@ -31,6 +31,7 @@ class RoomCat extends \yii\db\ActiveRecord
     public $tariff;
     public $comfort;
     public $is_paid;
+    public $not_available_dates;
 
 
     const BED_TYPE_ONE = 1;

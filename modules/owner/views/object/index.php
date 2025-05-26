@@ -23,6 +23,7 @@ use app\models\Objects;
         <div class="property-grid">
             <?php
             foreach ($dataProvider->getModels() as $model):
+                $status = Objects::statusData($model['status']);
                 $bind_model = Objects::findOne($model['id']);
                 ?>
                 <a href="<?= Url::to(['/owner/object/view', 'object_id' => $model['id']]) ?>">
@@ -32,6 +33,7 @@ use app\models\Objects;
                             <div class="status-badge not-published">
                                 <span class="dot"></span>
                                 Не Опубликован
+                                <?=$status['label']?>
                             </div>
                         </div>
                         <div class="property-info">
