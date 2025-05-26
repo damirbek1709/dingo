@@ -177,9 +177,7 @@ class Objects extends \yii\db\ActiveRecord
                     'name',
                     'name_en',
                     'name_ky',
-                    'city',
-                    'city_en',
-                    'city_ky',
+                    'city_id'
                 ],
                 'required'
             ],
@@ -231,6 +229,15 @@ class Objects extends \yii\db\ActiveRecord
             return $file_array;
         }
         return false;
+    }
+
+    public static function cityList()
+    {
+        $client = Yii::$app->meili->connect()->index('region');
+        $cities = $client->search('', [
+            'limit' => 100
+        ])->getHits();
+        return ArrayHelper::map($cities, 'id', 'name');
     }
 
     public function getFinancialDocs()

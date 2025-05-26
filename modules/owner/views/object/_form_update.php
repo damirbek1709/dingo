@@ -7,6 +7,8 @@ use vova07\imperavi\Widget;
 use yii\widgets\MaskedInput;
 use kartik\file\FileInput;
 use kartik\editors\Summernote;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
 
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
@@ -33,7 +35,6 @@ use kartik\editors\Summernote;
         ],
     ]);
     $name_list = $model->name;
-    $city_list = $model->city;
     $address_list = $model->address;
     $description_list = $model->description;
 
@@ -44,9 +45,7 @@ use kartik\editors\Summernote;
     $name_en = $name_list[1] ? $name_list[1] : "";
     $name_ky = $name_list[2] ? $name_list[2] : "";
 
-    $city = $city_list[0] ? $city_list[0] : "";
-    $city_en = $city_list[1] ? $city_list[1] : "";
-    $city_ky = $city_list[2] ? $city_list[2] : "";
+    $model->city_id = $model->city[0] ? $model->city[0] : "";
 
     $address = $address_list[0] ? $address_list[0] : "";
     $address_en = $address_list[1] ? $address_list[1] : "";
@@ -113,17 +112,18 @@ use kartik\editors\Summernote;
                         <?= Yii::t('app', 'Загрузите ваши банковские данные для осуществления выплат на ваш счет'); ?>
                     </div>
                 </div>
-                <?php $financial_docs = $model->getFinancialDocs();
-                if ($financial_docs) {
-                    foreach ($financial_docs as $doc) {
-                        echo Html::beginTag('div', ['class' => 'ceo_doc_cover']);
-                        echo Html::a($doc['name'], $doc['link'], ['class' => 'ceo_doc']);
-                        echo Html::tag('span', '', ['class' => 'doc_delete_icon', 'name' => $doc['name'], 'folder' => 'financial']);
-                        echo Html::endTag('div');
-                    }
-                }
-                ?>
             </h2>
+            <?php $financial_docs = $model->getFinancialDocs();
+            if ($financial_docs) {
+                foreach ($financial_docs as $doc) {
+                    echo Html::beginTag('div', ['class' => 'ceo_doc_cover']);
+                    echo Html::a($doc['name'], $doc['link'], ['class' => 'ceo_doc']);
+                    echo Html::tag('span', '', ['class' => 'doc_delete_icon', 'name' => $doc['name'], 'folder' => 'financial']);
+                    echo Html::endTag('div');
+                }
+            }
+            ?>
+
             <?php
             echo $form->field($model, 'financial_doc')->widget(FileInput::classname(), [
                 'options' => [],
@@ -143,11 +143,34 @@ use kartik\editors\Summernote;
             ?>
         </div>
 
-        <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'value' => $city]) ?>
-        <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'value' => $city_en]) ?>
-        <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'value' => $city_ky]) ?>
 
-        <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address]) ?>
+        <?php echo $form->field($model, 'city_id')->widget(Select2::class, [
+            'options' => [
+                'placeholder' => 'Введите город или село...',
+                'class' => 'form-input'
+            ],
+            'pluginOptions' => [
+                'minimumInputLength' => 2,
+                'ajax' => [
+                    'url' => Url::to(['/site/search-regions']),
+                    'dataType' => 'json',
+                    'delay' => 250,
+                    'data' => new JsExpression('function(params) { return {q:params.term}; }'),
+                    'processResults' => new JsExpression('function (data) {
+                        return {
+                            results: $.map(data.results, function (item) {
+                                return {
+                                    id: item.id,
+                                    text: item.display // <- Make sure this goes into `text`
+                                };
+                            })
+                        };
+                    }'),
+                ],
+            ],
+        ])->label(Yii::t('app', 'Город или село'));
+        ?>
+         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address]) ?>
         <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_en]) ?>
         <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
 
@@ -250,6 +273,7 @@ use kartik\editors\Summernote;
 </div>
 
 <script>
+
     var mainImgIdField = $('#roomcat-img');
     $('body').on('click', '.img-main', function () {
         var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
@@ -440,5 +464,12 @@ use kartik\editors\Summernote;
         margin-bottom: 20px;
         display: flex;
         align-items: center;
+    }
+
+    .select2-selection {
+        border-radius: 20px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
     }
 </style>

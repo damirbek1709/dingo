@@ -6,9 +6,13 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use kartik\editors\Summernote;
 use yii\widgets\MaskedInput;
+use yii\web\JsExpression;
+use kartik\select2\Select2;
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
-/** @var yii\widgets\ActiveForm $form */ ?>
+/** @var yii\widgets\ActiveForm $form */
+$model->city_id = $model->city ? $model->city[0] : "";
+?>
 
 
 <div class="col-md-6">
@@ -41,10 +45,32 @@ use yii\widgets\MaskedInput;
             ]
         ) ?>
 
-        <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город')]) ?>
-        <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город английском')]) ?>
-        <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город кыргызском')]) ?>
-
+        <?php echo $form->field($model, 'city_id')->widget(Select2::class, [
+            'options' => [
+                'placeholder' => 'Введите город или село...',
+                'class' => 'form-input'
+            ],
+            'pluginOptions' => [
+                'minimumInputLength' => 2,
+                'ajax' => [
+                    'url' => Url::to(['/site/search-regions']),
+                    'dataType' => 'json',
+                    'delay' => 250,
+                    'data' => new JsExpression('function(params) { return {q:params.term}; }'),
+                    'processResults' => new JsExpression('function (data) {
+                        return {
+                            results: $.map(data.results, function (item) {
+                                return {
+                                    id: item.id,
+                                    text: item.display // <- Make sure this goes into `text`
+                                };
+                            })
+                        };
+                    }'),
+                ],
+            ],
+        ])->label(Yii::t('app', 'Город или село'));
+        ?>
         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес')]) ?>
         <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
         <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
@@ -380,5 +406,12 @@ use yii\widgets\MaskedInput;
         font-size: 20px;
         line-height: 24px;
         letter-spacing: 0px;
+    }
+
+    .select2-selection {
+        border-radius: 20px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
     }
 </style>

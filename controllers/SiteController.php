@@ -13,6 +13,9 @@ use app\models\Freedom;
 use yii\httpclient\Client;
 use app\models\Product;
 use app\components\ResendClient;
+use yii\helpers\Json;
+use Exception;
+
 class SiteController extends Controller
 {
     public $layout;
@@ -97,29 +100,74 @@ class SiteController extends Controller
         return $this->render('page', ['id' => 1]);
     }
 
+    public function actionSearchRegions()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        $query = Yii::$app->request->get('q', '');
+        if (empty($query) || strlen($query) < 2) {
+            return ['results' => []];
+        }
+
+        try {
+            $client = Yii::$app->meili->connect();
+            $health = $client->health();
+            if ($health['status'] !== 'available') {
+                throw new Exception('MeiliSearch server not available');
+            }
+
+            $index = $client->index('region');
+            $searchResults = $index->search($query);
+
+            $results = [];
+            $hits = $searchResults->getHits();
+
+            if (is_array($hits) && !empty($hits)) {
+                foreach ($hits as $hit) {
+                    if (!is_array($hit) || !isset($hit['id']) || !isset($hit['name'])) {
+                        Yii::warning('Invalid hit structure: ' . Json::encode($hit), 'meilisearch');
+                        continue;
+                    }
+
+                    $id = $hit['id'];
+                    if (is_numeric($id)) {
+                        $id = (string) $id;
+                    } elseif (!is_string($id)) {
+                        Yii::warning('Invalid ID type for hit: ' . Json::encode($hit), 'meilisearch');
+                        continue;
+                    }
+
+                    $results[] = [
+                        'id' => (string)$hit['id'],
+                        'text' => $hit['name'], // this is what Select2 expects by default
+                        'display' => $hit['name'] . (!empty($hit['region']) ? ' (' . $hit['region'] . ')' : ''),
+                        'geo_data'=>$hit['geo_data']
+                        
+                    ];
+                }
+            }
+
+            return ['results' => $results, 'total' => count($results)];
+
+        } catch (Exception $e) {
+            Yii::error('MeiliSearch error: ' . $e->getMessage() . "\nTrace: " . $e->getTraceAsString(), 'meilisearch');
+
+            return [
+                'results' => [],
+                'error' => 'Search temporarily unavailable',
+                'debug' => YII_DEBUG ? $e->getMessage() : null
+            ];
+        }
+    }
+
     public function actionAbout()
     {
 
-        $data = [
-            "id"=>23,
-            "name" => "Бишкек",
-            "name_ru" => "Бишкек",
-            "name_en" => "Bishkek",
-            "name_kg" => "Бишкек",
-            "old_name" => "Фрунзе",
-            "region" => "Бишкек",
-            "place" => "city",
-            "country" => "KG",
-            "geo_data" => [
-                42.8777895,
-                74.6066926
-            ]
-        ];
+        $query = Yii::$app->request->get('q');
         $client = Yii::$app->meili->connect();
-        $index = $client->index('region');
-        if ($index->addDocuments([$data])) {
-            echo "added";die();
-        }
+        $results = $client->index('region')->search('');
+
+        print_r($results->getHits());
+        echo "</pre>";
     }
 
     public function actionPayment()

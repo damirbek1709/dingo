@@ -23,6 +23,7 @@ use app\models\TariffSearch;
 use app\models\Booking;
 use app\models\BookingSearch;
 use yii\helpers\Json;
+use Exception;
 /**
  * EventController implements the CRUD actions for Event model.
  */
@@ -84,7 +85,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'delete', 'file-upload', 'room-beds','search-regions'],
+                    'actions' => ['comfort', 'payment', 'terms', 'room-list', 'add-room', 'update', 'delete', 'file-upload', 'room-beds', 'search-regions'],
                     'roles' => ['owner', 'admin'],
                     'matchCallback' => function () {
                         $object_id = Yii::$app->request->get('object_id');
@@ -331,22 +332,8 @@ class ObjectController extends Controller
         ]);
     }
 
-    public function actionSearchRegions()
-    {
-        $query = Yii::$app->request->get('q');
-        $client = Yii::$app->meili->connect();
-        $results= $client->index('regions')->search($query);
 
-        $data = array_map(function ($item) {
-            return [
-                'name' => $item['name'],
-                'name_en' => $item['name_en'],
-                'name_ky' => $item['name_ky'],
-            ];
-        }, $results['hits']);
 
-        return Json::encode($data);
-    }
 
 
     public function actionView($object_id)
@@ -393,6 +380,15 @@ class ObjectController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->validate()) {
+                if ($model->city_id) {
+                    $client = Yii::$app->meili->connect();
+                    $city = $client->index('region')->getDocument($model->city_id);
+                    $model->city = [
+                        $city['name'] ?? '',
+                        $city['name_en'] ?? '',
+                        $city['name_kg'] ?? '',
+                    ];
+                }
                 if ($model->save(false)) {
                     $model->images = UploadedFile::getInstances($model, 'images');
                     if ($model->images) {
@@ -436,7 +432,7 @@ class ObjectController extends Controller
                     'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
                     'type' => (int) $model->type,
                     'reception' => (int) $model->reception,
-                    'city' => [$model->city, $model->city_en, $model->city_ky],
+                    'city' => $model->city,
                     'address' => [$model->address, $model->address_en, $model->address_ky],
                     'description' => ["<div>" . $model->description . "</div>", "<div>" . $model->description_en . "</div>", "<div>" . $model->description_ky . "</div>"],
                     'currency' => $model->currency,
@@ -515,6 +511,7 @@ class ObjectController extends Controller
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post())) {
+
             $model->type = (int) $model->type;
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
@@ -528,11 +525,15 @@ class ObjectController extends Controller
                 $request['Objects']['name_ky'] ?? '',
             ];
 
-            $model->city = [
-                $request['Objects']['city'] ?? '',
-                $request['Objects']['city_en'] ?? '',
-                $request['Objects']['city_ky'] ?? '',
-            ];
+            if ($model->city_id) {
+                $client = Yii::$app->meili->connect();
+                $city = $client->index('region')->getDocument($model->city_id);
+                $model->city = [
+                    $city['name'] ?? '',
+                    $city['name_en'] ?? '',
+                    $city['name_kg'] ?? '',
+                ];
+            }
 
             $model->address = [
                 $request['Objects']['address'] ?? '',
