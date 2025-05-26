@@ -193,12 +193,8 @@ $model->city_id = $model->city ? $model->city[0] : "";
                     ],
                 ]) ?>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
-        <?= $form->field($model, 'check_in')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Заезд')]) ?>
-       
-       
-       
-       
-        <?= $form->field($model, 'check_out')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Выезд')]) ?>
+        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд')]) ?>
+        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд')]) ?>
         <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')]) ?>
         <?= $form->field($model, 'reception')->checkbox() ?>
 
@@ -214,6 +210,21 @@ $model->city_id = $model->city ? $model->city[0] : "";
         <?php ActiveForm::end(); ?>
     </div>
 </div>
+
+<?php 
+$this->registerJs("
+    const checkIn = document.getElementById('" . Html::getInputId($model, 'check_in') . "');
+    const checkOut = document.getElementById('" . Html::getInputId($model, 'check_out') . "');
+
+    [checkIn, checkOut].forEach(function(input) {
+        input.addEventListener('click', function() {
+            this.focus();
+            // Optionally trigger input click again for better browser support
+            this.click();
+        });
+    });
+");
+?>
 
 
 
@@ -344,6 +355,7 @@ $model->city_id = $model->city ? $model->city[0] : "";
         $('#objects-lat').val(placemark.geometry.getCoordinates()[0]);
         $('#objects-lon').val(placemark.geometry.getCoordinates()[1]);
     }
+    
 </script>
 
 <style>
