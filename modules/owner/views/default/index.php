@@ -23,6 +23,7 @@ use app\models\Objects;
         <div class="property-grid">
             <?php
             foreach ($dataProvider->getModels() as $model):
+                $status = Objects::statusData($model['status']);
                 $bind_model = Objects::findOne($model['id']);
                 if ($bind_model):
                     ?>
