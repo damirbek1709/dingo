@@ -13,6 +13,8 @@ use yii\web\JsExpression;
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
 /** @var yii\widgets\ActiveForm $form */
+
+$cityName = $model->city ? $model->city[0] : "";
 ?>
 
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
@@ -45,7 +47,7 @@ use yii\web\JsExpression;
     $name_en = $name_list[1] ? $name_list[1] : "";
     $name_ky = $name_list[2] ? $name_list[2] : "";
 
-    
+
     $address = $address_list[0] ? $address_list[0] : "";
     $address_en = $address_list[1] ? $address_list[1] : "";
     $address_ky = $address_list[2] ? $address_list[2] : "";
@@ -143,10 +145,13 @@ use yii\web\JsExpression;
         </div>
 
 
-        <?php echo $form->field($model, 'city_id')->widget(Select2::class, [
+        <?php
+
+        echo $form->field($model, 'city_id')->widget(Select2::class, [
+            'initValueText' => $cityName, // <-- This displays the selected value text
             'options' => [
                 'placeholder' => 'Введите город или село...',
-                'class' => 'form-input'
+                'class' => 'form-input',
             ],
             'pluginOptions' => [
                 'minimumInputLength' => 2,
@@ -156,15 +161,15 @@ use yii\web\JsExpression;
                     'delay' => 250,
                     'data' => new JsExpression('function(params) { return {q:params.term}; }'),
                     'processResults' => new JsExpression('function (data) {
+                return {
+                    results: $.map(data.results, function (item) {
                         return {
-                            results: $.map(data.results, function (item) {
-                                return {
-                                    id: item.id,
-                                    text: item.display // <- Make sure this goes into `text`
-                                };
-                            })
+                            id: item.id,
+                            text: item.display
                         };
-                    }'),
+                    })
+                };
+            }'),
                 ],
             ],
         ]);
