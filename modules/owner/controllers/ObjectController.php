@@ -42,7 +42,7 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'tariff-list', 'room', 'view', 'delete', 'comfort', 'index-admin', 'file-upload', 'finances'],
+                    'actions' => ['room-list', 'update','tariff-list', 'room', 'view', 'delete', 'comfort', 'index-admin', 'file-upload', 'finances'],
                     'roles' => ['admin'],
                 ],
                 [
@@ -595,6 +595,7 @@ class ObjectController extends Controller
 
                 $status = Objects::currentStatus($object_id, $model->status ? $model->status : Objects::STATUS_NOT_PUBLISHED);
 
+                
                 $object_arr = [
                     'id' => (int) $model->id,
                     'name' => $model->name,
@@ -614,13 +615,17 @@ class ObjectController extends Controller
                     'early_check_in' => (bool) $model->early_check_in,
                     'late_check_in' => (bool) $model->late_check_in,
                     'internet_public' => (bool) $model->internet_public,
-                    'user_id' => (int) Yii::$app->user->id,
                     'email' => $model->email,
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
                     'general_room_count' => $model->general_room_count,
                     'status' => $status
                 ];
+
+                if(!Yii::$app->user->can('admin')){
+                    $object_arr['user_id'] = (int) Yii::$app->user->id;
+                }
+                
 
                 $index->updateDocuments($object_arr);
                 return $this->redirect(['view', 'object_id' => $model->id]);
