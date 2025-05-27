@@ -1,11 +1,9 @@
 <?php
-
 $db_arr = [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=dingo_db',
-    'username' => 'dingo_user',
-    'password' => '9a(Q}ZjjwfJ[Rx+k',
+    'dsn' => 'mysql:host=localhost;dbname=dingo_dev',
+    'username' => 'dingo_dev',
+    'password' => 'ctpwt4ZpXSsea[(k',
     'charset' => 'utf8mb4'
 ];
-
 return $db_arr;
