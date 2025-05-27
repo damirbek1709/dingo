@@ -56,7 +56,7 @@ Modal::begin([
 
 <script>
     // Use event delegation for elements that might be reloaded with Pjax
-    $(document).on('click', '.save-button', function () {
+    $(document).on('click', '.moderate-button', function () {
         $('#statusModal').modal('show');
     });
 

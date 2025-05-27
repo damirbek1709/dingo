@@ -40,7 +40,7 @@ Modal::begin([
     } ?>
     <?php if ($status_arr['current_status'] != Objects::STATUS_ON_MODERATION): ?>
         <div class="dialog-button-cover">
-            <button style="width:100%" data-status="<?= $model->status; ?>" class="save-button">
+            <button style="width:100%" data-status="<?= $model->status; ?>" class="save-button moderate-button">
                 <?= $status_arr['button_text'] ?>
             </button>
         </div>
@@ -59,7 +59,7 @@ Modal::begin([
     var object_id = "<?= $model->id ?>";
     var html = $('.dialog-content').html();
 
-    $(document).on('click', '.save-button', function () {
+    $(document).on('click', '.moderate-button', function () {
         var data_status = parseInt($(this).attr('data-status'));
         var switcher = false;
         var status_not_published = "<?= Objects::STATUS_NOT_PUBLISHED ?>";
