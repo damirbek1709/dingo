@@ -18,7 +18,7 @@ use yii\widgets\Pjax;
         <div class="status-description">
             <?= $status_arr['description'] ?>
         </div>
-        <div class="save-button" style="width:100%"><?= Yii::t('app', 'Модерировать') ?></div>
+        <div class="save-button moderate-button" style="width:100%"><?= Yii::t('app', 'Модерировать') ?></div>
 
     </div>
 </div>
