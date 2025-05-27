@@ -72,7 +72,6 @@ class Objects extends \yii\db\ActiveRecord
 
 
 
-
     const SEARCH_TYPE_CITY = 3;
     const SEARCH_TYPE_REGION = 1;
     const SEARCH_TYPE_HOTEL = 2;

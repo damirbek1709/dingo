@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 
     <div class="oblast_update">
         <?php $form = ActiveForm::begin([
-            'enableClientValidation' => false,
+            'enableClientValidation' => true,
             'enableAjaxValidation' => false,
             'options' => [
                 'enctype' => 'multipart/form-data',
@@ -46,7 +46,24 @@ use yii\widgets\ActiveForm;
                 <button type="button" class="increment increase">+</button>
             </div>
         </div>
-        <div class="clear"></div>
+        <div class="clear" style="margin-top: 10px;display:inline-block"></div>
+        <div id="default-prices-wrapper" style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-gap: 0 20px;">
+            <?php
+            $defaultPrices = is_array($model->default_prices) ? $model->default_prices : [];
+            $count = $model->guest_amount ?: 1;
+            for ($i = 0; $i < $count; $i++): ?>
+                <div class="form-group default-price-input">
+                    <?= Html::label("Цена за " . ($i + 1) . " гостя", "RoomCat_default_prices_$i", ['class' => 'form-label']) ?>
+                    <?= Html::textInput("RoomCat[default_prices][$i]", $defaultPrices[$i] ?? '', [
+                        'class' => 'form-input',
+                        'id' => "RoomCat_default_prices_$i",
+                        'required' => true,
+                        'oninvalid' => "this.setCustomValidity('Пожалуйста, укажите цену')",
+                        'oninput' => "this.setCustomValidity('')"
+                    ]) ?>
+                </div>
+            <?php endfor; ?>
+        </div>
 
         <?php //= $form->field($model, 'guest_amount')->textInput() ?>
         <div class="terms_section">
@@ -63,7 +80,8 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
 
-        <?= $form->field($model, 'base_price')->textInput() ?>
+
+
         <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
         <?php echo $form->errorSummary($model); ?>
 
@@ -89,6 +107,7 @@ use yii\widgets\ActiveForm;
                 let value = parseInt(input.value);
                 if (value > 0) {
                     input.value = value - 1;
+                    updateDefaultPricesInputs(value - 1);
                 }
             });
         });
@@ -99,9 +118,51 @@ use yii\widgets\ActiveForm;
                 const input = this.previousElementSibling;
                 let value = parseInt(input.value);
                 input.value = value + 1;
+                updateDefaultPricesInputs(value + 1);
             });
         });
     });
+
+    function updatePriceFields() {
+        const guestCount = parseInt(guestInput.value) || 1;
+        // Очищаем контейнер
+        priceContainer.innerHTML = '';
+
+        // Создаем нужное количество полей
+        for (let i = 1; i <= guestCount; i++) {
+            const field = createPriceField(i);
+            priceContainer.appendChild(field);
+        }
+    }
+
+    function updateDefaultPricesInputs(count) {
+        let wrapper = $('#default-prices-wrapper');
+        let existingValues = [];
+
+        // Сохраняем текущие значения перед пересозданием
+        wrapper.find('input').each(function (index) {
+            existingValues[index] = $(this).val();
+        });
+
+        wrapper.empty();
+
+        for (let i = 0; i < count; i++) {
+            let value = existingValues[i] || ''; // Используем сохранённое значение или пустую строку
+
+            let inputHtml = `
+            <div class="form-group default-price-input">
+                <label class="form-label" for="RoomCat_default_prices_${i}">Цена за ${i + 1} гостя </label>
+                <input type="text" class="form-input"
+                    name="RoomCat[default_prices][${i}]"
+                    id="RoomCat_default_prices_${i}"
+                    required
+                    value="${value}"
+                    oninvalid="this.setCustomValidity('Пожалуйста, укажите цену')"
+                    oninput="this.setCustomValidity('')">
+            </div>`;
+            wrapper.append(inputHtml);
+        }
+    }
 
     document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(checkbox => {
         checkbox.addEventListener('change', function () {

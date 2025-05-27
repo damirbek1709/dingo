@@ -32,6 +32,8 @@ class RoomCat extends \yii\db\ActiveRecord
     public $comfort;
     public $is_paid;
     public $not_available_dates;
+    public $default_prices = [];
+
 
 
     const BED_TYPE_ONE = 1;
@@ -165,7 +167,7 @@ class RoomCat extends \yii\db\ActiveRecord
     {
         return [
             [['similar_room_amount', 'area'], 'required'],
-            [['bed_types', 'guest_amount'], 'safe'],
+            [['bed_types', 'guest_amount','default_prices'], 'safe'],
             [['guest_amount'], 'default', 'value' => 1],
             [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen', 'type_id'], 'integer'],
             [['area', 'base_price', 'title'], 'number'],
@@ -193,6 +195,7 @@ class RoomCat extends \yii\db\ActiveRecord
             'base_price' => Yii::t('app', 'Базовая цена'),
             'img' => Yii::t('app', 'Фото'),
             'images' => Yii::t('app', 'Фотографии'),
+            'default_prices' => Yii::t('app', 'Базовые цены'),
         ];
     }
 

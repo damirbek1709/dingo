@@ -2,6 +2,7 @@
 
 namespace app\modules\api\controllers;
 
+use app\models\Booking;
 use app\models\user\UserStatus;
 use Yii;
 use app\models\user\SignupForm;
@@ -169,6 +170,11 @@ class UserController extends BaseController
                     'actions' => ['signup', 'register', 'check-confirmation-code'],
                     'roles' => ['?'],
                 ],
+                [
+                    'allow' => true,
+                    'actions' => ['delete-account'],
+                    'roles' => ['@'],
+                ],
             ],
         ];
 
@@ -178,10 +184,31 @@ class UserController extends BaseController
                 'signup' => ['POST'],
                 'register' => ['POST'],
                 'check-confirmation-code' => ['POST'],
+                'delete-account' => ['POST'],
             ],
         ];
 
 
         return $behaviors;
+    }
+
+    // public function getActiveBookings(){
+    //     $bookings = Booking::find()->all();
+    // }
+
+    public function actionDeleteAccount()
+    {
+        $response["success"] = false;
+        $user = User::findOne(Yii::$app->user->id);
+        $user->confirmed_at = null;
+        $user->username = "deleted_user";
+        $user->email = "deleted_user";
+        $user->flags = User::FLAG_DELETED;
+        $bookings = Booking::findAll();
+        if ($user->save(false)) {
+            $response["success"] = true;
+            $response["message"] = Yii::t("app", "Удаление учётной записи прошло успешно");
+        }
+        return $response;
     }
 }

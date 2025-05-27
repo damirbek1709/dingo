@@ -54,7 +54,7 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'similar_room_amount')->textInput() ?>
         </div>
 
-        
+
         <?= $form->field($model, 'area')->textInput() ?>
         <div class="form-group" style="margin-bottom:25px">
             <div class="checkbox-group">
@@ -65,7 +65,23 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
 
-        <?= $form->field($model, 'base_price')->textInput() ?>
+        <div id="default-prices-wrapper" style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-gap: 0 20px;">
+            <?php
+            $defaultPrices = is_array($model->default_prices) ? $model->default_prices : [];
+            $count = $model->guest_amount ?: 1;
+            for ($i = 0; $i < $count; $i++): ?>
+                <div class="form-group default-price-input">
+                    <?= Html::label("Цена за " . ($i + 1) . " гостя", "RoomCat_default_prices_$i", ['class' => 'form-label']) ?>
+                    <?= Html::textInput("RoomCat[default_prices][$i]", $defaultPrices[$i] ?? '', [
+                        'class' => 'form-input',
+                        'id' => "RoomCat_default_prices_$i",
+                        'required' => true,
+                        'oninvalid' => "this.setCustomValidity('Пожалуйста, укажите цену')",
+                        'oninput' => "this.setCustomValidity('')"
+                    ]) ?>
+                </div>
+            <?php endfor; ?>
+        </div>
         <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
         <?php echo $form->errorSummary($model); ?>
 
@@ -141,6 +157,7 @@ use yii\widgets\ActiveForm;
                 if (value > 0) {
                     //input.val = value - 1;
                     input.attr('value', value - 1);
+                    updateDefaultPricesInputs(value - 1);
                 }
             });
         });
@@ -152,6 +169,7 @@ use yii\widgets\ActiveForm;
                 let value = parseInt(input.val());
                 //input.value = value + 1;
                 input.attr('value', value + 1);
+                updateDefaultPricesInputs(value + 1);
             });
         });
     });
@@ -187,7 +205,46 @@ use yii\widgets\ActiveForm;
         });
     });
 
+    function updatePriceFields() {
+        const guestCount = parseInt(guestInput.value) || 1;
+        // Очищаем контейнер
+        priceContainer.innerHTML = '';
 
+        // Создаем нужное количество полей
+        for (let i = 1; i <= guestCount; i++) {
+            const field = createPriceField(i);
+            priceContainer.appendChild(field);
+        }
+    }
+
+    function updateDefaultPricesInputs(count) {
+        let wrapper = $('#default-prices-wrapper');
+        let existingValues = [];
+
+        // Сохраняем текущие значения перед пересозданием
+        wrapper.find('input').each(function (index) {
+            existingValues[index] = $(this).val();
+        });
+
+        wrapper.empty();
+
+        for (let i = 0; i < count; i++) {
+            let value = existingValues[i] || ''; // Используем сохранённое значение или пустую строку
+
+            let inputHtml = `
+            <div class="form-group default-price-input">
+                <label class="form-label" for="RoomCat_default_prices_${i}">Цена за ${i + 1} гостя </label>
+                <input type="text" class="form-input"
+                    name="RoomCat[default_prices][${i}]"
+                    id="RoomCat_default_prices_${i}"
+                    required
+                    value="${value}"
+                    oninvalid="this.setCustomValidity('Пожалуйста, укажите цену')"
+                    oninput="this.setCustomValidity('')">
+            </div>`;
+            wrapper.append(inputHtml);
+        }
+    }
 
 
     // Количество кнопки +/-

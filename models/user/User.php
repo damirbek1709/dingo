@@ -7,7 +7,7 @@ use dektrium\user\helpers\Password;
 class User extends BaseUser
 {
 
-    
+    const FLAG_DELETED = 1;
     public function scenarios()
     {
         $scenarios = parent::scenarios();

@@ -42,7 +42,7 @@ class ObjectController extends Controller
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['room-list', 'update','tariff-list', 'room', 'view', 'delete', 'comfort', 'index-admin', 'file-upload', 'finances'],
+                    'actions' => ['room-list', 'update', 'tariff-list', 'room', 'view', 'delete', 'comfort', 'index-admin', 'file-upload', 'finances'],
                     'roles' => ['admin'],
                 ],
                 [
@@ -378,6 +378,8 @@ class ObjectController extends Controller
         $model = new Objects();
         $model->link_id = 1;
 
+
+
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->validate()) {
                 if ($model->city_id) {
@@ -451,7 +453,7 @@ class ObjectController extends Controller
                     'images' => $model->getPictures(),
                     'general_room_count' => (int) $model->general_room_count,
                     'status' => 0,
-                    'city_id'=>(int)$model->city_id
+                    'city_id' => (int) $model->city_id
                 ];
 
                 if ($index->addDocuments($object_arr)) {
@@ -595,14 +597,14 @@ class ObjectController extends Controller
 
                 $status = Objects::currentStatus($object_id, $model->status ? $model->status : Objects::STATUS_NOT_PUBLISHED);
 
-                
+
                 $object_arr = [
                     'id' => (int) $model->id,
                     'name' => $model->name,
                     'type' => (int) $model->type,
                     'reception' => (int) $model->reception,
                     'city' => $model->city,
-                    'city_id'=>(int)$model->city_id,
+                    'city_id' => (int) $model->city_id,
                     'address' => $model->address,
                     'description' => $model->description,
                     'currency' => $model->currency,
@@ -622,10 +624,10 @@ class ObjectController extends Controller
                     'status' => $status
                 ];
 
-                if(!Yii::$app->user->can('admin')){
+                if (!Yii::$app->user->can('admin')) {
                     $object_arr['user_id'] = (int) Yii::$app->user->id;
                 }
-                
+
 
                 $index->updateDocuments($object_arr);
                 return $this->redirect(['view', 'object_id' => $model->id]);
@@ -863,7 +865,10 @@ class ObjectController extends Controller
                 $meiliRooms = $object['rooms'];
             }
             $status = Objects::currentStatus($object_id, $object['status'] ? $object['status'] : Objects::STATUS_NOT_PUBLISHED);
-
+            $default_prices = [];
+            foreach ($model->default_prices as $val) {
+                $default_prices[] = (float) $val;
+            }
 
             $rooms_arr = [
                 'id' => (int) $room_id,
@@ -875,9 +880,9 @@ class ObjectController extends Controller
                 'balcony' => (int) $model->balcony,
                 'air_cond' => (int) $model->air_cond,
                 'kitchen' => (int) $model->kitchen,
-                'base_price' => (float) $model->base_price,
+                'base_price' => $model->default_prices ? (float)$model->default_prices[0] : 0,
                 'bed_types' => $bedTypes,
-
+                'default_prices' => $default_prices,
             ];
 
             $meiliRooms[] = $rooms_arr;
@@ -1057,6 +1062,11 @@ class ObjectController extends Controller
                 }
             }
 
+            $default_prices = [];
+            foreach ($model->default_prices as $val) {
+                $default_prices[] = (float) $val;
+            }
+
             // Update only the existing room data
             $room['room_title'] = $model->typeTitle($model->type_id);
             $room['guest_amount'] = (int) $model->guest_amount;
@@ -1066,7 +1076,8 @@ class ObjectController extends Controller
             $room['balcony'] = (int) $model->balcony;
             $room['air_cond'] = (int) $model->air_cond;
             $room['kitchen'] = (int) $model->kitchen;
-            $room['base_price'] = (float) $model->base_price;
+            $room['base_price']  = $model->default_prices ? (float)$model->default_prices[0] : 0;
+            $room['default_prices'] = $default_prices;
             $room['img'] = $model->img;
             //$room['images'] = $bind_model->getPictures();
             $room['bed_types'] = $bedTypes; // The processed bed_types in the required format
