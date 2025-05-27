@@ -120,6 +120,7 @@ class Objects extends \yii\db\ActiveRecord
 
             'city_en' => Yii::t('app', 'Город на английском'),
             'city_ky' => Yii::t('app', 'Город на кыргызском'),
+            'city_id' => Yii::t('app', 'Населенный пункт'),
 
             'address_en' => Yii::t('app', 'Адрес на английском'),
             'address_ky' => Yii::t('app', 'Адрес на кыргызском'),

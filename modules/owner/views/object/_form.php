@@ -69,7 +69,7 @@ $model->city_id = $model->city ? $model->city[0] : "";
                     }'),
                 ],
             ],
-        ])->label(Yii::t('app', 'Город или село'));
+        ]);
         ?>
 
         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес')]) ?>

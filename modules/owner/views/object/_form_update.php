@@ -168,7 +168,7 @@ use yii\web\JsExpression;
                     }'),
                 ],
             ],
-        ])->label(Yii::t('app', 'Город или село'));
+        ]);
         ?>
         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address]) ?>
         <div class="address_hint"><b>Пример:</b> Кыргызстан, Иссык-кульская область, город Чолпон-Ата, улица
