@@ -77,12 +77,12 @@ $model->city_id = $model->city ? $model->city[0] : "";
             Комсомольская 27.</div>
 
         <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
-        <div class="address_hint"><b>Пример:</b> Кыргызстан, Ыссык-Кол облусу, Чолпон-Ата шаары, Комсомольская 27
-            кочосу.</div>
-
-        <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
         <div class="address_hint"><b>Пример:</b> 27 Komsomolskaya street, Cholpon-Ata city, issyk-Kul region, Kyrgyz
             Republic</div>
+
+        <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
+        <div class="address_hint"><b>Пример:</b> Кыргызстан, Ыссык-Кол облусу, Чолпон-Ата шаары, Комсомольская 27
+            кочосу.</div>
 
 
     </div>
@@ -193,8 +193,8 @@ $model->city_id = $model->city ? $model->city[0] : "";
                     ],
                 ]) ?>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
-        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд'),'style'=>'width:150px']) ?>
-        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд'),'style'=>'width:150px']) ?>
+        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд'), 'style' => 'width:150px']) ?>
+        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд'), 'style' => 'width:150px']) ?>
 
         <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')]) ?>
         <?= $form->field($model, 'reception')->checkbox() ?>
@@ -342,7 +342,7 @@ $model->city_id = $model->city ? $model->city[0] : "";
         $('#objects-lat').val(placemark.geometry.getCoordinates()[0]);
         $('#objects-lon').val(placemark.geometry.getCoordinates()[1]);
     }
-    
+
 </script>
 
 <style>

@@ -45,8 +45,7 @@ use yii\web\JsExpression;
     $name_en = $name_list[1] ? $name_list[1] : "";
     $name_ky = $name_list[2] ? $name_list[2] : "";
 
-    $model->city_id = $model->city[0] ? $model->city[0] : "";
-
+    
     $address = $address_list[0] ? $address_list[0] : "";
     $address_en = $address_list[1] ? $address_list[1] : "";
     $address_ky = $address_list[2] ? $address_list[2] : "";
@@ -175,12 +174,14 @@ use yii\web\JsExpression;
             Комсомольская 27.</div>
 
         <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_en]) ?>
-        <div class="address_hint"><b>Пример:</b> Кыргызстан, Ыссык-Кол облусу, Чолпон-Ата шаары, Комсомольская 27
-            кочосу.</div>
-
-        <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
         <div class="address_hint"><b>Пример:</b> 27 Komsomolskaya street, Cholpon-Ata city, issyk-Kul region, Kyrgyz
             Republic</div>
+
+        <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
+
+
+        <div class="address_hint"><b>Пример:</b> Кыргызстан, Ыссык-Кол облусу, Чолпон-Ата шаары, Комсомольская 27
+            кочосу.</div>
 
 
         <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
@@ -201,11 +202,11 @@ use yii\web\JsExpression;
         </div>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true]) ?>
 
-        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд'),'style'=>'width:150px']) ?>
-        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд'),'style'=>'width:150px']) ?>
+        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд'), 'style' => 'width:150px']) ?>
+        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд'), 'style' => 'width:150px']) ?>
 
-        
-        
+
+
         <?= $form->field($model, 'reception')->checkbox() ?>
         <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')])->label(Yii::t('app', 'Общее количество комнат')); ?>
         <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
@@ -281,7 +282,7 @@ use yii\web\JsExpression;
 
 
     <?php ActiveForm::end(); ?>
-    
+
 
 </div>
 
