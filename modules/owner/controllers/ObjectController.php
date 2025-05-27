@@ -450,7 +450,8 @@ class ObjectController extends Controller
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
                     'general_room_count' => (int) $model->general_room_count,
-                    'status' => 0
+                    'status' => 0,
+                    'city_id'=>(int)$model->city_id
                 ];
 
                 if ($index->addDocuments($object_arr)) {
@@ -600,6 +601,7 @@ class ObjectController extends Controller
                     'type' => (int) $model->type,
                     'reception' => (int) $model->reception,
                     'city' => $model->city,
+                    'city_id'=>(int)$model->city_id,
                     'address' => $model->address,
                     'description' => $model->description,
                     'currency' => $model->currency,
