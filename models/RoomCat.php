@@ -152,7 +152,7 @@ class RoomCat extends \yii\db\ActiveRecord
                 'id' => $image->id,
                 'picture' => $picture,
                 'thumbnailPicture' => $img_url,
-                'orignal'=>Url::base().'/'.$original,
+                'orignal' => Url::base() . '/' . $original,
                 'isMain' => $image->isMain,
             ];
         }
@@ -167,7 +167,7 @@ class RoomCat extends \yii\db\ActiveRecord
     {
         return [
             [['similar_room_amount', 'area'], 'required'],
-            [['bed_types', 'guest_amount','default_prices'], 'safe'],
+            [['bed_types', 'guest_amount', 'default_prices'], 'safe'],
             [['guest_amount'], 'default', 'value' => 1],
             [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen', 'type_id'], 'integer'],
             [['area', 'base_price', 'title'], 'number'],
@@ -201,8 +201,10 @@ class RoomCat extends \yii\db\ActiveRecord
 
     public function typeList()
     {
-        return ArrayHelper::map(RoomType::find()->all(), 'id', 'title');
+        return ArrayHelper::map(Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_ROOM])->all(), 'id', 'title');
     }
+
+    
 
     public function typeTitle($id)
     {

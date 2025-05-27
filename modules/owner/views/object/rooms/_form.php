@@ -29,7 +29,7 @@ use yii\widgets\ActiveForm;
             ],
         ]); ?>
 
-        <?= $form->field($model, 'type_id')->dropDownList(items: $model->typeList())->label(Yii::t('app', 'Тип номера')) ?>
+        <?= $form->field($model, 'type_id')->dropDownList($model->typeList())->label(Yii::t('app', 'Тип номера')) ?>
 
 
         <div class="form-group">

@@ -441,18 +441,7 @@ class Objects extends \yii\db\ActiveRecord
 
     public static function objectTypeList()
     {
-        return [
-            self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
-            self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
-            self::OBJECT_TYPE_RESTBASE => 'База отдыха',
-            self::OBJECT_TYPE_BUNGALOW => 'Бунгало',
-            self::OBJECT_TYPE_BOUTIQUE_HOTEL => 'Бутик-отель',
-            self::OBJECT_TYPE_VILLA => 'Вилла',
-            self::OBJECT_TYPE_GLAMPING => 'Глэмпинг',
-            self::OBJECT_TYPE_GUESTHOUSE => 'Гостевой дом',
-            self::OBJECT_TYPE_RESIDENTIAL_PREMISES => 'Жилое помещение',
-        ];
-
+        return ArrayHelper::map(Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_OBJECT])->all(), 'id', 'title');
     }
 
 
