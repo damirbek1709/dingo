@@ -47,6 +47,27 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
 
+        <div style="font-size:11px;margin-bottom:15px">
+            <?= Yii::t('app', '"Пожалуйста укажите самую минимальную, базовую цену за номер при самом дешевом тарифе". По дизайну можно сделат так же, как и при загрузке документов.') ?>
+        </div>
+        <div id="default-prices-wrapper" style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-gap: 0 20px;">
+            <?php
+            $defaultPrices = is_array($model->default_prices) ? $model->default_prices : [];
+            $count = $model->guest_amount ?: 1;
+            for ($i = 0; $i < $count; $i++): ?>
+                <div class="form-group default-price-input">
+                    <?= Html::label("Цена за " . ($i + 1) . " гостя", "RoomCat_default_prices_$i", ['class' => 'form-label']) ?>
+                    <?= Html::textInput("RoomCat[default_prices][$i]", $defaultPrices[$i] ?? '', [
+                        'class' => 'form-input',
+                        'id' => "RoomCat_default_prices_$i",
+                        'required' => true,
+                        'oninvalid' => "this.setCustomValidity('Пожалуйста, укажите цену')",
+                        'oninput' => "this.setCustomValidity('')"
+                    ]) ?>
+                </div>
+            <?php endfor; ?>
+        </div>
+
         <div class="clear"></div>
 
         <?php //= $form->field($model, 'guest_amount')->textInput() ?>
@@ -65,23 +86,7 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
 
-        <div id="default-prices-wrapper" style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-gap: 0 20px;">
-            <?php
-            $defaultPrices = is_array($model->default_prices) ? $model->default_prices : [];
-            $count = $model->guest_amount ?: 1;
-            for ($i = 0; $i < $count; $i++): ?>
-                <div class="form-group default-price-input">
-                    <?= Html::label("Цена за " . ($i + 1) . " гостя", "RoomCat_default_prices_$i", ['class' => 'form-label']) ?>
-                    <?= Html::textInput("RoomCat[default_prices][$i]", $defaultPrices[$i] ?? '', [
-                        'class' => 'form-input',
-                        'id' => "RoomCat_default_prices_$i",
-                        'required' => true,
-                        'oninvalid' => "this.setCustomValidity('Пожалуйста, укажите цену')",
-                        'oninput' => "this.setCustomValidity('')"
-                    ]) ?>
-                </div>
-            <?php endfor; ?>
-        </div>
+        
         <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
         <?php echo $form->errorSummary($model); ?>
 

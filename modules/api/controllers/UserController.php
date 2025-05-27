@@ -172,7 +172,7 @@ class UserController extends BaseController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['delete-account'],
+                    'actions' => ['delete-account','edit-account'],
                     'roles' => ['@'],
                 ],
             ],
@@ -185,6 +185,7 @@ class UserController extends BaseController
                 'register' => ['POST'],
                 'check-confirmation-code' => ['POST'],
                 'delete-account' => ['POST'],
+                'edit-account' => ['POST'],
             ],
         ];
 
@@ -203,11 +204,28 @@ class UserController extends BaseController
         $user->confirmed_at = null;
         $user->username = "deleted_user";
         $user->email = "deleted_user";
+        $user->name = "Deleted User";
         $user->flags = User::FLAG_DELETED;
-        $bookings = Booking::findAll();
+        $booking = Booking::find()->where(['user_id' => Yii::$app->user->id , 'status'=>Booking::PAID_STATUS_PAID])->andWhere(['>', 'date_from', date('Y-m-d')])->one();
         if ($user->save(false)) {
-            $response["success"] = true;
             $response["message"] = Yii::t("app", "Удаление учётной записи прошло успешно");
+            if($booking){
+                $response["message"] = Yii::t("app", "Удаление учётной записи прошло успешно, но на вашем объекте действующая бронь, ");
+            }
+            $response["success"] = true;
+        }
+        return $response;
+    }
+
+    public function actionEditAccount()
+    {
+        $response["success"] = false;
+        $user = User::findOne(Yii::$app->user->id);
+        $name = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'name') ?? "";
+        $user->name = $name;
+        if ($user->save(false)) {
+            $response["message"] = Yii::t("app", "Изменения сохранены");
+            $response["success"] = true;
         }
         return $response;
     }

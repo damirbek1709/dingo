@@ -15,6 +15,10 @@ class User extends BaseUser
         $scenarios['create'][]   = 'search_data';
         $scenarios['update'][]   = 'search_data';
         $scenarios['register'][] = 'search_data';
+
+        $scenarios['create'][]   = 'name';
+        $scenarios['update'][]   = 'name';
+        $scenarios['register'][] = 'name';
         return $scenarios;
     }
 
@@ -25,6 +29,7 @@ class User extends BaseUser
         // add some rules
 
         $rules['search_dataSafe'] = ['search_data', 'safe'];
+        $rules['nameSafe'] = ['name', 'safe'];
         
         return $rules;
     }
