@@ -57,20 +57,19 @@ ModuleAsset::register($this);
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => [
-                
                 [
                     'label' => $user_string,
                     'options' => [
                         'class' => 'user-link-class'
                     ],
                     'items' => [
-                       ['label' => 'Панель управления', 'url' => ['/admin'], 'visible' => Yii::$app->user->can('admin')],
-                        [
-                            'label' => 'Аккаунт',
-                            'url' => ['/user/settings/account'],
-                            'visible' => !Yii::$app->user->isGuest,
+                       //['label' => 'Панель управления', 'url' => ['/admin'], 'visible' => Yii::$app->user->can('admin')],
+                        // [
+                        //     'label' => 'Аккаунт',
+                        //     'url' => ['/user/settings/account'],
+                        //     'visible' => !Yii::$app->user->isGuest,
 
-                        ],
+                        // ],
                         [
                             'label' => 'Выход',
                             'url' => ['/user/logout'],

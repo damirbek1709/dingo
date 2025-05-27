@@ -8,7 +8,7 @@ use yii\widgets\Pjax;
 <div class="owner-nav-cover row">
 
     <div class="owner-nav-item owner-nav-item-info">
-        <?= Html::a(Yii::t('app', 'Панель'), ['view', 'object_id' => '']); ?>
+        <?= Html::a(Yii::t('app', 'Панель'), '#'); ?>
     </div>
     <div class="owner-nav-item owner-nav-item-comfort">
         <?= Html::a(Yii::t('app', 'Пользователи'), ['/user/admin']); ?>

@@ -151,6 +151,7 @@ $config = [
                 'atelier' => 'site/atelier',
                 'clients' => 'site/clients',
                 'offer' => 'site/offer',
+                'admin' => 'admin/object',
                 'projects' => 'site/projects',
                 '<controller:\w+>/<id:\d+>' => '<controller>/view',
                 '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
