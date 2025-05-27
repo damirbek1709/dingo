@@ -47,6 +47,8 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
         <div class="clear" style="margin-top: 10px;display:inline-block"></div>
+        <div style="font-size:11px;margin-bottom:15px"><?=Yii::t('app','"Пожалуйста укажите самую минимальную, базовую цену за номер при самом дешевом тарифе". По дизайну можно сделат так же, как и при загрузке документов.')?></div>
+
         <div id="default-prices-wrapper" style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-gap: 0 20px;">
             <?php
             $defaultPrices = is_array($model->default_prices) ? $model->default_prices : [];
@@ -64,7 +66,7 @@ use yii\widgets\ActiveForm;
                 </div>
             <?php endfor; ?>
         </div>
-
+        
         <?php //= $form->field($model, 'guest_amount')->textInput() ?>
         <div class="terms_section">
             <?= $form->field($model, 'similar_room_amount')->textInput() ?>
