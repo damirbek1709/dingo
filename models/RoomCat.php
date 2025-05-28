@@ -204,14 +204,12 @@ class RoomCat extends \yii\db\ActiveRecord
         return ArrayHelper::map(Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_ROOM])->all(), 'id', 'title');
     }
 
-    
+
 
     public function typeTitle($id)
     {
-        $title = RoomType::findOne($id)->title ? RoomType::findOne($id)->title : '';
-        $title_en = RoomType::findOne($id)->title_en ? RoomType::findOne($id)->title_en : '';
-        $title_ky = RoomType::findOne($id)->title_ky ? RoomType::findOne($id)->title_ky : '';
-        return [$title, $title_en, $title_ky];
+        $result = Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_ROOM, 'id' => $id])->one();
+        return [$result->title, $result->title_en, $result->title_ky];
     }
 
     public function getWallpaper()
