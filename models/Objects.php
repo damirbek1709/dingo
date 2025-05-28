@@ -562,7 +562,7 @@ class Objects extends \yii\db\ActiveRecord
     public function objectTypeString()
     {
         $result = Vocabulary::findOne($this->type);
-        return $result->title;
+        return $result ? $result->title : "";
     }
 
 
