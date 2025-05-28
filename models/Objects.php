@@ -561,19 +561,8 @@ class Objects extends \yii\db\ActiveRecord
 
     public function objectTypeString()
     {
-        $arr = [
-            0 => '',
-            self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
-            self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
-            self::OBJECT_TYPE_RESTBASE => 'База отдыха',
-            self::OBJECT_TYPE_BUNGALOW => 'Бунгало',
-            self::OBJECT_TYPE_BOUTIQUE_HOTEL => 'Бутик-отель',
-            self::OBJECT_TYPE_VILLA => 'Вилла',
-            self::OBJECT_TYPE_GLAMPING => 'Глэмпинг',
-            self::OBJECT_TYPE_GUESTHOUSE => 'Гостевой дом',
-            self::OBJECT_TYPE_RESIDENTIAL_PREMISES => 'Жилое помещение',
-        ];
-        return $arr[$this->type];
+        $result = Vocabulary::findOne($this->type);
+        return $result->title;
     }
 
 
