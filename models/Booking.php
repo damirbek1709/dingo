@@ -292,8 +292,10 @@ class Booking extends \yii\db\ActiveRecord
                 $lang_index = 0;
         }
 
+        $roomData = [];
+
         if (array_key_exists('rooms', $object)) {
-            $roomData = [];
+            
             $tariffData = [];
             foreach ($object['rooms'] as $room) {
                 $roomData[$room['id']] = $room['room_title'][$lang_index];
