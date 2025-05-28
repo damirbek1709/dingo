@@ -155,11 +155,12 @@ class Tariff extends \yii\db\ActiveRecord
         return false;
     }
 
+    
+
     public function getMealTitle($id)
     {
         $result = Vocabulary::find()->where(['id' => $id])->one();
-        
-        return $result->title;
+        return ['label'=>$result->title, 'class'=>'included-breakfast'];
     }
 
     /**
