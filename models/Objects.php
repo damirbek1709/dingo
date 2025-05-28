@@ -142,7 +142,8 @@ class Objects extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function hostName($user_id){
+    public static function hostName($user_id)
+    {
         $user = User::findOne($user_id);
         return $user->name ? $user->name : "Имя не заполнено";
     }
@@ -455,18 +456,8 @@ class Objects extends \yii\db\ActiveRecord
 
     public static function typeString($id = 1)
     {
-        $arr = [
-            self::OBJECT_TYPE_APARTHOTEL => 'Апарт-отель',
-            self::OBJECT_TYPE_APARTMENTS => 'Апартаменты',
-            self::OBJECT_TYPE_RESTBASE => 'База отдыха',
-            self::OBJECT_TYPE_BUNGALOW => 'Бунгало',
-            self::OBJECT_TYPE_BOUTIQUE_HOTEL => 'Бутик-отель',
-            self::OBJECT_TYPE_VILLA => 'Вилла',
-            self::OBJECT_TYPE_GLAMPING => 'Глэмпинг',
-            self::OBJECT_TYPE_GUESTHOUSE => 'Гостевой дом',
-            self::OBJECT_TYPE_RESIDENTIAL_PREMISES => 'Жилое помещение',
-        ];
-        return $arr[$id];
+        $result = Vocabulary::find()->where(['id' => $id])->one();
+        return $result->title;
     }
 
     public static function objectList()
