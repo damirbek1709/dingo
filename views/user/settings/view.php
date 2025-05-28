@@ -81,7 +81,7 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
                 </div>
 
                 <div class="whatsapp">
-                    <?= Html::a('<i class="fa fa-whatsapp"></i>' . Yii::t('app', 'Связаться в WhatsApp'), '', ['class' => 'whatsapp-button']); ?>
+                    <?= Html::a('<i class="fa fa-whatsapp"></i>' . Yii::t('app', 'Связаться в WhatsApp'), 'https://wa.me/996500090708', ['class' => 'whatsapp-button','target'=>'_blank']); ?>
                 </div>
 
                 <div class="contact-section">
