@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 
     <div class="oblast_update">
         <?php $form = ActiveForm::begin([
-            'enableClientValidation' => false,
+            'enableClientValidation' => true,
             'enableAjaxValidation' => false,
             'options' => [
                 'enctype' => 'multipart/form-data',
@@ -29,7 +29,7 @@ use yii\widgets\ActiveForm;
             ],
         ]); ?>
 
-        <?= $form->field($model, 'type_id')->dropDownList(items: $model->typeList())->label(Yii::t('app', 'Тип номера')) ?>
+        <?= $form->field($model, 'type_id')->dropDownList($model->typeList())->label(Yii::t('app', 'Тип номера')) ?>
 
 
         <div class="form-group">
@@ -37,65 +37,39 @@ use yii\widgets\ActiveForm;
                 for="guest_amount_id"><?= Yii::t('app', 'Максимальное количество гостей') ?></label>
             <div class="increment-input" style="margin-top: 0;">
                 <button type="button" class="decrement decrease">-</button>
-                <?= Html::input('text', 'children', $model->guest_amount ? $model->guest_amount : 0, [
+                <?= Html::input('text', 'RoomCat[guest_amount]', $model->guest_amount ? $model->guest_amount : 1, [
                     'class' => 'form-control children-count',
                     'readonly' => true,
-                    'label' => 'Количество гостей'
+                    'label' => 'Количество гостей',
+                    //'name'=>'RoomCat[guest_amount]'
                 ]); ?>
                 <button type="button" class="increment increase">+</button>
             </div>
         </div>
-        <div class="clear"></div>
+        <div class="clear" style="margin-top: 10px;display:inline-block"></div>
+        <div style="font-size:11px;margin-bottom:15px"><?=Yii::t('app','"Пожалуйста укажите самую минимальную, базовую цену за номер при самом дешевом тарифе". По дизайну можно сделат так же, как и при загрузке документов.')?></div>
 
+        <div id="default-prices-wrapper" style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-gap: 0 20px;">
+            <?php
+            $defaultPrices = is_array($model->default_prices) ? $model->default_prices : [];
+            $count = $model->guest_amount ?: 1;
+            for ($i = 0; $i < $count; $i++): ?>
+                <div class="form-group default-price-input">
+                    <?= Html::label("Цена за " . ($i + 1) . " гостя", "RoomCat_default_prices_$i", ['class' => 'form-label']) ?>
+                    <?= Html::textInput("RoomCat[default_prices][$i]", $defaultPrices[$i] ?? '', [
+                        'class' => 'form-input',
+                        'id' => "RoomCat_default_prices_$i",
+                        'required' => true,
+                        'oninvalid' => "this.setCustomValidity('Пожалуйста, укажите цену')",
+                        'oninput' => "this.setCustomValidity('')"
+                    ]) ?>
+                </div>
+            <?php endfor; ?>
+        </div>
+        
         <?php //= $form->field($model, 'guest_amount')->textInput() ?>
         <div class="terms_section">
             <?= $form->field($model, 'similar_room_amount')->textInput() ?>
-        </div>
-
-        <div class="form-section form-group">
-            <div class="bed-type-row bed-types-grid">
-                <div>
-                    <label class="form-label"><?= Yii::t('app', 'Тип кровати') ?>
-                        <span class="required_star">*</span>
-                    </label>
-                </div>
-
-                <div>
-                    <label class="form-label"><?= Yii::t('app', 'Количество') ?>
-                        <span class="required_star">*</span>
-                    </label>
-                </div>
-
-
-                <?php foreach ($model->bedTypes() as $id => [$label, $info]): ?>
-                    <div class="checkbox-group checkbox-grid">
-                        <!-- Checkbox for bed type selection -->
-                        <?= $form->field($model, "bed_types[{$id}][checked]")->checkbox([
-                            'label' => false,
-                            'value' => 1,
-                            'uncheck' => 0,
-                            'data-id' => $id,
-                        ])->label(false) ?>
-                        <div>
-                            <?= $label[0] ?>
-                            <div class="bed-info"><?= $info ?></div>
-                        </div>
-                    </div>
-
-                    <div class="quantity-input">
-                        <button type="button" class="quantity-btn decrease" data-id="<?= $id ?>">−</button>
-                        <?= $form->field($model, "bed_types[{$id}][quantity]")->input('text', [
-                            'min' => 0,
-                            'value' => 0,
-                            'readonly' => true, // Initially disabled until checkbox is checked
-                            'class' => 'quantity-display',
-                            'id' => "quantity-{$id}", // Unique ID for each input
-                        ])->label(false); ?>
-
-                        <button type="button" class="quantity-btn increase" data-id="<?= $id ?>">+</button>
-                    </div>
-                <?php endforeach; ?>
-            </div>
         </div>
 
         <?= $form->field($model, 'area')->textInput() ?>
@@ -108,7 +82,8 @@ use yii\widgets\ActiveForm;
             </div>
         </div>
 
-        <?= $form->field($model, 'base_price')->textInput() ?>
+
+
         <?php echo $form->field($model, 'img')->hiddenInput()->label(false); ?>
         <?php echo $form->errorSummary($model); ?>
 
@@ -134,6 +109,7 @@ use yii\widgets\ActiveForm;
                 let value = parseInt(input.value);
                 if (value > 0) {
                     input.value = value - 1;
+                    updateDefaultPricesInputs(value - 1);
                 }
             });
         });
@@ -144,9 +120,51 @@ use yii\widgets\ActiveForm;
                 const input = this.previousElementSibling;
                 let value = parseInt(input.value);
                 input.value = value + 1;
+                updateDefaultPricesInputs(value + 1);
             });
         });
     });
+
+    function updatePriceFields() {
+        const guestCount = parseInt(guestInput.value) || 1;
+        // Очищаем контейнер
+        priceContainer.innerHTML = '';
+
+        // Создаем нужное количество полей
+        for (let i = 1; i <= guestCount; i++) {
+            const field = createPriceField(i);
+            priceContainer.appendChild(field);
+        }
+    }
+
+    function updateDefaultPricesInputs(count) {
+        let wrapper = $('#default-prices-wrapper');
+        let existingValues = [];
+
+        // Сохраняем текущие значения перед пересозданием
+        wrapper.find('input').each(function (index) {
+            existingValues[index] = $(this).val();
+        });
+
+        wrapper.empty();
+
+        for (let i = 0; i < count; i++) {
+            let value = existingValues[i] || ''; // Используем сохранённое значение или пустую строку
+
+            let inputHtml = `
+            <div class="form-group default-price-input">
+                <label class="form-label" for="RoomCat_default_prices_${i}">Цена за ${i + 1} гостя </label>
+                <input type="text" class="form-input"
+                    name="RoomCat[default_prices][${i}]"
+                    id="RoomCat_default_prices_${i}"
+                    required
+                    value="${value}"
+                    oninvalid="this.setCustomValidity('Пожалуйста, укажите цену')"
+                    oninput="this.setCustomValidity('')">
+            </div>`;
+            wrapper.append(inputHtml);
+        }
+    }
 
     document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(checkbox => {
         checkbox.addEventListener('change', function () {

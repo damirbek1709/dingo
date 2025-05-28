@@ -4,10 +4,15 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use vova07\imperavi\Widget;
+use kartik\editors\Summernote;
+use yii\widgets\MaskedInput;
+use yii\web\JsExpression;
+use kartik\select2\Select2;
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
-/** @var yii\widgets\ActiveForm $form */ ?>
+/** @var yii\widgets\ActiveForm $form */
+$model->city_id = $model->city ? $model->city[0] : "";
+?>
 
 
 <div class="col-md-6">
@@ -40,19 +45,41 @@ use vova07\imperavi\Widget;
             ]
         ) ?>
 
-        <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город')]) ?>
-        <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город английском')]) ?>
-        <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите город кыргызском')]) ?>
+        <?php echo $form->field($model, 'city_id')->widget(Select2::class, [
+            'options' => [
+                'placeholder' => 'Введите город или село...',
+                'class' => 'form-input'
+            ],
+            'pluginOptions' => [
+                'minimumInputLength' => 2,
+                'ajax' => [
+                    'url' => Url::to(['/site/search-regions']),
+                    'dataType' => 'json',
+                    'delay' => 250,
+                    'data' => new JsExpression('function(params) { return {q:params.term}; }'),
+                    'processResults' => new JsExpression('function (data) {
+                        return {
+                            results: $.map(data.results, function (item) {
+                                return {
+                                    id: item.id,
+                                    text: item.display // <- Make sure this goes into `text`
+                                };
+                            })
+                        };
+                    }'),
+                ],
+            ],
+        ]);
+        ?>
 
         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес')]) ?>
-        <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
-        <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
+        <div class="address_hint"><b>Пример:</b>Улица Комсомольская 27</div>
 
-        <?php
-        echo $form->field($model, 'description')->textarea();
-        echo $form->field($model, 'description_en')->textarea();
-        echo $form->field($model, 'description_ky')->textarea();
-        ?>
+        <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
+        <div class="address_hint"><b>Пример:</b> 27 Komsomolskaya street</div>
+
+        <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
+        <div class="address_hint"><b>Пример:</b> Комсомольская 27 кочосу.</div>
     </div>
 </div>
 
@@ -72,6 +99,21 @@ use vova07\imperavi\Widget;
         ?>
         <?= $form->field($model, 'lat')->hiddenInput(['maxlength' => true, 'value' => $lat])->label(false) ?>
         <?= $form->field($model, 'lon')->hiddenInput(['maxlength' => true, 'value' => $lon])->label(false); ?>
+    </div>
+</div>
+
+<div class="col-md-12">
+    <div class="row">
+        <?php
+        echo $form->field($model, 'description')->widget(Summernote::class, [
+            'useKrajeePresets' => true,
+        ]);
+        echo $form->field($model, 'description_en')->widget(Summernote::class, [
+            'useKrajeePresets' => true,
+        ]);
+        echo $form->field($model, 'description_ky')->widget(Summernote::class, [
+            'useKrajeePresets' => true,
+        ]); ?>
     </div>
 </div>
 
@@ -129,10 +171,26 @@ use vova07\imperavi\Widget;
 <div class="col-md-6">
     <div class="row">
         <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'phone')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Номер телефона')]) ?>
+        <?= $form->field($model, 'phone', [
+            'template' => '
+        <label class="control-label" for="phone">{label}</label>
+        <div class="input-group">
+            <span class="input-group-text">+996</span>
+            {input}
+        </div>
+        {error}
+    '
+        ])->widget(MaskedInput::class, [
+                    'mask' => '999 99 99 99',
+                    'options' => [
+                        'class' => 'form-input',
+                        'placeholder' => '___ __ __ __',
+                    ],
+                ]) ?>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Сайт')]) ?>
-        <?= $form->field($model, 'check_in')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Заезд')]) ?>
-        <?= $form->field($model, 'check_out')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Выезд')]) ?>
+        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд'), 'style' => 'width:150px']) ?>
+        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд'), 'style' => 'width:150px']) ?>
+
         <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')]) ?>
         <?= $form->field($model, 'reception')->checkbox() ?>
 
@@ -148,6 +206,7 @@ use vova07\imperavi\Widget;
         <?php ActiveForm::end(); ?>
     </div>
 </div>
+
 
 
 
@@ -278,6 +337,7 @@ use vova07\imperavi\Widget;
         $('#objects-lat').val(placemark.geometry.getCoordinates()[0]);
         $('#objects-lon').val(placemark.geometry.getCoordinates()[1]);
     }
+
 </script>
 
 <style>
@@ -353,5 +413,170 @@ use vova07\imperavi\Widget;
         font-size: 20px;
         line-height: 24px;
         letter-spacing: 0px;
+    }
+
+    .select2-selection {
+        border-radius: 20px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .address_hint {
+        margin-bottom: 30px;
+        margin-top: -20px;
+    }
+
+    .time-input-container {
+        max-width: 300px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+    }
+
+    .time-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .time-scroll-container {
+        position: relative;
+        width: 60px;
+        height: 120px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+        transition: border-color 0.3s ease;
+    }
+
+    .time-scroll-container:hover {
+        border-color: #007acc;
+    }
+
+    .time-scroll-container:focus-within {
+        border-color: #007acc;
+        box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.1);
+    }
+
+    .time-scroll {
+        height: 100%;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+        scroll-snap-type: y mandatory;
+        padding: 40px 0;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .time-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .time-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .time-scroll::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 2px;
+    }
+
+    .time-scroll::-webkit-scrollbar-thumb:hover {
+        background: #999;
+    }
+
+    .time-option {
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 500;
+        color: #666;
+        cursor: pointer;
+        scroll-snap-align: center;
+        transition: all 0.2s ease;
+        user-select: none;
+    }
+
+    .time-option:hover {
+        background: #f0f8ff;
+        color: #007acc;
+    }
+
+    .time-option.selected {
+        color: #007acc;
+        font-weight: 600;
+        background: #f0f8ff;
+        transform: scale(1.05);
+    }
+
+    .time-separator {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+        margin: 0 5px;
+    }
+
+    .time-label {
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 14px;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .selected-time {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        padding: 12px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .time-scroll-container::before,
+    .time-scroll-container::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 40px;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .time-scroll-container::before {
+        top: 0;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), transparent);
+    }
+
+    .time-scroll-container::after {
+        bottom: 0;
+        background: linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent);
+    }
+
+    @media (max-width: 480px) {
+        .time-input-container {
+            margin: 0 10px;
+            padding: 15px;
+        }
+
+        .time-scroll-container {
+            width: 50px;
+            height: 100px;
+        }
+
+        .time-option {
+            height: 35px;
+            font-size: 14px;
+        }
     }
 </style>

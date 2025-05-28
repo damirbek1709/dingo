@@ -11,122 +11,125 @@ use yii\widgets\ActiveForm;
 /** @var app\models\BookingSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = Yii::t('app', 'Bookings');
-//$this->params['breadcrumbs'][] = $this->title;
+$this->title = Yii::t('app', 'Бронирования');
+$this->params['breadcrumbs'][] = ['label' => 'Назад к списку', 'url' => ['/admin']];
+$this->params['breadcrumbs'][] = ['label' => $object['name'][0], 'url' => ['/admin/object/view','object_id'=>$object_id]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="col-md-12">
 
-    <div class="oblast-update">
-        <?= $this->render('top_nav', ['object_id' => $object_id]) ?>
-        <div class="search-filter-bar">
-            <?php $form = ActiveForm::begin([
-                'action' => ['booking/index', 'object_id' => $object_id],
-                'method' => 'get',
-                'options' => ['class' => 'search-filter-form'],
-            ]); ?>
-            <div class="search-box">
-                <?= Html::textInput('guest_name', $guest_name, [
-                    'placeholder' => 'Поиск по имени гостя',
-                    'class' => 'guest-input'
-                ]) ?>
-                <button type="submit" class="search-icon"></button>
-            </div>
-            <?php $form->end(); ?>
 
-            <div class="status-tabs">
-                <button
-                    class="future_active"><?= Html::a(Yii::t('app', 'Предстоящие'), ['/owner/booking', 'object_id' => $object_id, 'status' => 'future']) ?></button>
-                <button
-                    class="cancel_active"><?= Html::a(Yii::t('app', 'Отмененные'), ['/owner/booking', 'object_id' => $object_id, 'status' => 'canceled']) ?></button>
-                <button
-                    class="past_active"><?= Html::a(Yii::t('app', 'Завершенные'), ['/owner/booking', 'object_id' => $object_id, 'status' => 'past']) ?></button>
-                <button
-                    class="all_active"><?= Html::a(Yii::t('app', 'Все'), ['/owner/booking/index', 'object_id' => $object_id]) ?></button>
-            </div>
+<div class="oblast-update">
+    <?= $this->render('top_nav', ['object_id' => $object_id]) ?>
 
-            <button class="filter-button" id="open-filters">
-                <?= Yii::t('app', 'Фильтры') ?>
-            </button>
+
+    <div class="search-filter-bar">
+        <?php $form = ActiveForm::begin([
+            'action' => ['booking/index', 'object_id' => $object_id],
+            'method' => 'get',
+            'options' => ['class' => 'search-filter-form'],
+        ]); ?>
+        <div class="search-box">
+            <?= Html::textInput('guest_name', $guest_name, [
+                'placeholder' => 'Поиск по имени гостя',
+                'class' => 'guest-input'
+            ]) ?>
+            <button type="submit" class="search-icon"></button>
+        </div>
+        <?php $form->end(); ?>
+
+        <div class="status-tabs">
+            <button
+                class="future_active"><?= Html::a(Yii::t('app', 'Предстоящие'), ['/owner/booking', 'object_id' => $object_id, 'status' => 'future']) ?></button>
+            <button
+                class="cancel_active"><?= Html::a(Yii::t('app', 'Отмененные'), ['/owner/booking', 'object_id' => $object_id, 'status' => 'canceled']) ?></button>
+            <button
+                class="past_active"><?= Html::a(Yii::t('app', 'Завершенные'), ['/owner/booking', 'object_id' => $object_id, 'status' => 'past']) ?></button>
+            <button
+                class="all_active"><?= Html::a(Yii::t('app', 'Все'), ['/owner/booking/index', 'object_id' => $object_id]) ?></button>
         </div>
 
-        <div class="booking-index">
-            <?= GridView::widget([
-                'dataProvider' => $dataProvider,
-                //'filterModel' => $searchModel,
-                'summary' => false,
-                'columns' => [
-                    'guest_name',
-                    [
-                        'attribute' => 'date_from',
-                        'value' => function ($model) {
-                        return $model->dateFormat($model->date_from);
-                    }
-                    ],
-                    [
-                        'attribute' => 'date_to',
-                        'value' => function ($model) {
-                        return $model->dateFormat($model->date_to);
-                    }
-                    ],
-                    [
-                        'attribute' => 'room_id',
-                        'value' => function ($model) {
-                        return $model->bookingRoomTitle();
-                    }
-                    ],
-                    [
-                        'attribute' => 'object_id',
-                        'value' => function ($model) {
-                        return $model->bookingObjectTitle();
-                    }
-                    ],
-                    [
-                        'attribute' => 'tariff_id',
-                        'value' => function ($model) {
-                        return $model->bookingTariffTitle();
-                    }
-                    ],
-                    'special_comment',
-                    [
-                        'attribute' => 'created_at',
-                        'value' => function ($model) {
-                        return $model->dateFormat($model->created_at);
-                    }
-                    ],
-                    [
-                        'attribute' => 'sum',
-                        'value' => function ($model) {
-                        return $model->sum . " " . $model->currency;
-                    }
-                    ],
-                    [
-                        'attribute' => 'status',
-                        'value' => function ($model) {
-                        return $model->bookingStatusString();
-                    }
-                    ],
-                    //'guest_email:email',
-                    //'guest_phone',
-                    //'guest_name',
-                    //'date_from',
-                    //
-                    //'status',
-                    //'other_guests',
-                    //'cancellation_type',
-                    //'cancellation_penalty_sum',
-                    //'user_id',
-                    //'special_comment',
-                    [
-                        'class' => ActionColumn::className(),
-                        'template' => '{view}',
-                        'urlCreator' => function ($action, Booking $model, $key, $index, $column) {
-                        return Url::toRoute([$action, 'id' => $model->id]);
-                    }
-                    ],
+        <button class="filter-button" id="open-filters">
+            <?= Yii::t('app', 'Фильтры') ?>
+        </button>
+    </div>
+
+    <div class="booking-index">
+        <?= GridView::widget([
+            'dataProvider' => $dataProvider,
+            //'filterModel' => $searchModel,
+            'summary' => false,
+            'columns' => [
+                'guest_name',
+                [
+                    'attribute' => 'date_from',
+                    'value' => function ($model) {
+                    return $model->dateFormat($model->date_from);
+                }
                 ],
-            ]); ?>
+                [
+                    'attribute' => 'date_to',
+                    'value' => function ($model) {
+                    return $model->dateFormat($model->date_to);
+                }
+                ],
+                [
+                    'attribute' => 'room_id',
+                    'value' => function ($model) {
+                    return $model->bookingRoomTitle();
+                }
+                ],
+                [
+                    'attribute' => 'object_id',
+                    'value' => function ($model) {
+                    return $model->bookingObjectTitle();
+                }
+                ],
+                [
+                    'attribute' => 'tariff_id',
+                    'value' => function ($model) {
+                    return $model->bookingTariffTitle();
+                }
+                ],
+                'special_comment',
+                [
+                    'attribute' => 'created_at',
+                    'value' => function ($model) {
+                    return $model->dateFormat($model->created_at);
+                }
+                ],
+                [
+                    'attribute' => 'sum',
+                    'value' => function ($model) {
+                    return $model->sum . " " . $model->currency;
+                }
+                ],
+                [
+                    'attribute' => 'status',
+                    'value' => function ($model) {
+                    return $model->bookingStatusString();
+                }
+                ],
+                //'guest_email:email',
+                //'guest_phone',
+                //'guest_name',
+                //'date_from',
+                //
+                //'status',
+                //'other_guests',
+                //'cancellation_type',
+                //'cancellation_penalty_sum',
+                //'user_id',
+                //'special_comment',
+                [
+                    'class' => ActionColumn::className(),
+                    'template' => '{view}',
+                    'urlCreator' => function ($action, Booking $model, $key, $index, $column) {
+                    return Url::toRoute([$action, 'id' => $model->id]);
+                }
+                ],
+            ],
+        ]); ?>
 
-        </div>
     </div>
 </div>
 

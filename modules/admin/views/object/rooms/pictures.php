@@ -17,7 +17,8 @@ use yii\widgets\ActiveForm;
         'options' => [
             'enctype' => 'multipart/form-data'
         ]
-    ]); ?>
+    ]);
+    ?>
     <div class="col-md-12">
         <div class="back_link">
             <?= Html::a(Yii::t('app', 'К списку номеров'), ['room-list', 'object_id' => $object_id]) ?>
@@ -29,7 +30,7 @@ use yii\widgets\ActiveForm;
 
             <div class="col-md-9">
                 <div class="card">
-                    <h1 class="general_title"><?= $title ?></h1>
+                    <h1 class="general_title"><?= $title[0] ?></h1>
                     <div class="drop-zone" id="drop-zone">
                         <div class="drop-icon"></div>
                         <div class="drop-text-top">Нажмите или перетащите файл в эту область для загрузки</div>
@@ -44,63 +45,30 @@ use yii\widgets\ActiveForm;
                     </div>
 
                     <div class="preview-container" id="preview-container">
-                        <?php if ($model->getImages()): ?>
-                            <?php foreach ($model->getImages() as $index => $image): ?>
-                                <?php if ($image && method_exists($image, 'getUrl')): ?>
-                                    <div class="preview<?= $index === 0 ? ' main' : '' ?>">
+                        <?php
+                        if ($picture_list): ?>
+                            <?php foreach ($picture_list as $index => $image): ?>
+                                <?php if ($image): ?>
+                                    <div class="preview<?= $index === 0 ? ' main' : '' ?>" id="<?= $image->id; ?>">
                                         <?php if ($index === 0): ?>
                                             <div class="main-label"><?= Yii::t('app', 'Главная') ?></div>
                                         <?php else: ?>
-                                            <button class="make-main" type="button" onclick="makeMain(this.parentElement)"
-                                                id="<?= $image->id ?>">
+                                            <span class="make-main" type="button"
+                                                onclick="makeMain(this.parentElement, <?= $image->id ?>)" id="<?= $image->id ?>">
                                                 <?= Yii::t('app', 'Сделать главной') ?>
-                                            </button>
+                                            </span>
+
+                                            <span class="remove_photo" type="button" image_id="<?= $image->id ?>">
+                                                <span class="remove_icon"></span>
+                                            </span>
                                         <?php endif; ?>
 
-                                        <?= Html::img($image->getUrl('300x200')) ?>
+                                        <?= Html::img($image->getUrl('300x200'), ['image_id' => $image->id]) ?>
                                     </div>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </div>
-                    <?php
-
-                    // $initial_preview = $model->imagesPreview();
-                    // $images = $model->getImages();
-                    
-                    // echo $form->field($model, 'images[]')->widget(
-                    //     \kartik\file\FileInput::class,
-                    //     [
-                    //         'options' => ['accept' => 'image/*', 'multiple' => 'true'],
-                    //         'pluginOptions' => [
-                    //             'previewFileType' => 'image',
-                    //             'initialPreview' => $initial_preview,
-                    //             'initialPreviewConfig' => array_map(function ($image) use ($model) {
-                    //                 return [
-                    //                     'url' => Url::to(['object/remove-room-image', 'image_id' => $image->id, 'model' => 'RoomCat', 'model_id' => $model->id]),
-                    //                     'key' => $image->id,
-                    //                     'extra' => [
-                    //                         'main' => $image->id,
-                    //                     ],
-                    //                 ];
-                    //             }, $images),
-                    //             'overwriteInitial' => false,
-                    //             'initialPreviewAsData' => true,
-                    //             'initialPreviewFileType' => 'image',
-                    //             'initialPreviewShowDelete' => true,
-                    //             'showRemove' => false,
-                    //             'showUpload' => false,
-                    //             'otherActionButtons' => '
-                    //             <button type="button" class="kv-cust-btn img-main btn btn-sm" title="Set as main">
-                    //                 <i class="glyphicon glyphicon-ok"></i>
-                    //             </button>
-                    //             ',
-                    //             'fileActionSettings' => [
-                    //                 'showZoom' => false,
-                    //             ],
-                    //         ],
-                    //     ]
-                    // ); ?>
 
                     <div class="form-group">
                         <?= Html::submitButton(Yii::t('app', 'Сохранить'), ['class' => 'save-button']) ?>
@@ -115,15 +83,6 @@ use yii\widgets\ActiveForm;
 </div>
 
 <script>
-    var mainImgIdField = $('#roomcat-img');
-    $('body').on('click', '.img-main', function () {
-        var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
-        mainImgIdField.val(imgId);
-        $('.file-preview-thumbnails .file-preview-frame').removeClass('main');
-        $('.img-main').removeClass('main');
-        $(this).addClass('main');
-    });
-
 
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
@@ -163,6 +122,7 @@ use yii\widgets\ActiveForm;
                     const button = document.createElement('button');
                     button.className = 'make-main';
                     button.textContent = 'Сделать главной';
+                    button.type = 'button'; // <- Add this line
                     button.onclick = () => makeMain(div);
                     div.appendChild(button);
                 }

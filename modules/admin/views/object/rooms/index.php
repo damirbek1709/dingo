@@ -16,11 +16,15 @@ $this->title = Yii::t('app', 'Список номеров');
 // $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Объекты'), 'url' => ['object/view', 'id' => $object_id]];
 // $this->params['breadcrumbs'][] = ['label' => $object_title, 'url' => ['view', 'id' => $object_id]];
 // $this->params['breadcrumbs'][] = $this->title;
+
+$this->params['breadcrumbs'][] = ['label' => 'Назад к списку', 'url' => ['/admin']];
+$this->params['breadcrumbs'][] = ['label' => $model['name'][0], 'url' => ['view','object_id'=>$object_id]];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <link href="<?= Url::base() ?>/modules/owner/assets/css/room.css" rel="stylesheet">
 <div class="oblast-update">
     <!-- <h1><?php //echo Html::encode($object_title) ?></h1> -->
-    <?php echo $this->render('../top_nav', ['model' => $model]); ?>
+    <?php echo $this->render('../top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
 
     <div class="clear">
         <div class="card">
@@ -33,9 +37,7 @@ $this->title = Yii::t('app', 'Список номеров');
                             class="button button-secondary"><?= Html::a(Yii::t('app', 'Тарифы'), ['tariff-list', 'object_id' => $model->id]) ?></button>
                     </div>
                 </div>
-                <div style="float:right">
-                    <?= Html::a(Yii::t('app', '+ Добавить номер'), ['add-room', 'object_id' => $object_id], ['class' => 'add-room-btn']) ?>
-                </div>
+                
             </div>
 
             <?php
@@ -46,9 +48,21 @@ $this->title = Yii::t('app', 'Список номеров');
                 ?>
                 <div class="room_list clear">
                     <div class="room-card">
-                        <?php echo Html::a(Html::img($bind_model->getImage()->getUrl('120x150'), ['alt' => "Room Image"]), ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?>
+                        <?php
+                        if ($bind_model) {
+                            echo Html::a(Html::img($bind_model->getImage()->getUrl('120x150'), ['alt' => "Room Image"]), ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]);
+
+                        } else {
+                            if (array_key_exists('images', $val)) {
+                                if (array_key_exists('thumbnailPicture', $$val['images'])) {
+                                    echo Html::a($val['images']['thumbnailPicture'], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]);
+                                }
+                            }
+
+                        } ?>
                         <div class="room-card-details">
-                            <h3><?= Html::a($val['room_title'],['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?></h3>
+                            <h3><?= Html::a($val['room_title'][0], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?>
+                            </h3>
                             <div class="room-info">
                                 <span class="room-area">
                                     <span><?= $val['area'] ?> м2</span>
@@ -57,10 +71,11 @@ $this->title = Yii::t('app', 'Список номеров');
                                 <span class="room_guest_amount"><?= $val['guest_amount'] ?>
                                     <?= Yii::t('app', 'взрослых') ?>
                                 </span>
-
-                                <span class="room_bed_type"><?= $val['bed_types'][0]['title'] ?>
-                                    (<?= $val['bed_types'][0]['quantity'] ?>)
-                                </span>
+                                <?php if (array_key_exists('bed_types', $val) && array_key_exists('0', $val['bed_types'])): ?>
+                                    <!-- <span class="room_bed_type"><?php //echo $val['bed_types'][0]['title'] ?>
+                                        (<?php //echo $val['bed_types'][0]['quantity'] ?>)
+                                    </span> -->
+                                <?php endif; ?>
                                 <div class="room-card-options">
                                     <button class="options-btn"></button>
                                     <div class="options-menu">
@@ -109,12 +124,6 @@ $this->title = Yii::t('app', 'Список номеров');
         </div>
     </div>
 </div>
-
-<script>
-</script>
-
-
-
 <script>
     $(document).ready(function () {
         // When any of the options button is clicked, toggle its corresponding menu
@@ -136,9 +145,6 @@ $this->title = Yii::t('app', 'Список номеров');
             }
         });
 
-
-
-
         $('.dropdown-btn').on('click', function () {
             $(this).parent().toggleClass('active');
         });
@@ -151,35 +157,40 @@ $this->title = Yii::t('app', 'Список номеров');
         });
 
 
-        $('.tariff-bind').on('change', function () {
-            var tariffId = $(this).val();  // Get the tariff ID
-            var room_id = $(this).attr('room_id');
-            var isChecked = $(this).prop('checked');  // Check if the checkbox is checked
-            var object_id = $(this).attr('object_id');  // Check if the checkbox is checked
+        let debounce = false;
 
-            // Send AJAX request to the backend
+        $('.tariff-bind').on('change', function () {
+            if (debounce) return;
+            debounce = true;
+
+            const checkbox = $(this);
+            const tariffId = checkbox.val();
+            const room_id = checkbox.attr('room_id');
+            const object_id = checkbox.attr('object_id');
+            const isChecked = checkbox.prop('checked') ? 'true' : 'false';
+
             $.ajax({
-                url: "<?= Yii::$app->urlManager->createUrl('/owner/tariff/bind-tariff') ?>", // Your action URL
+                url: "<?= Yii::$app->urlManager->createUrl('/owner/tariff/bind-tariff') ?>",
                 type: 'POST',
                 data: {
-                    tariff_id: tariffId,  // Send the tariff ID
+                    tariff_id: tariffId,
                     checked: isChecked,
-                    room_id: room_id,   // Send the checked state
-                    object_id: object_id,   // Send the checked state
-                    _csrf: $('meta[name="csrf-token"]').attr('content')  // CSRF token for security (if needed)
+                    room_id: room_id,
+                    object_id: object_id,
+                    _csrf: $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function (response) {
-                    if (response.success) {
-                        console.log('Tariff successfully updated');
-                    } else {
-                        console.log('Failed to update tariff');
-                    }
+                    console.log(response.success ? 'Tariff successfully updated' : 'Failed to update tariff');
                 },
                 error: function (xhr, status, error) {
                     console.log('AJAX error: ' + status + ' ' + error);
+                },
+                complete: function () {
+                    debounce = false;
                 }
             });
         });
+
     });
 
 </script>

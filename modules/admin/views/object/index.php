@@ -97,7 +97,7 @@ use yii\widgets\Pjax;
                             'template' => '{view}',
                             'buttons' => [
                                 'view' => function ($url, $model) {
-                                                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['/owner/object/view', 'object_id' => $model['id']], [
+                                                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['/admin/object/view', 'object_id' => $model['id']], [
                                                         'title' => Yii::t('app', 'View'),
                                                     ]);
                                                 },

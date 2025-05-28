@@ -20,11 +20,11 @@ use yii\widgets\ActiveForm;
     ]); ?>
     <div class="col-md-12">
         <div class="back_link">
-            <?= Html::a(Yii::t('app', 'К списку номеров'), ['room-list', 'object_id' => $object_id]) ?>
+            <?= Html::a(Yii::t('app', 'К списку номеров'), ['room-list', 'object_id' => $object_id,'disabled'=>true]) ?>
         </div>
         <div class="row">
             <div class="col-md-3">
-                <?php echo $this->render('room_nav', ['room_id' => $room_id, 'object_id' => $object_id]); ?>
+                <?php echo $this->render('room_nav', ['room_id' => $room_id, 'object_id' => $object_id,'disabled'=>true]); ?>
             </div>
 
             <div class="col-md-9">
@@ -47,36 +47,42 @@ use yii\widgets\ActiveForm;
                             <?php foreach ($model->bedTypes() as $id => [$label, $info]): ?>
                                 <div class="checkbox-group checkbox-grid">
                                     <!-- Checkbox for bed type selection -->
+                                    <?php
+                                    $value = 0;
+                                    $quantity_disabled = "disabled";
+                                    
+                                    ?>
                                     <?= $form->field($model, "bed_types[{$id}][checked]")->checkbox([
                                         'label' => false,
                                         'value' => 1,
                                         'uncheck' => 0,
                                         'data-id' => $id,
+                                        'class' => 'bed-types-checkbox',
+                                        'disabled'=>true
                                     ])->label(false) ?>
                                     <div>
-                                        <?= $label[0] ?>
-                                        <div class="bed-info"><?= $info ?></div>
+                                        <label for="roomcat-bed_types-<?= $id ?>-checked"><?= $label[0] ?></label>
+                                        <div class="bed-info">
+                                            <?= $label[1] ?>
+                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="quantity-input">
-                                    <button type="button" class="quantity-btn decrease" data-id="<?= $id ?>">−</button>
+                                <div class="quantity-input <?= $quantity_disabled; ?>" data-id="<?= $id ?>">
 
                                     <?= $form->field($model, "bed_types[{$id}][quantity]")->input('text', [
                                         'min' => 0,
+                                        'disabled' => $quantity_disabled,
                                         'value' => isset($model->bed_types[$id]) ? $model->bed_types[$id]['quantity'] : 0, // Prepopulate the quantity with saved value
                                         'readonly' => !isset($model->bed_types[$id]) || $model->bed_types[$id]['quantity'] == 0, // If quantity is 0 or not set, make it readonly
                                         'class' => 'quantity-display',
+                                        'data-id' => $id,
                                         'id' => "quantity-{$id}", // Unique ID for each input
                                     ])->label(false) ?>
-
-                                    <button type="button" class="quantity-btn increase" data-id="<?= $id ?>">+</button>
                                 </div>
                             <?php endforeach; ?>
                         </div>
-                        <div class="form-group">
-                            <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'save-button']) ?>
-                        </div>
+                        
 
                         <?php ActiveForm::end(); ?>
                     </div>
@@ -86,66 +92,6 @@ use yii\widgets\ActiveForm;
 
     </div>
 </div>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Get all increase/decrease buttons
-        const decreaseButtons = document.querySelectorAll('.decrease');
-        const increaseButtons = document.querySelectorAll('.increase');
-
-        // Add event listeners to decrease buttons
-        decreaseButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const input = this.nextElementSibling;
-                let value = parseInt(input.value);
-                if (value > 0) {
-                    input.value = value - 1;
-                }
-            });
-        });
-
-        // Add event listeners to increase buttons
-        increaseButtons.forEach(button => {
-            button.addEventListener('click', function () {
-                const input = this.previousElementSibling;
-                let value = parseInt(input.value);
-                input.value = value + 1;
-            });
-        });
-    });
-
-    document.querySelectorAll('.checkbox-group input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function () {
-            const id = this.dataset.id;
-            const quantityInput = document.querySelector(`#quantity-${id}`);
-
-            // Enable or disable the quantity input based on checkbox state
-            if (this.checked) {
-                quantityInput.removeAttribute('readonly');
-            } else {
-                quantityInput.setAttribute('readonly', 'true');
-                quantityInput.value = 0; // Reset quantity to 0 when unchecked
-            }
-        });
-    });
-
-    document.querySelectorAll('.quantity-btn').forEach(button => {
-        button.addEventListener('click', function () {
-            const id = this.dataset.id;
-            const quantityInput = document.querySelector(`#quantity-${id}`);
-            let currentValue = parseInt(quantityInput.value) || 0;
-
-            if (this.classList.contains('increase')) {
-                currentValue++;
-            } else if (this.classList.contains('decrease') && currentValue > 0) {
-                currentValue--;
-            }
-
-            quantityInput.value = currentValue; // Update the quantity field
-        });
-    });
-
-</script>
 
 <style>
     .main {

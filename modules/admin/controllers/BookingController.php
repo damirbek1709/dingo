@@ -39,6 +39,10 @@ class BookingController extends Controller
      */
     public function actionIndex($object_id, $status = null, $guest_name = "")
     {
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($object_id);
+
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
         $current_date = date('Y-m-d');
@@ -108,6 +112,7 @@ class BookingController extends Controller
             'date_from' => $date_from,
             'date_to' => $date_to,
             'date_book' => $date_book,
+            'object'=>$object
         ]);
     }
 

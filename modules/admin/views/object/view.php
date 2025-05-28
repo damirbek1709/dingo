@@ -3,19 +3,21 @@
 use yii\widgets\DetailView;
 use yii\helpers\Html;
 use app\models\Objects;
+use yii\web\NotFoundHttpException;
 /* @var $this yii\web\View */
 /* @var $model app\models\MeilisearchModel */
 
-$name_list = $model->name;
-$title = $name_list[0];
-$this->title = $title;
-// $this->params['breadcrumbs'][] = ['label' => 'Объекты', 'url' => ['index']];
-// $this->params['breadcrumbs'][] = $title;
+
+$title = $model->name;
+
+$this->title = $title[0];
+$this->params['breadcrumbs'][] = ['label' => 'Назад к списку', 'url' => ['/admin']];
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="oblast-update">
 
-    <?php echo $this->render('top_nav', ['model' => $model]); ?>
+    <?php echo $this->render('top_nav', ['model' => $model,'object_id'=>$object_id]); ?>
 
     <div class="col-md-12">
         <div class="row">
@@ -23,11 +25,13 @@ $this->title = $title;
                 <?php echo $this->render('nav', ['model' => $model]); ?>
             </div>
             <div class="col-md-9">
+
                 <div class="card">
+
                     <div class="header">
                         <div>
                             <div class="section-label">Название</div>
-                            <h2 class="section-value"><?= $title; ?></h2>
+                            <h2 class="section-value"><?= $title[0]; ?></h2>
                         </div>
                     </div>
 
@@ -94,7 +98,12 @@ $this->title = $title;
 
                             <div class="section">
                                 <div class="section-label"><?= Yii::t('app', 'Валюта') ?></div>
-                                <div class="section-value"><?= $model->currency; ?></div>
+                                <div class="section-value"><?= $model->currency ? $model->currency : 'KGS'; ?></div>
+                            </div>
+
+                            <div class="section">
+                                <div class="section-label"><?= Yii::t('app', 'Описание') ?></div>
+                                <div class="section-value"><?= Objects::attributeIndexed($model->description); ?></div>
                             </div>
 
                             <div class="section">
@@ -109,6 +118,25 @@ $this->title = $title;
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="section">
+                                <legend><?=Yii::t('app', 'Контактная информация')?></legend>
+                                <div class="check-in-out">
+                                    <div class="time-section">
+                                        <div class="section-label"><?= Yii::t('app', 'Контактный телефон') ?></div>
+                                        <div class="section-value"><?= $model->phone; ?></div>
+                                    </div>
+                                    <div class="time-section">
+                                        <div class="section-label"><?= Yii::t('app', 'E-mail') ?></div>
+                                        <div class="section-value"><?= $model->email ?></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="section">
+                                <div class="section-label"><?= Yii::t('app', 'Сайт объекта') ?></div>
+                                <div class="section-value"><?=$model->site; ?></div>
+                            </div>
                         </div>
                     </div>
 
@@ -116,20 +144,18 @@ $this->title = $title;
                         <div class="row" style="padding:0 0 0 15px">
                             <div class="photo-grid">
                                 <?php
-                                if (count($model->getImages()) > 1):
-                                    $counter = 0;
-                                    foreach ($model->getImages() as $image): ?>
-                                        <div class="photo-item">
-                                            <?php echo Html::img($image->getUrl('260x180'), ['class' => 'view-thumbnail-img']); ?>
-                                            <!-- <div class="main-photo-badge">Главная</div> -->
-                                        </div>
-                                        <?php
-                                        $counter++;
-                                        if ($counter >= 4) {
-                                            break;
-                                        }
-                                    endforeach;
-                                endif;
+                                $counter = 0;
+                                foreach ($model->getImages() as $image): ?>
+                                    <div class="photo-item">
+                                        <?php echo Html::img($image->getUrl('260x180'), ['class' => 'view-thumbnail-img']); ?>
+                                        <!-- <div class="main-photo-badge">Главная</div> -->
+                                    </div>
+                                    <?php
+                                    $counter++;
+                                    if ($counter >= 4) {
+                                        break;
+                                    }
+                                endforeach;
                                 ?>
                             </div>
                             <div class="photo-actions">

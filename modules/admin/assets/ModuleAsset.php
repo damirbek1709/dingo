@@ -21,8 +21,7 @@ class ModuleAsset extends AssetBundle
     public $css = [
         'css/main.css',
         'css/navbar.css',
-        'css/room.css',
-        'css/dingo.css',
+        'css/room.css'
     ];
     public $js = [
         'js/app.js',

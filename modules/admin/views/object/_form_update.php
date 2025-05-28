@@ -4,13 +4,17 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use vova07\imperavi\Widget;
-use dosamigos\fileupload\FileUploadUI;
+use yii\widgets\MaskedInput;
 use kartik\file\FileInput;
-
+use kartik\editors\Summernote;
+use kartik\select2\Select2;
+use yii\web\JsExpression;
 
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
 /** @var yii\widgets\ActiveForm $form */
+
+$cityName = $model->city ? $model->city[0] : "";
 ?>
 
 <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
@@ -18,7 +22,7 @@ use kartik\file\FileInput;
 <div class="oblast-form">
 
     <?php $form = ActiveForm::begin([
-        'enableClientValidation' => false,
+        'enableClientValidation' => true,
         'enableAjaxValidation' => false,
         'options' => [
             'enctype' => 'multipart/form-data',
@@ -33,7 +37,6 @@ use kartik\file\FileInput;
         ],
     ]);
     $name_list = $model->name;
-    $city_list = $model->city;
     $address_list = $model->address;
     $description_list = $model->description;
 
@@ -44,17 +47,14 @@ use kartik\file\FileInput;
     $name_en = $name_list[1] ? $name_list[1] : "";
     $name_ky = $name_list[2] ? $name_list[2] : "";
 
-    $city = $city_list[0] ? $city_list[0] : "";
-    $city_en = $city_list[1] ? $city_list[1] : "";
-    $city_ky = $city_list[2] ? $city_list[2] : "";
 
     $address = $address_list[0] ? $address_list[0] : "";
     $address_en = $address_list[1] ? $address_list[1] : "";
     $address_ky = $address_list[2] ? $address_list[2] : "";
 
-    $description = $description_list[0] ? $description_list[0] : "";
-    $description_en = $description_list[1] ? $description_list[1] : "";
-    $description_ky = $description_list[2] ? $description_list[2] : "";
+    $model->description = $description_list[0] ? $description_list[0] : "";
+    $model->description_en = $description_list[1] ? $description_list[1] : "";
+    $model->description_ky = $description_list[2] ? $description_list[2] : "";
     ?>
 
     <div class="col-md-6">
@@ -66,9 +66,24 @@ use kartik\file\FileInput;
 
         <div class="form-section document-upload">
             <h2 class="section-title">
-                Учредительные документы компании
-                <span class="info-icon">i</span>
+                <?= Yii::t('app', 'Учредительные документы компании') ?>
+                <div class="tooltip-container">
+                    <span class="info-icon"></span>
+                    <div class="tooltip">
+                        <?= Yii::t('app', 'Загрузите все документы подтверждающие статус юридического лица (патент, свидетельство, паспорт и тд)'); ?>
+                    </div>
+                </div>
             </h2>
+            <?php $ceo_docs = $model->getCeoDocs();
+            if ($ceo_docs) {
+                foreach ($ceo_docs as $doc) {
+                    echo Html::beginTag('div', ['class' => 'ceo_doc_cover']);
+                    echo Html::a($doc['name'], $doc['link'], ['class' => 'ceo_doc']);
+                    echo Html::tag('span', '', ['class' => 'doc_delete_icon', 'name' => $doc['name'], 'folder' => 'ceo']);
+                    echo Html::endTag('div');
+                }
+            }
+            ?>
             <?php
             echo $form->field($model, 'ceo_doc')->widget(FileInput::classname(), [
                 'options' => [],
@@ -91,9 +106,25 @@ use kartik\file\FileInput;
 
         <div class="form-section">
             <h2 class="section-title">
-                Банковские Реквизиты
-                <span class="info-icon">i</span>
+                <?= Yii::t('app', 'Банковские Реквизиты') ?>
+                <div class="tooltip-container">
+                    <span class="info-icon"></span>
+                    <div class="tooltip">
+                        <?= Yii::t('app', 'Загрузите ваши банковские данные для осуществления выплат на ваш счет'); ?>
+                    </div>
+                </div>
             </h2>
+            <?php $financial_docs = $model->getFinancialDocs();
+            if ($financial_docs) {
+                foreach ($financial_docs as $doc) {
+                    echo Html::beginTag('div', ['class' => 'ceo_doc_cover']);
+                    echo Html::a($doc['name'], $doc['link'], ['class' => 'ceo_doc']);
+                    echo Html::tag('span', '', ['class' => 'doc_delete_icon', 'name' => $doc['name'], 'folder' => 'financial']);
+                    echo Html::endTag('div');
+                }
+            }
+            ?>
+
             <?php
             echo $form->field($model, 'financial_doc')->widget(FileInput::classname(), [
                 'options' => [],
@@ -113,113 +144,71 @@ use kartik\file\FileInput;
             ?>
         </div>
 
-        <?= $form->field($model, 'city')->textInput(['maxlength' => true, 'value' => $city]) ?>
-        <?= $form->field($model, 'city_en')->textInput(['maxlength' => true, 'value' => $city_en]) ?>
-        <?= $form->field($model, 'city_ky')->textInput(['maxlength' => true, 'value' => $city_ky]) ?>
 
+        <?php
+
+        echo $form->field($model, 'city_id')->widget(Select2::class, [
+            'initValueText' => $cityName, // <-- This displays the selected value text
+            'options' => [
+                'placeholder' => 'Введите город или село...',
+                'class' => 'form-input',
+            ],
+            'pluginOptions' => [
+                'minimumInputLength' => 2,
+                'ajax' => [
+                    'url' => Url::to(['/site/search-regions']),
+                    'dataType' => 'json',
+                    'delay' => 250,
+                    'data' => new JsExpression('function(params) { return {q:params.term}; }'),
+                    'processResults' => new JsExpression('function (data) {
+                return {
+                    results: $.map(data.results, function (item) {
+                        return {
+                            id: item.id,
+                            text: item.display
+                        };
+                    })
+                };
+            }'),
+                ],
+            ],
+        ]);
+        ?>
         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'value' => $address]) ?>
+        <div class="address_hint"><b>Пример:</b>Комсомольская 27.</div>
+
         <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'value' => $address_en]) ?>
+        <div class="address_hint"><b>Пример:</b> 27 Komsomolskaya street</div>
+
         <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'value' => $address_ky]) ?>
-
-        <!-- <label class="form__container" id="upload-container">Choose or Drag & Drop Files
-        <?php //$form->field($model, 'images[]')->fileInput(['multiple' => true, 'accept' => 'image/*', 'class' => 'form__file']) ?>
-    </label>
-    <div class="form__files-container" id="files-list-container"></div> -->
-
-
+        <div class="address_hint"><b>Пример:</b> Комсомольская 27 кочосу.</div>
 
 
         <?php //= $form->field($model, 'features')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'phone')->textInput(['maxlength' => true]) ?>
+        <div class="form-group">
+            <label class="control-label" for="phone">Телефон</label>
+            <div class="input-group">
+                <span class="input-group-text">+996</span>
+                <?= MaskedInput::widget([
+                    'name' => 'Object[phone]',
+                    'value' => $model->phone,
+                    'mask' => '999 99 99 99',
+                    'options' => [
+                        'class' => 'form-input input-phone',
+                        'placeholder' => '___ __ __ __',
+                    ],
+                ]) ?>
+            </div>
+        </div>
         <?= $form->field($model, 'site')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'check_in')->textInput(['maxlength' => true]) ?>
-        <?= $form->field($model, 'check_out')->textInput(['maxlength' => true]) ?>
+
+        <?= $form->field($model, 'check_in')->input('time', ['placeholder' => Yii::t('app', 'Заезд'), 'style' => 'width:150px']) ?>
+        <?= $form->field($model, 'check_out')->input('time', ['placeholder' => Yii::t('app', 'Выезд'), 'style' => 'width:150px']) ?>
+
+
+
         <?= $form->field($model, 'reception')->checkbox() ?>
         <?= $form->field($model, 'general_room_count')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Общее количество комнат')])->label(Yii::t('app', 'Общее количество комнат')); ?>
-
-
-
-        <?php
-        // $model->description = $model->description[0];
-        // echo $form->field($model, 'description')->widget(
-        //     Widget::className(),
-        //     [
-        //         'settings' => [
-        //             'lang' => 'ru',
-        //             'minHeight' => 200,
-        //             'formatting' => ['p', 'blockquote', 'h2'],
-        //             'imageCaption' => true,
-        //             'imageUpload' => Url::to(['site/image-upload']),
-        //             'fileUpload' => Url::to(['site/file-upload']),
-        //             'plugins' => [
-        //                 'imagemanager',
-        //                 'filemanager',
-        //                 'clips',
-        //                 'fullscreen',
-        //                 'table',
-        //                 'fontsize',
-        //                 'fontcolor',
-        //                 'video',
-        //             ],
-        //         ],
-        //     ]
-        // ); ?>
-
-        <?php
-        echo $form->field($model, 'description')->textarea(['value' => $description]);
-        echo $form->field($model, 'description_en')->textarea(['value' => $description_en]);
-        echo $form->field($model, 'description_ky')->textarea(['value' => $description_ky]);
-
-        // $model->description_en = $model->description[1];
-        // echo $form->field($model, 'description_en')->widget(
-        //     Widget::className(),
-        //     [
-        //         'settings' => [
-        //             'lang' => 'ru',
-        //             'minHeight' => 200,
-        //             'formatting' => ['p', 'blockquote', 'h2'],
-        //             'imageCaption' => true,
-        //             'imageUpload' => Url::to(['site/image-upload']),
-        //             'fileUpload' => Url::to(['site/file-upload']),
-        //             'plugins' => [
-        //                 'imagemanager',
-        //                 'filemanager',
-        //                 'clips',
-        //                 'fullscreen',
-        //                 'table',
-        //                 'fontsize',
-        //                 'fontcolor',
-        //                 'video',
-        //             ]
-        //         ],
-        //     ]
-        // ); ?>
-
-        <?php
-        // $model->description_ky = $model->description[2];
-        // echo $form->field($model, 'description_ky')->widget(
-        //     Widget::className(),
-        //     [
-        //         'settings' => [
-        //             'lang' => 'ru',
-        //             'minHeight' => 200,
-        //             'formatting' => ['p', 'blockquote', 'h2'],
-        //             'imageCaption' => true,
-        //             'imageUpload' => Url::to(['site/image-upload']),
-        //             'fileUpload' => Url::to(['site/file-upload']),
-        //             'plugins' => [
-        //                 'imagemanager',
-        //                 'filemanager',
-        //                 'clips',
-        //                 'fullscreen',
-        //                 'table',
-        //                 'fontsize',
-        //                 'fontcolor',
-        //                 'video',
-        //             ]
-        //         ],
-        //     ]
-        // ); ?>
         <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
 
 
@@ -229,6 +218,20 @@ use kartik\file\FileInput;
         <div id="map" style="width: 100%; height: 400px;"></div>
     </div>
 
+
+
+    <div class="col-md-12">
+        <?php
+        echo $form->field($model, 'description')->widget(Summernote::class, [
+            'useKrajeePresets' => true,
+        ]);
+        echo $form->field($model, 'description_en')->widget(Summernote::class, [
+            'useKrajeePresets' => true,
+        ]);
+        echo $form->field($model, 'description_ky')->widget(Summernote::class, [
+            'useKrajeePresets' => true,
+        ]); ?>
+    </div>
     <div class="col-md-12">
         <?php
         $images = $model->getImages();
@@ -280,9 +283,11 @@ use kartik\file\FileInput;
 
     <?php ActiveForm::end(); ?>
 
+
 </div>
 
 <script>
+
     var mainImgIdField = $('#roomcat-img');
     $('body').on('click', '.img-main', function () {
         var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
@@ -291,7 +296,7 @@ use kartik\file\FileInput;
         $('.img-main').removeClass('main');
         $(this).addClass('main');
     });
-    
+
 
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
@@ -344,7 +349,7 @@ use kartik\file\FileInput;
         });
     }
 
-    $('.remove_photo').on('click',function() {
+    $('.remove_photo').on('click', function () {
         var image_id = $(this).attr('image_id');
         var object_id = "<?= $model->id ?>";
         var parent = $(this).parent();
@@ -359,7 +364,7 @@ use kartik\file\FileInput;
                 object_id: object_id,
                 _csrf: $('meta[name="csrf-token"]').attr('content')
             },
-            success: function(response) {
+            success: function (response) {
                 if (response == "true") {
                     parent.fadeOut();
                 }
@@ -368,7 +373,7 @@ use kartik\file\FileInput;
         });
     });
 
-    
+
     function makeMain(div, image_id) {
         const previewContainer = document.getElementById('preview-container');
 
@@ -473,5 +478,17 @@ use kartik\file\FileInput;
         margin-bottom: 20px;
         display: flex;
         align-items: center;
+    }
+
+    .select2-selection {
+        border-radius: 20px !important;
+        height: 40px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .address_hint {
+        margin-bottom: 30px;
+        margin-top: -20px;
     }
 </style>

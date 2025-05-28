@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 // $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенности');
 ?>
 <div class="oblast-update">
-<?php echo $this->render('top_nav', ['model' => $model]); ?>
+<?php echo $this->render('top_nav', ['model' => $model,'object_id'=>$object_id]); ?>
     <?php $form = ActiveForm::begin();
     $list_comfort = Objects::сomfortList();
     ?>
@@ -37,7 +37,7 @@ use yii\widgets\ActiveForm;
                             <div class="comfort_list_grid">
                                 <?php foreach ($comforts as $comfort): ?>
                                     <div class="comfort-item">
-                                        <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][selected]", isset($selectedComforts[$comfort->id]), ['value' => 1, 'id' => "comfort-{$categoryId}-{$comfort->id}"]) ?>
+                                        <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][selected]", isset($selectedComforts[$comfort->id]), ['disabled'=>true,'value' => 1, 'id' => "comfort-{$categoryId}-{$comfort->id}"]) ?>
                                         <label for="comfort-<?= $categoryId ?>-<?= $comfort->id ?>"><?= Html::encode($comfort->title) ?></label>
 
                                         <div class="toggle-switch-container">

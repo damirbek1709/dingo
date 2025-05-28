@@ -4,6 +4,7 @@ $params = require __DIR__ . '/params.php';
 $db = file_exists(__DIR__ . '/db-local.php') ?
     require(__DIR__ . '/db-local.php') : require(__DIR__ . '/db.php');
 
+
 $config = [
     'id' => 'basic',
     'language' => 'ru',
@@ -157,9 +158,11 @@ $config = [
                 '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
                 'owner/object/booking' => 'owner/booking',
+                'admin/object/booking' => 'admin/booking',
                 'user/edit-account' => 'user/settings/edit-profile',
                 'user/view-account' => 'user/settings/profile',
                 'user/delete-account' => 'user/settings/delete-account',
+                // Map /object/view to the view action inside owner module
             ],
         ],
     ],
