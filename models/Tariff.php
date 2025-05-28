@@ -157,12 +157,9 @@ class Tariff extends \yii\db\ActiveRecord
 
     public function getMealTitle($id)
     {
-        $arr = [
-            self::MEAL_TYPE_NO_BREAKFEST => ['label' => Yii::t('app', 'Без завтрака'), 'class' => 'no-breakfast'],
-            self::MEAL_TYPE_INCLUDED_BREAKFEST => ['label' => Yii::t('app', 'Завтрак включен'), 'class' => 'included-brekfast'],
-            self::MEAL_TYPE_THREE_TIMES => ['label' => Yii::t('app', 'Трехразовое питание'), 'class' => 'three_times_meal'],
-        ];
-        return $arr[$id];
+        $result = Vocabulary::find()->where(['id' => $id])->one();
+        
+        return $result->title;
     }
 
     /**
