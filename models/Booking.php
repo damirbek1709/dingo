@@ -173,8 +173,8 @@ class Booking extends \yii\db\ActiveRecord
         $arr['address'] = $result['address'];
         $arr['phone'] = $result['phone'];
         $arr['city'] = $result['city'];
-        $arr['totalPrice'] = $this->sum;
-        $arr['transaction_number'] = $this->transaction_number;
+        $arr['totalPrice'] = (float)$this->sum;
+        $arr['transaction_number'] = (int)$this->transaction_number;
 
         $arr['email'] = $result['email'];
         $arr['check_in'] = $result['check_in'];
