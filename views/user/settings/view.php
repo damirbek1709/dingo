@@ -67,8 +67,6 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
                                     <?= Html::a(Yii::t('app', 'Удалить аккаунт'), ['/user/delete-account'], ['class' => 'user-delete-btn', 'data-confirm' => Yii::t('app', 'Вы уверены что хотите удалить аккаунт?')]); ?>
                                 </div>
                             </div>
-
-
                         </div>
                     </div>
                 </div>
@@ -105,51 +103,29 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
                 </div>
 
                 <div class="policy-section">
-                    <button class="policy-header" onclick="togglePolicy(this)">
-                        <span class="policy-text">Политика конфиденциальности и обработки данных</span>
+                    <button class="policy-header">
+                        <span class="policy-text"><?=Html::a('Политика конфиденциальности и обработки данных',['/site/privacy'])?></span>
                         <div class="chevron-right"></div>
                     </button>
-                    <div class="policy-content">
-                        <div class="policy-content-inner">
-                            <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты информации о
-                                пользователях услуг сайта.</p>
-                            <p>Мы собираем только необходимую информацию для предоставления качественных услуг и
-                                обязуемся не передавать персональные данные третьим лицам без вашего согласия.</p>
-                            <p>Подробная информация о том, какие данные мы собираем, как их используем и защищаем,
-                                доступна в полной версии политики.</p>
-                        </div>
-                    </div>
+                    
                 </div>
 
                 <div class="policy-section">
-                    <button class="policy-header" onclick="togglePolicy(this)">
-                        <span class="policy-text">Политика возврата денежных средств</span>
+                    <button class="policy-header">
+                        <span class="policy-text"><?=Html::a('Политика бронирования, выплат и возврата денежных средств',['/site/return'])?></span>
                         <div class="chevron-right"></div>
                     </button>
-                    <div class="policy-content">
-                        <div class="policy-content-inner">
-                            <p>Мы стремимся обеспечить полное удовлетворение наших клиентов качеством предоставляемых
-                                услуг.</p>
-                            <p>В случае необходимости возврата денежных средств, заявка рассматривается в течение 3-5
-                                рабочих дней.</p>
-                            <p>Возврат осуществляется на тот же способ оплаты, который использовался при совершении
-                                платежа.</p>
-                            <ul style="margin-top: 10px; padding-left: 20px;">
-                                <li>Возврат в течение 14 дней - 100% от суммы</li>
-                                <li>Возврат в течение 30 дней - 70% от суммы</li>
-                                <li>После 30 дней - рассматривается индивидуально</li>
-                            </ul>
-                        </div>
-                    </div>
+                    
+                </div>
+
+                <div class="policy-section">
+                    <button class="policy-header">
+                        <span class="policy-text"><?=Html::a('Договор оферты',['/site/offer'])?></span>
+                        <div class="chevron-right"></div>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<script>
-    function togglePolicy(button) {
-        const policySection = button.parentElement;
-        policySection.classList.toggle('active');
-    }
-</script>

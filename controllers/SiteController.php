@@ -173,17 +173,20 @@ class SiteController extends Controller
     
     public function actionPrivacy()
     {
+        $this->layout = "general";
         return $this->render('page', ['id' => 1]);
     }
 
     public function actionReturn()
     {
-        return $this->render('page', ['id' => 3]);
+        $this->layout = "general";
+        return $this->render('page', ['id' => 2]);
     }
 
     public function actionOffer()
     {
-        return $this->render('page', ['id' => 4]);
+        $this->layout = "general";
+        return $this->render('page', ['id' => 3]);
     }
 
 
