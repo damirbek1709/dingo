@@ -32,9 +32,7 @@ class Page extends \yii\db\ActiveRecord
     {
         return [
             [['title', 'text'], 'required'],
-            [['title_en', 'text_en', 'title_ky', 'text_ky'], 'safe'],
-            [['text', 'text_en', 'text_ky'], 'string'],
-            [['title', 'title_en', 'title_ky'], 'string', 'max' => 255],
+            [['title'], 'string', 'max' => 255],
         ];
     }
 

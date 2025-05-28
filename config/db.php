@@ -7,4 +7,5 @@ $db_arr = [
     'password' => 'ctpwt4ZpXSsea[(k',
     'charset' => 'utf8mb4'
 ];
+
 return $db_arr;

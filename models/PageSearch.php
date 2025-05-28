@@ -18,7 +18,7 @@ class PageSearch extends Page
     {
         return [
             [['id'], 'integer'],
-            [['title', 'text', 'title_en', 'text_en', 'title_ky', 'text_ky'], 'safe'],
+            [['title', 'text'], 'safe'],
         ];
     }
 
@@ -62,11 +62,7 @@ class PageSearch extends Page
         ]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
-            ->andFilterWhere(['like', 'text', $this->text])
-            ->andFilterWhere(['like', 'title_en', $this->title_en])
-            ->andFilterWhere(['like', 'text_en', $this->text_en])
-            ->andFilterWhere(['like', 'title_ky', $this->title_ky])
-            ->andFilterWhere(['like', 'text_ky', $this->text_ky]);
+            ->andFilterWhere(['like', 'text', $this->text]);
 
         return $dataProvider;
     }

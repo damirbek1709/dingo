@@ -112,7 +112,7 @@ class Booking extends \yii\db\ActiveRecord
         if ($this->cancel_reason_id) {
             return $arr[$this->cancel_reason_id];
         }
-        return false;
+        return null;
 
     }
 
@@ -172,6 +172,10 @@ class Booking extends \yii\db\ActiveRecord
         $arr['image'] = $object->getImage()->getUrl('200x');
         $arr['address'] = $result['address'];
         $arr['phone'] = $result['phone'];
+        $arr['city'] = $result['city'];
+        $arr['totalPrice'] = $this->sum;
+        $arr['transaction_number'] = $this->transaction_number;
+
         $arr['email'] = $result['email'];
         $arr['check_in'] = $result['check_in'];
         $arr['check_out'] = $result['check_out'];

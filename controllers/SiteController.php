@@ -170,27 +170,22 @@ class SiteController extends Controller
         echo "</pre>";
     }
 
-    public function actionPayment()
+    
+    public function actionPrivacy()
     {
-        return $this->render('page', ['id' => 3]);
-    }
-
-    public function actionSelfPickup()
-    {
-        return $this->render('page', ['id' => 4]);
+        return $this->render('page', ['id' => 1]);
     }
 
     public function actionReturn()
     {
-        return $this->render('page', ['id' => 5]);
+        return $this->render('page', ['id' => 3]);
     }
 
-
-
-    public function actionClients()
+    public function actionOffer()
     {
-        return $this->render('page', ['id' => 8]);
+        return $this->render('page', ['id' => 4]);
     }
+
 
 
 

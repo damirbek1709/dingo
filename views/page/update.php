@@ -3,16 +3,16 @@
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
-/** @var app\models\Place $model */
+/** @var app\models\Page $model */
 
-$this->title = Yii::t('app', 'Update Place: {name}', [
-    'name' => $model->name,
+$this->title = Yii::t('app', 'Update Page: {name}', [
+    'name' => $model->title,
 ]);
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Places'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Pages'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->title, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
-<div class="place-update">
+<div class="page-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
