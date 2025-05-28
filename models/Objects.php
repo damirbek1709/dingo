@@ -457,7 +457,7 @@ class Objects extends \yii\db\ActiveRecord
     public static function typeString($id = 1)
     {
         $result = Vocabulary::find()->where(['id' => $id])->one();
-        return $result->title;
+        return $result ? $result->title : "";
     }
 
     public static function objectList()
