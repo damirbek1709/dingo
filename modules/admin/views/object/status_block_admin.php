@@ -18,6 +18,7 @@ use yii\widgets\Pjax;
         <div class="status-description">
             <?= $status_arr['description'] ?>
         </div>
+
         <div class="save-button moderate-button" style="width:100%"><?= Yii::t('app', 'Модерировать') ?></div>
 
     </div>
@@ -38,16 +39,32 @@ Modal::begin([
         отправьте объект на доработку.
     </div>
     <div class="row action-buttons">
-        <div class="col-md-6">
-            <button data-send="<?= Objects::STATUS_DENIED; ?>" data-status="<?= $model->status; ?>"
-                style="width:100%;font-size:13px" class="save-button moderate-button moderate-button-white">Отправить на
-                доработку</button>
-        </div>
 
-        <div class="col-md-6">
-            <button style="width:100%;font-size:14px" data-send="<?= Objects::STATUS_PUBLISHED; ?>"
-                class="save-button moderate-button"><?= Yii::t('app', 'Одобрить') ?></button>
-        </div>
+
+
+        <?php if ($model->status != Objects::STATUS_PUBLISHED): ?>
+            <div class="col-md-6">
+                <button data-send="<?= Objects::STATUS_DENIED; ?>" data-status="<?= $model->status; ?>"
+                    style="width:100%;font-size:13px"
+                    class="save-button moderate-call-button moderate-button-white">Отправить на
+                    доработку</button>
+            </div>
+            <div class="col-md-6">
+                <button style="width:100%;font-size:14px" data-send="<?= Objects::STATUS_PUBLISHED; ?>"
+                    class="save-button moderate-call-button"><?= Yii::t('app', 'Одобрить') ?></button>
+            </div>
+        <?php elseif ($model->status == Objects::STATUS_PUBLISHED): ?>
+            <div class="col-md-6">
+                <button data-send="<?= Objects::STATUS_NOT_PUBLISHED; ?>" data-status="<?= $model->status; ?>"
+                    style="width:100%;font-size:13px"
+                    class="save-button moderate-call-button moderate-button-white"><?= Yii::t('app', 'Снять с публикации') ?></button>
+            </div>
+            <div class="col-md-6">
+                <button style="width:100%;font-size:14px"
+                    class="save-button cancel-button"><?= Yii::t('app', 'Отмена') ?></button>
+            </div>
+
+        <?php endif; ?>
     </div>
 </div>
 
@@ -63,7 +80,7 @@ Modal::begin([
     var object_id = "<?= $model->id ?>";
     var html = $('.dialog-content').html();
 
-    $(document).on('click', '.moderate-button', function () {
+    $(document).on('click', '.moderate-call-button', function () {
         if (!$(this).hasClass('dismiss')) {
             var html = $('.dialog-content').html();
             var data_status = parseInt($(this).attr('data-send'));

@@ -40,7 +40,7 @@ use yii\widgets\Pjax;
                                             },
                             'label' => Yii::t('app', 'Название'),
                         ],
-                        
+
                         [
                             'attribute' => 'type',
                             'value' => function ($model) {
@@ -61,7 +61,7 @@ use yii\widgets\Pjax;
                         ],
 
                         [
-                            'label'=>'Имя хоста',
+                            'label' => 'Имя хоста',
                             'attribute' => 'host_name',
                             'value' => function ($model) {
                                                 return Objects::hostName($model['user_id']);
@@ -95,24 +95,18 @@ use yii\widgets\Pjax;
                         [
                             'class' => 'yii\grid\ActionColumn',
                             'template' => '{view}',
+                            'header' => 'Действие',
                             'buttons' => [
                                 'view' => function ($url, $model) {
-                                                    return Html::a('<span class="glyphicon glyphicon-eye-open"></span>', ['/admin/object/view', 'object_id' => $model['id']], [
-                                                        'title' => Yii::t('app', 'View'),
+                                                    $string = "Просмотр";
+                                                    if ($model['status'] == Objects::STATUS_ON_MODERATION) {
+                                                        $string = "Модерация";
+                                                    }
+                                                    return Html::a($string, ['/admin/object/view', 'object_id' => $model['id']], [
+                                                        'class' => 'table_action_button',
+                                                        'title' => Yii::t('app', $string),
                                                     ]);
                                                 },
-                                // 'update' => function ($url, $model) {
-                                //                 return Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['update', 'id' => $model['id']], [
-                                //                     'title' => Yii::t('app', 'Update'),
-                                //                 ]);
-                                //             },
-                                // 'delete' => function ($url, $model) {
-                                //                 return Html::a('<span class="glyphicon glyphicon-trash"></span>', ['delete', 'id' => $model['id']], [
-                                //                     'title' => Yii::t('app', 'Delete'),
-                                //                     'data-confirm' => Yii::t('app', 'Are you sure you want to delete this item?'),
-                                //                     'data-method' => 'post',
-                                //                 ]);
-                                //             },
                             ]
                         ],
 
@@ -156,6 +150,13 @@ use yii\widgets\Pjax;
         color: green;
         cursor: pointer;
         font-weight: bold;
+    }
+
+    .table_action_button {
+        border: 1px solid #333;
+        color: #333;
+        border-radius: 4px;
+        padding: 1px 6px;
     }
 
     .deny::before {

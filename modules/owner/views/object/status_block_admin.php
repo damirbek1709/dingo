@@ -144,7 +144,7 @@ Modal::begin([
     });
 
     $('#statusModal').on('hide.bs.modal', function (e) {
-        $('.dialog-content').html(html);
+        //$('.dialog-content').html(html);
         $.pjax.reload({ container: '#moderation-status-block' });
     });
 

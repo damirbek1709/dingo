@@ -347,7 +347,6 @@ class Objects extends \yii\db\ActiveRecord
         $arr = [
             self::STATUS_NOT_PUBLISHED => [
                 'label' => Yii::t('app', 'Не опубликовано'),
-                'title' => Yii::t('app', 'Не опубликовано'),
                 'description' => Yii::t('app', 'Заполните информацию об объекте, номерах, тарифах и ценах, чтобы опубликовать'),
                 'color' => '#232323',
                 'html' => '<div>
@@ -397,12 +396,20 @@ class Objects extends \yii\db\ActiveRecord
             ],
             self::STATUS_DENIED => [
                 'label' => Yii::t('app', 'Отклонено'),
-                'title' => Yii::t('app', 'Отклонено'),
                 'description' => Yii::t('app', 'Объект не прошёл модерацию. Необходимо внести правки и отправить повторно'),
                 'color' => '#F5222D',
                 'button_text' => Yii::t('app', 'Внести правки'),
                 'title' => Yii::t('app', 'Объект отклонён'),
-                'curren t_ status' => self::STATUS_DENIED,
+                'current_status' => self::STATUS_DENIED,
+                'html' => "<div> К  сожалению, объект не прошёл модерацию. Проверьте данные и внесите необходимые правки. После этого вы сможете отправить объект на повторную проверку.</div>",
+            ],
+            self::STATUS_DELETED => [
+                'label' => Yii::t('app', 'Снят с публикации'),
+                'description' => Yii::t('app', 'Объект был снят с публикации'),
+                'color' => '#F5222D',
+                'button_text' => Yii::t('app', 'Внести правки'),
+                'title' => Yii::t('app', 'Объект отклонён'),
+                'current_status' => self::STATUS_DELETED,
                 'html' => "<div> К  сожалению, объект не прошёл модерацию. Проверьте данные и внесите необходимые правки. После этого вы сможете отправить объект на повторную проверку.</div>",
             ]
         ];
