@@ -64,12 +64,12 @@ ModuleAsset::register($this);
                     ],
                     'items' => [
                        //['label' => 'Панель управления', 'url' => ['/admin'], 'visible' => Yii::$app->user->can('admin')],
-                        // [
-                        //     'label' => 'Аккаунт',
-                        //     'url' => ['/user/settings/account'],
-                        //     'visible' => !Yii::$app->user->isGuest,
+                        [
+                            'label' => 'Аккаунт',
+                            'url' => ['/user/view-account'],
+                            'visible' => !Yii::$app->user->isGuest,
 
-                        // ],
+                        ],
                         [
                             'label' => 'Выход',
                             'url' => ['/user/logout'],

@@ -10,6 +10,7 @@ use dektrium\user\models\LoginForm;
 use dektrium\user\models\User;
 class SecurityController extends BaseSecurityController
 {
+    public $layout;
     public function actionLogin()
     {
         if (!\Yii::$app->user->isGuest) {
@@ -26,7 +27,7 @@ class SecurityController extends BaseSecurityController
 
         if ($model->load(\Yii::$app->getRequest()->post()) && $model->login()) {
             $this->trigger(self::EVENT_AFTER_LOGIN, $event);
-            if(Yii::$app->user->can('admin')){
+            if (Yii::$app->user->can('admin')) {
                 return $this->redirect('/admin/object');
             }
             return $this->goHome();

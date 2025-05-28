@@ -12,13 +12,17 @@ class User extends BaseUser
     {
         $scenarios = parent::scenarios();
 
-        $scenarios['create'][]   = 'search_data';
-        $scenarios['update'][]   = 'search_data';
+        $scenarios['create'][] = 'search_data';
+        $scenarios['update'][] = 'search_data';
         $scenarios['register'][] = 'search_data';
 
-        $scenarios['create'][]   = 'name';
-        $scenarios['update'][]   = 'name';
+        $scenarios['create'][] = 'name';
+        $scenarios['update'][] = 'name';
         $scenarios['register'][] = 'name';
+
+        $scenarios['create'][] = 'phone';
+        $scenarios['update'][] = 'phone';
+        $scenarios['register'][] = 'phone';
         return $scenarios;
     }
 
@@ -30,8 +34,24 @@ class User extends BaseUser
 
         $rules['search_dataSafe'] = ['search_data', 'safe'];
         $rules['nameSafe'] = ['name', 'safe'];
-        
+        $rules['phoneSafe'] = ['phone', 'safe'];
         return $rules;
+    }
+
+    public function attributeLabels()
+    {
+        return [
+            'username' => \Yii::t('user', 'Username'),
+            'email' => \Yii::t('user', 'E-mail'),
+            'name' => \Yii::t('user', 'Имя и фамилия'),
+            'phone' => \Yii::t('user', 'Телефон'),
+            'registration_ip' => \Yii::t('user', 'Registration ip'),
+            'unconfirmed_email' => \Yii::t('user', 'New email'),
+            'password' => \Yii::t('user', 'Password'),
+            'created_at' => \Yii::t('user', 'Registration time'),
+            'last_login_at' => \Yii::t('user', 'Last login'),
+            'confirmed_at' => \Yii::t('user', 'Confirmation time'),
+        ];
     }
 
     public static function findIdentityByAccessToken($token, $type = null)

@@ -17,6 +17,7 @@ use app\models\WalletTransaction;
 
 class RegistrationController extends BaseRegistrationController
 {
+    public $layout;
     /** @inheritdoc */
     public function behaviors()
     {
@@ -143,6 +144,7 @@ class RegistrationController extends BaseRegistrationController
 
     public function actionSignin()
     {
+        //$this->layout = "//general";
         if (!$this->module->enableRegistration) {
             throw new NotFoundHttpException();
         }

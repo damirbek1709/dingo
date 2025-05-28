@@ -45,7 +45,7 @@ $config = [
                 'security' => 'app\controllers\user\SecurityController',
                 // 'admin' => 'app\controllers\user\AdminController',
                 // 'profile' => 'app\controllers\user\ProfileController',
-                // 'settings' => 'app\controllers\user\SettingsController',
+                'settings' => 'app\controllers\user\SettingsController',
             ],
             'urlRules' => [
                 '<id:\d+>' => 'profile/show',
@@ -157,6 +157,9 @@ $config = [
                 '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
                 '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
                 'owner/object/booking' => 'owner/booking',
+                'user/edit-account' => 'user/settings/edit-profile',
+                'user/view-account' => 'user/settings/profile',
+                'user/delete-account' => 'user/settings/delete-account',
             ],
         ],
     ],

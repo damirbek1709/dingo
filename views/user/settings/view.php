@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /** @var yii\web\View $this */
 /** @var app\models\Booking $model */
 
-$this->title = $model->id;
+$this->title = Yii::t('app', 'Мой профиль');
 \yii\web\YiiAsset::register($this);
 $roles = Yii::$app->authManager->getRolesByUser($model->id);
 ?>
@@ -56,7 +56,7 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
                                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                                     </svg>
-                                    <?= Html::a(Yii::t('app', 'Редактировать'), ['edit-profile'], ['class' => '']) ?>
+                                    <?= Html::a('Редактировать', ['/user/edit-account'], ['class' => '']) ?>
                                 </button>
                             </div>
 
@@ -64,7 +64,7 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
                             <div class="user-delete-block">
                                 <div>
                                     <?= Html::a(Yii::t('app', 'Выйти'), ['/user/logout'], ['class' => 'save-button logout-button', 'data-method' => 'POST']); ?>
-                                    <?= Html::a(Yii::t('app', 'Удалить аккаунт'), ['/user/delete'], ['class' => 'user-delete-btn']); ?>
+                                    <?= Html::a(Yii::t('app', 'Удалить аккаунт'), ['/user/delete-account'], ['class' => 'user-delete-btn', 'data-confirm' => Yii::t('app', 'Вы уверены что хотите удалить аккаунт?')]); ?>
                                 </div>
                             </div>
 
@@ -105,20 +105,51 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
                 </div>
 
                 <div class="policy-section">
-                    <div class="policy-item">
+                    <button class="policy-header" onclick="togglePolicy(this)">
                         <span class="policy-text">Политика конфиденциальности и обработки данных</span>
                         <div class="chevron-right"></div>
+                    </button>
+                    <div class="policy-content">
+                        <div class="policy-content-inner">
+                            <p>Настоящая Политика конфиденциальности определяет порядок обработки и защиты информации о
+                                пользователях услуг сайта.</p>
+                            <p>Мы собираем только необходимую информацию для предоставления качественных услуг и
+                                обязуемся не передавать персональные данные третьим лицам без вашего согласия.</p>
+                            <p>Подробная информация о том, какие данные мы собираем, как их используем и защищаем,
+                                доступна в полной версии политики.</p>
+                        </div>
                     </div>
                 </div>
 
                 <div class="policy-section">
-                    <div class="policy-item">
+                    <button class="policy-header" onclick="togglePolicy(this)">
                         <span class="policy-text">Политика возврата денежных средств</span>
                         <div class="chevron-right"></div>
+                    </button>
+                    <div class="policy-content">
+                        <div class="policy-content-inner">
+                            <p>Мы стремимся обеспечить полное удовлетворение наших клиентов качеством предоставляемых
+                                услуг.</p>
+                            <p>В случае необходимости возврата денежных средств, заявка рассматривается в течение 3-5
+                                рабочих дней.</p>
+                            <p>Возврат осуществляется на тот же способ оплаты, который использовался при совершении
+                                платежа.</p>
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>Возврат в течение 14 дней - 100% от суммы</li>
+                                <li>Возврат в течение 30 дней - 70% от суммы</li>
+                                <li>После 30 дней - рассматривается индивидуально</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    function togglePolicy(button) {
+        const policySection = button.parentElement;
+        policySection.classList.toggle('active');
+    }
+</script>
