@@ -40,6 +40,7 @@ use yii\widgets\Pjax;
                                             },
                             'label' => Yii::t('app', 'Название'),
                         ],
+                        
                         [
                             'attribute' => 'type',
                             'value' => function ($model) {
@@ -57,6 +58,14 @@ use yii\widgets\Pjax;
                                                 return $model['address'];
                                             },
                             'label' => Yii::t('app', 'Адрес'),
+                        ],
+
+                        [
+                            'label'=>'Имя хоста',
+                            'attribute' => 'host_name',
+                            'value' => function ($model) {
+                                                return Objects::hostName($model['user_id']);
+                                            },
                         ],
                         'email',
                         [

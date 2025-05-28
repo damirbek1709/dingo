@@ -1957,3 +1957,14 @@ a.logout-button:hover {
     box-sizing: border-box;
     margin-bottom: 25px;
 }
+.policy-text a{
+    color:#333;
+}
+.fa-whatsapp {
+    background-image: url(icons_2.svg);
+    background-repeat: no-repeat;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-position: 0px 0px;
+}

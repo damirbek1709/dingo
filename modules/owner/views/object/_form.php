@@ -73,18 +73,13 @@ $model->city_id = $model->city ? $model->city[0] : "";
         ?>
 
         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес')]) ?>
-        <div class="address_hint"><b>Пример:</b> Кыргызстан, Иссык-кульская область, город Чолпон-Ата, улица
-            Комсомольская 27.</div>
+        <div class="address_hint"><b>Пример:</b>Улица Комсомольская 27</div>
 
         <?= $form->field($model, 'address_en')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес английском')]) ?>
-        <div class="address_hint"><b>Пример:</b> 27 Komsomolskaya street, Cholpon-Ata city, issyk-Kul region, Kyrgyz
-            Republic</div>
+        <div class="address_hint"><b>Пример:</b> 27 Komsomolskaya street</div>
 
         <?= $form->field($model, 'address_ky')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес кыргызском')]) ?>
-        <div class="address_hint"><b>Пример:</b> Кыргызстан, Ыссык-Кол облусу, Чолпон-Ата шаары, Комсомольская 27
-            кочосу.</div>
-
-
+        <div class="address_hint"><b>Пример:</b> Комсомольская 27 кочосу.</div>
     </div>
 </div>
 

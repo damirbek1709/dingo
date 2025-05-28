@@ -7,6 +7,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\FileHelper;
 use yii\helpers\Url;
 use rico\yii2images\models\Image;
+use app\models\user\User;
 
 
 class Objects extends \yii\db\ActiveRecord
@@ -70,6 +71,8 @@ class Objects extends \yii\db\ActiveRecord
     public $from_price;
     public $phone_code;
 
+    public $host_name;
+
 
 
     const SEARCH_TYPE_CITY = 3;
@@ -102,7 +105,6 @@ class Objects extends \yii\db\ActiveRecord
             'address' => Yii::t('app', 'Адрес'),
             'currency' => Yii::t('app', 'Валюта'),
             'features' => Yii::t('app', 'Адрес'),
-            'phone' => Yii::t('app', 'Телефон'),
             'site' => Yii::t('app', 'Сайт'),
             'check_in' => Yii::t('app', 'Заезд'),
             'check_out' => Yii::t('app', 'Выезд'),
@@ -126,7 +128,8 @@ class Objects extends \yii\db\ActiveRecord
 
             'description_en' => Yii::t('app', 'Описание на английском'),
             'description_ky' => Yii::t('app', 'Описание на кыргызском'),
-            'general_room_count' => Yii::t('app', 'Общее количество комнат')
+            'general_room_count' => Yii::t('app', 'Общее количество комнат'),
+            'host_name' => Yii::t('app', 'Имя хоста'),
         ];
     }
 
@@ -137,6 +140,11 @@ class Objects extends \yii\db\ActiveRecord
                 'class' => 'rico\yii2images\behaviors\ImageBehave',
             ]
         ];
+    }
+
+    public static function hostName($user_id){
+        $user = User::findOne($user_id);
+        return $user->name ? $user->name : "Имя не заполнено";
     }
 
     public static function attributeIndexed($attr)
