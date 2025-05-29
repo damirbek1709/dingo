@@ -70,6 +70,7 @@ $this->title = Yii::t('app', 'Bookings');
                     ],
                     [
                         'attribute' => 'room_id',
+                        'format' => 'raw',
                         'value' => function ($model) {
                         $full = $model->bookingRoomTitle();
                         $cut = StringHelper::truncate($full, 20);
@@ -78,6 +79,7 @@ $this->title = Yii::t('app', 'Bookings');
                     ],
                     [
                         'attribute' => 'object_id',
+                        'format' => 'raw',
                         'value' => function ($model) {
                         $full = $model->bookingObjectTitle();
                         $cut = StringHelper::truncate($full, 20);
@@ -86,6 +88,7 @@ $this->title = Yii::t('app', 'Bookings');
                     ],
                     [
                         'attribute' => 'tariff_id',
+                        'format' => 'raw',
                         'value' => function ($model) {
                         $full = $model->bookingTariffTitle();
                         $cut = StringHelper::truncate($full, 20);
