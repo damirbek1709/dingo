@@ -45,39 +45,7 @@ class BookingController extends Controller
         $current_date = date('Y-m-d');
         $active = "all_active";
 
-        if ($guest_name) {
-            $dataProvider->query->andFilterWhere(['LIKE', 'guest_name', $guest_name]);
-        }
-
-        $room_id = Yii::$app->request->get('room_id') ? Yii::$app->request->get('room_id') : null;
-        if ($room_id) {
-            $dataProvider->query->andFilterWhere(['room_id' => $room_id]);
-        }
-
-        $tariff_id = Yii::$app->request->get('tariff_id') ? Yii::$app->request->get('tariff_id') : null;
-        if ($tariff_id) {
-            $dataProvider->query->andFilterWhere(['tariff_id' => $tariff_id]);
-        }
-
-        $date_from = Yii::$app->request->get('date_from') ? Yii::$app->request->get('date_from') : null;
-        if ($date_from) {
-            $dataProvider->query->andFilterWhere(['>=', 'date_from', $date_from]);
-        }
-
-        $date_to = Yii::$app->request->get('date_to') ? Yii::$app->request->get('date_to') : null;
-        if ($date_to) {
-            $dataProvider->query->andFilterWhere(['<=', 'date_to', $date_to]);
-        }
-
-        $date_book = Yii::$app->request->get('book_date') ? Yii::$app->request->get('book_date') : null;
-        if ($date_book) {
-            $dataProvider->query->andFilterWhere(['created_at' => $date_book]);
-        }
-
-        $status_arr = Yii::$app->request->get('status', []);
-        if ($status_arr) {
-            $dataProvider->query->andFilterWhere(['status' => $status_arr]);
-        }
+        
         if ($status) {
             switch ($status) {
                 case "future":
@@ -105,11 +73,7 @@ class BookingController extends Controller
             'object_id' => $object_id,
             'active' => $active,
             "guest_name" => $guest_name,
-            'room_id' => $room_id,
-            'tariff_id' => $tariff_id,
-            'date_from' => $date_from,
-            'date_to' => $date_to,
-            'date_book' => $date_book,
+            
         ]);
     }
 
