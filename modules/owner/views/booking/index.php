@@ -97,7 +97,9 @@ $this->title = Yii::t('app', 'Bookings');
                     ],
                     [
                         'attribute' => 'special_comment',
-                        'value' => $model->special_comment ? StringHelper::truncate($special_comment, 20) : "",
+                        'value' => function ($model) {
+                        return $model->special_comment ? StringHelper::truncate($model->special_comment, 20) : "";
+                    },
                         'format' => 'raw'
                     ],
                     'special_comment',
