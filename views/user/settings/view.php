@@ -104,38 +104,46 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
 
                 <div class="policy-section">
                     <button class="policy-header">
-                        <?= Html::beginTag('a', ['href' => '/site/privacy']) ?>
-                        <span class="policy-text">Политика конфиденциальности и обработки данных</span>
-                        <div class="chevron-right"></div>
-                        <?= Html::endTag('a') ?>
-                    </button>
-                </div>
-
-                <div class="policy-section">
-                    <button class="policy-header">
-                        <?= Html::beginTag('a', ['href' => '/site/return']) ?>
-                        <span class="policy-text">Политика бронирования, выплат и возврата денежных средств</span>
-                        <div class="chevron-right"></div>
-                        <?= Html::endTag('a') ?>
+                        <span class="policy-text">
+                            <?= Html::a('Политика конфиденциальности и обработки данных', ['/site/privacy']) ?>
+                        </span>
                     </button>
 
                 </div>
 
                 <div class="policy-section">
                     <button class="policy-header">
-                        <?= Html::beginTag('a', ['href' => '/site/offer']) ?>
-                        <span class="policy-text">Договор оферты</span>
-                        <div class="chevron-right"></div>
-                        <?= Html::endTag('a') ?>
+                        <span class="policy-text">
+                            <?= Html::a('Политика бронирования, выплат и возврата денежных средств', ['/site/return']) ?>
+                        </span>
+                    </button>
+
+                </div>
+
+                <div class="policy-section">
+                    <button class="policy-header">
+                        <span class="policy-text">
+                            <?= Html::a('Договор оферты', ['/site/offer']) ?>
+                        </span>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <style>
-    .policy-header a {
-        display: contents;
-        color: #333;
+    .policy-text a:after {
+        content: '';
+        width: 12px;
+        height: 12px;
+        border-right: 2px solid #999;
+        border-top: 2px solid #999;
+        transform: rotate(45deg);
+        margin-left: 12px;
+        transition: transform 0.3s ease;
+        float: right;
+        display: inline-block;
+        padding-left: 10px;
     }
 </style>
