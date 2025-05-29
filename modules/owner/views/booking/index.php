@@ -74,7 +74,7 @@ $this->title = Yii::t('app', 'Bookings');
                         'value' => function ($model) {
                         $full = $model->bookingRoomTitle();
                         $cut = StringHelper::truncate($full, 20);
-                        return "<span full='$full'>" . $cut . "</span>";
+                        return "<span class='grid_short' full='$full'>" . $cut . "</span>";
                     }
                     ],
                     [
@@ -83,7 +83,7 @@ $this->title = Yii::t('app', 'Bookings');
                         'value' => function ($model) {
                         $full = $model->bookingObjectTitle();
                         $cut = StringHelper::truncate($full, 20);
-                        return "<span full='$full'>" . $cut . "</span>";
+                        return "<span class='grid_short' full='$full'>" . $cut . "</span>";
                     }
                     ],
                     [
@@ -92,7 +92,7 @@ $this->title = Yii::t('app', 'Bookings');
                         'value' => function ($model) {
                         $full = $model->bookingTariffTitle();
                         $cut = StringHelper::truncate($full, 20);
-                        return "<span full='$full'>" . $cut . "</span>";
+                        return "<span class='grid_short' full='$full'>" . $cut . "</span>";
                     }
                     ],
                     [
@@ -100,7 +100,7 @@ $this->title = Yii::t('app', 'Bookings');
                         'value' => function ($model) {
                         $full = $model->special_comment;
                         $cut = $model->special_comment ? StringHelper::truncate($full, 20) : "";
-                        return "<span full='$full'>" . $cut . "</span>";
+                        return "<span class='grid_short' full='$full'>" . $cut . "</span>";
                     },
                         'format' => 'raw'
                     ],
@@ -244,7 +244,7 @@ $room_list = Booking::getRoomList($object_id);
 
 Modal::begin([
     'id' => 'booking-modal',
-    //'size' => 'modal-md',
+    'size' => 'modal-md',
     'header' => '<h2 class="modal-title">Параметры бронирования</h2>',
     'options' => ['class' => 'modal-2'],
 ]); ?>
@@ -885,6 +885,38 @@ Modal::begin([
 
     .send-button:active {
         transform: translateY(0);
+    }
+
+    .grid_short {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .grid_short::after {
+        content: attr(full);
+        position: absolute;
+        white-space: pre-wrap;
+        bottom: 125%;
+        /* Position above */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: #fff;
+        padding: 8px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        /* Bigger font */
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        z-index: 100;
+        width: max-content;
+        max-width: 300px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .grid_short:hover::after {
+        opacity: 1;
     }
 
     @media (max-width: 640px) {
