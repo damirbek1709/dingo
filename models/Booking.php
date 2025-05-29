@@ -173,14 +173,14 @@ class Booking extends \yii\db\ActiveRecord
         $arr['address'] = $result['address'];
         $arr['phone'] = $result['phone'];
         $arr['city'] = $result['city'];
-        $arr['totalPrice'] = (float)$this->sum;
-        $arr['transaction_number'] = (int)$this->transaction_number;
+        $arr['totalPrice'] = (float) $this->sum;
+        $arr['transaction_number'] = (int) $this->transaction_number;
 
         $arr['email'] = $result['email'];
         $arr['check_in'] = $result['check_in'];
         $arr['check_out'] = $result['check_out'];
         $arr['is_returnable'] = false;
-        $arr['other_guests']=$this->other_guests;
+        $arr['other_guests'] = $this->other_guests;
 
         $tariff_model = Tariff::findOne($this->tariff_id);
         $arr['terms'] = [];
@@ -210,8 +210,7 @@ class Booking extends \yii\db\ActiveRecord
                     $arr['is_returnable'] = false;
                     $arr['penalty_days'] = null;
                     $arr['penalty_percent'] = null;
-                }
-                 elseif ($this->cancel_reason_id == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
+                } elseif ($this->cancel_reason_id == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
                     $arr['penalty_days'] = $tariff_model->penalty_days;
                     $arr['penalty_percent'] = $tariff_model->penalty_sum;
                     // $current_date = date('Y-m-d');
@@ -232,7 +231,7 @@ class Booking extends \yii\db\ActiveRecord
                 }
             }
         }
-        
+
 
         return $arr;
     }
@@ -295,7 +294,7 @@ class Booking extends \yii\db\ActiveRecord
         $roomData = [];
 
         if (array_key_exists('rooms', $object)) {
-            
+
             $tariffData = [];
             foreach ($object['rooms'] as $room) {
                 $roomData[$room['id']] = $room['room_title'][$lang_index];
@@ -390,16 +389,22 @@ class Booking extends \yii\db\ActiveRecord
     public function bookingStatusString()
     {
         $string = Yii::t('app', 'Активный');
-        if ($this->status == self::PAID_STATUS_PAID) {
-            if ($this->date_from <= date('Y-m-d')) {
-                $string = Yii::t('app', 'Активный');
-            } elseif ($this->date_to > date('Y-m-d')) {
-                $string = Yii::t('app', 'Завершен');
-            }
-        } elseif ($this->status == self::PAID_STATUS_CANCELED) {
+
+        if ($this->date_from <= date('Y-m-d') && $this->date_to >= date('Y-m-d')) {
+            $string = Yii::t('app', 'Активный');
+        } 
+        
+        
+        elseif ($this->date_to < date('Y-m-d')) {
+            $string = Yii::t('app', 'Завершен');
+        }
+
+        elseif ($this->date_from > date('Y-m-d')){
+            $string = Yii::t('app', 'Предстоящий');
+        }
+
+        if ($this->status == self::PAID_STATUS_CANCELED) {
             $string = Yii::t('app', 'Отменен');
-        } elseif ($this->status == self::PAID_STATUS_CANCEL_INQUIRY) {
-            $string = Yii::t('app', 'Заявка на отмену брони');
         }
         return $string;
     }
