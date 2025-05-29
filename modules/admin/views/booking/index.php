@@ -106,7 +106,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'attribute' => 'status',
                     'value' => function ($model) {
-                    return $model->bookingStatusString();
+                    return $model->bookingStatusString()." ".$model->status;
                 }
                 ],
                 //'guest_email:email',
