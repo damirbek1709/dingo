@@ -101,8 +101,13 @@ $this->title = Yii::t('app', 'Bookings');
                     ],
                     [
                         'attribute' => 'status',
+                        'format' => 'raw',
                         'value' => function ($model) {
-                        return $model->bookingStatusString();
+                        $string = $model->bookingStatusString()["string"];
+                        $color = $model->bookingStatusString()["color"];
+                        return "<span style='color:{$color};border-radius:4px;padding:2px 4px;border:1px solid {$color};display:block;min-width:90px;text-align:center'>" . $string . "</span>";
+
+
                     }
                     ],
                     //'guest_email:email',
@@ -124,7 +129,12 @@ $this->title = Yii::t('app', 'Bookings');
                             'view' => function ($url, $model) {
                             return Html::tag('span', 'Подробнее', [
                                 'class' => 'table_action_button',
+                                'guest_amount' => $model->guestAmount(),
                                 'title' => Yii::t('app', 'Подробнее'),
+                                'transaction_number' => $model->transaction_number,
+                                'request-text' => $model->special_comment,
+                                'color' => $model->bookingStatusString()["color"],
+                                'status' => $model->bookingStatusString()["string"],
                             ]);
                         },
                         ]
@@ -236,9 +246,9 @@ Modal::begin([
 </div>
 <div class="booking-info">
     <div class="booking-info-item booking-info-head">Бронирование:</div>
-    <div class="booking-info-item">2х мест, стандарт</div>
-    <div class="booking-info-item">28 мая 2025 - 30 мая 2025</div>
-    <div class="booking-info-item">2 гостя, 1 ребенок</div>
+    <div class="booking-info-item booking-info-room">2х мест, стандарт</div>
+    <div class="booking-info-item booking-info-dates">28 мая 2025 - 30 мая 2025</div>
+    <div class="booking-info-item booking-info-guests">2 гостя, 1 ребенок</div>
 </div>
 
 <div class="booking-details">
@@ -249,22 +259,22 @@ Modal::begin([
 
     <div class="detail-row">
         <span class="detail-label">Стоимость</span>
-        <span class="detail-value">19 000 KGS</span>
+        <span class="detail-value detail-price">19 000 KGS</span>
     </div>
 
     <div class="detail-row">
         <span class="detail-label">Дата бронирования:</span>
-        <span class="detail-value">28 мая 2025</span>
+        <span class="detail-value detail-book-date">28 мая 2025</span>
     </div>
 
     <div class="detail-row">
         <span class="detail-label">№ Бронирования</span>
-        <span class="detail-value">123434574573</span>
+        <span class="detail-value detail-transaction-number">123434574573</span>
     </div>
 
     <div class="detail-row">
         <span class="detail-label">Тариф</span>
-        <span class="detail-value">Все включено</span>
+        <span class="detail-value detail-tariff">Все включено</span>
     </div>
 </div>
 
@@ -281,9 +291,10 @@ Modal::begin([
 <?php Modal::end(); ?>
 
 <style>
-    .booking-info-head{
-        color:rgba(0, 0, 0, 0.45)!important;
+    .booking-info-head {
+        color: rgba(0, 0, 0, 0.45) !important;
     }
+
     .search-filter-form {
         width: 100%;
     }
@@ -298,7 +309,7 @@ Modal::begin([
     }
 
     .modal-body {
-        padding: 0!important;
+        padding: 0 !important;
     }
 
     .search-box {
@@ -788,6 +799,30 @@ Modal::begin([
     });
 
     $(document).on('click', '.table_action_button', function () {
+        var name = $(this).parent().siblings().first().text();
+        var room = $(this).parent().siblings().eq(3).text();
+        var dates = $(this).parent().siblings().eq(1).text() + " - " + $(this).parent().siblings().eq(2).text();
+        var guests = $(this).attr('guest_amount') + " гостя";
+        var price = $(this).parent().siblings().eq(8).text();
+        var tariff = $(this).parent().siblings().eq(5).text();
+        var book_date = $(this).parent().siblings().eq(7).text();
+        var color = $(this).attr('color');
+        var status = $(this).attr('status');
+
+
+        $('.guest-name').text(name);
+        $('.booking-info-room').text(room);
+        $('.booking-info-dates').text(dates);
+        $('.booking-info-guests').text(guests);
+        $('.status-dialog-badge').css('color', color);
+        $('.status-dialog-badge').text(status);
+
+        $('.detail-transaction-number').text($(this).attr('transaction_number'));
+
+        $('.detail-price').text(price);
+        $('.detail-book-date').text(book_date);
+        $('.detail-tariff').text(tariff);
+        $('.request-text').text($(this).attr('request-text'));
         $('#booking-modal').modal('show');
     });
 

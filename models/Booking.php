@@ -389,23 +389,29 @@ class Booking extends \yii\db\ActiveRecord
     public function bookingStatusString()
     {
         $string = Yii::t('app', 'Активный');
+        $color = '#52c41a';
 
         if ($this->date_from <= date('Y-m-d') && $this->date_to >= date('Y-m-d')) {
             $string = Yii::t('app', 'Активный');
-        } 
-        
-        if ($this->date_to < date('Y-m-d')) {
-            $string = Yii::t('app', 'Завершен');
+            $color = '#52c41a';
         }
 
-        if ($this->date_from > date('Y-m-d')){
-            $string = Yii::t('app', 'Предстоящий');
+        if ($this->date_to < date('Y-m-d')) {
+            $string = Yii::t('app', 'Завершен');
+            $color = '#000000e0';
+        }
+
+        if ($this->date_from > date('Y-m-d')) {
+            $string = Yii::t('app', 'В ожидании');
+            $color = '#fa8c16';
+
         }
 
         if ($this->status == self::PAID_STATUS_CANCELED) {
             $string = Yii::t('app', 'Отменен');
+            $color = '#f5222d';
         }
-        return $string;
+        return ["string" => $string, "color" => $color];
     }
 
     public function dateFormat($date)
@@ -421,6 +427,21 @@ class Booking extends \yii\db\ActiveRecord
             'd MMMM yyyy' // Format: day full_month_name year
         );
         return $formatter->format(new DateTime($date));
+    }
+
+    public function guestAmount()
+    {
+        if (empty($this->other_guests) || trim($this->other_guests) === '') {
+            return 1;
+        }
+
+        // Split by comma and count non-empty names after trimming whitespace
+        $names = array_map('trim', explode(',', $this->other_guests));
+        $names = array_filter($names, function ($name) {
+            return !empty($name);
+        });
+
+        return count($names) + 1;
     }
 
 }
