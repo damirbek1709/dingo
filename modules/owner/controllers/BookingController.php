@@ -81,15 +81,15 @@ class BookingController extends Controller
         if ($status) {
             switch ($status) {
                 case "future":
-                    $dataProvider->query->andWhere(['>', 'date_from', $current_date]);
+                    $dataProvider->query->andFilterWhere(['>', 'date_from', $current_date]);
                     $active = "future_active";
                     break;
                 case "past":
-                    $dataProvider->query->andWhere(['<', 'date_to', $current_date]);
+                    $dataProvider->query->andFilterWhere(['<', 'date_to', $current_date]);
                     $active = "past_active";
                     break;
                 case "canceled":
-                    $dataProvider->query->andWhere(['status' => Booking::PAID_STATUS_CANCELED]);
+                    $dataProvider->query->andFilterWhere(['status' => Booking::PAID_STATUS_CANCELED]);
                     $active = "cancel_active";
                     break;
                 default:
