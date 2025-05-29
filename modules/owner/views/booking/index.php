@@ -124,7 +124,9 @@ $this->title = Yii::t('app', 'Bookings');
                                 'status' => $model->bookingStatusString()["string"],
                                 'cancel_text' => $model->cancelText(),
                                 'cancel_date' => $model->cancel_date ? $model->dateFormat($model->cancel_date) : "",
-                                'return_sum' => $model->sum - $model->cancellation_penalty_sum,
+                                'return_sum' => $model->sum - $model->cancellation_penalty_sum . " " . $model->currency,
+                                'penalty_sum' => $model->cancellation_penalty_sum . " " . $model->currency,
+                                'cancel_reason'=>$model->cancelReasonArray[0],
                             ]);
                         },
                         ]
@@ -261,6 +263,16 @@ Modal::begin([
         <div>
             <span class="detail-label">Сумма возврата:</span>
             <span class="detail-value detail-return-sum"></span>
+        </div>
+
+        <div>
+            <span class="detail-label">Сумма штрафа:</span>
+            <span class="detail-value detail-penalty-sum"></span>
+        </div>
+
+        <div>
+            <span class="detail-label">Причина отмены:</span>
+            <span class="detail-value detail-cancel-reason"></span>
         </div>
     </div>
 
@@ -410,6 +422,8 @@ Modal::begin([
             $('.cancel_case').css("display", "block");
             $('.detail-cancel-date').text($(this).attr('cancel_date'));
             $('.detail-return-sum').text($(this).attr('return_sum'));
+            $('.detail-penalty-sum').text($(this).attr('penalty_sum'));
+            $('.detail-cancel-reason').text($(this).attr('cancel_reason'));
         }
         else {
             $('.cancel_case').css("display", "none");
