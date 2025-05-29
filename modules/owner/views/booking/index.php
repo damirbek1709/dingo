@@ -254,12 +254,12 @@ Modal::begin([
 
     <div class="detail-row cancel_case" style="display:none">
         <div>
-            <span class="detail-label">Дата отмены</span>
+            <span class="detail-label">Дата отмены:</span>
             <span class="detail-value detail-cancel-date"></span>
         </div>
 
         <div>
-            <span class="detail-label">Сумма возврата</span>
+            <span class="detail-label">Сумма возврата:</span>
             <span class="detail-value detail-return-sum"></span>
         </div>
     </div>
@@ -411,7 +411,7 @@ Modal::begin([
             $('.detail-cancel-date').text($(this).attr('cancel_date'));
             $('.detail-return-sum').text($(this).attr('return_sum'));
         }
-        else{
+        else {
             $('.cancel_case').css("display", "none");
         }
         $('#booking-modal').modal('show');
@@ -522,6 +522,13 @@ Modal::begin([
         display: flex;
         align-items: center;
         gap: 6px;
+    }
+
+    .detail-row div {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
     }
 
 
