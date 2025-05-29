@@ -122,8 +122,9 @@ $this->title = Yii::t('app', 'Bookings');
                                 'request-text' => $model->special_comment,
                                 'color' => $model->bookingStatusString()["color"],
                                 'status' => $model->bookingStatusString()["string"],
-                                'cancel_text'=>$model->cancelText(),
-                                'cancel_date'=>$model->cancel_date ? $model->cancel_date : "",
+                                'cancel_text' => $model->cancelText(),
+                                'cancel_date' => $model->cancel_date ? $model->dateFormat($model->cancel_date) : "",
+                                'return_sum' => $model->sum - $model->cancellation_penalty_sum,
                             ]);
                         },
                         ]
@@ -252,8 +253,15 @@ Modal::begin([
     </div>
 
     <div class="detail-row cancel_case" style="display:none">
-        <span class="detail-label">Дата отмены</span>
-        <span class="detail-value detail-cancel-date"></span>
+        <div>
+            <span class="detail-label">Дата отмены</span>
+            <span class="detail-value detail-cancel-date"></span>
+        </div>
+
+        <div>
+            <span class="detail-label">Сумма возврата</span>
+            <span class="detail-value detail-return-sum"></span>
+        </div>
     </div>
 
     <div class="detail-row">
@@ -283,6 +291,150 @@ Modal::begin([
 <div style="clear: both;"></div>
 
 <?php Modal::end(); ?>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#open-filters').on('click', function () {
+            $('#filterDrawer').addClass('open');
+        });
+
+        $('#closeFilters').on('click', function () {
+            $('#filterDrawer').removeClass('open');
+        });
+
+        $('.status-tags button').on('click', function () {
+            $(this).toggleClass('active');
+        });
+
+        $('#room-select').on('change', function () {
+            let roomId = $(this).val();
+            let objectId = $(this).data('object');
+
+            if (roomId) {
+                $('#tariff-select').attr('disabled', false);
+                $.ajax({
+                    url: "<?= Yii::$app->urlManager->createUrl('/owner/booking/get-tariffs'); ?>", // adjust if your route differs
+                    type: 'GET',
+                    data: {
+                        room_id: roomId,
+                        object_id: objectId
+                    },
+                    success: function (data) {
+                        let $tariff = $('#tariff-select');
+                        $tariff.empty();
+                        $tariff.append('<option value="">Выберите тариф</option>');
+
+                        $.each(data, function (key, value) {
+                            $tariff.append('<option value="' + key + '">' + value + '</option>');
+                        });
+                    },
+                    error: function () {
+                        alert('Ошибка при загрузке тарифов');
+                    }
+                });
+            } else {
+                $('#tariff-select').html('<option value="">Выберите тариф</option>');
+            }
+        });
+
+        $(document).on('click', '.status-button', function (e) {
+            e.preventDefault(); // prevents unwanted form submission on accidental button clicks
+            const $checkbox = $(this).siblings('input[type=checkbox]');
+            const isChecked = $checkbox.prop('checked');
+
+            $checkbox.prop('checked', !isChecked);
+            $(this).toggleClass('active', !isChecked);
+        });
+
+        $('.reset-filter-link').on('click', function (e) {
+            e.preventDefault();
+
+            const $form = $(this).closest('form');
+
+            // Reset all inputs
+            $form.find('input[type="text"], input[type="date"], select').val('');
+            // Uncheck all checkboxes and remove visual state
+            $form.find('input[type="checkbox"]').each(function () {
+                $(this).prop('checked', false);
+            });
+            // Remove active class from status buttons
+            $form.find('.status-button').removeClass('active');
+            // Reset tariff dropdown
+            $('#tariff-select').html('<option value="">Выберите тариф</option>');
+        });
+
+        $(document).on('mouseup', function (e) {
+            const $drawer = $('#filterDrawer');
+            const $button = $('#open-filters');
+
+            // If click is outside the drawer AND not the "open filters" button
+            if (!$drawer.is(e.target) && $drawer.has(e.target).length === 0 &&
+                !$button.is(e.target) && $button.has(e.target).length === 0) {
+                $drawer.removeClass('open');
+            }
+        });
+    });
+
+    $(document).on('click', '.table_action_button', function () {
+        var name = $(this).parent().siblings().first().text();
+        var room = $(this).parent().siblings().eq(3).text();
+        var dates = $(this).parent().siblings().eq(1).text() + " - " + $(this).parent().siblings().eq(2).text();
+        var guests = $(this).attr('guest_amount') + " гостя";
+        var price = $(this).parent().siblings().eq(8).text();
+        var tariff = $(this).parent().siblings().eq(5).text();
+        var book_date = $(this).parent().siblings().eq(7).text();
+        var color = $(this).attr('color');
+        var status = $(this).attr('status');
+
+
+        $('.guest-name').text(name);
+        $('.booking-info-room').text(room);
+        $('.booking-info-dates').text(dates);
+        $('.booking-info-guests').text(guests);
+        $('.status-dialog-badge').css('border', '1px solid ' + color).css('color', color);
+        $('.status-dialog-badge').text(status);
+
+        $('.detail-transaction-number').text($(this).attr('transaction_number'));
+
+        $('.detail-price').text(price);
+        $('.detail-book-date').text(book_date);
+        $('.detail-tariff').text(tariff);
+        $('.request-text').text($(this).attr('request-text'));
+        $('.detail-cancel-term').text($(this).attr('cancel_text'));
+        $('.detail-cancel-date').text($(this).attr('cancel_date'));
+        $('.detail-return-sum').text($(this).attr('return_sum'));
+
+
+        if (status == "Отменен") {
+            $('.cancel_case').css("display:block");
+        }
+        $('#booking-modal').modal('show');
+    });
+
+    document.querySelector('.close-btn').addEventListener('click', function () {
+        document.body.style.display = 'none';
+    });
+
+    // Send button functionality
+    document.querySelector('.send-button').addEventListener('click', function () {
+        const message = document.querySelector('.message-input').value;
+        if (message.trim()) {
+            alert('Сообщение отправлено: ' + message);
+            document.querySelector('.message-input').value = '';
+        } else {
+            alert('Пожалуйста, введите сообщение');
+        }
+    });
+
+    // Click outside to close
+    document.addEventListener('click', function (e) {
+        if (e.target === document.body) {
+            document.body.style.display = 'none';
+        }
+    });
+</script>
 
 <style>
     .status_td {
@@ -716,144 +868,3 @@ Modal::begin([
         }
     }
 </style>
-
-<script>
-    $(document).ready(function () {
-        $('#open-filters').on('click', function () {
-            $('#filterDrawer').addClass('open');
-        });
-
-        $('#closeFilters').on('click', function () {
-            $('#filterDrawer').removeClass('open');
-        });
-
-        $('.status-tags button').on('click', function () {
-            $(this).toggleClass('active');
-        });
-
-        $('#room-select').on('change', function () {
-            let roomId = $(this).val();
-            let objectId = $(this).data('object');
-
-            if (roomId) {
-                $('#tariff-select').attr('disabled', false);
-                $.ajax({
-                    url: "<?= Yii::$app->urlManager->createUrl('/owner/booking/get-tariffs'); ?>", // adjust if your route differs
-                    type: 'GET',
-                    data: {
-                        room_id: roomId,
-                        object_id: objectId
-                    },
-                    success: function (data) {
-                        let $tariff = $('#tariff-select');
-                        $tariff.empty();
-                        $tariff.append('<option value="">Выберите тариф</option>');
-
-                        $.each(data, function (key, value) {
-                            $tariff.append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    },
-                    error: function () {
-                        alert('Ошибка при загрузке тарифов');
-                    }
-                });
-            } else {
-                $('#tariff-select').html('<option value="">Выберите тариф</option>');
-            }
-        });
-
-        $(document).on('click', '.status-button', function (e) {
-            e.preventDefault(); // prevents unwanted form submission on accidental button clicks
-            const $checkbox = $(this).siblings('input[type=checkbox]');
-            const isChecked = $checkbox.prop('checked');
-
-            $checkbox.prop('checked', !isChecked);
-            $(this).toggleClass('active', !isChecked);
-        });
-
-        $('.reset-filter-link').on('click', function (e) {
-            e.preventDefault();
-
-            const $form = $(this).closest('form');
-
-            // Reset all inputs
-            $form.find('input[type="text"], input[type="date"], select').val('');
-            // Uncheck all checkboxes and remove visual state
-            $form.find('input[type="checkbox"]').each(function () {
-                $(this).prop('checked', false);
-            });
-            // Remove active class from status buttons
-            $form.find('.status-button').removeClass('active');
-            // Reset tariff dropdown
-            $('#tariff-select').html('<option value="">Выберите тариф</option>');
-        });
-
-        $(document).on('mouseup', function (e) {
-            const $drawer = $('#filterDrawer');
-            const $button = $('#open-filters');
-
-            // If click is outside the drawer AND not the "open filters" button
-            if (!$drawer.is(e.target) && $drawer.has(e.target).length === 0 &&
-                !$button.is(e.target) && $button.has(e.target).length === 0) {
-                $drawer.removeClass('open');
-            }
-        });
-    });
-
-    $(document).on('click', '.table_action_button', function () {
-        var name = $(this).parent().siblings().first().text();
-        var room = $(this).parent().siblings().eq(3).text();
-        var dates = $(this).parent().siblings().eq(1).text() + " - " + $(this).parent().siblings().eq(2).text();
-        var guests = $(this).attr('guest_amount') + " гостя";
-        var price = $(this).parent().siblings().eq(8).text();
-        var tariff = $(this).parent().siblings().eq(5).text();
-        var book_date = $(this).parent().siblings().eq(7).text();
-        var color = $(this).attr('color');
-        var status = $(this).attr('status');
-
-
-        $('.guest-name').text(name);
-        $('.booking-info-room').text(room);
-        $('.booking-info-dates').text(dates);
-        $('.booking-info-guests').text(guests);
-        $('.status-dialog-badge').css('border', '1px solid ' + color).css('color', color);
-        $('.status-dialog-badge').text(status);
-
-        $('.detail-transaction-number').text($(this).attr('transaction_number'));
-
-        $('.detail-price').text(price);
-        $('.detail-book-date').text(book_date);
-        $('.detail-tariff').text(tariff);
-        $('.request-text').text($(this).attr('request-text'));
-        $('.detail-cancel-term').text($(this).attr('cancel_text'));
-
-
-        if(status == "Отменен"){
-            alert("cancel");
-            $('detail-cancel-term').css("display:block");
-        }
-        $('#booking-modal').modal('show');
-    });
-
-    document.querySelector('.close-btn').addEventListener('click', function () {
-        document.body.style.display = 'none';
-    });
-
-    // Send button functionality
-    document.querySelector('.send-button').addEventListener('click', function () {
-        const message = document.querySelector('.message-input').value;
-        if (message.trim()) {
-            alert('Сообщение отправлено: ' + message);
-            document.querySelector('.message-input').value = '';
-        } else {
-            alert('Пожалуйста, введите сообщение');
-        }
-    });
-
-    // Click outside to close
-    document.addEventListener('click', function (e) {
-        if (e.target === document.body) {
-            document.body.style.display = 'none';
-        }
-    });
-</script>
