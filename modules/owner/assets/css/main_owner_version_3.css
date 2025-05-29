@@ -1244,7 +1244,7 @@ a.desc:after {
 }
 
 .modal-content {
-    display: inline-block;
+    display: block;
 }
 
 .modal-body {
@@ -1629,6 +1629,7 @@ a.desc:after {
     border-right: none;
     padding: 15px 12px;
     /* min-width: 200px; */
+    vertical-align: middle;
 }
 
 .table-bordered>tbody>thead {
@@ -1888,13 +1889,15 @@ a.logout-button:hover {
 
 .policy-text {
     color: #333;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 400;
+    display: inline-block;
+    max-width: 345px;
 }
 
 .chevron-right {
-    width: 10px;
-    height: 9px;
+    width: 12px;
+    height: 12px;
     border-right: 2px solid #999;
     border-top: 2px solid #999;
     transform: rotate(45deg);

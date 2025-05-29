@@ -81,7 +81,7 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
                 </div>
 
                 <div class="whatsapp">
-                    <?= Html::a('<i class="fa fa-whatsapp"></i>' . Yii::t('app', 'Связаться в WhatsApp'), 'https://wa.me/996500090708', ['class' => 'whatsapp-button','target'=>'_blank']); ?>
+                    <?= Html::a('<i class="fa fa-whatsapp"></i>' . Yii::t('app', 'Связаться в WhatsApp'), 'https://wa.me/996500090708', ['class' => 'whatsapp-button', 'target' => '_blank']); ?>
                 </div>
 
                 <div class="contact-section">
@@ -104,28 +104,38 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
 
                 <div class="policy-section">
                     <button class="policy-header">
-                        <span class="policy-text"><?=Html::a('Политика конфиденциальности и обработки данных',['/site/privacy'])?></span>
+                        <?= Html::beginTag('a', ['href' => '/site/privacy']) ?>
+                        <span class="policy-text">Политика конфиденциальности и обработки данных</span>
                         <div class="chevron-right"></div>
+                        <?= Html::endTag('a') ?>
                     </button>
-                    
                 </div>
 
                 <div class="policy-section">
                     <button class="policy-header">
-                        <span class="policy-text"><?=Html::a('Политика бронирования, выплат и возврата денежных средств',['/site/return'])?></span>
+                        <?= Html::beginTag('a', ['href' => '/site/return']) ?>
+                        <span class="policy-text">Политика бронирования, выплат и возврата денежных средств</span>
                         <div class="chevron-right"></div>
+                        <?= Html::endTag('a') ?>
                     </button>
-                    
+
                 </div>
 
                 <div class="policy-section">
                     <button class="policy-header">
-                        <span class="policy-text"><?=Html::a('Договор оферты',['/site/offer'])?></span>
+                        <?= Html::beginTag('a', ['href' => '/site/offer']) ?>
+                        <span class="policy-text">Договор оферты</span>
                         <div class="chevron-right"></div>
+                        <?= Html::endTag('a') ?>
                     </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
+<style>
+    .policy-header a {
+        display: contents;
+        color: #333;
+    }
+</style>
