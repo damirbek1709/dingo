@@ -88,7 +88,11 @@ class SiteController extends Controller
     {
         if (Yii::$app->user->isGuest) {
             return $this->redirect(['user/signin']);
-        } else {
+        }
+        elseif(Yii::$app->user->identity->isAdmin){
+            return $this->redirect(['/admin']);
+        }
+        else {
             return $this->redirect(['/owner']);
         }
 
