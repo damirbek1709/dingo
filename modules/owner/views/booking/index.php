@@ -123,7 +123,7 @@ $this->title = Yii::t('app', 'Bookings');
                                 'color' => $model->bookingStatusString()["color"],
                                 'status' => $model->bookingStatusString()["string"],
                                 'cancel_text'=>$model->cancelText(),
-                                //'cancellation_date'
+                                'cancel_date'=>$model->cancel_date ? $model->cancel_date : "",
                             ]);
                         },
                         ]
@@ -253,7 +253,7 @@ Modal::begin([
 
     <div class="detail-row cancel_case" style="display:none">
         <span class="detail-label">Дата отмены</span>
-        <span class="detail-value detail-price"></span>
+        <span class="detail-value detail-cancel-date"></span>
     </div>
 
     <div class="detail-row">
@@ -826,6 +826,11 @@ Modal::begin([
         $('.detail-tariff').text(tariff);
         $('.request-text').text($(this).attr('request-text'));
         $('.detail-cancel-term').text($(this).attr('cancel_text'));
+
+
+        if(status == "Отменен"){
+            $('detail-cancel-term').css("display:block");
+        }
         $('#booking-modal').modal('show');
     });
 
