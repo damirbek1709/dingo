@@ -102,7 +102,7 @@ $this->title = Yii::t('app', 'Bookings');
                     [
                         'attribute' => 'status',
                         'value' => function ($model) {
-                        return $model->bookingStatusString()." ".$model->status;
+                        return $model->bookingStatusString();
                     }
                     ],
                     //'guest_email:email',
