@@ -1871,7 +1871,7 @@ a.logout-button:hover {
 }
 
 .policy-header {
-    display: flex;
+    display: inline-block;
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
@@ -1891,8 +1891,10 @@ a.logout-button:hover {
     color: #333;
     font-size: 15px;
     font-weight: 400;
-    display: inline-block;
-    max-width: 345px;
+    /* display: inline-block; */
+    max-width: 100%;
+    align-items: center;
+    display: flex;
 }
 
 .chevron-right {
@@ -1966,6 +1968,11 @@ a.logout-button:hover {
 }
 .policy-text a{
     color:#333;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    justify-content: space-between;
 }
 .fa-whatsapp {
     background-image: url(icons_2.svg);
