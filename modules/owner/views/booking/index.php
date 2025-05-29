@@ -829,6 +829,7 @@ Modal::begin([
 
 
         if(status == "Отменен"){
+            alert("cancel");
             $('detail-cancel-term').css("display:block");
         }
         $('#booking-modal').modal('show');
