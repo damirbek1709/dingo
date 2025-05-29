@@ -104,7 +104,6 @@ $this->title = Yii::t('app', 'Bookings');
                     },
                         'format' => 'raw'
                     ],
-                    'special_comment',
                     [
                         'attribute' => 'created_at',
                         'value' => function ($model) {
