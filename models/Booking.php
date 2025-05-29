@@ -65,7 +65,7 @@ class Booking extends \yii\db\ActiveRecord
             [['status'], 'default', 'value' => 1],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
-            [['date_from', 'date_to'], 'safe'],
+            [['date_from', 'date_to', 'cancel_date'], 'safe'],
             [['tariff_id', 'currency'], 'string', 'max' => 11],
             [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number'], 'string', 'max' => 255],
             [['other_guests'], 'string', 'max' => 500],
@@ -141,6 +141,7 @@ class Booking extends \yii\db\ActiveRecord
             'cancellation_type' => Yii::t('app', 'Тип отмены'),
             'cancellation_penalty_sum' => Yii::t('app', 'Сумма штрафа'),
             'created_at' => Yii::t('app', 'Дата брони'),
+            'created_date' => Yii::t('app', 'Дата отмены'),
             'owner_id' => Yii::t('app', 'Хост'),
             'cancel_reason_id' => Yii::t('app', 'Причина отмены'),
         ];

@@ -122,7 +122,8 @@ $this->title = Yii::t('app', 'Bookings');
                                 'request-text' => $model->special_comment,
                                 'color' => $model->bookingStatusString()["color"],
                                 'status' => $model->bookingStatusString()["string"],
-                                'cancel_text'=>$model->cancelText()
+                                'cancel_text'=>$model->cancelText(),
+                                //'cancellation_date'
                             ]);
                         },
                         ]
@@ -248,6 +249,11 @@ Modal::begin([
     <div class="detail-row">
         <span class="detail-label">Стоимость</span>
         <span class="detail-value detail-price">19 000 KGS</span>
+    </div>
+
+    <div class="detail-row cancel_case" style="display:none">
+        <span class="detail-label">Дата отмены</span>
+        <span class="detail-value detail-price"></span>
     </div>
 
     <div class="detail-row">

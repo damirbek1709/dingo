@@ -297,6 +297,7 @@ class BookingController extends BaseController
         $response['success'] = false;
         $model = Booking::findOne($id);
         if ($model) {
+            $model->cancel_date = date('Y-m-d');
             $model->status = Booking::PAID_STATUS_CANCELED;
             $model->cancel_reason_id = $reason_id;
             if ($model->save(false)) {
