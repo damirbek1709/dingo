@@ -95,6 +95,11 @@ $this->title = Yii::t('app', 'Bookings');
                         return "<span full={$full}>" . $cut . "</span>";
                     }
                     ],
+                    [
+                        'attribute' => 'special_comment',
+                        'value' => $model->special_comment ? StringHelper::truncate($special_comment, 20) : "",
+                        'format' => 'raw'
+                    ],
                     'special_comment',
                     [
                         'attribute' => 'created_at',
