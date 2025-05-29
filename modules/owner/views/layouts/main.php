@@ -48,7 +48,7 @@ ModuleAsset::register($this);
 
         NavBar::begin([
             'brandLabel' => Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']),
-            'brandUrl' => Yii::$app->user->identity->isAdmin ? ['/admin'] : ['/owner/default/index'],
+            'brandUrl' =>  ['/owner/default/index'],
             'options' => [
                 'class' => 'navbar-default navbar-inverse navbar-fixed-top navbar-owner',
             ],
