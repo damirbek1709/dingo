@@ -256,38 +256,38 @@ Modal::begin([
 
     <div class="detail-row cancel_case" style="display:none">
         <div>
-            <span class="detail-label">Дата отмены:</span>
+            <span class="detail-label">Дата отмены: </span>
             <span class="detail-value detail-cancel-date"></span>
         </div>
 
         <div>
-            <span class="detail-label">Сумма возврата:</span>
+            <span class="detail-label">Сумма возврата: </span>
             <span class="detail-value detail-return-sum"></span>
         </div>
 
         <div>
-            <span class="detail-label">Сумма штрафа:</span>
+            <span class="detail-label">Сумма штрафа: </span>
             <span class="detail-value detail-penalty-sum"></span>
         </div>
 
         <div>
-            <span class="detail-label">Причина отмены:</span>
+            <span class="detail-label">Причина отмены: </span>
             <span class="detail-value detail-cancel-reason"></span>
         </div>
     </div>
 
     <div class="detail-row">
-        <span class="detail-label">Дата бронирования:</span>
+        <span class="detail-label">Дата бронирования: </span>
         <span class="detail-value detail-book-date">28 мая 2025</span>
     </div>
 
     <div class="detail-row">
-        <span class="detail-label">№ Бронирования</span>
+        <span class="detail-label">№ Бронирования </span>
         <span class="detail-value detail-transaction-number">123434574573</span>
     </div>
 
     <div class="detail-row">
-        <span class="detail-label">Тариф</span>
+        <span class="detail-label">Тариф </span>
         <span class="detail-value detail-tariff">Все включено</span>
     </div>
 </div>
