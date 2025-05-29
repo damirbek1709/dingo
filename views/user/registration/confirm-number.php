@@ -8,7 +8,7 @@ use yii\widgets\ActiveForm;
 
     <div class="subtitle">
         Был отправлен на электронную почту<br>
-        mail@example.com
+        <?php echo $session_email; ?>
     </div>
 
     <?php $form = ActiveForm::begin([

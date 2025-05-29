@@ -156,10 +156,11 @@ class RegistrationController extends BaseRegistrationController
 
         if ($model->load(Yii::$app->request->post())) {
             if (in_array($model->email, ['damirbek@gmail.com'])) {
+                Yii::$app->session->set('session_email', $model->email);
                 $user = User::find()->where(['email' => $model->email])->one();
                 $dao = Yii::$app->db;
                 $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
-                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '0000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
+                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '000000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
                 return $this->redirect('confirm-number');
             } else {
                 $user = User::find()->where(['email' => $model->email])->one();
@@ -178,6 +179,7 @@ class RegistrationController extends BaseRegistrationController
                             ->setHtmlBody("<h1>{$token->code}</h1>")
                             ->setTextBody('Hello from Resend! This is a test email.')
                             ->send();
+                            Yii::$app->session->set('session_email', $model->email);
 
                     } else {
                         Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
@@ -210,6 +212,7 @@ class RegistrationController extends BaseRegistrationController
                                 ->setHtmlBody("<h1>{$token->code}</h1>")
                                 ->setTextBody('Hello from Resend! This is a test email.')
                                 ->send();
+                                Yii::$app->session->set('session_email', $model->email);
                         } else {
                             Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
                         }
@@ -237,6 +240,7 @@ class RegistrationController extends BaseRegistrationController
 
         // Perform AJAX validation
         $this->performAjaxValidation($model);
+        $session_email = Yii::$app->session->get('session_email');
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             // Validate the form
@@ -256,6 +260,11 @@ class RegistrationController extends BaseRegistrationController
 
                 // Log in the user
                 if (Yii::$app->user->login($user)) {
+                    Yii::$app->session->remove('session_email');
+                    if(Yii::$app->user->identity->isAdmin){
+                        return $this->redirect('/admin');
+                    }
+
                     $filter_string = "user_id=" . Yii::$app->user->id;
                     $client = Yii::$app->meili->connect();
                     $res = $client->index('object')->search('', [
@@ -264,6 +273,8 @@ class RegistrationController extends BaseRegistrationController
                         ],
                         'limit' => 10000
                     ])->getHits();
+
+                    
 
                     if (count($res)) {
                         return $this->redirect('/owner/object/index');
@@ -281,6 +292,7 @@ class RegistrationController extends BaseRegistrationController
         return $this->render('confirm-number', [
             'model' => $model,
             'module' => $this->module,
+            'session_email' => $session_email
         ]);
     }
 
