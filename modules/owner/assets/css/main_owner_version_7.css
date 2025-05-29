@@ -1744,14 +1744,14 @@ a.desc:after {
 }
 
 .user-profile-left-block {
-    height: 300px;
+    /* height: 339px; */
 }
 
 .user-delete-block {
     display: flex;
     align-items: flex-end;
     justify-content: flex-end;
-    height: 300px;
+    height: 350px;
     flex-direction: row;
     flex-wrap: wrap;
     /* enables breaking onto new line */
