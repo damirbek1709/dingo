@@ -414,6 +414,17 @@ class Booking extends \yii\db\ActiveRecord
         return ["string" => $string, "color" => $color];
     }
 
+    public function cancelText()
+    {
+        $text = "Отмена не возможна";
+        $tariff = Tariff::findOne($this->tariff_id);
+        if ($tariff->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
+            $date_free_till = "";
+            $text = "";
+        }
+        return $text;
+    }
+
     public function dateFormat($date)
     {
         if (!$date)

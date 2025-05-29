@@ -153,12 +153,13 @@ class BookingController extends BaseController
         $model->special_comment = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'special_comment');
         $model->cancel_reason = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancel_reason');
         $model->currency = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'currency');
-        $model->cancellation_type = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_type');
+        //$model->cancellation_type = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_type');
         //$model->cancellation_penalty_sum = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cancellation_penalty_sum');
         $model->status = Booking::PAID_STATUS_NOT_PAID;
         $currency = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'currency');
 
         $tariff = Tariff::findOne($model->tariff_id);
+        $model->cancellation_type = $tariff->cancellation;
         $model->cancellation_penalty_sum = $model->sum / 100 * $tariff->penalty_sum;
 
 

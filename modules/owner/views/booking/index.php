@@ -105,22 +105,9 @@ $this->title = Yii::t('app', 'Bookings');
                         'value' => function ($model) {
                         $string = $model->bookingStatusString()["string"];
                         $color = $model->bookingStatusString()["color"];
-                        return "<span style='color:{$color};border-radius:4px;padding:2px 4px;border:1px solid {$color};display:block;min-width:90px;text-align:center'>" . $string . "</span>";
-
-
+                        return "<span class='status_td' style='color:{$color};border:1px solid {$color};'>" . $string . "</span>";
                     }
                     ],
-                    //'guest_email:email',
-                    //'guest_phone',
-                    //'guest_name',
-                    //'date_from',
-                    //
-                    //'status',
-                    //'other_guests',
-                    //'cancellation_type',
-                    //'cancellation_penalty_sum',
-                    //'user_id',
-                    //'special_comment',
                     [
                         'class' => ActionColumn::className(),
                         'template' => '{view}',
@@ -135,6 +122,7 @@ $this->title = Yii::t('app', 'Bookings');
                                 'request-text' => $model->special_comment,
                                 'color' => $model->bookingStatusString()["color"],
                                 'status' => $model->bookingStatusString()["string"],
+                                'cancel_text'=>$model->cancelText()
                             ]);
                         },
                         ]
@@ -291,6 +279,15 @@ Modal::begin([
 <?php Modal::end(); ?>
 
 <style>
+    .status_td {
+        border-radius: 4px;
+        padding: 2px 4px;
+        display: block;
+        min-width: 90px;
+        text-align: center;
+        cursor: pointer;
+    }
+
     .booking-info-head {
         color: rgba(0, 0, 0, 0.45) !important;
     }
