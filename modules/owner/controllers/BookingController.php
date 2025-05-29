@@ -66,7 +66,7 @@ class BookingController extends Controller
 
         $date_to = Yii::$app->request->get('date_to') ? Yii::$app->request->get('date_to') : null;
         if ($date_to) {
-            $dataProvider->query->andFilterWhere(['<', 'date_to', $date_to]);
+            $dataProvider->query->andFilterWhere(['<=', 'date_to', $date_to]);
         }
 
         $date_book = Yii::$app->request->get('book_date') ? Yii::$app->request->get('book_date') : null;
