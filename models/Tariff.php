@@ -160,7 +160,7 @@ class Tariff extends \yii\db\ActiveRecord
     public function getMealTitle($id)
     {
         $result = Vocabulary::find()->where(['id' => $id])->one();
-        return  $result ? ['label' => $result->title, 'class' => 'three_times_meal'] : [];
+        return  $result ? ['label' => $result->title, 'class' => 'three_times_meal'] : ['label' => '', 'class' => 'three_times_meal'];
     }
 
     /**
