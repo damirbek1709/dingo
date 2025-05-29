@@ -421,6 +421,7 @@ class Booking extends \yii\db\ActiveRecord
         if ($tariff->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
             $penalty_days = $tariff->penalty_days;
             $date_free_till = date("Y-m-d", strtotime($this->date_from . " -{$penalty_days} days"));
+            $date_free_till = $this->dateFormat($date_free_till);
             $text = "Бесплатная отмена до {$date_free_till}";
         }
         return $text;
