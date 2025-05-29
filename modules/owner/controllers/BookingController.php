@@ -83,6 +83,7 @@ class BookingController extends Controller
                 case "future":
                     $dataProvider->query->andFilterWhere(['>', 'date_from', $current_date]);
                     $active = "future_active";
+                    
                     break;
                 case "past":
                     $dataProvider->query->andFilterWhere(['<', 'date_to', $current_date]);

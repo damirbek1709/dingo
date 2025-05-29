@@ -394,12 +394,11 @@ class Booking extends \yii\db\ActiveRecord
             $string = Yii::t('app', 'Активный');
         } 
         
-        
-        elseif ($this->date_to < date('Y-m-d')) {
+        if ($this->date_to < date('Y-m-d')) {
             $string = Yii::t('app', 'Завершен');
         }
 
-        elseif ($this->date_from > date('Y-m-d')){
+        if ($this->date_from > date('Y-m-d')){
             $string = Yii::t('app', 'Предстоящий');
         }
 
