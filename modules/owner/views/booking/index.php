@@ -7,7 +7,7 @@ use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\ActiveForm;
 use yii\bootstrap\Modal;
-
+use yii\helpers\StringHelper;
 /** @var yii\web\View $this */
 /** @var app\models\BookingSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -71,19 +71,25 @@ $this->title = Yii::t('app', 'Bookings');
                     [
                         'attribute' => 'room_id',
                         'value' => function ($model) {
-                        return $model->bookingRoomTitle();
+                        $full = $model->bookingRoomTitle();
+                        $cut = StringHelper::truncate($full, 20);
+                        return "<span full={$full}>" . $cut . "</span>";
                     }
                     ],
                     [
                         'attribute' => 'object_id',
                         'value' => function ($model) {
-                        return $model->bookingObjectTitle();
+                        $full = $model->bookingObjectTitle();
+                        $cut = StringHelper::truncate($full, 20);
+                        return "<span full={$full}>" . $cut . "</span>";
                     }
                     ],
                     [
                         'attribute' => 'tariff_id',
                         'value' => function ($model) {
-                        return $model->bookingTariffTitle();
+                        $full = $model->bookingTariffTitle();
+                        $cut = StringHelper::truncate($full, 20);
+                        return "<span full={$full}>" . $cut . "</span>";
                     }
                     ],
                     'special_comment',
@@ -126,7 +132,7 @@ $this->title = Yii::t('app', 'Bookings');
                                 'cancel_date' => $model->cancel_date ? $model->dateFormat($model->cancel_date) : "",
                                 'return_sum' => $model->sum - $model->cancellation_penalty_sum . " " . $model->currency,
                                 'penalty_sum' => $model->cancellation_penalty_sum . " " . $model->currency,
-                                'cancel_reason'=>$model->cancel_reason_id ? $model->getCancelReasonArray()[0] : "",
+                                'cancel_reason' => $model->cancel_reason_id ? $model->getCancelReasonArray()[0] : "",
                             ]);
                         },
                         ]
