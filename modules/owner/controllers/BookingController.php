@@ -74,10 +74,15 @@ class BookingController extends Controller
             $dataProvider->query->andFilterWhere(['created_at' => $date_book]);
         }
 
-        $status_arr = Yii::$app->request->get('status', []);
-        if ($status_arr) {
-            $dataProvider->query->andFilterWhere(['status' => $status_arr]);
+        // Only apply status array filter if no specific status is provided
+        if (!$status) {
+            $status_arr = Yii::$app->request->get('status', []);
+            if ($status_arr) {
+                $dataProvider->query->andFilterWhere(['status' => $status_arr]);
+            }
         }
+
+        // Handle specific status filtering
         if ($status) {
             switch ($status) {
                 case "future":
@@ -92,9 +97,7 @@ class BookingController extends Controller
                     $dataProvider->query->andFilterWhere(['status' => Booking::PAID_STATUS_CANCELED]);
                     $active = "cancel_active";
                     break;
-                default:
-                    $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
-
+                // Remove the default case as it was redundant
             }
         }
 
@@ -111,7 +114,6 @@ class BookingController extends Controller
             'date_book' => $date_book,
         ]);
     }
-
     /**
      * Displays a single Booking model.
      * @param int $id ID
