@@ -31,6 +31,11 @@ $roles = Yii::$app->authManager->getRolesByUser($model->id);
                         </div>
 
                         <div class="section" style="border-bottom:0">
+                            <div class="section-label"><?= Yii::t('app', 'Телефон') ?></div>
+                            <div class="section-value"><?= $model->phone; ?></div>
+                        </div>
+
+                        <div class="section" style="border-bottom:0">
                             <div class="section-label"><?= Yii::t('app', 'Роль') ?></div>
                             <div class="section-value"><?php
                             $assignments = Yii::$app->authManager->getAssignments($model->id);
