@@ -60,13 +60,14 @@ class BookingController extends Controller
         }
 
         $date_from = Yii::$app->request->get('date_from') ? Yii::$app->request->get('date_from') : null;
-        if ($date_from) {
-            $dataProvider->query->andFilterWhere(['>=', 'date_from', $date_from]);
-        }
-
         $date_to = Yii::$app->request->get('date_to') ? Yii::$app->request->get('date_to') : null;
-        if ($date_to) {
-            $dataProvider->query->andFilterWhere(['<=', 'date_to', $date_to]);
+
+        if ($date_from && $date_to) {
+            $dataProvider->query->andFilterWhere(['>=', 'date_from', $date_from])->andFilterWhere(['<=', 'date_to', $date_to]);
+        } elseif ($date_from && !$date_to) {
+            $dataProvider->query->andFilterWhere(['date_from' => $date_from]);
+        } elseif ($date_to && !$date_from) {
+            $dataProvider->query->andFilterWhere(['date_to'=> $date_to]);
         }
 
         $date_book = Yii::$app->request->get('book_date') ? Yii::$app->request->get('book_date') : null;
@@ -234,31 +235,31 @@ class BookingController extends Controller
                 "data" => "Custom merchant data",
             ],
             "cash_voucher_data" => [
-                "email" => $model->guest_email,
-                "inn" => "123456789012",
-                "group" => "group_id",
-                "taxation_system" => 0,
-                "payment_address" => "Your shop address",
-                "positions" => [
-                    [
-                        "quantity" => 1,
-                        "price" => $model->sum, // in tyiyn
-                        "position_description" => $model->bookingRoomTitle(),
-                        "tax" => 1,
-                        "payment_method_type" => 1,
-                        "payment_subject_type" => 1,
-                        "nomenclature_code" => "ABC123"
-                    ]
+                    "email" => $model->guest_email,
+                    "inn" => "123456789012",
+                    "group" => "group_id",
+                    "taxation_system" => 0,
+                    "payment_address" => "Your shop address",
+                    "positions" => [
+                            [
+                                "quantity" => 1,
+                                "price" => $model->sum, // in tyiyn
+                                "position_description" => $model->bookingRoomTitle(),
+                                "tax" => 1,
+                                "payment_method_type" => 1,
+                                "payment_subject_type" => 1,
+                                "nomenclature_code" => "ABC123"
+                            ]
+                        ],
+                    "payments" => [
+                        [
+                            "payment_type" => 1,
+                            "amount" => 1000
+                        ]
+                    ],
+                    "order_id" => $model->id,
+                    "send_cash_voucher" => true
                 ],
-                "payments" => [
-                    [
-                        "payment_type" => 1,
-                        "amount" => 1000
-                    ]
-                ],
-                "order_id" => $model->id,
-                "send_cash_voucher" => true
-            ],
             "payment" => [
                 "amount" => $model->sum,
                 "currency" => $model->currency,
@@ -284,21 +285,21 @@ class BookingController extends Controller
                 "force_disable" => true
             ],
             "addendum" => [
-                "lodging" => [
-                    "check_out_date" => "2025-05-19",
-                    "room" => [
-                        "rate" => 999999999999,
-                        "number_of_nights" => 1
-                    ],
-                    "total_tax" => 0,
-                    "charges" => [
-                        "room_service" => 0,
-                        "bar_or_lounge" => 0,
-                        // ... other charges
-                        "health_club" => 0
+                    "lodging" => [
+                        "check_out_date" => "2025-05-19",
+                        "room" => [
+                            "rate" => 999999999999,
+                            "number_of_nights" => 1
+                        ],
+                        "total_tax" => 0,
+                        "charges" => [
+                            "room_service" => 0,
+                            "bar_or_lounge" => 0,
+                            // ... other charges
+                            "health_club" => 0
+                        ]
                     ]
-                ]
-            ],
+                ],
             "booking_info" => [
                 "firstname" => "John",
                 "surname" => "Doe",
