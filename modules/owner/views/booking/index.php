@@ -74,7 +74,7 @@ $this->title = Yii::t('app', 'Bookings');
                         'value' => function ($model) {
                         $full = $model->bookingRoomTitle();
                         $cut = StringHelper::truncate($full, 20);
-                        return "<span full={$full}>" . $cut . "</span>";
+                        return "<span full='$full'>" . $cut . "</span>";
                     }
                     ],
                     [
@@ -83,7 +83,7 @@ $this->title = Yii::t('app', 'Bookings');
                         'value' => function ($model) {
                         $full = $model->bookingObjectTitle();
                         $cut = StringHelper::truncate($full, 20);
-                        return "<span full={$full}>" . $cut . "</span>";
+                        return "<span full='$full'>" . $cut . "</span>";
                     }
                     ],
                     [
@@ -92,13 +92,15 @@ $this->title = Yii::t('app', 'Bookings');
                         'value' => function ($model) {
                         $full = $model->bookingTariffTitle();
                         $cut = StringHelper::truncate($full, 20);
-                        return "<span full={$full}>" . $cut . "</span>";
+                        return "<span full='$full'>" . $cut . "</span>";
                     }
                     ],
                     [
                         'attribute' => 'special_comment',
                         'value' => function ($model) {
-                        return $model->special_comment ? StringHelper::truncate($model->special_comment, 20) : "";
+                        $full = $model->special_comment;
+                        $cut = $model->special_comment ? StringHelper::truncate($full, 20) : "";
+                        return "<span full='$full'>" . $cut . "</span>";
                     },
                         'format' => 'raw'
                     ],
