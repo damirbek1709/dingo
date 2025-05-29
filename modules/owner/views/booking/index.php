@@ -403,12 +403,16 @@ Modal::begin([
         $('.detail-tariff').text(tariff);
         $('.request-text').text($(this).attr('request-text'));
         $('.detail-cancel-term').text($(this).attr('cancel_text'));
-        $('.detail-cancel-date').text($(this).attr('cancel_date'));
-        $('.detail-return-sum').text($(this).attr('return_sum'));
+
 
 
         if (status == "Отменен") {
-            $('.cancel_case').css("display:block");
+            $('.cancel_case').css("display", "block");
+            $('.detail-cancel-date').text($(this).attr('cancel_date'));
+            $('.detail-return-sum').text($(this).attr('return_sum'));
+        }
+        else{
+            $('.cancel_case').css("display", "none");
         }
         $('#booking-modal').modal('show');
     });
