@@ -242,7 +242,7 @@ Modal::begin([
 <div class="booking-details">
     <div class="detail-row">
         <span class="detail-label">Правила отмены:</span>
-        <span class="detail-value">бесплатная отмена до 10 мая 2025</span>
+        <span class="detail-value detail-cancel-term">бесплатная отмена до 10 мая 2025</span>
     </div>
 
     <div class="detail-row">
@@ -819,6 +819,7 @@ Modal::begin([
         $('.detail-book-date').text(book_date);
         $('.detail-tariff').text(tariff);
         $('.request-text').text($(this).attr('request-text'));
+        $('.detail-cancel-term').text($(this).attr('cancel_text'));
         $('#booking-modal').modal('show');
     });
 

@@ -419,8 +419,9 @@ class Booking extends \yii\db\ActiveRecord
         $text = "Отмена не возможна";
         $tariff = Tariff::findOne($this->tariff_id);
         if ($tariff->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
-            $date_free_till = "";
-            $text = "";
+            $penalty_days = $tariff->penalty_days;
+            $date_free_till = date("Y-m-d", strtotime($this->date_from . " -{$penalty_days} days"));
+            $text = "Бесплатная отмена до {$date_free_till}";
         }
         return $text;
     }
