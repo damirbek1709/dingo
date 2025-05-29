@@ -549,10 +549,9 @@ Modal::begin([
 
     .status-dialog-badge {
         display: inline-block;
-        background: #FFF4E6;
-        color: #D97706;
-        padding: 6px 12px;
-        border-radius: 20px;
+        background: rgb(253 253 253);
+        padding: 2px 6px;
+        border-radius: 4px;
         font-size: 12px;
         font-weight: 500;
         margin-bottom: 12px;
@@ -814,7 +813,7 @@ Modal::begin([
         $('.booking-info-room').text(room);
         $('.booking-info-dates').text(dates);
         $('.booking-info-guests').text(guests);
-        $('.status-dialog-badge').css('color', color);
+        $('.status-dialog-badge').css('border', '1px solid ' + color).css('color', color);
         $('.status-dialog-badge').text(status);
 
         $('.detail-transaction-number').text($(this).attr('transaction_number'));
