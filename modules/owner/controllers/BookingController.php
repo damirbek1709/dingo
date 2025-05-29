@@ -91,6 +91,7 @@ class BookingController extends Controller
                 case "canceled":
                     $dataProvider->query->andFilterWhere(['status' => Booking::PAID_STATUS_CANCELED]);
                     $active = "cancel_active";
+                    echo "test";die();
                     break;
                 default:
                     $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
