@@ -6,6 +6,7 @@ use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\ActiveForm;
+use yii\bootstrap\Modal;
 
 /** @var yii\web\View $this */
 /** @var app\models\BookingSearch $searchModel */
@@ -15,7 +16,6 @@ $this->title = Yii::t('app', 'Bookings');
 //$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="col-md-12">
-
     <div class="oblast-update">
         <?= $this->render('top_nav', ['object_id' => $object_id]) ?>
         <div class="search-filter-bar">
@@ -119,9 +119,15 @@ $this->title = Yii::t('app', 'Bookings');
                     [
                         'class' => ActionColumn::className(),
                         'template' => '{view}',
-                        'urlCreator' => function ($action, Booking $model, $key, $index, $column) {
-                        return Url::toRoute([$action, 'id' => $model->id]);
-                    }
+                        'header' => Yii::t('app', 'Действие'),
+                        'buttons' => [
+                            'view' => function ($url, $model) {
+                            return Html::tag('span', 'Подробнее', [
+                                'class' => 'table_action_button',
+                                'title' => Yii::t('app', 'Подробнее'),
+                            ]);
+                        },
+                        ]
                     ],
                 ],
             ]); ?>
@@ -215,8 +221,69 @@ $room_list = Booking::getRoomList($object_id);
 </div>
 
 <?php $form->end(); ?>
+<?php
+
+Modal::begin([
+    'id' => 'booking-modal',
+    //'size' => 'modal-md',
+    'header' => '<h2 class="modal-title">Параметры бронирования</h2>',
+    'options' => ['class' => 'modal-2'],
+]); ?>
+<div class="status-dialog-badge">В ожидании</div>
+<div class="guest-info">
+
+    <div class="guest-name">Асанова Алия</div>
+</div>
+<div class="booking-info">
+    <div class="booking-info-item booking-info-head">Бронирование:</div>
+    <div class="booking-info-item">2х мест, стандарт</div>
+    <div class="booking-info-item">28 мая 2025 - 30 мая 2025</div>
+    <div class="booking-info-item">2 гостя, 1 ребенок</div>
+</div>
+
+<div class="booking-details">
+    <div class="detail-row">
+        <span class="detail-label">Правила отмены:</span>
+        <span class="detail-value">бесплатная отмена до 10 мая 2025</span>
+    </div>
+
+    <div class="detail-row">
+        <span class="detail-label">Стоимость</span>
+        <span class="detail-value">19 000 KGS</span>
+    </div>
+
+    <div class="detail-row">
+        <span class="detail-label">Дата бронирования:</span>
+        <span class="detail-value">28 мая 2025</span>
+    </div>
+
+    <div class="detail-row">
+        <span class="detail-label">№ Бронирования</span>
+        <span class="detail-value">123434574573</span>
+    </div>
+
+    <div class="detail-row">
+        <span class="detail-label">Тариф</span>
+        <span class="detail-value">Все включено</span>
+    </div>
+</div>
+
+<div class="special-requests">
+    <h3 class="section-title">Особые пожелания</h3>
+    <p class="request-text">Ранний заезд в 11:00 и выезд в 19:00?</p>
+
+    <textarea class="message-input" placeholder="Напишите вашему гостю о вашем решении"></textarea>
+</div>
+
+<button class="send-button">Отправить</button>
+<div style="clear: both;"></div>
+
+<?php Modal::end(); ?>
 
 <style>
+    .booking-info-head{
+        color:rgba(0, 0, 0, 0.45)!important;
+    }
     .search-filter-form {
         width: 100%;
     }
@@ -228,6 +295,10 @@ $room_list = Booking::getRoomList($object_id);
         margin-bottom: 25px;
         background: #f9f9f9;
         font-family: sans-serif;
+    }
+
+    .modal-body {
+        padding: 0!important;
     }
 
     .search-box {
@@ -410,6 +481,227 @@ $room_list = Booking::getRoomList($object_id);
         color: #fff;
         border-color: #2563eb;
     }
+
+    .table_action_button {
+        color: rgba(54, 118, 188, 1);
+        border: 1px solid rgba(54, 118, 188, 1);
+        padding: 2px 6px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .modal-container {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        position: relative;
+        padding: 15px 0;
+        border-bottom: unset;
+    }
+
+    .modal-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #999;
+        cursor: pointer;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+        background: #f0f0f0;
+        color: #666;
+    }
+
+    .status-dialog-badge {
+        display: inline-block;
+        background: #FFF4E6;
+        color: #D97706;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+        margin-bottom: 12px;
+    }
+
+    .guest-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .guest-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #E5E7EB;
+        overflow: hidden;
+    }
+
+    .guest-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .guest-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+    }
+
+    .modal-content {
+        padding: 0 24px 24px;
+    }
+
+    .booking-details {
+        margin-bottom: 24px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px 0;
+        border-bottom: 1px solid #F3F4F6;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        color: #6B7280;
+        font-size: 14px;
+    }
+
+    .detail-value {
+        color: #111827;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .booking-info {
+        margin-bottom: 24px;
+    }
+
+    .booking-info-item {
+        color: #374151;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .booking-info-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .special-requests {
+        margin-bottom: 24px;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 12px;
+    }
+
+    .request-text {
+        color: #6B7280;
+        font-size: 14px;
+        margin-bottom: 16px;
+    }
+
+    .message-input {
+        width: 100%;
+        border: 1px solid #D1D5DB;
+        border-radius: 12px;
+        padding: 16px;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 80px;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+
+    .message-input:focus {
+        outline: none;
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .message-input::placeholder {
+        color: #9CA3AF;
+    }
+
+    .send-button {
+        background: #3B82F6;
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 16px 32px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        float: right;
+        transition: all 0.2s;
+    }
+
+    .send-button:hover {
+        background: #2563EB;
+        transform: translateY(-1px);
+    }
+
+    .send-button:active {
+        transform: translateY(0);
+    }
+
+    @media (max-width: 640px) {
+        .modal-container {
+            width: 95%;
+            margin: 20px;
+        }
+
+        .modal-header,
+        .modal-content {
+            padding-left: 16px;
+            padding-right: 16px;
+        }
+
+        .detail-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .detail-value {
+            text-align: left;
+        }
+    }
 </style>
 
 <script>
@@ -493,5 +785,31 @@ $room_list = Booking::getRoomList($object_id);
                 $drawer.removeClass('open');
             }
         });
+    });
+
+    $(document).on('click', '.table_action_button', function () {
+        $('#booking-modal').modal('show');
+    });
+
+    document.querySelector('.close-btn').addEventListener('click', function () {
+        document.body.style.display = 'none';
+    });
+
+    // Send button functionality
+    document.querySelector('.send-button').addEventListener('click', function () {
+        const message = document.querySelector('.message-input').value;
+        if (message.trim()) {
+            alert('Сообщение отправлено: ' + message);
+            document.querySelector('.message-input').value = '';
+        } else {
+            alert('Пожалуйста, введите сообщение');
+        }
+    });
+
+    // Click outside to close
+    document.addEventListener('click', function (e) {
+        if (e.target === document.body) {
+            document.body.style.display = 'none';
+        }
     });
 </script>
