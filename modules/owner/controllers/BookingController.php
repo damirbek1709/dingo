@@ -55,7 +55,7 @@ class BookingController extends Controller
         }
 
         $tariff_id = Yii::$app->request->get('tariff_id') ? Yii::$app->request->get('tariff_id') : null;
-        if ($room_id) {
+        if ($tariff_id) {
             $dataProvider->query->andFilterWhere(['tariff_id' => $tariff_id]);
         }
 
