@@ -126,7 +126,7 @@ $this->title = Yii::t('app', 'Bookings');
                                 'cancel_date' => $model->cancel_date ? $model->dateFormat($model->cancel_date) : "",
                                 'return_sum' => $model->sum - $model->cancellation_penalty_sum . " " . $model->currency,
                                 'penalty_sum' => $model->cancellation_penalty_sum . " " . $model->currency,
-                                'cancel_reason'=>$model->cancelReasonArray[0],
+                                'cancel_reason'=>$model->cancel_reason_id ? $model->getCancelReasonArray()[0] : "",
                             ]);
                         },
                         ]
