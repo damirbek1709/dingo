@@ -57,11 +57,11 @@ ModuleAsset::register($this);
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => [
                 $object_arr,
-                [
-                    'label' => '',
-                    'url' => '#',
-                    'options' => ['class' => 'menu-notification-icon']
-                ],
+                // [
+                //     'label' => '',
+                //     'url' => '#',
+                //     'options' => ['class' => 'menu-notification-icon']
+                // ],
                 [
                     'label' => $user_string,
                     'options' => [

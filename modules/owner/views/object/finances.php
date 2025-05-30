@@ -6,7 +6,7 @@ use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\ActiveForm;
-
+use yii\helpers\StringHelper;
 /** @var yii\web\View $this */
 /** @var app\models\BookingSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -24,7 +24,7 @@ $this->title = Yii::t('app', 'Bookings');
                 'method' => 'get',
                 'options' => ['class' => 'search-filter-form'],
             ]); ?>
-            
+
             <?php $form->end(); ?>
             <div class="status-tabs">
                 <button
@@ -37,7 +37,7 @@ $this->title = Yii::t('app', 'Bookings');
                     class="all_active"><?= Html::a(Yii::t('app', 'Все'), ['/owner/booking/index', 'object_id' => $object_id]) ?></button>
             </div>
 
-            
+
         </div>
 
         <div class="booking-index">
@@ -47,58 +47,89 @@ $this->title = Yii::t('app', 'Bookings');
                 'summary' => false,
                 'columns' => [
                     //'owner_id',
+                    // [
+                    //     'attribute' => 'date_from',
+                    //     'value' => function ($model) {
+                    //     return $model->dateFormat($model->date_from);
+                    // }
+                    // ],
+                    // [
+                    //     'attribute' => 'date_to',
+                    //     'value' => function ($model) {
+                    //     return $model->dateFormat($model->date_to);
+                    // }
+                    // ],
+                    [
+                        'attribute' => 'owner_id',
+                        'value' => function ($model) {
+                            return Yii::$app->user->identity->name;
+                        }
+                    ],
+                    [
+                        'attribute' => 'room_id',
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            $full = $model->bookingRoomTitle();
+                            $cut = StringHelper::truncate($full, 20);
+                            return "<span class='grid_short' full='$full'>" . $cut . "</span>";
+                        }
+                    ],
+                    [
+                        'attribute' => 'transaction_number',
+                        'value' => function ($model) {
+                            return $model->transaction_number;
+                        },
+                        'label' => '№ Бронирования',
+                    ],
+                    [
+                        'attribute' => 'created_at',
+                        'value' => function ($model) {
+                            return $model->dateFormat($model->created_at);
+                        }
+                    ],
                     [
                         'attribute' => 'date_from',
                         'value' => function ($model) {
-                        return $model->dateFormat($model->date_from);
-                    }
+                            return $model->dateFormat($model->date_from);
+                        }
                     ],
                     [
                         'attribute' => 'date_to',
                         'value' => function ($model) {
-                        return $model->dateFormat($model->date_to);
-                    }
-                    ],
-                    [
-                        'attribute' => 'room_id',
-                        'value' => function ($model) {
-                        return $model->bookingRoomTitle();
-                    }
-                    ],
-                    [
-                        'attribute' => 'object_id',
-                        'value' => function ($model) {
-                        return $model->bookingObjectTitle();
-                    }
-                    ],
-                    [
-                        'attribute' => 'tariff_id',
-                        'value' => function ($model) {
-                        return $model->bookingTariffTitle();
-                    }
+                            return $model->dateFormat($model->date_to);
+                        }
                     ],
                     //'special_comment',
-                    [
-                        'attribute' => 'created_at',
-                        'value' => function ($model) {
-                        return $model->dateFormat($model->created_at);
-                    }
-                    ],
+            
                     [
                         'attribute' => 'sum',
                         'value' => function ($model) {
-                        return $model->sum . " " . $model->currency;
-                    }
+                            return $model->sum . " " . $model->currency;
+                        }
+                    ],
+                    [
+                        'attribute' => 'comission',
+                        'value' => function ($model) {
+                            return $model->comissionFee();
+                        }
+                    ],
+                    [
+                        'label'=>Yii::t('app', 'К выплате'),
+                        'attribute' => 'income',
+                        'value' => function ($model) {
+                            return $model->incomeString();
+                        }
                     ],
                     [
                         'attribute' => 'status',
                         'format' => 'raw',
                         'value' => function ($model) {
-                        $string = $model->bookingStatusString()["string"];
-                        $color = $model->bookingStatusString()["color"];
-                        return "<span class='status_td' style='color:{$color};border:1px solid {$color};'>" . $string . "</span>";
-                    }
+                            $string = $model->bookingStatusString()["string"];
+                            $color = $model->bookingStatusString()["color"];
+                            return "<span class='status_td' style='color:{$color};border:1px solid {$color};'>" . $string . "</span>";
+                        }
                     ],
+                    
                     //'guest_email:email',
                     //'guest_phone',
                     //'guest_name',
@@ -114,8 +145,8 @@ $this->title = Yii::t('app', 'Bookings');
                         'class' => ActionColumn::className(),
                         'template' => '{view}',
                         'urlCreator' => function ($action, Booking $model, $key, $index, $column) {
-                        return Url::toRoute([$action, 'id' => $model->id]);
-                    }
+                            return Url::toRoute([$action, 'id' => $model->id]);
+                        }
                     ],
                 ],
             ]); ?>
@@ -135,6 +166,7 @@ $this->title = Yii::t('app', 'Bookings');
         text-align: center;
         cursor: pointer;
     }
+
     .search-filter-form {
         width: 100%;
     }
@@ -328,5 +360,36 @@ $this->title = Yii::t('app', 'Bookings');
         color: #fff;
         border-color: #2563eb;
     }
-</style>
 
+    .grid_short {
+        position: relative;
+        cursor: pointer;
+    }
+
+    .grid_short::after {
+        content: attr(full);
+        position: absolute;
+        white-space: pre-wrap;
+        bottom: 125%;
+        /* Position above */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #333;
+        color: #fff;
+        padding: 8px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        /* Bigger font */
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+        z-index: 100;
+        width: max-content;
+        max-width: 300px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .grid_short:hover::after {
+        opacity: 1;
+    }
+</style>

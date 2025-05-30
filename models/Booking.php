@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\models\user\User;
 use Yii;
 use app\components\flashpay\Payment;
 use app\components\flashpay\Gate;
@@ -46,6 +47,9 @@ class Booking extends \yii\db\ActiveRecord
     const CANCEL_REASON_MISTAKE = 4;
     const CANCEL_REASON_NO_RESPONSE = 5;
     const CANCEL_REASON_OTHER = 6;
+
+    public $commission;
+    public $income;
     /**
      * {@inheritdoc}
      */
@@ -65,12 +69,13 @@ class Booking extends \yii\db\ActiveRecord
             [['status'], 'default', 'value' => 1],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
-            [['date_from', 'date_to', 'cancel_date'], 'safe'],
+            [['date_from', 'date_to', 'cancel_date', 'comission','income'], 'safe'],
             [['tariff_id', 'currency'], 'string', 'max' => 11],
             [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number'], 'string', 'max' => 255],
             [['other_guests'], 'string', 'max' => 500],
         ];
     }
+
 
     public function getCancelReasonArray()
     {
@@ -143,6 +148,8 @@ class Booking extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Дата брони'),
             'created_date' => Yii::t('app', 'Дата отмены'),
             'owner_id' => Yii::t('app', 'Хост'),
+            'comission' => Yii::t('app', 'Комиссия'),
+            'income' => Yii::t('app', 'Прибыль'),
             'cancel_reason_id' => Yii::t('app', 'Причина отмены'),
         ];
     }
@@ -155,6 +162,21 @@ class Booking extends \yii\db\ActiveRecord
             'objectDetails',
             'cancelReasonArray'
         ]);
+    }
+
+    public function comissionFee()
+    {
+        $percent = Yii::$app->user->identity->fee_percent ? Yii::$app->user->identity->fee_percent : User::FIXED_FEE;
+        $percent_sum = $this->sum * $percent / 100;
+        return $percent_sum . " " . $this->currency;
+    }
+
+    public function incomeString()
+    {
+        $percent = Yii::$app->user->identity->fee_percent ? Yii::$app->user->identity->fee_percent : User::FIXED_FEE;
+        $percent_sum = $this->sum * $percent / 100;
+        $income_sum = $this->sum - $percent_sum;
+        return $income_sum . " " . $this->currency;
     }
 
     public function getObjectDetails()

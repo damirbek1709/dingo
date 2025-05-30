@@ -8,7 +8,9 @@ use dektrium\rbac\models\Assignment;
 
 class User extends BaseUser
 {
+    const FIXED_FEE = 10;
     public $objects;
+
 
     const FLAG_DELETED = 1;
     public function scenarios()
