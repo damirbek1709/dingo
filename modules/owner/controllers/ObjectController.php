@@ -1684,7 +1684,7 @@ class ObjectController extends Controller
             'object_id' => $object_id,
             'object_title' => $object['name'][0],
             'room_id' => $id,
-            'title' => $model->typeTitle($model->type_id),
+            'title' => $room['room_title'],
             'picture_list' => $model->getImages()
         ]);
     }
