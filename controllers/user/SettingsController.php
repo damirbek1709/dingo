@@ -4,6 +4,7 @@ namespace app\controllers\user;
 
 use app\models\user\User;
 use dektrium\user\controllers\SettingsController as BaseSettingsController;
+use dektrium\user\models\UserSearch;
 use Yii;
 use yii\filters\AccessControl;
 use yii\web\NotFoundHttpException;
@@ -32,6 +33,12 @@ class SettingsController extends BaseSettingsController
                         'allow' => true,
                         'actions' => ['profile', 'account', 'networks', 'disconnect', 'delete', 'edit-profile', 'delete-account'],
                         'roles' => ['@'],
+                    ],
+
+                    [
+                        'allow' => true,
+                        'actions' => ['list'],
+                        'roles' => ['admin'],
                     ],
                     [
                         'allow' => true,
@@ -117,9 +124,9 @@ class SettingsController extends BaseSettingsController
         $user = User::findOne($id);
 
         $user->confirmed_at = null;
-        $rand = $id.rand(1000,9999);
-        $user->username = "deleted_user_".$rand;
-        $user->email = "deleted_user_".$rand;
+        $rand = $id . rand(1000, 9999);
+        $user->username = "deleted_user_" . $rand;
+        $user->email = "deleted_user_" . $rand;
         $user->name = "Deleted User";
         $user->flags = User::FLAG_DELETED;
 
@@ -158,6 +165,18 @@ class SettingsController extends BaseSettingsController
             \Yii::$app->user->logout();
             return $this->goHome();
         }
+    }
+
+    public function actionList()
+    {
+        $this->layout = "/general";
+        $searchModel = Yii::createObject(UserSearch::className());
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+
+        return $this->render('list', [
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+        ]);
     }
 
 }

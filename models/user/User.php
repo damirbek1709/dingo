@@ -3,9 +3,12 @@ namespace app\models\user;
 
 use dektrium\user\models\User as BaseUser;
 use dektrium\user\helpers\Password;
+use yii\data\ActiveDataProvider;
+use dektrium\rbac\models\Assignment;
 
 class User extends BaseUser
 {
+    public $objects;
 
     const FLAG_DELETED = 1;
     public function scenarios()
@@ -35,6 +38,7 @@ class User extends BaseUser
         $rules['search_dataSafe'] = ['search_data', 'safe'];
         $rules['nameSafe'] = ['name', 'safe'];
         $rules['phoneSafe'] = ['phone', 'safe'];
+        $rules['objectsSafe'] = ['objects', 'safe'];
         return $rules;
     }
 
@@ -44,6 +48,7 @@ class User extends BaseUser
             'username' => \Yii::t('user', 'Username'),
             'email' => \Yii::t('user', 'E-mail'),
             'name' => \Yii::t('user', 'Имя и фамилия'),
+            'objects' => \Yii::t('user', 'Объекты'),
             'phone' => \Yii::t('user', 'Телефон'),
             'registration_ip' => \Yii::t('user', 'Registration ip'),
             'unconfirmed_email' => \Yii::t('user', 'New email'),
@@ -103,9 +108,45 @@ class User extends BaseUser
         }
     }
 
+    public function getAuthAssignments()
+    {
+        return $this->hasMany(Assignment::className(), ['user_id' => 'id']);
+    }
+
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
+    }
+
+    public function search($params)
+    {
+        $query = $this->finder->getUserQuery();
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'sort' => ['defaultOrder' => ['created_at' => SORT_DESC]],
+        ]);
+
+        if (!($this->load($params) && $this->validate())) {
+            return $dataProvider;
+        }
+
+        $modelClass = $query->modelClass;
+        $table_name = $modelClass::tableName();
+
+        if ($this->created_at !== null) {
+            $date = strtotime($this->created_at);
+            $query->andFilterWhere(['between', $table_name . '.created_at', $date, $date + 3600 * 24]);
+        }
+
+        $query->andFilterWhere(['like', $table_name . '.username', $this->username])
+            ->andFilterWhere(['like', $table_name . '.email', $this->email])
+            ->andFilterWhere(['like', $table_name . '.name', $this->name])
+            ->andFilterWhere(['like', $table_name . '.phone', $this->name])
+            ->andFilterWhere([$table_name . '.id' => $this->id])
+            ->andFilterWhere([$table_name . 'registration_ip' => $this->registration_ip]);
+
+        return $dataProvider;
     }
 
 

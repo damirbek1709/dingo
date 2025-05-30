@@ -11,7 +11,7 @@ use yii\widgets\Pjax;
         <?= Html::a(Yii::t('app', 'Панель'), ['/admin']); ?>
     </div>
     <div class="owner-nav-item owner-nav-item-comfort">
-        <?= Html::a(Yii::t('app', 'Пользователи'), ['/user/admin']); ?>
+        <?= Html::a(Yii::t('app', 'Пользователи'), ['/admin/user']); ?>
     </div>
 
     <div class="owner-nav-item owner-nav-item-payment">

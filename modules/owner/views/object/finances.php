@@ -46,7 +46,7 @@ $this->title = Yii::t('app', 'Bookings');
                 //'filterModel' => $searchModel,
                 'summary' => false,
                 'columns' => [
-                    'owner_id',
+                    //'owner_id',
                     [
                         'attribute' => 'date_from',
                         'value' => function ($model) {
