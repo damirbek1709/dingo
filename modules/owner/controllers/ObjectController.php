@@ -1555,18 +1555,7 @@ class ObjectController extends Controller
         $model = new RoomCat($room);
         $model->setAttributes($room, false);
         $model->img = $bind_model->getImage() ? $bind_model->getImage()->id : null;
-
-        // Prepopulate bed_types
-        $model->bed_types = [];
-        if (isset($room['bed_types']) && is_array($room['bed_types'])) {
-
-            foreach ($room['bed_types'] as $bedType) {
-                $model->bed_types[$bedType['id']] = [
-                    'checked' => $bedType['quantity'] > 0 ? 1 : 0,  // Set checked if quantity > 0
-                    'quantity' => $bedType['quantity'],
-                ];
-            }
-        }
+ 
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             $model->images = UploadedFile::getInstances($model, 'images');
@@ -1579,20 +1568,12 @@ class ObjectController extends Controller
                 }
             }
 
-            $bedTypes = [];
-            if (isset($model->bed_types) && is_array($model->bed_types)) {
-                foreach ($model->bed_types as $key => $val) {
-                    if ($val['checked']) {
-                        $bedTypeDetails = $model->bedTypes(); // Get all bed types
-                        $bedTypeTitle = isset($bedTypeDetails[$key]) ? $bedTypeDetails[$key][0] : 'Unknown';
-                        $bedTypes[] = [
-                            'id' => (int) $key,
-                            'title' => $bedTypeTitle,
-                            'quantity' => (int) $val['quantity']
-                        ];
-                    }
-                }
+            $default_prices = [];
+            foreach ($model->default_prices as $val) {
+                $default_prices[] = (float) $val;
             }
+
+            
 
             $room['room_title'] = $model->typeTitle($model->type_id);
             $room['guest_amount'] = (int) $model->guest_amount;
@@ -1604,7 +1585,7 @@ class ObjectController extends Controller
             $room['kitchen'] = (int) $model->kitchen;
             $room['base_price'] = (int) $model->base_price;
             $room['img'] = $model->img;
-            $room['bed_types'] = $bedTypes;
+            $room['default_prices'] = $default_prices;
 
 
             // Update the room in the rooms array if it exists
