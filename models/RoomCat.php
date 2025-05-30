@@ -209,7 +209,7 @@ class RoomCat extends \yii\db\ActiveRecord
     public function typeTitle($id)
     {
         $result = Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_ROOM, 'id' => $id])->one();
-        return [$result->title, $result->title_en, $result->title_ky];
+        return $result ? [$result->title, $result->title_en, $result->title_ky, $id] : [];
     }
 
     public function getWallpaper()

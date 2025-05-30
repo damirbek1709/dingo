@@ -29,6 +29,16 @@ use yii\widgets\ActiveForm;
             ],
         ]); ?>
 
+        <?php
+        if(count($model->room_title) > 3){
+            $model->type_id = $model->room_title[3];
+        }
+        else{
+            $bind_model = RoomCat::findOne($model->id);
+            $model->type_id = $bind_model ? $bind_model->type_id : "";
+        }
+        ?>
+
         <?= $form->field($model, 'type_id')->dropDownList($model->typeList())->label(Yii::t('app', 'Тип номера')) ?>
 
 
