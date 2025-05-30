@@ -48,7 +48,7 @@ use yii\widgets\ActiveForm;
         </div>
 
         <div style="font-size:11px;margin-bottom:15px">
-            <?= Yii::t('app', '"Пожалуйста укажите самую минимальную, базовую цену за номер при самом дешевом тарифе". По дизайну можно сделат так же, как и при загрузке документов.') ?>
+            <?= Yii::t('app', '"Пожалуйста укажите самую минимальную, базовую цену за номер при самом дешевом тарифе"') ?>
         </div>
         <div id="default-prices-wrapper" style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-gap: 0 20px;">
             <?php
