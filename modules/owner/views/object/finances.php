@@ -71,12 +71,12 @@ $this->title = Yii::t('app', 'Bookings');
                         return $model->bookingObjectTitle();
                     }
                     ],
-                    // [
-                    //     'attribute' => 'tariff_id',
-                    //     'value' => function ($model) {
-                    //     return $model->bookingTariffTitle();
-                    // }
-                    // ],
+                    [
+                        'attribute' => 'tariff_id',
+                        'value' => function ($model) {
+                        return $model->bookingTariffTitle();
+                    }
+                    ],
                     //'special_comment',
                     [
                         'attribute' => 'created_at',
@@ -92,8 +92,11 @@ $this->title = Yii::t('app', 'Bookings');
                     ],
                     [
                         'attribute' => 'status',
+                        'format' => 'raw',
                         'value' => function ($model) {
-                        return $model->bookingStatusString();
+                        $string = $model->bookingStatusString()["string"];
+                        $color = $model->bookingStatusString()["color"];
+                        return "<span class='status_td' style='color:{$color};border:1px solid {$color};'>" . $string . "</span>";
                     }
                     ],
                     //'guest_email:email',
@@ -124,6 +127,14 @@ $this->title = Yii::t('app', 'Bookings');
 
 
 <style>
+    .status_td {
+        border-radius: 4px;
+        padding: 2px 4px;
+        display: block;
+        min-width: 90px;
+        text-align: center;
+        cursor: pointer;
+    }
     .search-filter-form {
         width: 100%;
     }

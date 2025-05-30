@@ -26,6 +26,8 @@ class User extends BaseUser
         $scenarios['create'][] = 'phone';
         $scenarios['update'][] = 'phone';
         $scenarios['register'][] = 'phone';
+
+       $scenarios['update'][] = 'fee_percent';
         return $scenarios;
     }
 
@@ -38,6 +40,7 @@ class User extends BaseUser
         $rules['search_dataSafe'] = ['search_data', 'safe'];
         $rules['nameSafe'] = ['name', 'safe'];
         $rules['phoneSafe'] = ['phone', 'safe'];
+        $rules['fee_percentSafe'] = ['fee_percent', 'safe'];
         $rules['objectsSafe'] = ['objects', 'safe'];
         return $rules;
     }
@@ -50,6 +53,7 @@ class User extends BaseUser
             'name' => \Yii::t('user', 'Имя и фамилия'),
             'objects' => \Yii::t('user', 'Объекты'),
             'phone' => \Yii::t('user', 'Телефон'),
+            'fee_percent' => \Yii::t('user', 'Процент от брони'),
             'registration_ip' => \Yii::t('user', 'Registration ip'),
             'unconfirmed_email' => \Yii::t('user', 'New email'),
             'password' => \Yii::t('user', 'Password'),
