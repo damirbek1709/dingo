@@ -155,7 +155,7 @@ class RegistrationController extends BaseRegistrationController
         $this->performAjaxValidation($model);
 
         if ($model->load(Yii::$app->request->post())) {
-            if (in_array($model->email, ['damirbek@gmail.com'])) {
+            if (in_array($model->email, ['damirbek@gmail.com','adiletprosoft@gmail.com'])) {
                 Yii::$app->session->set('session_email', $model->email);
                 $user = User::find()->where(['email' => $model->email])->one();
                 $dao = Yii::$app->db;
