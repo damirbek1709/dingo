@@ -16,11 +16,11 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
         <button class="sidebar-close" id="sidebar-close">&times;</button>
         <div class="sidebar-inner">
-            <h3><?=Yii::t('app','Редактирование')?></h3>
+            <h3><?= Yii::t('app', 'Редактирование') ?></h3>
 
             <form id="w0" method="post">
                 <div class="date-range-container" style="margin-top: 20px;">
-                    <div class="date-range-label"><?=Yii::t('app','Заезд и выезд')?></div>
+                    <div class="date-range-label"><?= Yii::t('app', 'Заезд и выезд') ?></div>
                     <div class="date-range-inputs">
                         <input type="date" id="checkin" class="date-input" placeholder="От">
                         <span class="date-separator">→</span>
@@ -30,7 +30,8 @@ $this->title = Yii::t('app', 'Доступность и цены');
                 </div>
                 <div id="sidebar-details"></div>
                 <div class="sidebar_submit">
-                    <div style="display:inline-block;float:right" class="save-button update-tariff"><?=Yii::t('app','Сохранить')?></div>
+                    <div style="display:inline-block;float:right" class="save-button update-tariff">
+                        <?= Yii::t('app', 'Сохранить') ?></div>
                 </div>
             </form>
         </div>
@@ -209,7 +210,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
         $('#checkout').val(convertToISO(date));
 
         let sidebar_title = `<h4 class="sidebar_title">${room.room_title[0]} </h4>`;
-        let  html = `<div class="form-group">
+        let html = `<div class="form-group">
                     <label>Доступно номеров </label>
                     <input class="form-control" type="text" id="similar_room_count" value="${room.similar_room_amount}">
                 </div>`;
@@ -233,11 +234,15 @@ $this->title = Yii::t('app', 'Доступность и цены');
             };
 
             for (let i = 0; i < room.guest_amount; i++) {
-                const priceValue = (selectedTariff.prices && selectedTariff.prices[0] &&
-                    Array.isArray(selectedTariff.prices[0].price_arr) &&
-                    selectedTariff.prices[0].price_arr[i])
-                    ? selectedTariff.prices[0].price_arr[i]
-                    : '';
+                let priceValue = '';
+                if (Array.isArray(selectedTariff.prices)) {
+                    const matchedRange = selectedTariff.prices.find(priceBlock =>
+                        isDateInRange(date, priceBlock.from_date, priceBlock.to_date)
+                    );
+                    if (matchedRange && Array.isArray(matchedRange.price_arr)) {
+                        priceValue = matchedRange.price_arr[i] || '';
+                    }
+                }
 
                 html += `
                     <div>
