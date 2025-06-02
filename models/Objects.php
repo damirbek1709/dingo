@@ -145,7 +145,7 @@ class Objects extends \yii\db\ActiveRecord
     public static function hostName($user_id)
     {
         $user = User::findOne($user_id);
-        return $user? $user->name : "Имя не заполнено";
+        return $user ? $user->name : "Имя не заполнено";
     }
 
     public static function attributeIndexed($attr)
@@ -520,9 +520,16 @@ class Objects extends \yii\db\ActiveRecord
                     'class' => 'owner-nav-item-object',
                 ],
             ];
+            return $general_arr;
         }
+        return [
+            'label' => '',
+            'visible' => Yii::$app->user->can('owner'),
+            'options' => [
+                'class' => 'owner-nav-item-object',
+            ],
+        ];
 
-        return $general_arr;
     }
 
     public static function mealList()

@@ -27,19 +27,7 @@ $meal_title = $model->getMealTitle($model->meal_type);
                         <?php echo $meal_title['label']; ?>
                     </span>
 
-                    <div class="room-card-options">
-                        <button class="options-btn"></button>
-                        <div class="options-menu">
-                            <ul>
-                                <li><span class="room-open-icon"></span>
-                                    <?= Html::a(Yii::t('app', 'Редактировать'), ['/owner/object/edit-tariff', 'id' => $model->id, 'object_id' => $object_id], ['class' => '']) ?>
-                                </li>
-                                <li class="room-delete-btn"><span class="room-delete-icon"></span>
-                                    <?= Html::a(Yii::t('app', 'Удалить'), ['/owner/tariff/delete', 'id' => $model->id, 'object_id' => $object_id], ['class' => '']) ?>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
 

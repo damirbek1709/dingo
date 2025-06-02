@@ -46,7 +46,9 @@ class ObjectController extends Controller
                         'booking',
                         'comfort',
                         'payment',
-                        'terms'
+                        'terms',
+                        'pictures',
+                        'room-comfort'
                     ],
                     'roles' => ['admin'],
                 ],
@@ -139,6 +141,164 @@ class ObjectController extends Controller
         return $this->render('terms', [
             'model' => $model,
             'id' => $id,
+        ]);
+    }
+
+    public function actionRoomComfort($id, $object_id)
+    {
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $comforts_post = Yii::$app->request->post('comforts');
+
+        $object = $index->getDocument($object_id);
+        $room = [];
+        $model = new Objects($object);
+
+        // 🔁 Load the correct room from Meilisearch
+        if (isset($object['rooms']) && is_array($object['rooms'])) {
+            foreach ($object['rooms'] as $roomData) {
+                if (isset($roomData['id']) && $roomData['id'] == $id) {
+                    $room = $roomData;
+                    break;
+                }
+            }
+        }
+
+        // 🔄 Use updated room data from session if exists
+        $sessionKey = 'updated_room_' . $id;
+        if (Yii::$app->session->has($sessionKey)) {
+            $room = Yii::$app->session->get($sessionKey);
+            Yii::$app->session->remove($sessionKey);
+        }
+
+        // ✅ Process form submission
+        if (!empty($comforts_post)) {
+            $comfort_ids = [];
+
+            // 🧠 Extract selected comfort IDs
+            foreach ($comforts_post as $cat => $comfortsInCat) {
+                foreach ($comfortsInCat as $comfortId => $data) {
+                    if (isset($data['selected'])) {
+                        $comfort_ids[] = $comfortId;
+                    }
+                }
+            }
+
+            // 🗃 Fetch comforts from DB
+            $comfort_models = RoomComfort::find()->where(['id' => $comfort_ids])->all();
+            $comfortArr = [];
+
+            foreach ($comfort_models as $item) {
+                $catId = $item->category_id;
+                $itemId = $item->id;
+
+                // 🏷 Check if this comfort was selected
+                if (isset($comforts_post[$catId][$itemId]['selected'])) {
+                    $isPaid = isset($comforts_post[$catId][$itemId]['is_paid']) ? 1 : 0;
+
+                    $comfortArr[$catId][$itemId] = [
+                        'ru' => $item->title,
+                        'en' => $item->title_en,
+                        'ky' => $item->title_ky,
+                        'is_paid' => $isPaid,
+                    ];
+                }
+            }
+
+            // 🔄 Update the correct room in Meilisearch object
+            foreach ($object['rooms'] as $i => $roomData) {
+                if (isset($roomData['id']) && $roomData['id'] == $id) {
+                    $object['rooms'][$i]['comfort'] = $comfortArr;
+                    $room = $object['rooms'][$i];
+                    break;
+                }
+            }
+
+            // 💾 Send update to Meilisearch
+            $index->updateDocuments([
+                [
+                    'id' => (int) $object_id,
+                    'rooms' => $object['rooms']
+                ]
+            ]);
+
+            // 💡 Save updated room to session for immediate feedback
+            Yii::$app->session->set($sessionKey, $room);
+            Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+
+            return $this->refresh();
+        }
+
+        return $this->render('rooms/comfort', [
+            'object_id' => $object_id,
+            'object_title' => $object['name'][0],
+            'room_id' => $id,
+            'room' => $room,
+            'model' => $model,
+        ]);
+    }
+
+    public function actionPictures($id, $object_id)
+    {
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($object_id);
+        $model = RoomCat::findOne($id);
+
+        $rooms = $object['rooms'] ?? []; // Get existing rooms
+        $room = null;
+
+        foreach ($rooms as &$roomData) { // Use reference to modify the array
+            if ($roomData['id'] == $id) {
+                $room = &$roomData;
+                break;
+            }
+        }
+
+        if (!$room) {
+            throw new NotFoundHttpException('Room not found in Meilisearch.');
+        }
+
+        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+            $model->images = UploadedFile::getInstances($model, 'images');
+            if ($model->images) {
+                foreach ($model->images as $image) {
+                    $path = Yii::getAlias('@webroot/uploads/images/') . $image->name;
+                    $image->saveAs($path);
+                    $model->attachImage($path, true);
+                    @unlink($path);
+                }
+            }
+            $room['room_title'] = $model->typeTitle($model->type_id);
+            $room['guest_amount'] = (int) $model->guest_amount;
+            $room['similar_room_amount'] = (int) $model->similar_room_amount;
+            $room['area'] = (int) $model->area;
+            $room['bathroom'] = (int) $model->bathroom;
+            $room['balcony'] = (int) $model->balcony;
+            $room['air_cond'] = (int) $model->air_cond;
+            $room['kitchen'] = (int) $model->kitchen;
+            $room['base_price'] = (int) $model->base_price;
+            $room['img'] = $model->img;
+            $room['images'] = $model->getPictures();
+
+            // Update the document in Meilisearch
+            $meilisearchData = [
+                'id' => (int) $object_id,
+                'rooms' => $rooms // Preserve all rooms
+            ];
+
+            if ($index->updateDocuments($meilisearchData)) {
+                Yii::$app->session->setFlash('success', 'Ваши изменения сохранены!');
+                return $this->refresh();
+            }
+        }
+        return $this->render('rooms/pictures', [
+            'model' => $model,
+            'object_id' => $object_id,
+            'object_title' => $object['name'][0],
+            'room_id' => $id,
+            'title' => $room['room_title'],
+            'picture_list' => $model->getImages()
         ]);
     }
 

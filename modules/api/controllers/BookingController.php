@@ -262,6 +262,8 @@ class BookingController extends BaseController
     {
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
+        $user_id = Yii::$app->user->id;
+        $dataProvider->query->andFilterWhere(['user_id' => $user_id]);
 
         $pageSize = (int) Yii::$app->request->get('per-page', 10);
         $dataProvider->pagination = [

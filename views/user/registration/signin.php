@@ -77,18 +77,14 @@ $this->title = Yii::t('user', 'Sign in');
         </svg>
         <?= $form->field($model, 'email')->textInput(["type" => "email", 'class' => 'input', 'placeholder' => 'mail@example.com', 'autocomplete="email"'])->label(false); ?>
     </div>
-    <div class="form-caption">Мы отправим разовый пароль на вашу почту</div>
+    <div class="form-caption"><?=Yii::t('app','Мы отправим разовый пароль на вашу почту')?></div>
     <div class="checkbox-row">
         <input type="checkbox" id="terms" required checked>
         <label for="terms" class="checkbox-desc">
-            Я принимаю условия <a href="#" target="_blank" rel="noopener">договора оферты</a> и подтверждаю своё
-            согласие
+            <?=Yii::t('app','Я принимаю условия')?> <a href="/offer" target="_blank" rel="noopener"><?=Yii::t('app','договора оферты')?></a> <?=Yii::t('app','и подтверждаю своё согласие согласие')?>
         </label>
     </div>
-    <button type="submit" class="btn-main">Зарегистрироваться</button>
-    <div class="bottom-link">
-        Уже есть аккаунт?
-        <a href="#">Войти</a>
-    </div>
+    <button type="submit" class="btn-main"><?=Yii::t('app','Получить код')?></button>
+    
     <?php ActiveForm::end(); ?>
 </main>

@@ -31,15 +31,16 @@ use yii\widgets\ActiveForm;
                     <h2 class="general_title"><?= Yii::t('app', 'Условия'); ?></h2>
                     <!-- Early & Late Check-in -->
                     <h4 class="minor_title"><?= Yii::t('app', 'Ранний заезд, Поздний заезд'); ?></h4>
-                    <?= Html::checkbox('early_check_in', $model->early_check_in ? true : false, ['label' => 'Доступен ранний заезд']) ?>
+                    <?= Html::checkbox('early_check_in', $model->early_check_in ? true : false, ['label' => 'Доступен ранний заезд', 'disabled' => true]) ?>
                     <div class="clear"></div>
-                    <?= Html::checkbox('late_check_in', $model->late_check_in ? true : false, ['label' => 'Доступен поздний выезд']) ?>
+                    <?= Html::checkbox('late_check_in', $model->late_check_in ? true : false, ['label' => 'Доступен поздний выезд', 'disabled' => true]) ?>
 
                     <div id="meal-terms-container">
                         <h4 class="minor_title"><?= Yii::t('app', 'Питание с оплатой на месте'); ?></h4>
                         <div class="toggle-switch-container">
                             <label class="toggle-switch">
-                                <input type="checkbox" name="meal_purchaise" value="1" <?= $model->meal_purchaise ? 'checked' : '' ?> class="toggle-switch-input">
+                                <input type="checkbox" disabled="true" name="meal_purchaise" value="1"
+                                    <?= $model->meal_purchaise ? 'checked' : '' ?> class="toggle-switch-input">
                                 <span class="slider round"></span>
                             </label>
                             <span class="toggle-label"><?= Yii::t('app', 'Доступно с оплатой на месте') ?></span>
@@ -51,16 +52,23 @@ use yii\widgets\ActiveForm;
 
                                     <div class="select-box-double">
                                         <label><?= Yii::t('app', 'Тип питания') ?></label>
-                                        <?= Html::dropDownList("meal_terms[$index][meal_type]", $meal['meal_type'] ?? '', $meal_list, ['class' => 'form-control', 'prompt' => Yii::t('app', 'Выберите тип питания')]) ?>
+                                        <?= Html::dropDownList("meal_terms[$index][meal_type]", $meal['meal_type'] ?? '', $meal_list, [
+                                            'class' => 'form-control',
+                                            'readonly' => true,
+                                            'disabled' => true,
+                                            'prompt' => Yii::t('app', 'Выберите тип питания'),
+                                        ]) ?>
                                     </div>
 
                                     <div class="select-box-double">
                                         <label><?= Yii::t('app', 'Стоимость') ?></label>
-                                        <?= Html::input('text', "meal_terms[$index][meal_cost]", $meal['meal_cost'] ?? '', ['class' => 'form-control', 'placeholder' => Yii::t('app', 'Укажите стоимость питание')]) ?>
+                                        <?= Html::input('text', "meal_terms[$index][meal_cost]", $meal['meal_cost'] ?? '', [
+                                            'class' => 'form-control',
+                                            'readonly' => true,
+                                            'disabled' => true,
+                                            'placeholder' => Yii::t('app', 'Укажите стоимость питание')
+                                        ]) ?>
                                     </div>
-
-                                    <button type="button" class="btn remove-meal"></button>
-
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -69,42 +77,49 @@ use yii\widgets\ActiveForm;
                             <div class="meal-row">
                                 <div class="select-box-double">
                                     <label><?= Yii::t('app', 'Тип питания') ?></label>
-                                    <?= Html::dropDownList("meal_terms[0][meal_type]", '', $meal_list, ['class' => 'form-control', 'prompt' => Yii::t('app', 'Выберите тип питания')]) ?>
+                                    <?= Html::dropDownList("meal_terms[0][meal_type]", '', $meal_list, [
+                                        'class' => 'form-control',
+                                        'readonly' => true,
+                                        'disabled' => true,
+                                        'prompt' => Yii::t('app', 'Выберите тип питания')
+                                    ])
+                                        ?>
                                 </div>
 
                                 <div class="select-box-double">
                                     <label><?= Yii::t('app', 'Стоимость') ?></label>
-                                    <?= Html::input('text', "meal_terms[0][meal_cost]", '', ['class' => 'form-control', 'placeholder' => Yii::t('app', 'Укажите стоимость питание')]) ?>
+                                    <?= Html::input('text', "meal_terms[0][meal_cost]", '', [
+                                        'readonly' => true,
+                                        'disabled' => true,
+                                        'class' => 'form-control', 
+                                        'placeholder' => Yii::t('app', 'Укажите стоимость питание')]) ?>
                                 </div>
 
-                                <button type="button" class="btn remove-meal"></button>
                             </div>
                         <?php endif; ?>
                     </div>
 
                     <!-- Meal Terms -->
 
-                    <!-- Button to add new meal type -->
-                    <button type="button" id="add-meal" class="btn btn-terms"><span class="add-meal-plus">&#43;</span>
-                        <?= Yii::t('app', 'Добавить тип питания') ?></button>
 
                     <div class="terms_section"><!-- Internet & Animals Allowed -->
                         <h4 class="minor_title"><?php echo Yii::t('app', 'Интернет в общественных местах'); ?></h4>
-                        <?= Html::checkbox('internet_public', $model->internet_public ? true : false, ['label' => 'Интернет доступен']) ?>
+                        <?= Html::checkbox('internet_public', $model->internet_public ? true : false, ['label' => 'Интернет доступен','disabled'=>true]) ?>
                     </div>
 
                     <div class="terms_section">
                         <h4 class="minor_title"><?= Yii::t('app', 'Политика проживания с животными') ?></h4>
-                        <?= Html::checkbox('animals_allowed', $model->animals_allowed ? true : false, ['label' => 'Разрешено проживание с животными']) ?>
+                        <?= Html::checkbox('animals_allowed', $model->animals_allowed ? true : false, ['label' => 'Разрешено проживание с животными','disabled'=>true]) ?>
                     </div>
 
                     <div class="terms_section">
                         <h4><?= Yii::t('app', 'Младенцы'); ?></h4>
                         <div class="hint"><?= Yii::t('app', 'Размещаются с родителями бесплатно без места'); ?></div>
-                        <div class="increment-input">
+                        <div class="increment-input disabled-increaser">
                             <button type="button" class="decrement">-</button>
                             <?= Html::input('text', 'children', $model->children ? $model->children : 0, [
-                                'class' => 'form-control children-count',
+                                'class' => 'form-control children-count ',
+                            
                                 'readonly' => true,
                                 'label' => 'Грудные дети до'
                             ]); ?>
@@ -130,22 +145,7 @@ use yii\widgets\ActiveForm;
 $mealListJson = json_encode($meal_list);
 $script = <<<JS
 $(document).ready(function() {
-    $('.increment').click(function() {
-        let input = $(this).siblings('.children-count');
-        let value = parseInt(input.val());
-        if(value <= 17)
-        {
-            input.val(value + 1);
-        }
-    });
-
-    $('.decrement').click(function() {
-        let input = $(this).siblings('.children-count');
-        let value = parseInt(input.val());
-        if (value > 0) {
-            input.val(value - 1);
-        }
-    });
+    
 
     let mealIndex = $(".meal-row").length; 
     let mealList = $mealListJson; // Convert PHP array to JS object
@@ -191,6 +191,10 @@ $this->registerJs($script);
     .toggle-switch-container {
         display: flex;
         align-items: center;
+    }
+    .disabled-increaser{
+        background-color: #ccc!important;
+        cursor: not-allowed;
     }
 
     .toggle-switch {

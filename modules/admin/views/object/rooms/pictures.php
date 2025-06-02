@@ -31,18 +31,7 @@ use yii\widgets\ActiveForm;
             <div class="col-md-9">
                 <div class="card">
                     <h1 class="general_title"><?= $title[0] ?></h1>
-                    <div class="drop-zone" id="drop-zone">
-                        <div class="drop-icon"></div>
-                        <div class="drop-text-top">Нажмите или перетащите файл в эту область для загрузки</div>
-                        <div class="drop-text-bottom">Поддержка одиночной или массовой загрузки</div>
-                        <?= $form->field($model, 'images[]', [
-                            'template' => '{input}', // Hides label and wrapper
-                        ])->fileInput([
-                                    'multiple' => true,
-                                    'style' => 'display: none;',
-                                    'id' => 'file-input'
-                                ]) ?>
-                    </div>
+                    
 
                     <div class="preview-container" id="preview-container">
                         <?php
@@ -70,10 +59,7 @@ use yii\widgets\ActiveForm;
                         <?php endif; ?>
                     </div>
 
-                    <div class="form-group">
-                        <?= Html::submitButton(Yii::t('app', 'Сохранить'), ['class' => 'save-button']) ?>
-                    </div>
-
+                    
                     <?php ActiveForm::end(); ?>
                 </div>
             </div>

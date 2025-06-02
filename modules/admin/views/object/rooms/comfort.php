@@ -48,7 +48,10 @@ $this->title = Yii::t('app', 'Удобства номеров');
                                         <?= Html::checkbox(
                                             "comforts[$categoryId][$comfort->id][selected]",
                                             isset($selectedComforts[$comfort->id]), // check if selected
-                                            ['value' => 1]
+                                            [
+                                                'value' => 1,
+                                                'disabled' => true,
+                                            ]
                                         ) ?>
 
                                         <input type="hidden" name="comforts[<?= $categoryId ?>][<?= $comfort->id ?>][id]"
@@ -59,7 +62,7 @@ $this->title = Yii::t('app', 'Удобства номеров');
                                             <label class="toggle-switch">
                                                 <input type="checkbox"
                                                     name="comforts[<?= $categoryId ?>][<?= $comfort->id ?>][is_paid]" value="1"
-                                                    <?= (isset($selectedComforts[$comfort->id]['is_paid']) && $selectedComforts[$comfort->id]['is_paid']) ? 'checked' : '' ?>>
+                                                    <?= (isset($selectedComforts[$comfort->id]['is_paid']) && $selectedComforts[$comfort->id]['is_paid']) ? 'checked' : '' ?> disabled>
 
                                                 <span class="slider round"></span>
                                             </label>
@@ -70,12 +73,9 @@ $this->title = Yii::t('app', 'Удобства номеров');
                             </div>
                         </fieldset>
                     <?php endforeach; ?>
-
-                    <div class="form-group">
-                        <?= Html::submitButton('Сохранить', ['class' => 'save-button']) ?>
-                    </div>
                 </div>
             </div>
+
         </div>
     </div>
     <?php ActiveForm::end(); ?>

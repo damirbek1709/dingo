@@ -55,13 +55,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         } else {
                             if (array_key_exists('images', $val)) {
                                 if (array_key_exists('thumbnailPicture', $$val['images'])) {
-                                    echo Html::a($val['images']['thumbnailPicture'], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]);
+                                    echo Html::a($val['images']['thumbnailPicture'], ['/admin/object/room', 'id' => $room_id, 'object_id' => $object_id]);
                                 }
                             }
 
                         } ?>
                         <div class="room-card-details">
-                            <h3><?= Html::a($val['room_title'][0], ['/owner/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?>
+                            <h3><?= Html::a($val['room_title'][0], ['/admin/object/room', 'id' => $room_id, 'object_id' => $object_id]); ?>
                             </h3>
                             <div class="room-info">
                                 <span class="room-area">
@@ -83,9 +83,7 @@ $this->params['breadcrumbs'][] = $this->title;
                                             <li><span class="room-open-icon"></span>
                                                 <?= Html::a(Yii::t('app', 'Открыть'), ['room', 'id' => $val['id'], 'object_id' => $object_id], ['class' => '']) ?>
                                             </li>
-                                            <li class="room-delete-btn"><span class="room-delete-icon"></span>
-                                                <?= Html::a(Yii::t('app', 'Удалить'), ['delete-room', 'id' => $val['id'], 'object_id' => $object_id], ['class' => '']) ?>
-                                            </li>
+                                            
                                         </ul>
                                     </div>
                                 </div>
