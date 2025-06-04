@@ -454,7 +454,7 @@ class Objects extends \yii\db\ActiveRecord
 
     public static function regionList()
     {
-        return ArrayHelper::map(Oblast::find()->all(), 'id', 'title');
+        return Oblast::find()->all();
     }
 
     public static function objectTypeList()
