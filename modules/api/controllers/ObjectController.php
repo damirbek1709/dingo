@@ -577,33 +577,37 @@ class ObjectController extends BaseController
         $index = $client->index('object');
 
         $query = Yii::$app->request->get('query', '');
-        $results = [
-            'regions' => [],
-            'oblast' => []
-        ];
 
         if (!empty($query)) {
             $hotelMatches = $index->search($query, [
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
                 'limit' => 100 // Adjust as needed
             ])->getHits();
+
+            
         
             $matchedHotelCount = 0;
             $matchedHotelName = [];
         
             foreach ($hotelMatches as $hit) {
-
                 if (!empty($hit['name'])) {
-                    $counter = 1;
-                    $matchedHotelName[] = [
-                        'name' => $hit['name'],
-                        'amount' => $matchedHotelCount,
-                        'type' => Objects::SEARCH_TYPE_HOTEL
-                    ];
-                    $counter++;
+                    foreach ($hit['name'] as $variant) {
+                        if (mb_strtolower($variant) === mb_strtolower($query)) {
+                            $matchedHotelName = $hit['name'];
+                            $matchedHotelCount++;
+                            break 2; // Use the first exact matched hotel
+                        }
+                    }
                 }
             }
-            $results['hotels'] = $matchedHotelName;
+        
+            if ($matchedHotelCount > 0) {
+                $results['hotels'][] = [
+                    'name' => $matchedHotelName,
+                    'amount' => $matchedHotelCount,
+                    'type' => Objects::SEARCH_TYPE_HOTEL
+                ];
+            }
         }
 
         // Faceted count search
@@ -616,7 +620,11 @@ class ObjectController extends BaseController
         $cityCounts = $facetSearch->getFacetDistribution()['city'] ?? [];
         $oblastCounts = $facetSearch->getFacetDistribution()['oblast_id'] ?? [];
 
-        
+        $results = [
+            'regions' => [],
+            'hotels' => [],
+            'oblast' => []
+        ];
 
         $regionModels = Objects::regionList();
         foreach ($regionModels as $model) {
