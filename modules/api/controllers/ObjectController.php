@@ -57,7 +57,8 @@ class ObjectController extends BaseController
             'search',
             'room-images',
             'similar',
-            'exchange'
+            'exchange',
+            'search-stats'
         ];
 
 
@@ -86,7 +87,7 @@ class ObjectController extends BaseController
                 ]
             ]
         ];
-        
+
 
         $behaviors['verbs'] = [
             'class' => VerbFilter::className(),
