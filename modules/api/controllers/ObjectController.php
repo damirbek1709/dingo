@@ -576,69 +576,82 @@ class ObjectController extends BaseController
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
 
-        // Get query from request
-        $regionParam = Yii::$app->request->get('query', '');
+        $query = Yii::$app->request->get('query', '');
 
-        // Search for initial hit (to extract transliteration)
-        $hit = $index->search($regionParam, [
-            'limit' => 1
-        ])->getHits();
+        // Initial Meilisearch hit (just to extract translit fields)
+        $hit = $index->search($query, ['limit' => 1])->getHits();
 
-        $translit_city = isset($hit[0]['city']) ? $hit[0]['city'] : [];
-        $translit_hotel = isset($hit[0]['name']) ? $hit[0]['name'] : [];
-        $translit_oblast = isset($hit[0]['oblast_id']) ? $hit[0]['oblast_id'] : [];
+        $translit_city = $hit[0]['city'] ?? [];
+        $translit_hotel = $hit[0]['name'] ?? [];
+        $translit_oblast = $hit[0]['oblast_id'] ?? [];
 
-        // Get facets from all objects
-        $allFacetsSearch = $index->search('', [
+        // Faceted count search
+        $facetSearch = $index->search('', [
             'facets' => ['city', 'name', 'oblast_id'],
             'limit' => 0
         ]);
 
-        $allRegionCounts = $allFacetsSearch->getFacetDistribution()['city'] ?? [];
-        $allHotelCounts = $allFacetsSearch->getFacetDistribution()['name'] ?? [];
-        $allOblastCounts = $allFacetsSearch->getFacetDistribution()['oblast_id'] ?? [];
+        $cityCounts = $facetSearch->getFacetDistribution()['city'] ?? [];
+        $oblastCounts = $facetSearch->getFacetDistribution()['oblast_id'] ?? [];
 
-        // Prepare result array
         $results = [
             'regions' => [],
             'hotels' => [],
             'oblast' => []
         ];
 
-        // Load full region list
-        $regionList = Objects::regionList(); // Expected format: [id => ['title' => ..., 'title_en' => ..., 'title_ky' => ...]]
+        // Load all regions from DB
+        $regionModels = Objects::regionList(); // returns Oblast::find()->all()
 
-        foreach ($regionList as $regionId => $regionNames) {
-            $matchedAmount = 0;
+        foreach ($regionModels as $model) {
+            $titles = [
+                $model->title,
+                $model->title_en,
+                $model->title_ky
+            ];
 
-            // Compare each name variant against city facet keys
-            foreach ($regionNames as $variant) {
-                foreach ($allRegionCounts as $facetName => $count) {
-                    if (mb_strtolower($facetName) === mb_strtolower($variant)) {
-                        $matchedAmount += $count;
+            // Count matches in city facet
+            $cityAmount = 0;
+            foreach ($titles as $variant) {
+                foreach ($cityCounts as $cityName => $count) {
+                    if (mb_strtolower($cityName) === mb_strtolower($variant)) {
+                        $cityAmount += $count;
                     }
                 }
             }
 
             $results['regions'][] = [
-                'name' => array_values($regionNames), // e.g. ["Бишкек", "Bishkek", "Бишкек"]
-                'amount' => $matchedAmount,
+                'name' => $titles,
+                'amount' => $cityAmount,
                 'type' => Objects::SEARCH_TYPE_REGION
+            ];
+
+            // Count matches in oblast facet
+            $oblastAmount = 0;
+            foreach ($titles as $variant) {
+                foreach ($oblastCounts as $oblastName => $count) {
+                    if (mb_strtolower($oblastName) === mb_strtolower($variant)) {
+                        $oblastAmount += $count;
+                    }
+                }
+            }
+
+            $results['oblast'][] = [
+                'name' => $titles,
+                'amount' => $oblastAmount,
+                'type' => Objects::SEARCH_TYPE_REGION // create this constant if needed
             ];
         }
 
-        // Optional: fill matched hotels (if needed in future)
-        // Can be filled using logic like findBestMatches or getPrefixMatches, skipped here if not used
-
-        // Optional: fill matched oblasts (like above, if required)
-
-        // Handle user search data
+        // User search history
         $user_auth = null;
         $token = Yii::$app->request->headers->get('Authorization');
         $user_search_data = [];
+
         if ($token && preg_match('/^Bearer\s+(.*?)$/', $token, $matches)) {
             $user_auth = $matches[1];
         }
+
         if ($user_auth) {
             $user = User::find()->where(['auth_key' => $user_auth])->one();
             if ($user && $user->search_data) {
