@@ -556,7 +556,7 @@ class ObjectController extends BaseController
             $regions[$item->id]['name_ky'] = $item->title_ky;
             $regions[$item->id]['amount'] = 0;
 
-            $searchResponse = $index->search($query, [
+            $searchResponse = $index->search('', [
                 'filter' => "oblast_id = \"Бишкек\"",
                 //'limit' => 1,
             ]);
