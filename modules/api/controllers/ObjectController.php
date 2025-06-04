@@ -568,15 +568,15 @@ class ObjectController extends BaseController
         // ];
 
         // Prepare each individual field search
-        $fields = ['name', 'city', 'oblast_id'];
+        // $fields = ['name', 'city', 'oblast_id'];
 
-        foreach ($fields as $field) {
-            $searchResponse = $index->search($query, [
-                'filter' => "$field = \"$query\"",
-                'limit' => 1,
-            ]);
-            $result[$field]['amount'] = $searchResponse->getEstimatedTotalHits();
-        }
+        // foreach ($fields as $field) {
+        //     $searchResponse = $index->search($query, [
+        //         'filter' => "$field = \"$query\"",
+        //         'limit' => 1,
+        //     ]);
+        //     $result[$field]['amount'] = $searchResponse->getEstimatedTotalHits();
+        // }
 
         return $result;
     }
