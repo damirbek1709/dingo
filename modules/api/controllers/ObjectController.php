@@ -632,8 +632,7 @@ class ObjectController extends BaseController
             'oblast' => []
         ];
 
-        // Load all regions from DB
-        $regionModels = Objects::regionList(); // returns Oblast::find()->all()
+        $regionModels = Objects::regionList();
 
         foreach ($regionModels as $model) {
             $titles = [
@@ -642,23 +641,6 @@ class ObjectController extends BaseController
                 $model->title_ky
             ];
 
-            // Count matches in city facet
-            $cityAmount = 0;
-            foreach ($titles as $variant) {
-                foreach ($cityCounts as $cityName => $count) {
-                    if (mb_strtolower($cityName) === mb_strtolower($variant)) {
-                        $cityAmount += $count;
-                    }
-                }
-            }
-
-            $results['regions'][] = [
-                'name' => $titles,
-                'amount' => $cityAmount,
-                'type' => Objects::SEARCH_TYPE_REGION
-            ];
-
-            // Count matches in oblast facet
             $oblastAmount = 0;
             foreach ($titles as $variant) {
                 foreach ($oblastCounts as $oblastName => $count) {
@@ -668,7 +650,7 @@ class ObjectController extends BaseController
                 }
             }
 
-            $results['oblast'][] = [
+            $results['regions'][] = [
                 'name' => $titles,
                 'amount' => $oblastAmount,
                 'type' => Objects::SEARCH_TYPE_REGION // create this constant if needed
