@@ -555,28 +555,17 @@ class ObjectController extends BaseController
             $regions[$item->id]['name_en'] = $item->title_en;
             $regions[$item->id]['name_ky'] = $item->title_ky;
             $regions[$item->id]['amount'] = 0;
+
+            $searchResponse = $index->search($query, [
+                'filter' => "oblast_id = \"$query\"",
+                'limit' => 1,
+            ]);
+            $result[$item->id]['amount'] = $searchResponse->getEstimatedTotalHits();
         }
 
         $result = [
             $regions
         ];
-
-        // $result = [
-        //     'name' => ['amount' => 0],
-        //     'city' => ['amount' => 0],
-        //     'oblast_id' => ['amount' => 0],
-        // ];
-
-        // Prepare each individual field search
-        // $fields = ['name', 'city', 'oblast_id'];
-
-        // foreach ($fields as $field) {
-        //     $searchResponse = $index->search($query, [
-        //         'filter' => "$field = \"$query\"",
-        //         'limit' => 1,
-        //     ]);
-        //     $result[$field]['amount'] = $searchResponse->getEstimatedTotalHits();
-        // }
 
         return $result;
     }
