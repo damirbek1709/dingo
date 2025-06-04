@@ -564,7 +564,7 @@ class ObjectController extends BaseController
         }
 
         $result = [
-            $regions
+            "regions" => $regions
         ];
 
         return $result;
