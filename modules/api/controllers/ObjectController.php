@@ -557,8 +557,8 @@ class ObjectController extends BaseController
             $regions[$item->id]['amount'] = 0;
 
             $searchResponse = $index->search($query, [
-                'filter' => "oblast_id = \"$item->title\"",
-                'limit' => 1,
+                'filter' => "oblast_id = Бишкек",
+                //'limit' => 1,
             ]);
             $result[$item->id]['amount'] = $searchResponse->getEstimatedTotalHits();
         }
