@@ -578,6 +578,12 @@ class ObjectController extends BaseController
 
         $query = Yii::$app->request->get('query', '');
 
+        $results = [
+            'regions' => [],
+            'hotels' => [],
+            'oblast' => []
+        ];
+
         if (!empty($query)) {
             $hotelMatches = $index->search($query, [
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
@@ -616,11 +622,7 @@ class ObjectController extends BaseController
         $cityCounts = $facetSearch->getFacetDistribution()['city'] ?? [];
         $oblastCounts = $facetSearch->getFacetDistribution()['oblast_id'] ?? [];
 
-        $results = [
-            'regions' => [],
-            'hotels' => [],
-            'oblast' => []
-        ];
+        
 
         $regionModels = Objects::regionList();
         foreach ($regionModels as $model) {
