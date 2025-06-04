@@ -595,9 +595,6 @@ class ObjectController extends Controller
                     $bind_model->setMainImage($main_img);
                 }
 
-                $status = Objects::currentStatus($object_id, $model->status ? $model->status : Objects::STATUS_NOT_PUBLISHED);
-
-
                 $object_arr = [
                     'id' => (int) $model->id,
                     'name' => $model->name,
@@ -621,7 +618,6 @@ class ObjectController extends Controller
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
                     'general_room_count' => $model->general_room_count,
-                    'status' => $status
                 ];
 
                 if (!Yii::$app->user->can('admin')) {
