@@ -577,11 +577,10 @@ class ObjectController extends BaseController
         $index = $client->index('object');
 
         $query = Yii::$app->request->get('query', '');
-        $hit = $index->search($query, ['limit' => 1])->getHits();
 
         if (!empty($query)) {
             $hotelMatches = $index->search($query, [
-                'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
+                //'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
                 'limit' => 100 // Adjust as needed
             ])->getHits();
         
@@ -608,7 +607,7 @@ class ObjectController extends BaseController
                 ];
             }
         }
-        
+
         // Faceted count search
         $facetSearch = $index->search('', [
             'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
@@ -626,7 +625,6 @@ class ObjectController extends BaseController
         ];
 
         $regionModels = Objects::regionList();
-
         foreach ($regionModels as $model) {
             $titles = [
                 $model->title,
