@@ -551,10 +551,10 @@ class ObjectController extends BaseController
         $oblast_query = Oblast::find()->all();
         $regions = [];
         foreach ($oblast_query as $item) {
-            $regions[]['name'] = $item->title;
-            $regions[]['name_en'] = $item->title_en;
-            $regions[]['name_ky'] = $item->title_ky;
-            $regions[]['amount'] = 0;
+            $regions[$item->id]['name'] = $item->title;
+            $regions[$item->id]['name_en'] = $item->title_en;
+            $regions[$item->id]['name_ky'] = $item->title_ky;
+            $regions[$item->id]['amount'] = 0;
         }
 
         $result = [
