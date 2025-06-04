@@ -620,11 +620,7 @@ class ObjectController extends BaseController
                 }
             }
 
-            $results['regions'][] = [
-                'name' => $titles,
-                'amount' => $cityAmount,
-                'type' => Objects::SEARCH_TYPE_REGION
-            ];
+
 
             // Count matches in oblast facet
             $oblastAmount = 0;
@@ -636,10 +632,10 @@ class ObjectController extends BaseController
                 }
             }
 
-            $results['oblast'][] = [
+            $results['regions'][] = [
                 'name' => $titles,
                 'amount' => $oblastAmount,
-                'type' => Objects::SEARCH_TYPE_REGION // create this constant if needed
+                'type' => Objects::SEARCH_TYPE_REGION
             ];
         }
 
