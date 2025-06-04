@@ -654,7 +654,7 @@ class ObjectController extends BaseController
 
             $results['regions'][] = [
                 'name' => $titles,
-                'amount' => $oblastAmount,
+                'amount' => $cityAmount,
                 'type' => Objects::SEARCH_TYPE_REGION
             ];
 
