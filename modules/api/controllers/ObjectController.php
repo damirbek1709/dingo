@@ -577,16 +577,9 @@ class ObjectController extends BaseController
         $index = $client->index('object');
 
         $query = Yii::$app->request->get('query', '');
-
-        // Initial Meilisearch hit (just to extract translit fields)
         $hit = $index->search($query, ['limit' => 1])->getHits();
 
-        $translit_city = $hit[0]['city'] ?? [];
-        $translit_hotel = $hit[0]['name'] ?? [];
-        $translit_oblast = $hit[0]['oblast_id'] ?? [];
-
         if (!empty($query)) {
-            // Search by hotel name field
             $hotelMatches = $index->search($query, [
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
                 'limit' => 100 // Adjust as needed
@@ -619,6 +612,7 @@ class ObjectController extends BaseController
 
         // Faceted count search
         $facetSearch = $index->search('', [
+            'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
             'facets' => ['city', 'name', 'oblast_id'],
             'limit' => 0
         ]);
@@ -656,32 +650,6 @@ class ObjectController extends BaseController
                 'type' => Objects::SEARCH_TYPE_REGION // create this constant if needed
             ];
         }
-
-        if (!empty($query)) {
-            // Search by hotel name field
-            $hotelMatches = $index->search($query, [
-                'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
-                'limit' => 100 // Adjust as needed
-            ])->getHits();
-        
-            $matchedHotelCount = 0;
-            $matchedHotelName = [];
-        
-            foreach ($hotelMatches as $hit) {
-                if (!empty($hit['name'])) {
-                    foreach ($hit['name'] as $variant) {
-                        if (mb_strtolower($variant) === mb_strtolower($query)) {
-                            $matchedHotelName = $hit['name'];
-                            $matchedHotelCount++;
-                            break 2; // Use the first exact matched hotel
-                        }
-                    }
-                }
-            }
-        
-            
-        }
-        
 
         // User search history
         $user_auth = null;
