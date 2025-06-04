@@ -3,6 +3,7 @@
 namespace app\modules\api\controllers;
 
 use app\models\Comfort;
+use app\models\Oblast;
 use app\models\RoomComfort;
 use app\models\user\User;
 use Yii;
@@ -67,7 +68,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange','search-stats'],
+                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'search-stats'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -386,7 +387,7 @@ class ObjectController extends BaseController
             $saved_data = $user->search_data ? unserialize($user->search_data) : [];
             if ($user->search_data === null) {
                 if ($type == Objects::SEARCH_TYPE_REGION) {
-                    $translit_word = isset($hit[0]['region']) ? $hit[0]['region'] : [];
+                    $translit_word = isset($hit[0]['oblast_id']) ? $hit[0]['oblast_id'] : [];
                     $saved_data[] = [
                         'name' => $translit_word,
                         'region' => $queryWord,
@@ -547,11 +548,24 @@ class ObjectController extends BaseController
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
 
+        $oblast_query = Oblast::find()->all();
+        $regions = [];
+        foreach ($oblast_query as $item) {
+            $regions[]['name'] = $item->title;
+            $regions[]['name_en'] = $item->title_en;
+            $regions[]['name_ky'] = $item->title_ky;
+            $regions[]['amount'] = 0;
+        }
+
         $result = [
-            'name' => ['amount' => 0],
-            'city' => ['amount' => 0],
-            'oblast_id' => ['amount' => 0],
+            $regions
         ];
+
+        // $result = [
+        //     'name' => ['amount' => 0],
+        //     'city' => ['amount' => 0],
+        //     'oblast_id' => ['amount' => 0],
+        // ];
 
         // Prepare each individual field search
         $fields = ['name', 'city', 'oblast_id'];
