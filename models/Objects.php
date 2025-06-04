@@ -28,6 +28,7 @@ class Objects extends \yii\db\ActiveRecord
     public $city_en;
     public $city_ky;
     public $city;
+    public $oblast_id;
     public $city_id;
     public $address;
     public $address_ky;
@@ -186,7 +187,8 @@ class Objects extends \yii\db\ActiveRecord
                     'name',
                     'name_en',
                     'name_ky',
-                    'city_id'
+                    'city_id',
+                    'oblast_id'
                 ],
                 'required'
             ],

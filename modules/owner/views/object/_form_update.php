@@ -144,9 +144,9 @@ $cityName = $model->city ? $model->city[0] : "";
             ?>
         </div>
 
+        
 
         <?php
-
         echo $form->field($model, 'city_id')->widget(Select2::class, [
             'initValueText' => $cityName, // <-- This displays the selected value text
             'options' => [

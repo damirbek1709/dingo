@@ -44,6 +44,7 @@ $model->city_id = $model->city ? $model->city[0] : "";
                 'class' => 'form-input'
             ]
         ) ?>
+        
 
         <?php echo $form->field($model, 'city_id')->widget(Select2::class, [
             'options' => [

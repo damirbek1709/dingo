@@ -596,6 +596,39 @@ class ObjectController extends Controller
         ]);
     }
 
+    function translateOblast($oblast)
+    {
+        switch ($oblast) {
+            case "Бишкек":
+                return ["Bishkek", "Бишкек"];
+                break;
+            case "Ошская область":
+                return ["Osh oblast", "Ош областы"];
+                break;
+            case "Чуйская область":
+                return ["Chui oblast", "Чүй областы"];
+                break;
+            case "Джалал-Абадская область":
+                return ["Jalal-Abad oblast", "Жалал-Абад областы"];
+                break;
+            case "Нарынская область":
+                return ["Naryn oblast", "Нарын областы"];
+                break;
+            case "Таласская область":
+                return ["Talas oblast", "Талас областы"];
+                break;
+            case "Иссык-Кульская область":
+                return ["Yssyk-Kul oblast", "Ысык-Көл областы"];
+                break;
+            case "Баткенская область":
+                return ["Batken oblast", "Баткен областы"];
+                break;
+            default:
+                return ["", ""];
+
+        }
+    }
+
     public function actionUpdate($object_id)
     {
         $client = Yii::$app->meili->connect();
@@ -635,6 +668,11 @@ class ObjectController extends Controller
                     $city['name'] ?? '',
                     $city['name_en'] ?? '',
                     $city['name_kg'] ?? '',
+                ];
+                $model->oblast_id = [
+                    $city['region'] ?? '',
+                    $this->translateOblast($city['region'])[0],
+                    $this->translateOblast($city['region'])[1]
                 ];
             }
 
@@ -717,7 +755,8 @@ class ObjectController extends Controller
                     'email' => $model->email,
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
-                    'general_room_count' => $model->general_room_count
+                    'general_room_count' => $model->general_room_count,
+                    'oblast_id' => $model->oblast_id,
                 ];
 
                 if (!Yii::$app->user->can('admin')) {

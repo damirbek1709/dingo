@@ -366,6 +366,39 @@ class ObjectController extends Controller
         ]);
     }
 
+    function translateOblast($oblast)
+    {
+        switch ($oblast) {
+            case "Бишкек":
+                return ["Bishkek", "Бишкек"];
+                break;
+            case "Ошская область":
+                return ["Osh oblast", "Ош областы"];
+                break;
+            case "Чуйская область":
+                return ["Chui oblast", "Чүй областы"];
+                break;
+            case "Джалал-Абадская область":
+                return ["Jalal-Abad oblast", "Жалал-Абад областы"];
+                break;
+            case "Нарынская область":
+                return ["Naryn oblast", "Нарын областы"];
+                break;
+            case "Таласская область":
+                return ["Talas oblast", "Талас областы"];
+                break;
+            case "Иссык-Кульская область":
+                return ["Yssyk-Kul oblast", "Ысык-Көл областы"];
+                break;
+            case "Баткенская область":
+                return ["Batken oblast", "Баткен областы"];
+                break;
+            default:
+                return ["", ""];
+
+        }
+    }
+
     /**
      * Creates a new Event model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -389,6 +422,11 @@ class ObjectController extends Controller
                         $city['name'] ?? '',
                         $city['name_en'] ?? '',
                         $city['name_kg'] ?? '',
+                    ];
+                    $model->oblast_id = [
+                        $city['region'] ?? '',
+                        $this->translateOblast($city['region'])[0],
+                        $this->translateOblast($city['region'])[1]
                     ];
                 }
                 if ($model->save(false)) {
@@ -453,7 +491,8 @@ class ObjectController extends Controller
                     'images' => $model->getPictures(),
                     'general_room_count' => (int) $model->general_room_count,
                     'status' => 0,
-                    'city_id' => (int) $model->city_id
+                    'city_id' => (int) $model->city_id,
+                    'oblast_id' => $model->oblast_id,
                 ];
 
                 if ($index->addDocuments($object_arr)) {
@@ -536,6 +575,11 @@ class ObjectController extends Controller
                     $city['name_en'] ?? '',
                     $city['name_kg'] ?? '',
                 ];
+                $model->oblast_id = [
+                    $city['region'] ?? '',
+                    $this->translateOblast($city['region'])[0],
+                    $this->translateOblast($city['region'])[1]
+                ];
             }
 
             $model->address = [
@@ -552,8 +596,6 @@ class ObjectController extends Controller
 
 
             if ($bind_model->save(false) && $model->validate()) {
-
-
                 $bind_model->ceo_doc = UploadedFile::getInstance($bind_model, 'ceo_doc');
                 $bind_model->financial_doc = UploadedFile::getInstance($bind_model, 'financial_doc');
                 if ($bind_model->ceo_doc) {
@@ -618,6 +660,7 @@ class ObjectController extends Controller
                     'features' => $model->features ?? [],
                     'images' => $model->getPictures(),
                     'general_room_count' => $model->general_room_count,
+                    'oblast_id' => $model->oblast_id,
                 ];
 
                 if (!Yii::$app->user->can('admin')) {
@@ -876,7 +919,7 @@ class ObjectController extends Controller
                 'balcony' => (int) $model->balcony,
                 'air_cond' => (int) $model->air_cond,
                 'kitchen' => (int) $model->kitchen,
-                'base_price' => $model->default_prices ? (float)$model->default_prices[0] : 0,
+                'base_price' => $model->default_prices ? (float) $model->default_prices[0] : 0,
                 'bed_types' => $bedTypes,
                 'default_prices' => $default_prices,
             ];
@@ -1072,7 +1115,7 @@ class ObjectController extends Controller
             $room['balcony'] = (int) $model->balcony;
             $room['air_cond'] = (int) $model->air_cond;
             $room['kitchen'] = (int) $model->kitchen;
-            $room['base_price']  = $model->default_prices ? (float)$model->default_prices[0] : 0;
+            $room['base_price'] = $model->default_prices ? (float) $model->default_prices[0] : 0;
             $room['default_prices'] = $default_prices;
             $room['img'] = $model->img;
             //$room['images'] = $bind_model->getPictures();
@@ -1551,7 +1594,7 @@ class ObjectController extends Controller
         $model = new RoomCat($room);
         $model->setAttributes($room, false);
         $model->img = $bind_model->getImage() ? $bind_model->getImage()->id : null;
- 
+
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             $model->images = UploadedFile::getInstances($model, 'images');
@@ -1569,7 +1612,7 @@ class ObjectController extends Controller
                 $default_prices[] = (float) $val;
             }
 
-            
+
 
             $room['room_title'] = $model->typeTitle($model->type_id);
             $room['guest_amount'] = (int) $model->guest_amount;
