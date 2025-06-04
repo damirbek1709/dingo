@@ -609,7 +609,6 @@ class ObjectController extends BaseController
             }
         }
         
-
         // Faceted count search
         $facetSearch = $index->search('', [
             'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
