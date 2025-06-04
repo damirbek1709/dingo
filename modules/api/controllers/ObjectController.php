@@ -86,6 +86,7 @@ class ObjectController extends BaseController
                 ]
             ]
         ];
+        
 
         $behaviors['verbs'] = [
             'class' => VerbFilter::className(),
