@@ -583,6 +583,8 @@ class ObjectController extends BaseController
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
                 'limit' => 100 // Adjust as needed
             ])->getHits();
+
+            return count($hotelMatches);
         
             $matchedHotelCount = 0;
             $matchedHotelName = [];
