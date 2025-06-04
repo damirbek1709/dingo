@@ -614,7 +614,6 @@ class ObjectController extends BaseController
 
         $results = [
             'regions' => [],
-            'hotels' => [],
             'oblast' => []
         ];
 
