@@ -596,7 +596,7 @@ class ObjectController extends BaseController
                 if (!empty($hit['name'])) {
                     $counter = 1;
                     $matchedHotelName[] = [
-                        'name' => $matchedHotelName,
+                        'name' => $hit['name'],
                         'amount' => $matchedHotelCount,
                         'type' => Objects::SEARCH_TYPE_HOTEL
                     ];
