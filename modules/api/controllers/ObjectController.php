@@ -579,7 +579,6 @@ class ObjectController extends BaseController
         $query = Yii::$app->request->get('query', '');
 
         if (!empty($query)) {
-            return "Test";
             $hotelMatches = $index->search($query, [
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
                 'limit' => 100 // Adjust as needed
