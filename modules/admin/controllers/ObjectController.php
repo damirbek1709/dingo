@@ -18,6 +18,8 @@ use app\models\Comfort;
 use app\models\PaymentType;
 use app\models\Tariff;
 use yii\web\UploadedFile;
+use yii\helpers\FileHelper;
+use rico\yii2images\models\Image;
 
 /**
  * BusinessAccountBridgeController implements the CRUD actions for BusinessAccountBridge model.
@@ -612,6 +614,7 @@ class ObjectController extends Controller
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post())) {
+
             $model->type = (int) $model->type;
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
@@ -625,11 +628,15 @@ class ObjectController extends Controller
                 $request['Objects']['name_ky'] ?? '',
             ];
 
-            $model->city = [
-                $request['Objects']['city'] ?? '',
-                $request['Objects']['city_en'] ?? '',
-                $request['Objects']['city_ky'] ?? '',
-            ];
+            if ($model->city_id) {
+                $client = Yii::$app->meili->connect();
+                $city = $client->index('region')->getDocument($model->city_id);
+                $model->city = [
+                    $city['name'] ?? '',
+                    $city['name_en'] ?? '',
+                    $city['name_kg'] ?? '',
+                ];
+            }
 
             $model->address = [
                 $request['Objects']['address'] ?? '',
@@ -644,7 +651,9 @@ class ObjectController extends Controller
             ];
 
 
-            if ($bind_model->save(false)) {
+            if ($bind_model->save(false) && $model->validate()) {
+
+
                 $bind_model->ceo_doc = UploadedFile::getInstance($bind_model, 'ceo_doc');
                 $bind_model->financial_doc = UploadedFile::getInstance($bind_model, 'financial_doc');
                 if ($bind_model->ceo_doc) {
@@ -688,12 +697,14 @@ class ObjectController extends Controller
 
                 $status = Objects::currentStatus($object_id, $model->status ? $model->status : Objects::STATUS_NOT_PUBLISHED);
 
+
                 $object_arr = [
                     'id' => (int) $model->id,
                     'name' => $model->name,
                     'type' => (int) $model->type,
                     'reception' => (int) $model->reception,
                     'city' => $model->city,
+                    'city_id' => (int) $model->city_id,
                     'address' => $model->address,
                     'description' => $model->description,
                     'currency' => $model->currency,
@@ -712,6 +723,11 @@ class ObjectController extends Controller
                     'general_room_count' => $model->general_room_count,
                     'status' => $status
                 ];
+
+                if (!Yii::$app->user->can('admin')) {
+                    $object_arr['user_id'] = (int) Yii::$app->user->id;
+                }
+
 
                 $index->updateDocuments($object_arr);
                 return $this->redirect(['view', 'object_id' => $model->id]);
