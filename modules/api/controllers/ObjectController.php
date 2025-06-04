@@ -576,8 +576,10 @@ class ObjectController extends BaseController
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
 
-        // Get the query (search term)
+        // Get query from request
         $regionParam = Yii::$app->request->get('query', '');
+
+        // Search for initial hit (to extract transliteration)
         $hit = $index->search($regionParam, [
             'limit' => 1
         ])->getHits();
@@ -586,74 +588,51 @@ class ObjectController extends BaseController
         $translit_hotel = isset($hit[0]['name']) ? $hit[0]['name'] : [];
         $translit_oblast = isset($hit[0]['oblast_id']) ? $hit[0]['oblast_id'] : [];
 
-        // Parse query into array (support JSON array or comma-separated string)
-        $regionsArray = [];
-        if (!empty($regionParam)) {
-            $regionsArray = json_decode($regionParam, true);
-            if (json_last_error() !== JSON_ERROR_NONE || !is_array($regionsArray)) {
-                $regionsArray = explode(',', $regionParam);
-            }
-        }
-
-        // Default regions if no query provided
-        if (empty($regionsArray)) {
-            $regionsArray = Objects::regionList();
-        }
-
-        // Fetch all facet data (get all cities and hotel names)
+        // Get facets from all objects
         $allFacetsSearch = $index->search('', [
             'facets' => ['city', 'name', 'oblast_id'],
             'limit' => 0
         ]);
 
-
-
         $allRegionCounts = $allFacetsSearch->getFacetDistribution()['city'] ?? [];
         $allHotelCounts = $allFacetsSearch->getFacetDistribution()['name'] ?? [];
         $allOblastCounts = $allFacetsSearch->getFacetDistribution()['oblast_id'] ?? [];
 
+        // Prepare result array
         $results = [
             'regions' => [],
             'hotels' => [],
             'oblast' => []
         ];
 
-        foreach ($regionsArray as $requestedRegion) {
-            $length = mb_strlen($requestedRegion);
+        // Load full region list
+        $regionList = Objects::regionList(); // Expected format: [id => ['title' => ..., 'title_en' => ..., 'title_ky' => ...]]
 
-            $matchedRegions = [];
-            $matchedHotels = [];
-            $matchedHotels = [];
+        foreach ($regionList as $regionId => $regionNames) {
+            $matchedAmount = 0;
 
-            if ($length === 1 || $length === 2) {
-                // Direct prefix matching (for 1 or 2 letters)
-                $matchedRegions = $this->getPrefixMatches($requestedRegion, array_keys($allRegionCounts));
-                $matchedHotels = $this->getPrefixMatches($requestedRegion, array_keys($allHotelCounts));
-            } elseif ($length >= 3) {
-                // Use fuzzy matching (for 3+ letters)
-                $matchedRegions = $this->findBestMatches($requestedRegion, array_keys($allRegionCounts));
-                $matchedHotels = $this->findBestMatches($requestedRegion, array_keys($allHotelCounts));
+            // Compare each name variant against city facet keys
+            foreach ($regionNames as $variant) {
+                foreach ($allRegionCounts as $facetName => $count) {
+                    if (mb_strtolower($facetName) === mb_strtolower($variant)) {
+                        $matchedAmount += $count;
+                    }
+                }
             }
 
-            // Collect matched regions
-            foreach ($matchedRegions as $region) {
-                $results['regions'][] = [
-                    "name" => $translit_city,
-                    "amount" => $allRegionCounts[$region] ?? 0,
-                    "type" => Objects::SEARCH_TYPE_REGION
-                ];
-            }
-
-            // Collect matched hotels
-            foreach ($matchedHotels as $hotel) {
-                $results['hotels'][] = [
-                    "name" => $translit_hotel,
-                    "type" => Objects::SEARCH_TYPE_HOTEL
-                ];
-            }
+            $results['regions'][] = [
+                'name' => array_values($regionNames), // e.g. ["Бишкек", "Bishkek", "Бишкек"]
+                'amount' => $matchedAmount,
+                'type' => Objects::SEARCH_TYPE_REGION
+            ];
         }
 
-        // Handle user search data (same as your existing logic)
+        // Optional: fill matched hotels (if needed in future)
+        // Can be filled using logic like findBestMatches or getPrefixMatches, skipped here if not used
+
+        // Optional: fill matched oblasts (like above, if required)
+
+        // Handle user search data
         $user_auth = null;
         $token = Yii::$app->request->headers->get('Authorization');
         $user_search_data = [];
@@ -664,13 +643,14 @@ class ObjectController extends BaseController
             $user = User::find()->where(['auth_key' => $user_auth])->one();
             if ($user && $user->search_data) {
                 $user_search_data = unserialize($user->search_data);
-
             }
         }
+
         $results['user_search_data'] = $user_search_data;
 
         return $results;
     }
+
 
     /**
      * Find all matches where the option starts with the search term (case insensitive)
