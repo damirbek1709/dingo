@@ -581,7 +581,7 @@ class ObjectController extends BaseController
         $results = [
             'regions' => [],
             'hotels' => [],
-            'oblast' => []
+            'cities' => []
         ];
 
         if (!empty($query)) {
@@ -590,11 +590,11 @@ class ObjectController extends BaseController
                 'limit' => 100 // Adjust as needed
             ])->getHits();
 
-            
-        
+
+
             $matchedHotelCount = 0;
             $matchedHotelName = [];
-        
+
             foreach ($hotelMatches as $hit) {
                 if (!empty($hit['name'])) {
                     $matchedHotelName = $hit['name'];
@@ -602,7 +602,7 @@ class ObjectController extends BaseController
                     break; // Use the first exact matched hotel
                 }
             }
-        
+
             if ($matchedHotelCount > 0) {
                 $results['hotels'][] = [
                     'name' => $matchedHotelName,
@@ -610,6 +610,31 @@ class ObjectController extends BaseController
                     'type' => Objects::SEARCH_TYPE_HOTEL
                 ];
             }
+
+            $matchedCities = [];
+            $cityHitCount = 0;
+
+            foreach ($hotelMatches as $hit) {
+                if (!empty($hit['city'])) {
+                    foreach ($hit['city'] as $cityName) {
+                        if (stripos($cityName, $query) !== false) {
+                            $key = implode('|', $hit['city']); // use city array as unique key
+                            if (!isset($matchedCities[$key])) {
+                                $matchedCities[$key] = [
+                                    'name' => $hit['city'],
+                                    'amount' => 0,
+                                    'type' => 3 // or Objects::SEARCH_TYPE_CITY
+                                ];
+                            }
+                            $matchedCities[$key]['amount']++;
+                            $cityHitCount++;
+                            break; // prevent counting the same hit more than once
+                        }
+                    }
+                }
+            }
+
+            $results['cities'] = array_values($matchedCities); // reindex
         }
 
         // Faceted count search
@@ -622,7 +647,7 @@ class ObjectController extends BaseController
         $cityCounts = $facetSearch->getFacetDistribution()['city'] ?? [];
         $oblastCounts = $facetSearch->getFacetDistribution()['oblast_id'] ?? [];
 
-        
+
 
         $regionModels = Objects::regionList();
         foreach ($regionModels as $model) {
