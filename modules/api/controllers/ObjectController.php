@@ -591,13 +591,9 @@ class ObjectController extends BaseController
         
             foreach ($hotelMatches as $hit) {
                 if (!empty($hit['name'])) {
-                    foreach ($hit['name'] as $variant) {
-                        if (mb_strtolower($variant) === mb_strtolower($query)) {
-                            $matchedHotelName = $hit['name'];
-                            $matchedHotelCount++;
-                            break 2; // Use the first exact matched hotel
-                        }
-                    }
+                    $matchedHotelName = $hit['name'];
+                    $matchedHotelCount++;
+                    break; // Use the first exact matched hotel
                 }
             }
         
