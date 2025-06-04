@@ -585,6 +585,38 @@ class ObjectController extends BaseController
         $translit_hotel = $hit[0]['name'] ?? [];
         $translit_oblast = $hit[0]['oblast_id'] ?? [];
 
+        if (!empty($query)) {
+            // Search by hotel name field
+            $hotelMatches = $index->search($query, [
+                'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
+                'limit' => 100 // Adjust as needed
+            ])->getHits();
+        
+            $matchedHotelCount = 0;
+            $matchedHotelName = [];
+        
+            foreach ($hotelMatches as $hit) {
+                if (!empty($hit['name'])) {
+                    foreach ($hit['name'] as $variant) {
+                        if (mb_strtolower($variant) === mb_strtolower($query)) {
+                            $matchedHotelName = $hit['name'];
+                            $matchedHotelCount++;
+                            break 2; // Use the first exact matched hotel
+                        }
+                    }
+                }
+            }
+        
+            if ($matchedHotelCount > 0) {
+                $results['hotels'][] = [
+                    'name' => $matchedHotelName,
+                    'amount' => $matchedHotelCount,
+                    'type' => Objects::SEARCH_TYPE_HOTEL
+                ];
+            }
+        }
+        
+
         // Faceted count search
         $facetSearch = $index->search('', [
             'facets' => ['city', 'name', 'oblast_id'],
@@ -620,7 +652,11 @@ class ObjectController extends BaseController
                 }
             }
 
-
+            $results['regions'][] = [
+                'name' => $titles,
+                'amount' => $oblastAmount,
+                'type' => Objects::SEARCH_TYPE_REGION
+            ];
 
             // Count matches in oblast facet
             $oblastAmount = 0;
@@ -632,12 +668,38 @@ class ObjectController extends BaseController
                 }
             }
 
-            $results['regions'][] = [
+            $results['oblast'][] = [
                 'name' => $titles,
                 'amount' => $oblastAmount,
-                'type' => Objects::SEARCH_TYPE_REGION
+                'type' => Objects::SEARCH_TYPE_REGION // create this constant if needed
             ];
         }
+
+        if (!empty($query)) {
+            // Search by hotel name field
+            $hotelMatches = $index->search($query, [
+                'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
+                'limit' => 100 // Adjust as needed
+            ])->getHits();
+        
+            $matchedHotelCount = 0;
+            $matchedHotelName = [];
+        
+            foreach ($hotelMatches as $hit) {
+                if (!empty($hit['name'])) {
+                    foreach ($hit['name'] as $variant) {
+                        if (mb_strtolower($variant) === mb_strtolower($query)) {
+                            $matchedHotelName = $hit['name'];
+                            $matchedHotelCount++;
+                            break 2; // Use the first exact matched hotel
+                        }
+                    }
+                }
+            }
+        
+            
+        }
+        
 
         // User search history
         $user_auth = null;
