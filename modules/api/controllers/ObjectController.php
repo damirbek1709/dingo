@@ -66,7 +66,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar','room-comfort-title','exchange'],
+                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange','search-stats'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -111,7 +111,8 @@ class ObjectController extends BaseController
                 'category-comfort-title' => ['GET'],
                 'room-comfort-title' => ['GET'],
                 'room-images' => ['GET'],
-                'exchange'=>['GET']
+                'exchange' => ['GET'],
+                'search-stats' => ['GET']
             ],
         ];
 
@@ -300,7 +301,7 @@ class ObjectController extends BaseController
         }
         return $response;
     }
-    
+
 
     public function actionEdit()
     {
@@ -538,6 +539,32 @@ class ObjectController extends BaseController
         return $arr;
     }
 
+    public function actionSearchStats()
+    {
+        $query = Yii::$app->request->get('query', '');
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+
+        $result = [
+            'name' => ['amount' => 0],
+            'city' => ['amount' => 0],
+            'oblast_id' => ['amount' => 0],
+        ];
+
+        // Prepare each individual field search
+        $fields = ['name', 'city', 'oblast_id'];
+
+        foreach ($fields as $field) {
+            $searchResponse = $index->search($query, [
+                'filter' => "$field = \"$query\"",
+                'limit' => 1,
+            ]);
+            $result[$field]['amount'] = $searchResponse->getEstimatedTotalHits();
+        }
+
+        return $result;
+    }
+
 
     public function actionSearch()
     {
@@ -552,6 +579,7 @@ class ObjectController extends BaseController
 
         $translit_city = isset($hit[0]['city']) ? $hit[0]['city'] : [];
         $translit_hotel = isset($hit[0]['name']) ? $hit[0]['name'] : [];
+        $translit_oblast = isset($hit[0]['oblast_id']) ? $hit[0]['oblast_id'] : [];
 
         // Parse query into array (support JSON array or comma-separated string)
         $regionsArray = [];
@@ -569,7 +597,7 @@ class ObjectController extends BaseController
 
         // Fetch all facet data (get all cities and hotel names)
         $allFacetsSearch = $index->search('', [
-            'facets' => ['city', 'name'],
+            'facets' => ['city', 'name', 'oblast_id'],
             'limit' => 0
         ]);
 
@@ -577,16 +605,19 @@ class ObjectController extends BaseController
 
         $allRegionCounts = $allFacetsSearch->getFacetDistribution()['city'] ?? [];
         $allHotelCounts = $allFacetsSearch->getFacetDistribution()['name'] ?? [];
+        $allOblastCounts = $allFacetsSearch->getFacetDistribution()['oblast_id'] ?? [];
 
         $results = [
             'regions' => [],
-            'hotels' => []
+            'hotels' => [],
+            'oblast' => []
         ];
 
         foreach ($regionsArray as $requestedRegion) {
             $length = mb_strlen($requestedRegion);
 
             $matchedRegions = [];
+            $matchedHotels = [];
             $matchedHotels = [];
 
             if ($length === 1 || $length === 2) {
