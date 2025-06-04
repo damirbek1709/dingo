@@ -17,7 +17,7 @@ $meal_title = $model->getMealTitle($model->meal_type);
     <div>
         <div class="room-card">
             <div class="room-card-details">
-                <h3><?= $model->title; ?></h3>
+                <h3><?= Html::a($model->title, ['edit-tariff', 'id'=>$model->id,'object_id' => $object_id]); ?></h3>
                 <div class="room-info">
                     <span class="room-area <?= $cancellation_title['class'] ?>">
                         <span><?php echo $cancellation_title['label']; ?></span>
@@ -27,19 +27,6 @@ $meal_title = $model->getMealTitle($model->meal_type);
                         <?php echo $meal_title['label']; ?>
                     </span>
 
-                    <div class="room-card-options">
-                        <button class="options-btn"></button>
-                        <div class="options-menu">
-                            <ul>
-                                <li><span class="room-open-icon"></span>
-                                    <?= Html::a(Yii::t('app', 'Редактировать'), ['/owner/object/edit-tariff', 'id' => $model->id, 'object_id' => $object_id], ['class' => '']) ?>
-                                </li>
-                                <li class="room-delete-btn"><span class="room-delete-icon"></span>
-                                    <?= Html::a(Yii::t('app', 'Удалить'), ['/owner/tariff/delete', 'id' => $model->id, 'object_id' => $object_id], ['class' => '']) ?>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -69,9 +56,9 @@ $meal_title = $model->getMealTitle($model->meal_type);
                     }
                     ?>
                     <label>
-                        <input type="checkbox" <?php echo $checked; ?> name="room" value="<?php echo $room['id'] ?>"
-                            object_id="<?php echo $object_id ?>" tariff_id="<?= $model->id ?>"
-                            room_id="<?php echo $room['id'] ?>" class="room-bind">
+                        <input type="checkbox" <?php echo $checked; ?> name="room" disabled="true"
+                            value="<?php echo $room['id'] ?>" object_id="<?php echo $object_id ?>"
+                            tariff_id="<?= $model->id ?>" room_id="<?php echo $room['id'] ?>" class="room-bind">
                         <?php echo $room['room_title'][0]; ?>
                     </label>
 

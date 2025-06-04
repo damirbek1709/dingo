@@ -16,6 +16,8 @@ use app\models\TariffSearch;
 use app\models\RoomCat;
 use app\models\Comfort;
 use app\models\PaymentType;
+use app\models\Tariff;
+use yii\web\UploadedFile;
 
 /**
  * BusinessAccountBridgeController implements the CRUD actions for BusinessAccountBridge model.
@@ -48,7 +50,8 @@ class ObjectController extends Controller
                         'payment',
                         'terms',
                         'pictures',
-                        'room-comfort'
+                        'room-comfort',
+                        'edit-tariff'
                     ],
                     'roles' => ['admin'],
                 ],
@@ -141,6 +144,111 @@ class ObjectController extends Controller
         return $this->render('terms', [
             'model' => $model,
             'id' => $id,
+        ]);
+    }
+
+    public function actionEditTariff($id, $object_id)
+    {
+        $model = Tariff::findOne($id);
+        $model->object_id = $object_id;
+
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $object = $index->getDocument($object_id);
+        $object_title = $object['name'][0];
+
+        // Get all rooms and assign pre-checked room IDs
+        $rooms = $object['rooms'] ?? [];
+
+        $boundRoomIds = [];
+        foreach ($rooms as $room) {
+            if (!empty($room['tariff'])) {
+                foreach ($room['tariff'] as $tariff) {
+                    if ((int) $tariff['id'] === (int) $model->id) {
+                        $boundRoomIds[] = (int) $room['id'];
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Populate the model's room_list for checkbox pre-selection
+        $model->room_list = $boundRoomIds;
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                $room_list = $model->room_list;
+
+                try {
+                    $updatedRooms = [];
+
+                    foreach ($rooms as $roomData) {
+                        if (!is_array($roomData) || !isset($roomData['id'])) {
+                            Yii::warning("Invalid room data: " . json_encode($roomData));
+                            continue;
+                        }
+
+                        $roomData['id'] = (int) $roomData['id'];
+                        $roomData['tariff'] = $roomData['tariff'] ?? [];
+
+                        // Remove this tariff from all rooms
+                        $roomData['tariff'] = array_filter($roomData['tariff'], function ($t) use ($id) {
+                            return $t['id'] != $id;
+                        });
+
+                        // Re-add updated tariff only to selected rooms
+                        if ($room_list && in_array($roomData['id'], $room_list)) {
+                            $is_returnable = null;
+                            if ($model->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
+                                $is_returnable = true;
+                            } elseif ($model->cancellation == Tariff::NO_CANCELLATION) {
+                                $is_returnable = false;
+                            }
+                            $cancellation_terms = [
+                                'type' => $model->getCancellationType((int) $model->cancellation),
+                                'penalty_percent' => (double) $model->penalty_sum,
+                                'penalty_days' => (int) $model->penalty_days,
+                                'is_returnable' => $is_returnable,
+                            ];
+                            $tariff_data = [
+                                'id' => (int) $model->id,
+                                'payment_on_book' => (int) $model->payment_on_book,
+                                'cancellation' => $cancellation_terms,
+                                'meal_type' => ['id' => (int) $model->meal_type, 'name' => Objects::mealTypeFull($model->meal_type)],
+                                'title' => [$model->title, $model->title_en, $model->title_ky],
+                                'object_id' => (int) $object_id,
+                                'price' => (float) $roomData['base_price'],
+                                'from_date' => '',
+                                'to_date' => '',
+                                'prices' => [],
+                            ];
+
+                            $roomData['tariff'][] = $tariff_data;
+                        }
+
+                        $updatedRooms[] = $roomData;
+                    }
+
+                    // Update Meilisearch index
+                    $meilisearchData = [
+                        'id' => (int) $object_id,
+                        'rooms' => $updatedRooms
+                    ];
+
+                    $index->updateDocuments([$meilisearchData]);
+                    return $this->redirect(['tariff-list', 'object_id' => $object_id]);
+                } catch (\Exception $e) {
+                    Yii::error("Meilisearch operation error: " . $e->getMessage());
+                }
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
+
+        return $this->render('/tariff/update', [
+            'model' => $model,
+            'object_id' => $object_id,
+            'object_title' => $object_title
         ]);
     }
 
