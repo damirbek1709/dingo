@@ -583,31 +583,23 @@ class ObjectController extends BaseController
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
                 'limit' => 100 // Adjust as needed
             ])->getHits();
-
-            return count($hotelMatches);
         
             $matchedHotelCount = 0;
             $matchedHotelName = [];
         
             foreach ($hotelMatches as $hit) {
+
                 if (!empty($hit['name'])) {
-                    foreach ($hit['name'] as $variant) {
-                        if (mb_strtolower($variant) === mb_strtolower($query)) {
-                            $matchedHotelName = $hit['name'];
-                            $matchedHotelCount++;
-                            break 2; // Use the first exact matched hotel
-                        }
-                    }
+                    $counter = 1;
+                    $matchedHotelName[] = [
+                        'name' => $matchedHotelName,
+                        'amount' => $matchedHotelCount,
+                        'type' => Objects::SEARCH_TYPE_HOTEL
+                    ];
+                    $counter++;
                 }
             }
-        
-            if ($matchedHotelCount > 0) {
-                $results['hotels'][] = [
-                    'name' => $matchedHotelName,
-                    'amount' => $matchedHotelCount,
-                    'type' => Objects::SEARCH_TYPE_HOTEL
-                ];
-            }
+            $results['hotels'][] = $matchedHotelCount;
         }
 
         // Faceted count search
