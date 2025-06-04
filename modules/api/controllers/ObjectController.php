@@ -603,7 +603,7 @@ class ObjectController extends BaseController
                     $counter++;
                 }
             }
-            $results['hotels'][] = $matchedHotelCount;
+            $results['hotels'][] = $matchedHotelName;
         }
 
         // Faceted count search
