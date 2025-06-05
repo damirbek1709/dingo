@@ -591,6 +591,26 @@ class ObjectController extends BaseController
             ])->getHits();
 
 
+
+            $matchedHotelCount = 0;
+            $matchedHotelName = [];
+
+            foreach ($hotelMatches as $hit) {
+                if (!empty($hit['name'])) {
+                    $matchedHotelName = $hit['name'];
+                    $matchedHotelCount++;
+                    break; // Use the first exact matched hotel
+                }
+            }
+
+            if ($matchedHotelCount > 0) {
+                $results['hotels'][] = [
+                    'name' => $matchedHotelName,
+                    'amount' => $matchedHotelCount,
+                    'type' => Objects::SEARCH_TYPE_HOTEL
+                ];
+            }
+
             $matchedCities = [];
             $cityHitCount = 0;
             $matchedOblast = [];
@@ -633,6 +653,8 @@ class ObjectController extends BaseController
                     }
                 }
             }
+
+            //$results['cities'] = array_values($matchedCities); // reindex
             $results['regions'] = array_merge(array_values($matchedCities), array_values($matchedOblast)); // reindex
         } else {
 
