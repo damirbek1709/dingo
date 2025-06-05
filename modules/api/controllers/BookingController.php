@@ -275,13 +275,13 @@ class BookingController extends BaseController
         $current_date = date('Y-m-d');
 
         if ($finished) {
-            $dataProvider->query->andFilterWhere(['>', 'date_to', $current_date]);
+            $dataProvider->query->andFilterWhere(['<', 'date_to', $current_date]);
         }
         if ($canceled) {
             $dataProvider->query->andFilterWhere(['status' => Booking::PAID_STATUS_CANCELED]);
         }
         if ($future) {
-            $dataProvider->query->andFilterWhere(['<', 'date_from', $current_date]);
+            $dataProvider->query->andFilterWhere(['>=', 'date_from', $current_date]);
         }
 
         return [
