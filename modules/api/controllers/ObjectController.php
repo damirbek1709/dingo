@@ -625,7 +625,7 @@ class ObjectController extends BaseController
                                 $matchedCities[$key] = [
                                     'name' => $hit['city'],
                                     'amount' => 0,
-                                    'type' => 3 // or Objects::SEARCH_TYPE_CITY
+                                    'type' =>  Objects::SEARCH_TYPE_CITY
                                 ];
                             }
                             $matchedCities[$key]['amount']++;
@@ -642,7 +642,7 @@ class ObjectController extends BaseController
                                     $matchedOblast[$key] = [
                                         'name' => $hit['oblast_id'],
                                         'amount' => 0,
-                                        'type' => 3 // or Objects::SEARCH_TYPE_CITY
+                                        'type' =>  Objects::SEARCH_TYPE_REGION
                                     ];
                                 }
                                 $matchedOblast[$key]['amount']++;
