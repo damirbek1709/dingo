@@ -655,7 +655,7 @@ class ObjectController extends BaseController
             }
 
             //$results['cities'] = array_values($matchedCities); // reindex
-            $results['regions'] = array_combine($matchedCities, $matchedOblast); // reindex
+            $results['regions'] = array_merge(array_values($matchedCities), array_values($matchedOblast)); // reindex
         } else {
 
             // Faceted count search
