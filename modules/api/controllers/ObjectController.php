@@ -669,12 +669,12 @@ class ObjectController extends BaseController
             $oblastCounts = $facetSearch->getFacetDistribution()['oblast_id'] ?? [];
 
             $bishkekSearch = $index->search('', [
-                'filter' => 'status = ' . Objects::STATUS_PUBLISHED . ' AND city = "Бишкек"',
+                'filter' => 'status = ' . Objects::STATUS_PUBLISHED . ' AND city = "бишкек"',
                 'limit' => 1
             ]);
 
             $oshSearch = $index->search('', [
-                'filter' => 'status = ' . Objects::STATUS_PUBLISHED . ' AND city = "Ош"',
+                'filter' => 'status = ' . Objects::STATUS_PUBLISHED . ' AND city = "ош"',
                 'limit' => 1
             ]);
 
