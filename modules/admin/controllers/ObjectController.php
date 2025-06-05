@@ -603,25 +603,25 @@ class ObjectController extends Controller
                 return ["Bishkek", "Бишкек"];
                 break;
             case "Ошская область":
-                return ["Osh oblast", "Ош областы"];
+                return ["Osh oblast", "Ош облусу"];
                 break;
             case "Чуйская область":
-                return ["Chui oblast", "Чүй областы"];
+                return ["Chui oblast", "Чүй облусу"];
                 break;
             case "Джалал-Абадская область":
-                return ["Jalal-Abad oblast", "Жалал-Абад областы"];
+                return ["Jalal-Abad oblast", "Жалал-Абад облусу"];
                 break;
             case "Нарынская область":
-                return ["Naryn oblast", "Нарын областы"];
+                return ["Naryn oblast", "Нарын облусу"];
                 break;
             case "Таласская область":
-                return ["Talas oblast", "Талас областы"];
+                return ["Talas oblast", "Талас облусу"];
                 break;
             case "Иссык-Кульская область":
-                return ["Yssyk-Kul oblast", "Ысык-Көл областы"];
+                return ["Yssyk-Kul oblast", "Ысык-Көл облусу"];
                 break;
             case "Баткенская область":
-                return ["Batken oblast", "Баткен областы"];
+                return ["Batken oblast", "Баткен облусу"];
                 break;
             default:
                 return ["", ""];
@@ -687,11 +687,7 @@ class ObjectController extends Controller
                 $request['Objects']['description_en'] ?? '',
                 $request['Objects']['description_ky'] ?? '',
             ];
-
-
             if ($bind_model->save(false) && $model->validate()) {
-
-
                 $bind_model->ceo_doc = UploadedFile::getInstance($bind_model, 'ceo_doc');
                 $bind_model->financial_doc = UploadedFile::getInstance($bind_model, 'financial_doc');
                 if ($bind_model->ceo_doc) {
