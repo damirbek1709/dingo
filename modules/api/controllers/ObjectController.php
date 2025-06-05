@@ -613,6 +613,8 @@ class ObjectController extends BaseController
 
             $matchedCities = [];
             $cityHitCount = 0;
+            $matchedOblast = [];
+            $oblastHitCount = 0;
 
             foreach ($hotelMatches as $hit) {
                 if (!empty($hit['city'])) {
@@ -632,9 +634,28 @@ class ObjectController extends BaseController
                         }
                     }
                 }
+
+                if (!empty($hit['oblast_id'])) {
+                    foreach ($hit['oblast_id'] as $oblastName) {
+                        if (stripos($oblastName, $query) !== false) {
+                            $key = implode('|', $hit['oblast_id']); // use city array as unique key
+                            if (!isset($matchedOblast[$key])) {
+                                $matchedOblast[$key] = [
+                                    'name' => $hit['oblast_id'],
+                                    'amount' => 0,
+                                    'type' => 3 // or Objects::SEARCH_TYPE_CITY
+                                ];
+                            }
+                            $matchedOblast[$key]['amount']++;
+                            $oblastHitCount++;
+                            break; // prevent counting the same hit more than once
+                        }
+                    }
+                }
             }
 
             $results['cities'] = array_values($matchedCities); // reindex
+            $results['regions'] = array_values($matchedOblast); // reindex
         } else {
 
             // Faceted count search
