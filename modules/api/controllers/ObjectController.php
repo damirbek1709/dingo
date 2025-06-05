@@ -581,7 +581,7 @@ class ObjectController extends BaseController
         $results = [
             'regions' => [],
             'hotels' => [],
-            'cities' => []
+            //'cities' => []
         ];
 
         if (!empty($query)) {
