@@ -412,6 +412,13 @@ class ObjectController extends BaseController
                 $user->search_data = serialize($saved_data);
             } else {
                 $saved_data = unserialize($user->search_data);
+
+                foreach ($saved_data as $key => $item) {
+                    if (in_array($queryWord, $item['name'])) {
+                        unset($saved_data[$key]);
+                    }
+                }
+                
                 if (count($saved_data) > 2) {
                     array_shift($saved_data);
                     if ($type == Objects::SEARCH_TYPE_REGION) {
