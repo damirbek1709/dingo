@@ -585,6 +585,7 @@ class ObjectController extends BaseController
         ];
 
         if (!empty($query)) {
+            $query = ucfirst($query);
             $hotelMatches = $index->search($query, [
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
                 'limit' => 100
