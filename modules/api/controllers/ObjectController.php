@@ -589,10 +589,10 @@ class ObjectController extends BaseController
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
                 'limit' => 100
             ])->getHits();
-        
+
             $matchedCities = [];
             $matchedOblast = [];
-        
+
             foreach ($hotelMatches as $hit) {
                 // Process matched cities
                 if (!empty($hit['city'])) {
@@ -611,7 +611,7 @@ class ObjectController extends BaseController
                         }
                     }
                 }
-        
+
                 // Process matched oblasts
                 if (!empty($hit['oblast_id'])) {
                     foreach ($hit['oblast_id'] as $oblastName) {
@@ -630,10 +630,9 @@ class ObjectController extends BaseController
                     }
                 }
             }
-        
+
             $results['regions'] = array_merge(array_values($matchedCities), array_values($matchedOblast));
-        }
-         else {
+        } else {
 
             // Faceted count search
             $facetSearch = $index->search('', [
@@ -656,15 +655,15 @@ class ObjectController extends BaseController
             ]);
 
             $results['regions'][] = [
-                'name'=> ['Бишкек','Bishkek','Бишкек'],
-                'amount'=> count($bishkekSearch->getHits()),
-                'type'=>Objects::SEARCH_TYPE_CITY
+                'name' => ['Бишкек', 'Bishkek', 'Бишкек'],
+                'amount' => count($bishkekSearch->getHits()),
+                'type' => Objects::SEARCH_TYPE_CITY
             ];
 
             $results['regions'][] = [
-                'name'=> ['Ош','Osh','Ош'],
-                'amount'=> count($oshSearch->getHits()),
-                'type'=>Objects::SEARCH_TYPE_CITY
+                'name' => ['Ош', 'Osh', 'Ош'],
+                'amount' => count($oshSearch->getHits()),
+                'type' => Objects::SEARCH_TYPE_CITY
             ];
 
             $regionModels = Objects::regionList();
@@ -708,7 +707,7 @@ class ObjectController extends BaseController
             }
         }
 
-        
+
         $results['user_search_data'] = $user_search_data;
 
         return $results;
