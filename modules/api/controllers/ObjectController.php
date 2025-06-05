@@ -587,76 +587,53 @@ class ObjectController extends BaseController
         if (!empty($query)) {
             $hotelMatches = $index->search($query, [
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
-                'limit' => 100 // Adjust as needed
+                'limit' => 100
             ])->getHits();
-
-
-
-            $matchedHotelCount = 0;
-            $matchedHotelName = [];
-
-            foreach ($hotelMatches as $hit) {
-                if (!empty($hit['name'])) {
-                    $matchedHotelName = $hit['name'];
-                    $matchedHotelCount++;
-                    break; // Use the first exact matched hotel
-                }
-            }
-
-            if ($matchedHotelCount > 0) {
-                $results['hotels'][] = [
-                    'name' => $matchedHotelName,
-                    'amount' => $matchedHotelCount,
-                    'type' => Objects::SEARCH_TYPE_HOTEL
-                ];
-            }
-
+        
             $matchedCities = [];
-            $cityHitCount = 0;
             $matchedOblast = [];
-            $oblastHitCount = 0;
-
+        
             foreach ($hotelMatches as $hit) {
+                // Process matched cities
                 if (!empty($hit['city'])) {
                     foreach ($hit['city'] as $cityName) {
                         if (stripos($cityName, $query) !== false) {
-                            $key = implode('|', $hit['city']); // use city array as unique key
+                            $key = mb_strtolower(implode('|', $hit['city']));
                             if (!isset($matchedCities[$key])) {
                                 $matchedCities[$key] = [
                                     'name' => $hit['city'],
                                     'amount' => 0,
-                                    'type' =>  Objects::SEARCH_TYPE_CITY
+                                    'type' => Objects::SEARCH_TYPE_CITY
                                 ];
                             }
                             $matchedCities[$key]['amount']++;
-                            $cityHitCount++;
-                            break; // prevent counting the same hit more than once
+                            break;
                         }
                     }
-
-                    if (!empty($hit['oblast_id'])) {
-                        foreach ($hit['oblast_id'] as $oblastName) {
-                            if (stripos($oblastName, $query) !== false) {
-                                $key = implode('|', $hit['oblast_id']); // use city array as unique key
-                                if (!isset($matchedOblast[$key])) {
-                                    $matchedOblast[$key] = [
-                                        'name' => $hit['oblast_id'],
-                                        'amount' => 0,
-                                        'type' =>  Objects::SEARCH_TYPE_REGION
-                                    ];
-                                }
-                                $matchedOblast[$key]['amount']++;
-                                $oblastHitCount++;
-                                break; // prevent counting the same hit more than once
+                }
+        
+                // Process matched oblasts
+                if (!empty($hit['oblast_id'])) {
+                    foreach ($hit['oblast_id'] as $oblastName) {
+                        if (stripos($oblastName, $query) !== false) {
+                            $key = mb_strtolower(implode('|', $hit['oblast_id']));
+                            if (!isset($matchedOblast[$key])) {
+                                $matchedOblast[$key] = [
+                                    'name' => $hit['oblast_id'],
+                                    'amount' => 0,
+                                    'type' => Objects::SEARCH_TYPE_REGION
+                                ];
                             }
+                            $matchedOblast[$key]['amount']++;
+                            break;
                         }
                     }
                 }
             }
-
-            //$results['cities'] = array_values($matchedCities); // reindex
-            $results['regions'] = array_merge(array_values($matchedCities), array_values($matchedOblast)); // reindex
-        } else {
+        
+            $results['regions'] = array_merge(array_values($matchedCities), array_values($matchedOblast));
+        }
+         else {
 
             // Faceted count search
             $facetSearch = $index->search('', [
