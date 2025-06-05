@@ -633,25 +633,27 @@ class ObjectController extends BaseController
                             break; // prevent counting the same hit more than once
                         }
                     }
-                }
 
-                if (!empty($hit['oblast_id'])) {
-                    foreach ($hit['oblast_id'] as $oblastName) {
-                        if (stripos($oblastName, $query) !== false) {
-                            $key = implode('|', $hit['oblast_id']); // use city array as unique key
-                            if (!isset($matchedOblast[$key])) {
-                                $matchedOblast[$key] = [
-                                    'name' => $hit['oblast_id'],
-                                    'amount' => 0,
-                                    'type' => 3 // or Objects::SEARCH_TYPE_CITY
-                                ];
+                    if (!empty($hit['oblast_id'])) {
+                        foreach ($hit['oblast_id'] as $oblastName) {
+                            if (stripos($oblastName, $query) !== false) {
+                                $key = implode('|', $hit['oblast_id']); // use city array as unique key
+                                if (!isset($matchedOblast[$key])) {
+                                    $matchedOblast[$key] = [
+                                        'name' => $hit['oblast_id'],
+                                        'amount' => 0,
+                                        'type' => 3 // or Objects::SEARCH_TYPE_CITY
+                                    ];
+                                }
+                                $matchedOblast[$key]['amount']++;
+                                $oblastHitCount++;
+                                break; // prevent counting the same hit more than once
                             }
-                            $matchedOblast[$key]['amount']++;
-                            $oblastHitCount++;
-                            break; // prevent counting the same hit more than once
                         }
                     }
                 }
+
+
             }
 
             $results['cities'] = array_values($matchedCities); // reindex
