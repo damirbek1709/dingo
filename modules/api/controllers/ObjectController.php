@@ -635,42 +635,43 @@ class ObjectController extends BaseController
             }
 
             $results['cities'] = array_values($matchedCities); // reindex
-        }
+        } else {
 
-        // Faceted count search
-        $facetSearch = $index->search('', [
-            'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
-            'facets' => ['city', 'name', 'oblast_id'],
-            'limit' => 0
-        ]);
+            // Faceted count search
+            $facetSearch = $index->search('', [
+                'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
+                'facets' => ['city', 'name', 'oblast_id'],
+                'limit' => 0
+            ]);
 
-        $cityCounts = $facetSearch->getFacetDistribution()['city'] ?? [];
-        $oblastCounts = $facetSearch->getFacetDistribution()['oblast_id'] ?? [];
+            $cityCounts = $facetSearch->getFacetDistribution()['city'] ?? [];
+            $oblastCounts = $facetSearch->getFacetDistribution()['oblast_id'] ?? [];
 
 
 
-        $regionModels = Objects::regionList();
-        foreach ($regionModels as $model) {
-            $titles = [
-                $model->title,
-                $model->title_en,
-                $model->title_ky
-            ];
+            $regionModels = Objects::regionList();
+            foreach ($regionModels as $model) {
+                $titles = [
+                    $model->title,
+                    $model->title_en,
+                    $model->title_ky
+                ];
 
-            $oblastAmount = 0;
-            foreach ($titles as $variant) {
-                foreach ($oblastCounts as $oblastName => $count) {
-                    if (mb_strtolower($oblastName) === mb_strtolower($variant)) {
-                        $oblastAmount += $count;
+                $oblastAmount = 0;
+                foreach ($titles as $variant) {
+                    foreach ($oblastCounts as $oblastName => $count) {
+                        if (mb_strtolower($oblastName) === mb_strtolower($variant)) {
+                            $oblastAmount += $count;
+                        }
                     }
                 }
-            }
 
-            $results['regions'][] = [
-                'name' => $titles,
-                'amount' => $oblastAmount,
-                'type' => Objects::SEARCH_TYPE_REGION // create this constant if needed
-            ];
+                $results['regions'][] = [
+                    'name' => $titles,
+                    'amount' => $oblastAmount,
+                    'type' => Objects::SEARCH_TYPE_REGION // create this constant if needed
+                ];
+            }
         }
 
         // User search history
