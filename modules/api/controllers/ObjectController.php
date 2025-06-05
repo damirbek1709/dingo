@@ -587,51 +587,53 @@ class ObjectController extends BaseController
         if (!empty($query)) {
             $hotelMatches = $index->search($query, [
                 'filter' => 'status = ' . Objects::STATUS_PUBLISHED,
-                'limit' => 100
+                'limit' => 100 // Adjust as needed
             ])->getHits();
 
+
             $matchedCities = [];
+            $cityHitCount = 0;
             $matchedOblast = [];
+            $oblastHitCount = 0;
 
             foreach ($hotelMatches as $hit) {
-                // Process matched cities
                 if (!empty($hit['city'])) {
                     foreach ($hit['city'] as $cityName) {
                         if (stripos($cityName, $query) !== false) {
-                            $key = mb_strtolower(implode('|', $hit['city']));
+                            $key = implode('|', $hit['city']); // use city array as unique key
                             if (!isset($matchedCities[$key])) {
                                 $matchedCities[$key] = [
                                     'name' => $hit['city'],
                                     'amount' => 0,
-                                    'type' => Objects::SEARCH_TYPE_CITY
+                                    'type' =>  Objects::SEARCH_TYPE_CITY
                                 ];
                             }
                             $matchedCities[$key]['amount']++;
-                            break;
+                            $cityHitCount++;
+                            break; // prevent counting the same hit more than once
                         }
                     }
-                }
 
-                // Process matched oblasts
-                if (!empty($hit['oblast_id'])) {
-                    foreach ($hit['oblast_id'] as $oblastName) {
-                        if (stripos($oblastName, $query) !== false) {
-                            $key = mb_strtolower(implode('|', $hit['oblast_id']));
-                            if (!isset($matchedOblast[$key])) {
-                                $matchedOblast[$key] = [
-                                    'name' => $hit['oblast_id'],
-                                    'amount' => 0,
-                                    'type' => Objects::SEARCH_TYPE_REGION
-                                ];
+                    if (!empty($hit['oblast_id'])) {
+                        foreach ($hit['oblast_id'] as $oblastName) {
+                            if (stripos($oblastName, $query) !== false) {
+                                $key = implode('|', $hit['oblast_id']); // use city array as unique key
+                                if (!isset($matchedOblast[$key])) {
+                                    $matchedOblast[$key] = [
+                                        'name' => $hit['oblast_id'],
+                                        'amount' => 0,
+                                        'type' =>  Objects::SEARCH_TYPE_REGION
+                                    ];
+                                }
+                                $matchedOblast[$key]['amount']++;
+                                $oblastHitCount++;
+                                break; // prevent counting the same hit more than once
                             }
-                            $matchedOblast[$key]['amount']++;
-                            break;
                         }
                     }
                 }
             }
-
-            $results['regions'] = array_merge(array_values($matchedCities), array_values($matchedOblast));
+            $results['regions'] = array_merge(array_values($matchedCities), array_values($matchedOblast)); // reindex
         } else {
 
             // Faceted count search
@@ -655,15 +657,15 @@ class ObjectController extends BaseController
             ]);
 
             $results['regions'][] = [
-                'name' => ['Бишкек', 'Bishkek', 'Бишкек'],
-                'amount' => count($bishkekSearch->getHits()),
-                'type' => Objects::SEARCH_TYPE_CITY
+                'name'=> ['Бишкек','Bishkek','Бишкек'],
+                'amount'=> count($bishkekSearch->getHits()),
+                'type'=>Objects::SEARCH_TYPE_CITY
             ];
 
             $results['regions'][] = [
-                'name' => ['Ош', 'Osh', 'Ош'],
-                'amount' => count($oshSearch->getHits()),
-                'type' => Objects::SEARCH_TYPE_CITY
+                'name'=> ['Ош','Osh','Ош'],
+                'amount'=> count($oshSearch->getHits()),
+                'type'=>Objects::SEARCH_TYPE_CITY
             ];
 
             $regionModels = Objects::regionList();
@@ -707,7 +709,7 @@ class ObjectController extends BaseController
             }
         }
 
-
+        
         $results['user_search_data'] = $user_search_data;
 
         return $results;
