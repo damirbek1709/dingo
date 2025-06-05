@@ -652,12 +652,10 @@ class ObjectController extends BaseController
                         }
                     }
                 }
-
-
             }
 
-            $results['cities'] = array_values($matchedCities); // reindex
-            $results['regions'] = array_values($matchedOblast); // reindex
+            //$results['cities'] = array_values($matchedCities); // reindex
+            $results['regions'] = array_combine(array_values($matchedCities), array_values($matchedOblast)); // reindex
         } else {
 
             // Faceted count search
@@ -713,6 +711,7 @@ class ObjectController extends BaseController
             }
         }
 
+        
         $results['user_search_data'] = $user_search_data;
 
         return $results;
