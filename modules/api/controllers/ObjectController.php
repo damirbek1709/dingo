@@ -668,7 +668,27 @@ class ObjectController extends BaseController
             $cityCounts = $facetSearch->getFacetDistribution()['city'] ?? [];
             $oblastCounts = $facetSearch->getFacetDistribution()['oblast_id'] ?? [];
 
+            $bishkekSearch = $index->search('', [
+                'filter' => 'status = ' . Objects::STATUS_PUBLISHED . 'AND city = "Бишкек"',
+                'limit' => 1
+            ]);
 
+            $oshSearch = $index->search('', [
+                'filter' => 'status = ' . Objects::STATUS_PUBLISHED . 'AND city = "Ош"',
+                'limit' => 1
+            ]);
+
+            $results['regions'][] = [
+                'name'=> ['Бишкек','Bishkek','Бишкек'],
+                'amount'=> count($bishkekSearch->getHits()),
+                'type'=>Objects::SEARCH_TYPE_CITY
+            ];
+
+            $results['regions'][] = [
+                'name'=> ['Ош','Osh','Ош'],
+                'amount'=> count($oshSearch->getHits()),
+                'type'=>Objects::SEARCH_TYPE_CITY
+            ];
 
             $regionModels = Objects::regionList();
             foreach ($regionModels as $model) {

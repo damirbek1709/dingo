@@ -669,6 +669,9 @@ class ObjectController extends Controller
                     $city['name_en'] ?? '',
                     $city['name_kg'] ?? '',
                 ];
+                // if($model->city_id == 1 || $model->city_id = 650){
+
+                // }
                 $model->oblast_id = [
                     $city['region'] ?? '',
                     $this->translateOblast($city['region'])[0],
