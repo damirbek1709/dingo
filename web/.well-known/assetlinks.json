@@ -1,0 +1,13 @@
+[
+    {
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.dingo.dingoapp",
+        "sha256_cert_fingerprints": [
+          "FC:D6:CE:EE:83:B9:EE:D2:8B:92:14:D2:20:61:B1:3C:F7:9B:D1:85:86:6B:82:6F:DE:D1:BC:37:5B:FD:C1:8E",
+          "81:91:6E:4A:C9:0B:ED:AF:E7:08:28:D2:13:B0:07:CD:30:31:DC:F7:4A:B4:FC:EA:56:23:E4:70:CF:EC:BC:71"
+        ]
+      }
+    }
+  ]
