@@ -914,6 +914,7 @@ class ObjectController extends Controller
                 'room_title' => $model->typeTitle($model->type_id),
                 'guest_amount' => (int) $model->guest_amount,
                 'similar_room_amount' => (int) $model->similar_room_amount,
+                'room_left' => (int) (int) $model->similar_room_amount,
                 'area' => (int) $model->area,
                 'bathroom' => (int) $model->bathroom,
                 'balcony' => (int) $model->balcony,

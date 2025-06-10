@@ -168,6 +168,7 @@ class TariffController extends Controller
         $tariff_list = Yii::$app->request->post('tariff_list');
         $object_id = Yii::$app->request->post('object_id');
         $room_id = Yii::$app->request->post('room_id');
+        $room_left = Yii::$app->request->post('room_left');
 
         Yii::$app->response->format = Response::FORMAT_JSON;
 
@@ -182,6 +183,9 @@ class TariffController extends Controller
             if ((int) $roomData['id'] !== (int) $room_id) {
                 continue;
             }
+            $object['rooms'][$roomIndex]['room_left'] = (int) $room_left;
+
+
 
             $existingTariffs = $roomData['tariff'] ?? [];
 

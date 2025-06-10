@@ -31,7 +31,8 @@ $this->title = Yii::t('app', 'Доступность и цены');
                 <div id="sidebar-details"></div>
                 <div class="sidebar_submit">
                     <div style="display:inline-block;float:right" class="save-button update-tariff">
-                        <?= Yii::t('app', 'Сохранить') ?></div>
+                        <?= Yii::t('app', 'Сохранить') ?>
+                    </div>
                 </div>
             </form>
         </div>
@@ -203,16 +204,26 @@ $this->title = Yii::t('app', 'Доступность и цены');
         roomId = $(this).attr('room_id');
         const tariffId = parseInt($(this).attr('tariff_id')); // ✅ NEW
 
+
+
         const room = rooms.find(r => r.id == roomId);
         if (!room) return;
 
         $('#checkin').val(convertToISO(date));
         $('#checkout').val(convertToISO(date));
+        let room_left = 0;
 
         let sidebar_title = `<h4 class="sidebar_title">${room.room_title[0]} </h4>`;
+        if (!room.room_left) {
+            room_left = room.similar_room_amount;
+        }
+        else {
+            room_left = room.room_left;
+        }
+
         let html = `<div class="form-group">
                     <label>Доступно номеров </label>
-                    <input class="form-control" type="text" id="similar_room_count" value="${room.similar_room_amount}">
+                    <input class="form-control" type="text" id="similar_room_count" value="${room_left}">
                 </div>`;
 
         const selectedTariff = room.tariff.find(t => parseInt(t.id) === tariffId);
@@ -273,6 +284,8 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
         let from_date = $('#checkin').val();
         let to_date = $('#checkout').val();
+
+        let room_left_value = $("#similar_room_count").val();
 
         // Convert to ISO format for comparison and storage
         let from_date_iso = convertToISO(from_date);
@@ -374,6 +387,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
                 object_id: object_id,
                 room_id: roomId,
                 tariff_list: tariff_list,
+                room_left: room_left_value,
                 _csrf: $('meta[name="csrf-token"]').attr('content')
             },
             success: function (response) {

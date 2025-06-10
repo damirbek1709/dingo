@@ -25,6 +25,7 @@ class Tariff extends \yii\db\ActiveRecord
     const MEAL_TYPE_THREE_TIMES = 3;
 
     public $room_list;
+    public $room_left;
 
     /**
      * {@inheritdoc}
@@ -169,7 +170,7 @@ class Tariff extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['payment_on_book', 'payment_on_reception', 'cancellation', 'meal_type', 'object_id', 'penalty_days'], 'integer'],
+            [['payment_on_book', 'payment_on_reception', 'cancellation', 'meal_type', 'object_id', 'penalty_days','room_left'], 'integer'],
             [['cancellation', 'meal_type', 'title', 'title_en', 'title_ky'], 'required'],
             [['penalty_sum'], 'number'],
             [['room_list'], 'safe'],
