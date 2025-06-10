@@ -732,6 +732,10 @@ class ObjectController extends BaseController
             if ($user && $user->search_data) {
                 $user_search_data = unserialize($user->search_data, ['allowed_classes' => false]);
             }
+
+            if (is_object($user_search_data)) {
+                $user_search_data = (array) $user_search_data;
+            }
         }
 
 
