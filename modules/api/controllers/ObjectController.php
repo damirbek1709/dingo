@@ -730,11 +730,9 @@ class ObjectController extends BaseController
         if ($user_auth) {
             $user = User::find()->where(['auth_key' => $user_auth])->one();
             if ($user && $user->search_data) {
-                $user_search_data = unserialize($user->search_data, ['allowed_classes' => false]);
-            }
-
-            if (is_object($user_search_data)) {
-                $user_search_data = (array) $user_search_data;
+                $unserialized_data = unserialize($user->search_data);
+                // Convert to array if it's an object
+                $user_search_data = is_object($unserialized_data) ? (array) $unserialized_data : $unserialized_data;
             }
         }
 
