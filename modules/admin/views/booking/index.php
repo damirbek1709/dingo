@@ -72,18 +72,18 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->dateFormat($model->date_to);
                 }
                 ],
-                // [
-                //     'attribute' => 'room_id',
-                //     'value' => function ($model) {
-                //     return $model->bookingRoomTitle();
-                // }
-                // ],
-                // [
-                //     'attribute' => 'object_id',
-                //     'value' => function ($model) {
-                //     return $model->bookingObjectTitle();
-                // }
-                // ],
+                [
+                    'attribute' => 'room_id',
+                    'value' => function ($model) {
+                    return $model->bookingRoomTitle();
+                }
+                ],
+                [
+                    'attribute' => 'object_id',
+                    'value' => function ($model) {
+                    return $model->bookingObjectTitle();
+                }
+                ],
                 // [
                 //     'attribute' => 'tariff_id',
                 //     'value' => function ($model) {
