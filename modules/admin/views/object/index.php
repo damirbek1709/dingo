@@ -28,37 +28,37 @@ use yii\widgets\Pjax;
                     'summary' => false,
                     'columns' => [
                         //'id',
-                        [
-                            'attribute' => 'name',
-                            'format' => 'raw',
-                            'value' => function ($model) {
-                                                if (is_array($model['name'])) {
-                                                    //return implode(', ', $model['name']);
-                                                    return $model['name'][0];
-                                                }
-                                                return "";
-                                            },
-                            'label' => Yii::t('app', 'Название'),
-                        ],
+                        // [
+                        //     'attribute' => 'name',
+                        //     'format' => 'raw',
+                        //     'value' => function ($model) {
+                        //                         if (is_array($model['name'])) {
+                        //                             //return implode(', ', $model['name']);
+                        //                             return $model['name'][0];
+                        //                         }
+                        //                         return "";
+                        //                     },
+                        //     'label' => Yii::t('app', 'Название'),
+                        // ],
 
-                        [
-                            'attribute' => 'type',
-                            'value' => function ($model) {
-                                                return Objects::typeString($model['type']);
-                                            },
-                            'label' => Yii::t('app', 'Тип объекта'),
-                        ],
-                        [
-                            'attribute' => 'address',
-                            'format' => 'raw',
-                            'value' => function ($model) {
-                                                if (is_array($model['address'])) {
-                                                    return $model['address'][0];
-                                                }
-                                                return "";
-                                            },
-                            'label' => Yii::t('app', 'Адрес'),
-                        ],
+                        // [
+                        //     'attribute' => 'type',
+                        //     'value' => function ($model) {
+                        //                         return Objects::typeString($model['type']);
+                        //                     },
+                        //     'label' => Yii::t('app', 'Тип объекта'),
+                        // ],
+                        // [
+                        //     'attribute' => 'address',
+                        //     'format' => 'raw',
+                        //     'value' => function ($model) {
+                        //                         if (is_array($model['address'])) {
+                        //                             return $model['address'][0];
+                        //                         }
+                        //                         return "";
+                        //                     },
+                        //     'label' => Yii::t('app', 'Адрес'),
+                        // ],
 
                         [
                             'label' => 'Имя хоста',
