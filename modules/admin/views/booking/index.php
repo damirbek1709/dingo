@@ -60,17 +60,17 @@ $this->params['breadcrumbs'][] = $this->title;
             'summary' => false,
             'columns' => [
                 'guest_name',
-                [
-                    'attribute' => 'date_from',
-                    'value' => function ($model) {
-                    return $model->dateFormat($model->date_from);
-                }
-                ],
-                [
-                    'attribute' => 'date_to',
-                    'value' => function ($model) {
-                    return $model->dateFormat($model->date_to);
-                }
+                // [
+                //     'attribute' => 'date_from',
+                //     'value' => function ($model) {
+                //     return $model->dateFormat($model->date_from);
+                // }
+                // ],
+                // [
+                //     'attribute' => 'date_to',
+                //     'value' => function ($model) {
+                //     return $model->dateFormat($model->date_to);
+                // }
                 ],
                 [
                     'attribute' => 'room_id',

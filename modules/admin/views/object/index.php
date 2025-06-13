@@ -23,7 +23,95 @@ use yii\widgets\Pjax;
 
         <div class="col-md-12">
             <div class="card">
-                
+                <?= GridView::widget([
+                    'dataProvider' => $dataProvider,
+                    'summary' => false,
+                    'columns' => [
+                        //'id',
+                        [
+                            'attribute' => 'name',
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                                if (is_array($model['name'])) {
+                                                    //return implode(', ', $model['name']);
+                                                    return $model['name'][0];
+                                                }
+                                                return "";
+                                            },
+                            'label' => Yii::t('app', 'Название'),
+                        ],
+
+                        [
+                            'attribute' => 'type',
+                            'value' => function ($model) {
+                                                return Objects::typeString($model['type']);
+                                            },
+                            'label' => Yii::t('app', 'Тип объекта'),
+                        ],
+                        [
+                            'attribute' => 'address',
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                                if (is_array($model['address'])) {
+                                                    return $model['address'][0];
+                                                }
+                                                return "";
+                                            },
+                            'label' => Yii::t('app', 'Адрес'),
+                        ],
+
+                        [
+                            'label' => 'Имя хоста',
+                            'attribute' => 'host_name',
+                            'value' => function ($model) {
+                                                return Objects::hostName($model['user_id']);
+                                            },
+                        ],
+                        'email',
+                        [
+                            'attribute' => 'phone',
+                            'value' => function ($model) {
+                                                return $model['phone'];
+                                            },
+                            'label' => Yii::t('app', 'Контакты'),
+                        ],
+                        [
+                            'attribute' => 'status',
+                            'value' => function ($model) {
+                                                $status_arr = Objects::statusData($model['status']);
+                                                $color = $status_arr['color'];
+                                                return "<span style='border: 1px solid;padding: 2px 6px;border-radius: 4px;background-color: #00000003;color:$color;'>" . $status_arr['label'] . "</span>";
+                                            },
+                            'label' => Yii::t('app', 'Статус'),
+                            'format' => 'raw',
+                            'contentOptions' => ['style' => 'min-width: 190px;'],
+                            'filter' => Html::activeDropDownList(
+                                new \yii\base\DynamicModel(['status' => Yii::$app->request->get('status')]),
+                                'status',
+                                Objects::statusList(),
+                                ['class' => 'form-control', 'prompt' => 'Все']
+                            ),
+                        ],
+                        [
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => '{view}',
+                            'header' => 'Действие',
+                            'buttons' => [
+                                'view' => function ($url, $model) {
+                                                    $string = "Просмотр";
+                                                    if ($model['status'] == Objects::STATUS_ON_MODERATION) {
+                                                        $string = "Модерация";
+                                                    }
+                                                    return Html::a($string, ['/admin/object/view', 'object_id' => $model['id']], [
+                                                        'class' => 'table_action_button',
+                                                        'title' => Yii::t('app', $string),
+                                                    ]);
+                                                },
+                            ]
+                        ],
+
+                    ],
+                ]); ?>
             </div>
         </div>
     </div>
