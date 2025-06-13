@@ -84,19 +84,19 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->bookingObjectTitle();
                 }
                 ],
-                // [
-                //     'attribute' => 'tariff_id',
-                //     'value' => function ($model) {
-                //     return $model->bookingTariffTitle();
-                // }
-                // ],
-                // 'special_comment',
-                // [
-                //     'attribute' => 'created_at',
-                //     'value' => function ($model) {
-                //     return $model->dateFormat($model->created_at);
-                // }
-                // ],
+                [
+                    'attribute' => 'tariff_id',
+                    'value' => function ($model) {
+                    return $model->bookingTariffTitle();
+                }
+                ],
+                'special_comment',
+                [
+                    'attribute' => 'created_at',
+                    'value' => function ($model) {
+                    return $model->dateFormat($model->created_at);
+                }
+                ],
                 // [
                 //     'attribute' => 'sum',
                 //     'value' => function ($model) {
