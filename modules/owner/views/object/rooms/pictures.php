@@ -33,8 +33,12 @@ use yii\widgets\ActiveForm;
                     <h1 class="general_title"><?= $title[0] ?></h1>
                     <div class="drop-zone" id="drop-zone">
                         <div class="drop-icon"></div>
-                        <div class="drop-text-top">Нажмите или перетащите файл в эту область для загрузки</div>
-                        <div class="drop-text-bottom">Поддержка одиночной или массовой загрузки</div>
+                        <div class="drop-text-top">
+                            <?php echo Yii::t('app', 'Нажмите или перетащите файл в эту область для загрузки') ?>
+                        </div>
+                        <div class="drop-text-bottom">
+                            <?php echo Yii::t('app', 'Поддержка одиночной или массовой загрузки') ?>
+                        </div>
                         <?= $form->field($model, 'images[]', [
                             'template' => '{input}', // Hides label and wrapper
                         ])->fileInput([
@@ -42,6 +46,7 @@ use yii\widgets\ActiveForm;
                                     'style' => 'display: none;',
                                     'id' => 'file-input'
                                 ]) ?>
+
                     </div>
 
                     <div class="preview-container" id="preview-container">
@@ -70,6 +75,9 @@ use yii\widgets\ActiveForm;
                         <?php endif; ?>
                     </div>
 
+                    <?= $form->field($model, 'main_img')->hiddenInput(['id' => 'main-img-input'])->label(false) ?>
+
+
                     <div class="form-group">
                         <?= Html::submitButton(Yii::t('app', 'Сохранить'), ['class' => 'save-button']) ?>
                     </div>
@@ -77,17 +85,18 @@ use yii\widgets\ActiveForm;
                     <?php ActiveForm::end(); ?>
                 </div>
             </div>
+
+
         </div>
 
     </div>
 </div>
 
 <script>
-
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const previewContainer = document.getElementById('preview-container');
-    let mainImageIndex = 0;
+    const mainImgInput = document.getElementById('main-img-input');
 
     dropZone.addEventListener('click', () => fileInput.click());
 
@@ -109,25 +118,32 @@ use yii\widgets\ActiveForm;
     fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
     function handleFiles(files) {
-        [...files].forEach((file, index) => {
+        [...files].forEach((file) => {
             const reader = new FileReader();
             reader.onload = e => {
                 const div = document.createElement('div');
                 div.classList.add('preview');
 
+                const uniqueId = 'new_' + file.name.replace(/\W/g, '_') + '_' + Math.random().toString(36).substr(2, 5);
+                div.setAttribute('id', uniqueId);
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                div.appendChild(img);
+
                 if (!document.querySelector('.preview.main')) {
                     div.classList.add('main');
-                    div.innerHTML += `<div class="main-label">Главная</div>`;
+                    div.insertAdjacentHTML('afterbegin', `<div class="main-label">Главная</div>`);
+                    mainImgInput.value = uniqueId;
                 } else {
-                    const button = document.createElement('button');
+                    const button = document.createElement('span');
                     button.className = 'make-main';
                     button.textContent = 'Сделать главной';
-                    button.type = 'button'; // <- Add this line
-                    button.onclick = () => makeMain(div);
+                    button.setAttribute('type', 'button');
+                    button.onclick = () => makeMain(div, uniqueId);
                     div.appendChild(button);
                 }
 
-                div.innerHTML += `<img src="${e.target.result}" alt="preview">`;
                 previewContainer.appendChild(div);
             };
             reader.readAsDataURL(file);
@@ -135,19 +151,54 @@ use yii\widgets\ActiveForm;
     }
 
 
-    function makeMain(div) {
+    function makeMain(div, id = null) {
         [...previewContainer.children].forEach(child => {
             child.classList.remove('main');
             const label = child.querySelector('.main-label');
             if (label) label.remove();
         });
+
         div.classList.add('main');
         div.insertAdjacentHTML('afterbegin', `<div class="main-label">Главная</div>`);
+
+        const imageId = id || div.getAttribute('id');
+        mainImgInput.value = imageId;
     }
 
-    function save() {
-        alert('Файлы сохранены (логика сохранения не реализована)');
-    }
+    document.addEventListener('DOMContentLoaded', function () {
+        const mainPreview = document.querySelector('.preview.main');
+        if (mainPreview) {
+            const mainId = mainPreview.getAttribute('id');
+            if (mainId && mainImgInput) {
+                mainImgInput.value = mainId;
+            }
+        }
+    });
+
+    $('.remove_photo').on('click', function () {
+        var image_id = $(this).attr('image_id');
+        var model_id = "<?= $model->id ?>";
+        var parent = $(this).parent();
+        $.ajax({
+            method: "GET",
+            url: "<?= Yii::$app->urlManager->createUrl('/owner/object/remove-room-image') ?>",
+            // beforeSend: function(xhr) {
+            //     xhr.setRequestHeader('Authorization', "Bearer " + auth_key);
+            // },
+            data: {
+                image_id: image_id,
+                model_id: model_id,
+                _csrf: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function (response) {
+                if (response == "true") {
+                    parent.fadeOut();
+                }
+                //thisOne.removeClass('post-view-fav');
+            }
+        });
+    });
+
 </script>
 <style>
     .main {

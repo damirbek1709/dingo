@@ -416,7 +416,6 @@ class TariffController extends Controller
     }
 
 
-
     public function actionBindRoom()
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -488,28 +487,37 @@ class TariffController extends Controller
         } else {
             // Remove tariff
             if (isset($rooms[$roomIndex]['tariff']) && is_array($rooms[$roomIndex]['tariff'])) {
-                $rooms[$roomIndex]['tariff'] = array_values(array_filter(
-                    $rooms[$roomIndex]['tariff'],
-                    fn($item) => (int) $item['id'] !== $tariffId
-                ));
+                // Filter out the tariff instead of using unset
+                $rooms[$roomIndex]['tariff'] = array_filter($rooms[$roomIndex]['tariff'], function ($item) use ($tariffId) {
+                    return (int) $item['id'] !== $tariffId;
+                });
 
-                // If empty, remove the key
+                // Reindex the array to ensure proper indexing
+                $rooms[$roomIndex]['tariff'] = array_values($rooms[$roomIndex]['tariff']);
+
+                // Remove the tariff key if array is empty
                 if (empty($rooms[$roomIndex]['tariff'])) {
                     unset($rooms[$roomIndex]['tariff']);
                 }
             }
         }
 
+        // Clean up any remaining empty tariff arrays
         foreach ($rooms as &$room) {
-            if (isset($room['tariff']) && empty($room['tariff'])) {
+            if (isset($room['tariff']) && is_array($room['tariff']) && empty($room['tariff'])) {
                 unset($room['tariff']);
             }
         }
+
         $object['rooms'] = $rooms;
 
-
         try {
-            $response = $client->index('object')->updateDocuments([$object]);
+            // Use addDocuments() instead of updateDocuments() to ensure complete document replacement
+            // This will remove fields that are not present in the new document
+            $response = $client->index('object')->updateDocuments([
+                'id' => (int)$object_id,
+                'rooms' => $rooms
+            ]);
             if (isset($response['taskUid'])) {
                 return ['success' => true, 'task' => $response['taskUid']];
             } else {
@@ -520,6 +528,4 @@ class TariffController extends Controller
             return ['success' => false, 'error' => 'Exception: ' . $e->getMessage()];
         }
     }
-
-
 }

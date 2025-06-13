@@ -138,7 +138,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['index', 'create', 'add-tariff', 'edit-tariff', 'prices', 'remove-object-image', 'remove-file', 'send-to-moderation', 'unpublish'],
+                    'actions' => ['index', 'create', 'add-tariff', 'edit-tariff', 'prices', 'remove-object-image', 'remove-room-image', 'remove-file', 'send-to-moderation', 'unpublish'],
                     'roles' => ['admin', 'owner'],
                 ],
             ],
@@ -1170,13 +1170,12 @@ class ObjectController extends Controller
 
         // Удаляем комнату из массива
         array_splice($rooms, $roomIndex, 1);
-
-        $meilisearchData = [
-            'id' => (int) $object_id,
-            'rooms' => $rooms // Обновленный массив без удаленной комнаты
-        ];
-
-        if ($meiliIndex->updateDocuments([$meilisearchData])) { // Используем правильную переменную
+        if (
+            $client->index('object')->updateDocuments([
+                'id' => (int) $object_id,
+                'rooms' => $rooms
+            ])
+        ) { // Используем правильную переменную
             Yii::$app->session->setFlash('success', 'Комната успешно удалена!');
             return $this->redirect(['room-list', 'object_id' => $object_id]);
         } else {
@@ -1198,7 +1197,7 @@ class ObjectController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                $room_list = $model->room_list;
+                $room_list = $object['rooms'] ?? [];
                 try {
                     $rooms = $object['rooms'] ?? [];
                     $updatedRooms = [];
@@ -1210,7 +1209,7 @@ class ObjectController extends Controller
                         }
 
                         $roomData['id'] = (int) $roomData['id'];
-                        if (in_array($roomData['id'], $room_list)) {
+                        if (in_array($roomData['id'], $rooms)) {
                             $roomData['tariff'] = $roomData['tariff'] ?? [];
 
                             $is_returnable = null;
@@ -1433,13 +1432,11 @@ class ObjectController extends Controller
     {
         $post = RoomCat::findOne($model_id);
         Yii::$app->response->format = Response::FORMAT_JSON;
-        $images = $post->getImages();
-
-        foreach ($images as $image) {
-            if ($image->id == $image_id) { // Replace with the actual image ID
-                $post->removeImage($image);
-                break; // Stop after deleting the image
-            }
+        $image = Image::findOne($image_id);
+        if ($post->removeImage($image)) {
+            return "true";
+        } else {
+            return "false";
         }
     }
 
@@ -1688,24 +1685,40 @@ class ObjectController extends Controller
 
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             $model->images = UploadedFile::getInstances($model, 'images');
+            $mainTempId = $model->main_img; // e.g., 'new_filename_xyz' or existing ID
+            $mainImageSet = false;
+
             if ($model->images) {
                 foreach ($model->images as $image) {
+                    // Match the frontend temp ID logic
+                    $baseNameSanitized = preg_replace('/\W+/', '_', $image->name);
+                    $possibleTempIdPrefix = 'new_' . $baseNameSanitized;
+
                     $path = Yii::getAlias('@webroot/uploads/images/') . $image->name;
-                    $image->saveAs($path);
-                    $model->attachImage($path, true);
-                    @unlink($path);
+
+                    if ($image->saveAs($path)) {
+                        // Match full frontend-generated ID prefix
+                        $isMain = false;
+                        if (!$mainImageSet && strpos($mainTempId, $possibleTempIdPrefix) === 0) {
+                            $isMain = true;
+                            $mainImageSet = true;
+                        }
+
+                        $model->attachImage($path, $isMain);
+                        @unlink($path);
+                    }
                 }
             }
-            $room['room_title'] = $model->typeTitle($model->type_id);
-            $room['guest_amount'] = (int) $model->guest_amount;
-            $room['similar_room_amount'] = (int) $model->similar_room_amount;
-            $room['area'] = (int) $model->area;
-            $room['bathroom'] = (int) $model->bathroom;
-            $room['balcony'] = (int) $model->balcony;
-            $room['air_cond'] = (int) $model->air_cond;
-            $room['kitchen'] = (int) $model->kitchen;
-            $room['base_price'] = (int) $model->base_price;
-            $room['img'] = $model->img;
+
+            if ($model->main_img) {
+                $image_id = $model->main_img;
+                foreach ($model->getImages() as $image) {
+                    if ($image->id == $image_id) {
+                        $model->setMainImage($image);
+                    }
+                }
+            }
+
             $room['images'] = $model->getPictures();
 
             // Update the document in Meilisearch

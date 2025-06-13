@@ -36,7 +36,7 @@ use yii\widgets\Pjax;
                                                     //return implode(', ', $model['name']);
                                                     return $model['name'][0];
                                                 }
-                                                return $model['name'][0];
+                                                return "";
                                             },
                             'label' => Yii::t('app', 'Название'),
                         ],

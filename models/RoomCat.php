@@ -34,6 +34,7 @@ class RoomCat extends \yii\db\ActiveRecord
     public $not_available_dates;
     public $default_prices = [];
     public $room_left;
+    public $main_img;
 
 
 
@@ -168,7 +169,7 @@ class RoomCat extends \yii\db\ActiveRecord
     {
         return [
             [['similar_room_amount', 'area'], 'required'],
-            [['bed_types', 'guest_amount', 'default_prices','room_left'], 'safe'],
+            [['bed_types', 'guest_amount', 'default_prices', 'room_left','main_img'], 'safe'],
             [['guest_amount'], 'default', 'value' => 1],
             [['guest_amount', 'similar_room_amount', 'bathroom', 'balcony', 'air_cond', 'kitchen', 'type_id'], 'integer'],
             [['area', 'base_price', 'title'], 'number'],
@@ -198,6 +199,7 @@ class RoomCat extends \yii\db\ActiveRecord
             'images' => Yii::t('app', 'Фотографии'),
             'default_prices' => Yii::t('app', 'Базовые цены'),
             'room_left' => Yii::t('app', 'Доступно номеров'),
+            'main_img' => Yii::t('app', 'Главное изображение'),
         ];
     }
 
@@ -231,11 +233,7 @@ class RoomCat extends \yii\db\ActiveRecord
 
     public function getImageById($id)
     {
-        $imageQuery = self::find();
-        $finder = $this->getImagesFinder(['id' => $id]);
-        $imageQuery->where($finder);
-
-        $img = $imageQuery->one();
+        $img = Image::find()->where(['id'=>$id])->one();
         if (!$img) {
             return $this->getModule()->getPlaceHolder();
         }
@@ -243,17 +241,7 @@ class RoomCat extends \yii\db\ActiveRecord
         return $img;
     }
 
-    public function afterSave($insert, $changedAttributes)
-    {
-        if ($this->img) {
-            $image_id = $this->img;
-            foreach ($this->getImages() as $image) {
-                if ($image->id == $image_id) {
-                    $this->setMainImage($image);
-                }
-            }
-        }
-    }
+    
 
     public function imagesPreview($size = [], $thumb = true)
     {
