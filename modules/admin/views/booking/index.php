@@ -97,29 +97,19 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->dateFormat($model->created_at);
                 }
                 ],
-                // [
-                //     'attribute' => 'sum',
-                //     'value' => function ($model) {
-                //     return $model->sum . " " . $model->currency;
-                // }
-                // ],
+                [
+                    'attribute' => 'sum',
+                    'value' => function ($model) {
+                    return $model->sum . " " . $model->currency;
+                }
+                ],
                 // [
                 //     'attribute' => 'status',
                 //     'value' => function ($model) {
                 //     return $model->bookingStatusString();
                 // }
                 // ],
-                //'guest_email:email',
-                //'guest_phone',
-                //'guest_name',
-                //'date_from',
-                //
-                //'status',
-                //'other_guests',
-                //'cancellation_type',
-                //'cancellation_penalty_sum',
-                //'user_id',
-                //'special_comment',
+               
                 [
                     'class' => ActionColumn::className(),
                     'template' => '{view}',
