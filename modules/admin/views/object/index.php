@@ -55,7 +55,7 @@ use yii\widgets\Pjax;
                                                 if (is_array($model['address'])) {
                                                     return $model['address'][0];
                                                 }
-                                                return $model['address'];
+                                                return "";
                                             },
                             'label' => Yii::t('app', 'Адрес'),
                         ],
