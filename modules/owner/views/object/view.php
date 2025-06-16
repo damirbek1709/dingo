@@ -134,7 +134,7 @@ $this->title = $title[0];
                                 <div class="check-in-out">
                                     <div class="time-section">
                                         <div class="section-label"><?= Yii::t('app', 'Контактный телефон') ?></div>
-                                        <div class="section-value"><?= $model->phone; ?></div>
+                                        <div class="section-value">+996 <?= $model->phone; ?></div>
                                     </div>
                                     <div class="time-section">
                                         <div class="section-label"><?= Yii::t('app', 'E-mail') ?></div>

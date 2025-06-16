@@ -21,7 +21,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <div class="oblast-update">
     <?= $this->render('top_nav', ['object_id' => $object_id]) ?>
 
-
     <div class="search-filter-bar">
         <?php $form = ActiveForm::begin([
             'action' => ['booking/index', 'object_id' => $object_id],

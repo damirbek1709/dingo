@@ -188,7 +188,7 @@ class Objects extends \yii\db\ActiveRecord
                     'name_en',
                     'name_ky',
                     'city_id',
-                    'oblast_id'
+
                 ],
                 'required'
             ],
@@ -206,7 +206,7 @@ class Objects extends \yii\db\ActiveRecord
                     'site',
                     'lat',
                     'lon',
-
+                    'oblast_id',
                     'general_room_count',
                     'img'
                 ],
