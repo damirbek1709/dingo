@@ -50,107 +50,108 @@ $this->title = Yii::t('app', 'Bookings');
         </div>
 
         <div class="booking-index">
-            <?= GridView::widget([
-                'dataProvider' => $dataProvider,
-                //'filterModel' => $searchModel,
-                'summary' => false,
-                'columns' => [
-                    'guest_name',
-                    [
-                        'attribute' => 'date_from',
-                        'value' => function ($model) {
-                        return $model->dateFormat($model->date_from);
-                    }
+            <div class="table-responsive">
+                <?= GridView::widget([
+                    'dataProvider' => $dataProvider,
+                    //'filterModel' => $searchModel,
+                    'summary' => false,
+                    'columns' => [
+                        'guest_name',
+                        [
+                            'attribute' => 'date_from',
+                            'value' => function ($model) {
+                                return $model->dateFormat($model->date_from);
+                            }
+                        ],
+                        [
+                            'attribute' => 'date_to',
+                            'value' => function ($model) {
+                                return $model->dateFormat($model->date_to);
+                            }
+                        ],
+                        [
+                            'attribute' => 'room_id',
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                $full = $model->bookingRoomTitle();
+                                $cut = StringHelper::truncate($full, 20);
+                                return "<span class='grid_short' full='$full'>" . $cut . "</span>";
+                            }
+                        ],
+                        [
+                            'attribute' => 'object_id',
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                $full = $model->bookingObjectTitle();
+                                $cut = StringHelper::truncate($full, 20);
+                                return "<span class='grid_short' full='$full'>" . $cut . "</span>";
+                            }
+                        ],
+                        [
+                            'attribute' => 'tariff_id',
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                $full = $model->bookingTariffTitle();
+                                $cut = StringHelper::truncate($full, 20);
+                                return "<span class='grid_short' full='$full'>" . $cut . "</span>";
+                            }
+                        ],
+                        [
+                            'attribute' => 'special_comment',
+                            'value' => function ($model) {
+                                $full = $model->special_comment;
+                                $cut = $model->special_comment ? StringHelper::truncate($full, 20) : "";
+                                return "<span class='grid_short' full='$full'>" . $cut . "</span>";
+                            },
+                            'format' => 'raw'
+                        ],
+                        [
+                            'attribute' => 'created_at',
+                            'value' => function ($model) {
+                                return $model->dateFormat($model->created_at);
+                            }
+                        ],
+                        [
+                            'attribute' => 'sum',
+                            'value' => function ($model) {
+                                return $model->sum . " " . $model->currency;
+                            }
+                        ],
+                        [
+                            'attribute' => 'status',
+                            'format' => 'raw',
+                            'value' => function ($model) {
+                                $string = $model->bookingStatusString()["string"];
+                                $color = $model->bookingStatusString()["color"];
+                                return "<span class='status_td' style='color:{$color};border:1px solid {$color};'>" . $string . "</span>";
+                            }
+                        ],
+                        [
+                            'class' => ActionColumn::className(),
+                            'template' => '{view}',
+                            'header' => Yii::t('app', 'Действие'),
+                            'buttons' => [
+                                'view' => function ($url, $model) {
+                                    return Html::tag('span', 'Подробнее', [
+                                        'class' => 'table_action_button',
+                                        'guest_amount' => $model->guestAmount(),
+                                        'title' => Yii::t('app', 'Подробнее'),
+                                        'transaction_number' => $model->transaction_number,
+                                        'request-text' => $model->special_comment,
+                                        'color' => $model->bookingStatusString()["color"],
+                                        'status' => $model->bookingStatusString()["string"],
+                                        'cancel_text' => $model->cancelText(),
+                                        'cancel_date' => $model->cancel_date ? $model->dateFormat($model->cancel_date) : "",
+                                        'return_sum' => $model->sum - $model->cancellation_penalty_sum . " " . $model->currency,
+                                        'penalty_sum' => $model->cancellation_penalty_sum . " " . $model->currency,
+                                        'cancel_reason' => $model->cancel_reason_id ? $model->getCancelReasonArray()[0] : "",
+                                    ]);
+                                },
+                            ]
+                        ],
                     ],
-                    [
-                        'attribute' => 'date_to',
-                        'value' => function ($model) {
-                        return $model->dateFormat($model->date_to);
-                    }
-                    ],
-                    [
-                        'attribute' => 'room_id',
-                        'format' => 'raw',
-                        'value' => function ($model) {
-                        $full = $model->bookingRoomTitle();
-                        $cut = StringHelper::truncate($full, 20);
-                        return "<span class='grid_short' full='$full'>" . $cut . "</span>";
-                    }
-                    ],
-                    [
-                        'attribute' => 'object_id',
-                        'format' => 'raw',
-                        'value' => function ($model) {
-                        $full = $model->bookingObjectTitle();
-                        $cut = StringHelper::truncate($full, 20);
-                        return "<span class='grid_short' full='$full'>" . $cut . "</span>";
-                    }
-                    ],
-                    [
-                        'attribute' => 'tariff_id',
-                        'format' => 'raw',
-                        'value' => function ($model) {
-                        $full = $model->bookingTariffTitle();
-                        $cut = StringHelper::truncate($full, 20);
-                        return "<span class='grid_short' full='$full'>" . $cut . "</span>";
-                    }
-                    ],
-                    [
-                        'attribute' => 'special_comment',
-                        'value' => function ($model) {
-                        $full = $model->special_comment;
-                        $cut = $model->special_comment ? StringHelper::truncate($full, 20) : "";
-                        return "<span class='grid_short' full='$full'>" . $cut . "</span>";
-                    },
-                        'format' => 'raw'
-                    ],
-                    [
-                        'attribute' => 'created_at',
-                        'value' => function ($model) {
-                        return $model->dateFormat($model->created_at);
-                    }
-                    ],
-                    [
-                        'attribute' => 'sum',
-                        'value' => function ($model) {
-                        return $model->sum . " " . $model->currency;
-                    }
-                    ],
-                    [
-                        'attribute' => 'status',
-                        'format' => 'raw',
-                        'value' => function ($model) {
-                        $string = $model->bookingStatusString()["string"];
-                        $color = $model->bookingStatusString()["color"];
-                        return "<span class='status_td' style='color:{$color};border:1px solid {$color};'>" . $string . "</span>";
-                    }
-                    ],
-                    [
-                        'class' => ActionColumn::className(),
-                        'template' => '{view}',
-                        'header' => Yii::t('app', 'Действие'),
-                        'buttons' => [
-                            'view' => function ($url, $model) {
-                            return Html::tag('span', 'Подробнее', [
-                                'class' => 'table_action_button',
-                                'guest_amount' => $model->guestAmount(),
-                                'title' => Yii::t('app', 'Подробнее'),
-                                'transaction_number' => $model->transaction_number,
-                                'request-text' => $model->special_comment,
-                                'color' => $model->bookingStatusString()["color"],
-                                'status' => $model->bookingStatusString()["string"],
-                                'cancel_text' => $model->cancelText(),
-                                'cancel_date' => $model->cancel_date ? $model->dateFormat($model->cancel_date) : "",
-                                'return_sum' => $model->sum - $model->cancellation_penalty_sum . " " . $model->currency,
-                                'penalty_sum' => $model->cancellation_penalty_sum . " " . $model->currency,
-                                'cancel_reason' => $model->cancel_reason_id ? $model->getCancelReasonArray()[0] : "",
-                            ]);
-                        },
-                        ]
-                    ],
-                ],
-            ]); ?>
-
+                ]); ?>
+            </div>
         </div>
     </div>
 </div>
@@ -876,6 +877,16 @@ Modal::begin([
         cursor: pointer;
         float: right;
         transition: all 0.2s;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* для плавности на iOS */
+    }
+
+    .table-responsive table {
+        min-width: 1200px;
     }
 
     .send-button:hover {
