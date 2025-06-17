@@ -144,7 +144,7 @@ $cityName = $model->city ? $model->city[0] : "";
             ?>
         </div>
 
-        
+
 
         <?php
         echo $form->field($model, 'city_id')->widget(Select2::class, [
@@ -252,9 +252,11 @@ $cityName = $model->city ? $model->city[0] : "";
 
         <div class="preview-container" id="preview-container">
             <?php
-            if ($images): ?>
-                <?php foreach ($images as $index => $image): ?>
-                    <?php if ($image && method_exists($image, 'getUrl')): ?>
+            if ($images):
+                $picture_list = $images;
+                ?>
+                <?php foreach ($picture_list as $index => $image): ?>
+                    <?php if ($image): ?>
                         <div class="preview<?= $index === 0 ? ' main' : '' ?>" id="<?= $image->id; ?>">
                             <?php if ($index === 0): ?>
                                 <div class="main-label"><?= Yii::t('app', 'Главная') ?></div>
@@ -287,21 +289,11 @@ $cityName = $model->city ? $model->city[0] : "";
 </div>
 
 <script>
-
-    var mainImgIdField = $('#roomcat-img');
-    $('body').on('click', '.img-main', function () {
-        var imgId = $(this).siblings('.kv-file-remove').attr('data-key');
-        mainImgIdField.val(imgId);
-        $('.file-preview-thumbnails .file-preview-frame').removeClass('main');
-        $('.img-main').removeClass('main');
-        $(this).addClass('main');
-    });
-
-
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
     const previewContainer = document.getElementById('preview-container');
     let mainImageIndex = 0;
+    const mainImgInput = document.getElementById('objects-img');
 
     dropZone.addEventListener('click', () => fileInput.click());
 
@@ -323,31 +315,53 @@ $cityName = $model->city ? $model->city[0] : "";
     fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
     function handleFiles(files) {
-        const previewContainer = document.getElementById('preview-container');
-
-        [...files].forEach((file, index) => {
+        [...files].forEach((file) => {
             const reader = new FileReader();
             reader.onload = e => {
                 const div = document.createElement('div');
                 div.classList.add('preview');
 
+                const uniqueId = 'new_' + file.name.replace(/\W/g, '_') + '_' + Math.random().toString(36).substr(2, 5);
+                div.setAttribute('id', uniqueId);
+
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                div.appendChild(img);
+
                 if (!document.querySelector('.preview.main')) {
                     div.classList.add('main');
-                    div.innerHTML += `<div class="main-label">Главная</div>`;
+                    div.insertAdjacentHTML('afterbegin', `<div class="main-label">Главная</div>`);
+                    mainImgInput.value = uniqueId;
                 } else {
                     const button = document.createElement('span');
                     button.className = 'make-main';
                     button.textContent = 'Сделать главной';
-                    button.onclick = () => makeMain(div, file.name);  // You can replace 'file.name' with the actual image ID
+                    button.setAttribute('type', 'button');
+                    button.onclick = () => makeMain(div, uniqueId);
                     div.appendChild(button);
                 }
 
-                div.innerHTML += `<img src="${e.target.result}" alt="preview">`;
                 previewContainer.appendChild(div);
             };
             reader.readAsDataURL(file);
         });
     }
+
+
+    function makeMain(div, id = null) {
+        [...previewContainer.children].forEach(child => {
+            child.classList.remove('main');
+            const label = child.querySelector('.main-label');
+            if (label) label.remove();
+        });
+
+        div.classList.add('main');
+        div.insertAdjacentHTML('afterbegin', `<div class="main-label">Главная</div>`);
+
+        const imageId = id || div.getAttribute('id');
+        mainImgInput.value = imageId;
+    }
+
 
     $('.remove_photo').on('click', function () {
         var image_id = $(this).attr('image_id');
@@ -372,25 +386,6 @@ $cityName = $model->city ? $model->city[0] : "";
             }
         });
     });
-
-
-    function makeMain(div, image_id) {
-        const previewContainer = document.getElementById('preview-container');
-
-        // Remove 'main' class from all previews and remove 'main-label'
-        [...previewContainer.children].forEach(child => {
-            child.classList.remove('main');
-            const label = child.querySelector('.main-label');
-            if (label) label.remove();
-        });
-
-        // Add 'main' class to the selected preview and insert the 'Главная' label
-        div.classList.add('main');
-        div.insertAdjacentHTML('afterbegin', `<div class="main-label">Главная</div>`);
-
-        // Set the image ID to the hidden input field with id 'objects-img'
-        document.getElementById('objects-img').value = image_id; // This will set the value of the hidden input
-    }
 
     function save() {
         alert('Файлы сохранены (логика сохранения не реализована)');

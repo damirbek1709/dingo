@@ -66,6 +66,7 @@ class Objects extends \yii\db\ActiveRecord
     public $deny_reason;
     public $guest_amount;
 
+
     public $status;
     public $ceo_doc;
     public $financial_doc;

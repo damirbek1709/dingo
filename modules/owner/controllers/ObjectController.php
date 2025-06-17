@@ -333,9 +333,6 @@ class ObjectController extends Controller
     }
 
 
-
-
-
     public function actionView($object_id)
     {
         $new_object_data = Yii::$app->session->get('new_object_data');
@@ -553,7 +550,6 @@ class ObjectController extends Controller
 
         // Handle form submission
         if ($model->load(Yii::$app->request->post())) {
-
             $model->type = (int) $model->type;
             $model->lat = (float) $model->lat;
             $model->lon = (float) $model->lon;
@@ -624,17 +620,38 @@ class ObjectController extends Controller
                 }
 
                 $bind_model->images = UploadedFile::getInstances($model, 'images');
-                if ($model->images) {
+                if ($bind_model->images) {
+                    $mainTempId = $model->img; // e.g., 'new_filename_xyz' or existing ID
+                    $mainImageSet = false;
+
                     foreach ($bind_model->images as $image) {
-                        $path = Yii::getAlias('@webroot/uploads/images/store/') . $image->name;
-                        $image->saveAs($path);
-                        $bind_model->attachImage($path, true);
-                        @unlink($path);
+                        // Match the frontend temp ID logic
+                        $baseNameSanitized = preg_replace('/\W+/', '_', $image->name);
+                        $possibleTempIdPrefix = 'new_' . $baseNameSanitized;
+
+                        $path = Yii::getAlias('@webroot/uploads/images/') . $image->name;
+
+                        if ($image->saveAs($path)) {
+                            // Match full frontend-generated ID prefix
+                            $isMain = false;
+                            if (!$mainImageSet && strpos($mainTempId, $possibleTempIdPrefix) === 0) {
+                                $isMain = true;
+                                $mainImageSet = true;
+                            }
+
+                            $bind_model->attachImage($path, $isMain);
+                            @unlink($path);
+                        }
                     }
                 }
+
                 if ($model->img) {
-                    $main_img = Image::find()->where(['id' => $model->img])->one();
-                    $bind_model->setMainImage($main_img);
+                    $image_id = $model->img;
+                    foreach ($model->getImages() as $image) {
+                        if ($image->id == $image_id) {
+                            $model->setMainImage($image);
+                        }
+                    }
                 }
 
                 $object_arr = [
@@ -668,8 +685,11 @@ class ObjectController extends Controller
                 }
 
 
-                $index->updateDocuments($object_arr);
-                return $this->redirect(['view', 'object_id' => $model->id]);
+                if ($index->updateDocuments($object_arr)) {
+                    Yii::$app->session->set('new_object_data', $object_arr);
+                    return $this->redirect(['view', 'object_id' => $model->id]);
+                }
+
             }
         }
 
