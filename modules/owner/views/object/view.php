@@ -24,10 +24,8 @@ $this->title = $title[0];
             <div class="col-md-3">
                 <?php echo $this->render('nav', ['model' => $model]); ?>
             </div>
-            <div class="col-md-9">
-
+            <div class="col-md-9 mob_card_cover">
                 <div class="card">
-
                     <div class="header">
                         <div>
                             <div class="section-label">Название</div>
