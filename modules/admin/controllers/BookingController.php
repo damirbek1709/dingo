@@ -8,6 +8,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
+use yii\web\Response;
 
 /**
  * BookingController implements the CRUD actions for Booking model.
@@ -217,6 +218,7 @@ class BookingController extends Controller
     public function actionRefund($id)
     {
         try {
+            $this->response->format = Response::FORMAT_JSON;
             $model = Booking::findOne($id);
             // Prepare request data
             $requestData = $this->prepareRefundData($model->transaction_number, $model->sum, 'KGS', $model->special_comment, Booking::MERCHANT_ID);
