@@ -358,6 +358,8 @@ class BookingController extends Controller
 
         // Generate the signature *after* the $data array is fully assembled
         $data["general"]["signature"] = $this->generateSignature($data);
+        $this->asJson($data);
+        
 
         $headers = [
             'Accept: application/json',
