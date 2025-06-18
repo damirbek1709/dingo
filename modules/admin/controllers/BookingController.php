@@ -234,8 +234,6 @@ class BookingController extends Controller
             "general" => [
                 "project_id" => $projectId,
                 "payment_id" => $model->transaction_number,
-                "terminal_callback_url" => "https://dev.digno.kg/api/booking/terminal-callback",
-                "referrer_url" => "https://dev.digno.kg",
                 "merchant_callback_url" => "https://dev.digno.kg/api/booking/refund-callback",
             ],
             "payment" => [
@@ -292,7 +290,7 @@ class BookingController extends Controller
         // Generate signature and attach it
         $payload['general']['signature'] = $this->generateFlashPaySignature($payload, $secretKey);
 
-        print_r(json_encode($payload));die();
+        //print_r(json_encode($payload));die();
 
         // Logging request
         Yii::info('FlashPay refund request: ' . json_encode($payload), 'flashpay');
