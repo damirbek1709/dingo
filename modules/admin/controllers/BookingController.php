@@ -246,6 +246,41 @@ class BookingController extends Controller
         }
     }
 
+    public function actionCheckStatus($requestId)
+    {
+        // Set response format to JSON
+        $this->response->format = Response::FORMAT_JSON;
+
+        try {
+            // Prepare status request data
+            $requestData = [
+                'project_id' => (int) Booking::MERCHANT_ID,
+                'request_id' => (string) $requestId,
+            ];
+
+            // Generate signature
+            $signature = $this->generateSignature($requestData);
+            $requestData['signature'] = $signature;
+
+            // Send status request to Flash Pay
+            $response = $this->sendStatusRequest($requestData);
+
+            return [
+                'success' => true,
+                'data' => $response,
+                'request_data' => $requestData // For debugging
+            ];
+
+        } catch (\Exception $e) {
+            Yii::error('Flash Pay status check error: ' . $e->getMessage(), __METHOD__);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
     /**
      * Prepare refund request data
      */
@@ -254,23 +289,23 @@ class BookingController extends Controller
         $data = [
             'general' => [
                 'project_id' => Booking::MERCHANT_ID,
-                'payment_id' => (string)$paymentId,
+                'payment_id' => (string) $paymentId,
                 // signature will be added later
             ],
             'payment' => [
-                'currency' => (string)$currency,
-                'description' => (string)$description,
+                'currency' => (string) $currency,
+                'description' => (string) $description,
             ]
         ];
 
         // Add amount if specified (for partial refund)
         if ($amount !== null) {
-            $data['payment']['amount'] = (int)$amount;
+            $data['payment']['amount'] = (int) $amount;
         }
 
         // Add merchant refund ID if specified
         if ($merchantRefundId !== null) {
-            $data['payment']['merchant_refund_id'] = (string)$merchantRefundId;
+            $data['payment']['merchant_refund_id'] = (string) $merchantRefundId;
         }
 
         return $data;
@@ -355,7 +390,7 @@ class BookingController extends Controller
             return '';
         }
 
-        return (string)$value;
+        return (string) $value;
     }
 
     /**
@@ -419,9 +454,9 @@ class BookingController extends Controller
         return hash_equals($expectedSignature, $receivedSignature);
     }
 
-    
 
-    
+
+
     public function actionRefund2($id)
     {
         $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
@@ -431,7 +466,7 @@ class BookingController extends Controller
             "general" => [
                 "project_id" => Booking::MERCHANT_ID,
                 "payment_id" => $model->transaction_number, // Required: actual payment ID
-                "signature"=> $this->generateSignature($id),
+                "signature" => $this->generateSignature($id),
                 "terminal_callback_url" => "https://dev.digno.kg/booking/terminal-callback",
                 "referrer_url" => "https://dev.digno.kg",
                 "merchant_callback_url" => "https://dev.digno.kg//booking/merchant-callback",
@@ -520,7 +555,7 @@ class BookingController extends Controller
             ]
         ];
 
-        
+
 
         $headers = [
             'Accept: application/json',
