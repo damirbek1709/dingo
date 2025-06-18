@@ -345,9 +345,9 @@ class BookingController extends Controller
         }
 
         // Add merchant refund ID if specified
-        if ($merchantRefundId !== null) {
-            $data['payment']['merchant_refund_id'] = (string) $merchantRefundId;
-        }
+        // if ($merchantRefundId !== null) {
+        //     $data['payment']['merchant_refund_id'] = (string) $merchantRefundId;
+        // }
 
         return $data;
     }
