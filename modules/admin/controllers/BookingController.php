@@ -321,6 +321,9 @@ class BookingController extends Controller
 
         $responseData = json_decode($response, true);
 
+        echo "<pre>";print_r($responseData);echo "</pre>";die();
+
+
         // Log the response for debugging
         Yii::info('FlashPay refund response: ' . $response, 'flashpay');
 
