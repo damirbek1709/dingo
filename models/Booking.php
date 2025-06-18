@@ -72,7 +72,7 @@ class Booking extends \yii\db\ActiveRecord
             [['status'], 'default', 'value' => 1],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
-            [['date_from', 'date_to', 'cancel_date', 'comission','income'], 'safe'],
+            [['date_from', 'date_to', 'cancel_date', 'comission', 'income'], 'safe'],
             [['tariff_id', 'currency'], 'string', 'max' => 11],
             [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number'], 'string', 'max' => 255],
             [['other_guests'], 'string', 'max' => 500],
@@ -481,6 +481,58 @@ class Booking extends \yii\db\ActiveRecord
         });
 
         return count($names) + 1;
+    }
+
+    public static function generateSignature($data)
+    {
+        // Step 1: Remove signature field if it exists
+        if (isset($data['signature'])) {
+            unset($data['signature']);
+        }
+
+        // Step 2: Convert data to key:value strings and handle boolean values  
+        $keyValuePairs = [];
+        foreach ($data as $key => $value) {
+            // Convert boolean values to 1/0
+            if (is_bool($value)) {
+                $value = $value ? '1' : '0';
+            }
+
+            // Convert to UTF-8 string
+            $key = mb_convert_encoding($key, 'UTF-8');
+            $value = mb_convert_encoding((string) $value, 'UTF-8');
+
+            $keyValuePairs[] = $key . ':' . $value;
+        }
+
+        // Step 3: Sort in natural order (case-insensitive, natural sorting)
+        natsort($keyValuePairs);
+
+        // Step 4: Join with semicolon delimiter
+        $signatureString = implode(';', $keyValuePairs);
+
+        // Step 5: Calculate HMAC-SHA512 and encode with Base64
+        $hmac = hash_hmac('sha512', $signatureString, self::SECRET_KEY, true);
+        $signature = base64_encode($hmac);
+
+        return $signature;
+    }
+
+    /**
+     * Generate signature for refund request
+     */
+    public function generateRefundSignature($refundData)
+    {
+        return $this->generateSignature($refundData);
+    }
+
+    /**
+     * Verify received signature
+     */
+    public function verifySignature($data, $receivedSignature)
+    {
+        $calculatedSignature = $this->generateSignature($data);
+        return hash_equals($calculatedSignature, $receivedSignature);
     }
 
 }
