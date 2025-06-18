@@ -50,6 +50,8 @@ class Booking extends \yii\db\ActiveRecord
 
     public $commission;
     public $income;
+
+    public $refund_status;
     /**
      * {@inheritdoc}
      */
