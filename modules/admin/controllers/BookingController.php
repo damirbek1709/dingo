@@ -215,27 +215,15 @@ class BookingController extends Controller
 
     protected function generateSignature(array $data): string
     {
-        // Retrieve the secret key. Ensure 'Booking::SECRET_KEY' is properly defined
-        // and holds your actual secret key provided by FlashPay.
         $secretKey = Booking::SECRET_KEY; // Example: 'your_actual_secret_key_here'
 
-        // Step 1: Recursively sort the keys of the data array in natural order.
-        // This ensures a consistent order for signature generation.
         $sortedData = $this->sortRecursive($data);
-
-        // Step 2: Convert the sorted array to a canonical JSON string.
-        // JSON_UNESCAPED_UNICODE: Ensures multi-byte Unicode characters are not escaped (e.g., Russian characters).
-        // JSON_UNESCAPED_SLASHES: Prevents forward slashes '/' from being escaped to '\/'.
-        // These flags are crucial for generating a consistent, canonical string for hashing.
         $stringToSign = json_encode($sortedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         // It's good practice to check for JSON encoding errors.
         if (json_last_error() !== JSON_ERROR_NONE) {
             throw new \Exception('JSON encoding error: ' . json_last_error_msg());
         }
-
-        // Step 3: Calculate the HMAC-SHA512 hash of the canonical JSON string.
-        // The 'true' parameter makes hash_hmac return raw binary data.
         $hmac = hash_hmac('sha512', $stringToSign, $secretKey, true);
 
         // Step 4: Base64 encode the HMAC result.
