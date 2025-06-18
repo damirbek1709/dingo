@@ -252,7 +252,7 @@ class BookingController extends Controller
 
         // Send to FlashPay
         Yii::info('Refund request: ' . json_encode($payload), 'flashpay');
-        $response = Yii::$app->httpClient
+        $response = Yii::$app->client
             ->post('https://gateway.flashpay.kg/v2/payment/card/refund', json_encode($payload))
             ->setHeaders([
                 'Accept' => 'application/json',

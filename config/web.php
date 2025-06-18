@@ -73,6 +73,9 @@ $config = [
         ],
     ],
     'components' => [
+        'httpClient' => [
+            'class' => 'yii\httpclient\Client',
+        ],
         'view' => [
             'theme' => [
                 'pathMap' => [
