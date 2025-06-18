@@ -214,33 +214,33 @@ class BookingController extends Controller
     }
 
 
-    
+
     public function actionRefund($id)
     {
         $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
         $model = Booking::findOne($id);
-        
+
         if (!$model) {
             return $this->asJson(['error' => 'Booking not found']);
         }
-        
+
         if (empty($model->transaction_number)) {
             return $this->asJson(['error' => 'No transaction number found']);
         }
-        
+
         $refundAmount = $model->sum;
-        
+
         // Prepare the core data structure
         $data = [
             "general" => [
-                "project_id" => (int)Booking::MERCHANT_ID,
+                "project_id" => (int) Booking::MERCHANT_ID,
                 "payment_id" => $model->transaction_number,
                 "terminal_callback_url" => "https://dev.digno.kg/api/booking/terminal-callback",
                 "referrer_url" => "https://dev.digno.kg",
                 "merchant_callback_url" => "https://dev.digno.kg/api/booking/refund-callback",
             ],
             "payment" => [
-                "amount" => (int)$refundAmount,
+                "amount" => (int) $refundAmount,
                 "currency" => $model->currency ?? 'KGS',
                 "description" => "Booking refund for reservation #" . $model->id,
                 "merchant_refund_id" => "REFUND_" . $model->id . "_" . time()
@@ -253,7 +253,7 @@ class BookingController extends Controller
                 "positions" => [
                     [
                         "quantity" => 1,
-                        "price" => (int)$refundAmount,
+                        "price" => (int) $refundAmount,
                         "position_description" => $model->bookingRoomTitle(),
                         "tax" => 1,
                         "payment_method_type" => 1,
@@ -264,7 +264,7 @@ class BookingController extends Controller
                 "payments" => [
                     [
                         "payment_type" => 1,
-                        "amount" => (int)$refundAmount
+                        "amount" => (int) $refundAmount
                     ]
                 ],
                 "order_id" => $model->id,
@@ -275,7 +275,7 @@ class BookingController extends Controller
                 "positions" => [
                     [
                         "quantity" => 1,
-                        "amount" => (int)$refundAmount,
+                        "amount" => (int) $refundAmount,
                         "tax" => 1,
                         "tax_amount" => 0,
                         "description" => "Refund: " . $model->bookingRoomTitle()
@@ -289,28 +289,28 @@ class BookingController extends Controller
                 "force_disable" => false
             ]
         ];
-        
+
         // Flatten the data for signature generation (FlashPay might expect flattened structure)
         $signatureData = $this->flattenArrayForSignature($data);
-        
+
         // Generate signature
         $signatureGenerator = new FlashPaySignatureGenerator(self::FLASHPAY_SECRET_KEY);
         $signature = $signatureGenerator->generateSignature($signatureData);
-        
+
         // Add signature to the request
         $data['general']['signature'] = $signature;
-        
+
         // Log for debugging
         \Yii::info('FlashPay signature data: ' . json_encode($signatureData), 'flashpay');
         \Yii::info('Generated signature: ' . $signature, 'flashpay');
-        
+
         // Make the API request
         $headers = [
             'Accept: application/json',
             'Content-Type: application/json',
             'User-Agent: DignoKG/1.0'
         ];
-        
+
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
@@ -318,23 +318,23 @@ class BookingController extends Controller
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        
+
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        
+
         if (curl_errno($ch)) {
             $error = curl_error($ch);
             curl_close($ch);
             \Yii::error('FlashPay cURL error: ' . $error, 'flashpay');
             return $this->asJson(['error' => 'Connection error: ' . $error]);
         }
-        
+
         curl_close($ch);
         $responseData = json_decode($response, true);
-        
+
         // Log response
         \Yii::info('FlashPay refund response: ' . $response, 'flashpay');
-        
+
         // Handle response
         if ($httpCode === 200 && isset($responseData['status'])) {
             if ($responseData['status'] === 'success' || $responseData['status'] === 'processing') {
@@ -342,7 +342,7 @@ class BookingController extends Controller
                 $model->refund_status = 'processing';
                 $model->refund_request_date = date('Y-m-d H:i:s');
                 $model->save();
-                
+
                 return $this->asJson([
                     'success' => true,
                     'message' => 'Refund request submitted successfully',
@@ -350,7 +350,7 @@ class BookingController extends Controller
                 ]);
             }
         }
-        
+
         return $this->asJson([
             'success' => false,
             'status' => $httpCode,
@@ -358,7 +358,7 @@ class BookingController extends Controller
             'response' => $responseData,
         ]);
     }
-    
+
     /**
      * Helper method to flatten nested arrays for signature generation
      * FlashPay might expect a flat structure for signature calculation
@@ -368,7 +368,7 @@ class BookingController extends Controller
         $result = [];
         foreach ($array as $key => $value) {
             $newKey = $prefix === '' ? $key : $prefix . '_' . $key;
-            
+
             if (is_array($value) && !$this->isAssociativeArray($value)) {
                 // Handle indexed arrays (like positions, payments)
                 foreach ($value as $index => $item) {
@@ -387,7 +387,7 @@ class BookingController extends Controller
         }
         return $result;
     }
-    
+
     /**
      * Check if array is associative
      */
@@ -395,35 +395,30 @@ class BookingController extends Controller
     {
         return array_keys($array) !== range(0, count($array) - 1);
     }
-}
 
-// Test function to verify the signature generation matches FlashPay example
-function testFlashPaySignature()
-{
-    $testData = [
-        "project_id" => 12345,
-        "payment_id" => "X03936",
-        "payment_amount" => 2035,
-        "payment_currency" => "USD",
-        "payment_description" => "Guyliner purchase",
-        "customer_first_name" => "Jack",
-        "customer_id" => "user007",
-        "customer_last_name" => "Sparrow",
-        "customer_phone" => "02081234567",
-        "close_on_missclick" => true
-    ];
-    
-    $signature = Booking::generateSignature($testData);
-    
-    echo "Generated signature: " . $signature . "\n";
-    echo "Expected signature:  SyA3cx/dmFrwjRcpbnwEK9zaklWKR9buIfTctQob/EHUTutFLpI0zWpSDFEWEwbZt/04i83395RCdEhtUMw83A==\n";
-    echo "Match: " . ($signature === 'SyA3cx/dmFrwjRcpbnwEK9zaklWKR9buIfTctQob/EHUTutFLpI0zWpSDFEWEwbZt/04i83395RCdEhtUMw83A==' ? 'YES' : 'NO') . "\n";
-}
 
-// Uncomment to test:
-// testFlashPaySignature();
+    // Test function to verify the signature generation matches FlashPay example
+    function testFlashPaySignature()
+    {
+        $testData = [
+            "project_id" => 12345,
+            "payment_id" => "X03936",
+            "payment_amount" => 2035,
+            "payment_currency" => "USD",
+            "payment_description" => "Guyliner purchase",
+            "customer_first_name" => "Jack",
+            "customer_id" => "user007",
+            "customer_last_name" => "Sparrow",
+            "customer_phone" => "02081234567",
+            "close_on_missclick" => true
+        ];
 
-    
+        $signature = Booking::generateSignature($testData);
+
+        echo "Generated signature: " . $signature . "\n";
+        echo "Expected signature:  SyA3cx/dmFrwjRcpbnwEK9zaklWKR9buIfTctQob/EHUTutFLpI0zWpSDFEWEwbZt/04i83395RCdEhtUMw83A==\n";
+        echo "Match: " . ($signature === 'SyA3cx/dmFrwjRcpbnwEK9zaklWKR9buIfTctQob/EHUTutFLpI0zWpSDFEWEwbZt/04i83395RCdEhtUMw83A==' ? 'YES' : 'NO') . "\n";
+    }
 
 
 
