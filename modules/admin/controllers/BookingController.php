@@ -367,8 +367,6 @@ class BookingController extends Controller
         // Join with semicolon
         $stringToSign = implode(';', $fields);
 
-        return $stringToSign;
-
         // Generate HMAC SHA-512 and base64 encode it
         $signature = base64_encode(hash_hmac('sha512', $stringToSign, Booking::SECRET_KEY, true));
 
