@@ -213,115 +213,163 @@ class BookingController extends Controller
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 
-
     public function actionRefund($id)
     {
-        // Fetch booking
         $model = Booking::findOne($id);
-        if (!$model)
+        if (!$model) {
             return $this->asJson(['error' => 'Booking not found']);
+        }
+
         if (empty($model->transaction_number)) {
             return $this->asJson(['error' => 'No transaction number found']);
         }
 
-        $secretKey = Booking::SECRET_KEY; // Replace this!
         $projectId = Booking::MERCHANT_ID;
+        $secretKey = Booking::SECRET_KEY; // Replace with real secret
         $amount = $model->sum;
+        $currency = $model->currency ?? 'KGS';
 
-        // 1. Prepare request payload WITHOUT signature
+        // Build payload (without signature)
         $payload = [
-            'general' => [
-                'project_id' => $projectId,
-                'payment_id' => $model->transaction_number,
-                'terminal_callback_url' => 'https://dev.digno.kg/api/booking/terminal-callback',
-                'referrer_url' => 'https://dev.digno.kg',
-                'merchant_callback_url' => 'https://dev.digno.kg/api/booking/refund-callback',
+            "general" => [
+                "project_id" => $projectId,
+                "payment_id" => $model->transaction_number,
+                "terminal_callback_url" => "https://dev.digno.kg/api/booking/terminal-callback",
+                "referrer_url" => "https://dev.digno.kg",
+                "merchant_callback_url" => "https://dev.digno.kg/api/booking/refund-callback",
             ],
-            'payment' => [
-                'amount' => $amount,
-                'currency' => $model->currency ?? 'KGS',
-                'description' => 'Booking refund #' . $model->id,
-                'merchant_refund_id' => 'REFUND_' . $model->id . '_' . time(),
+            "payment" => [
+                "amount" => $amount,
+                "currency" => $currency,
+                "description" => "Booking refund for reservation #" . $model->id,
+                "merchant_refund_id" => "REFUND_" . $model->id . "_" . time()
             ],
-            // add any other fields (e.g. customer data, receipt_data) here...
+            "cash_voucher_data" => [
+                "email" => $model->guest_email,
+                "inn" => "123456789012",
+                "taxation_system" => 0,
+                "payment_address" => "Your business address",
+                "positions" => [
+                    [
+                        "quantity" => 1,
+                        "price" => $amount,
+                        "position_description" => $model->bookingRoomTitle(),
+                        "tax" => 1,
+                        "payment_method_type" => 1,
+                        "payment_subject_type" => 1,
+                        "nomenclature_code" => "ROOM_" . $model->id
+                    ]
+                ],
+                "payments" => [
+                    [
+                        "payment_type" => 1,
+                        "amount" => $amount
+                    ]
+                ],
+                "order_id" => $model->id,
+                "send_cash_voucher" => true
+            ],
+            "interface_type" => 0,
+            "receipt_data" => [
+                "positions" => [
+                    [
+                        "quantity" => 1,
+                        "amount" => $amount,
+                        "tax" => 1,
+                        "tax_amount" => 0,
+                        "description" => "Refund: " . $model->bookingRoomTitle()
+                    ]
+                ],
+                "total_tax_amount" => 0,
+                "common_tax" => 0
+            ],
+            "callback" => [
+                "delay" => 0,
+                "force_disable" => false
+            ]
         ];
 
-        // 2. Generate signature and add it into general block
+        // Generate signature and attach it
         $payload['general']['signature'] = $this->generateFlashPaySignature($payload, $secretKey);
-        //print_r($payload);die();
 
-        // Send to FlashPay
-        Yii::info('Refund request: ' . json_encode($payload), 'flashpay');
-        $response = Yii::$app->client
-            ->post('https://gateway.flashpay.kg/v2/payment/card/refund', json_encode($payload))
-            ->setHeaders([
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'User-Agent' => 'DignoKG/1.0',
-            ])
-            ->send();
+        // Logging request
+        Yii::info('FlashPay refund request: ' . json_encode($payload), 'flashpay');
 
-        Yii::info('Refund response: ' . $response->body, 'flashpay');
+        // Send via cURL
+        $ch = curl_init("https://gateway.flashpay.kg/v2/payment/card/refund");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'User-Agent: DignoKG/1.0'
+        ]);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
-        $data = $response->data;
-        if ($response->isOk && @$data['status'] === 'success') {
+        $responseRaw = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($ch)) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            Yii::error('FlashPay cURL error: ' . $error, 'flashpay');
+            return $this->asJson(['error' => 'Connection error: ' . $error]);
+        }
+
+        curl_close($ch);
+        Yii::info('FlashPay refund response: ' . $responseRaw, 'flashpay');
+
+        $response = json_decode($responseRaw, true);
+
+        if ($httpCode === 200 && isset($response['status']) && $response['status'] === 'success') {
             $model->refund_status = 'processing';
             $model->refund_request_date = date('Y-m-d H:i:s');
             $model->save(false);
+
             return $this->asJson([
                 'success' => true,
-                'refund_id' => $data['refund_id'] ?? null,
+                'message' => 'Refund request submitted',
+                'refund_id' => $response['refund_id'] ?? null
+            ]);
+        } else {
+            return $this->asJson([
+                'success' => false,
+                'status' => $httpCode,
+                'error' => $response['message'] ?? 'Refund failed',
+                'response' => $response
             ]);
         }
-
-        return $this->asJson(['success' => false, 'response' => $data]);
     }
 
-    /**
-     * Build signature per FlashPay Gate API specification:
-     * Flatten, sort, join with semicolons, HMAC-SHA512 + Base64.
-     *
-     * @param array  $payload   Request data WITHOUT signature field
-     * @param string $secretKey Your secret key
-     * @return string           Base64-encoded signature
-     */
+
     private function generateFlashPaySignature(array $payload, string $secretKey): string
     {
-        $lines = $this->flattenKeys($payload);
+        $lines = $this->flattenPayload($payload);
         sort($lines, SORT_NATURAL);
-        $flat = implode(';', $lines);
-        $hmac = hash_hmac('sha512', $flat, $secretKey, true);
-        return base64_encode($hmac);
+        $joined = implode(';', $lines);
+        return base64_encode(hash_hmac('sha512', $joined, $secretKey, true));
     }
 
-    /**
-     * Recursively flatten array into "parent:…:key:value" lines.
-     * Includes array indices for each element.
-     *
-     * @param array  $data
-     * @param string $prefix
-     * @return array
-     */
-    private function flattenKeys(array $data, string $prefix = ''): array
+    private function flattenPayload(array $data, string $prefix = ''): array
     {
-        $out = [];
-        foreach ($data as $key => $val) {
-            $path = $prefix === '' ? $key : "{$prefix}:{$key}";
-            if (is_array($val)) {
-                // numeric arrays – include index
-                if (array_values($val) === $val) {
-                    foreach ($val as $i => $elem) {
-                        $out = array_merge($out, $this->flattenKeys([$i => $elem], $path));
+        $result = [];
+        foreach ($data as $key => $value) {
+            $path = $prefix === '' ? $key : $prefix . ':' . $key;
+            if (is_array($value)) {
+                if (array_values($value) === $value) {
+                    foreach ($value as $i => $subValue) {
+                        $result = array_merge($result, $this->flattenPayload([$i => $subValue], $path));
                     }
                 } else {
-                    $out = array_merge($out, $this->flattenKeys($val, $path));
+                    $result = array_merge($result, $this->flattenPayload($value, $path));
                 }
             } else {
-                $value = $val === true ? '1' : ($val === false ? '0' : (string) $val);
-                $out[] = "{$path}:{$value}";
+                $result[] = $path . ':' . (is_bool($value) ? (int) $value : $value);
             }
         }
-        return $out;
+        return $result;
     }
 
 
