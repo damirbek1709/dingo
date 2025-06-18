@@ -218,7 +218,7 @@ class BookingController extends Controller
     {
         $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
         $model = Booking::findOne($id);
-        echo $this->generateSignature($id);
+        echo $this->generateSignature($id);die();
 
         $data = [
             "general" => [
