@@ -281,6 +281,47 @@ class BookingController extends Controller
         }
     }
 
+    private function sendStatusRequest($data)
+    {
+        $jsonData = Json::encode($data);
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => 'https://gateway.flashpay.kg/v2/payment/status/request',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $jsonData,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'Content-Length: ' . strlen($jsonData)
+            ],
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_TIMEOUT => 30,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new \Exception('CURL Error: ' . $error);
+        }
+
+        if ($httpCode !== 200) {
+            throw new \Exception('HTTP Error: ' . $httpCode . ' Response: ' . $response);
+        }
+
+        $responseData = Json::decode($response);
+
+        if (!$responseData) {
+            throw new \Exception('Invalid JSON response: ' . $response);
+        }
+
+        return $responseData;
+    }
+
     /**
      * Prepare refund request data
      */
