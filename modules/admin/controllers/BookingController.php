@@ -419,6 +419,53 @@ class BookingController extends Controller
         echo "Match: " . ($signature === 'SyA3cx/dmFrwjRcpbnwEK9zaklWKR9buIfTctQob/EHUTutFLpI0zWpSDFEWEwbZt/04i83395RCdEhtUMw83A==' ? 'YES' : 'NO') . "\n";
     }
 
+    public function actionCheckPaymentStatus($orderId)
+    {
+        $merchantId = Booking::MERCHANT_ID;
+        $secretKey = Booking::SECRET_KEY;
+        $nonceStr = Yii::$app->security->generateRandomString(16);
+
+        $data = [
+            'mch_id' => $merchantId,
+            'order_id' => $orderId,
+            'nonce_str' => $nonceStr,
+        ];
+
+        // Step 1: Generate signature
+        ksort($data);
+        $signStr = '';
+        foreach ($data as $key => $value) {
+            if ($value !== '') {
+                $signStr .= "$key=$value&";
+            }
+        }
+        $signStr .= "key=$secretKey";
+        $signature = strtoupper(md5($signStr));
+
+        // Add sign to the data
+        $data['sign'] = $signature;
+
+        // Step 2: Send cURL POST request
+        $ch = curl_init('https://api.flashpay.kg/v2/payment/status');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+        $response = curl_exec($ch);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            return $this->asJson(['success' => false, 'error' => $error]);
+        }
+
+        $result = json_decode($response, true);
+
+        return $this->asJson($result);
+    }
+
+
 
 
     /**
