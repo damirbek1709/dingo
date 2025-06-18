@@ -357,7 +357,7 @@ class BookingController extends Controller
         ];
 
         // Generate the signature *after* the $data array is fully assembled
-        $data["general"]["signature"] = $this->generateSignature($data);
+        $data["general"]["signature"] = "ZsNz0/8QWMeJ9FWp7FpXBcUEFT8Yv0SLlagrzCiHDvvUf6TZTYZZJreekkoKXP1O3mUzfOi8J0KRZgqpOgH0JA==";
        
 
         $headers = [
