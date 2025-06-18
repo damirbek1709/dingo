@@ -385,7 +385,7 @@ class BookingController extends Controller
         $payloadData = [
             'project_id' => $projectId,
             'request_id' => $requestId,
-            'signature'=>$this->generateSignature(74),
+            'signature'=>$this->generateSignature(73),
         ];
 
         // Encode JSON with no pretty print or extra spaces
