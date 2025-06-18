@@ -358,7 +358,7 @@ class BookingController extends Controller
 
         // Generate the signature *after* the $data array is fully assembled
         $data["general"]["signature"] = "ZsNz0/8QWMeJ9FWp7FpXBcUEFT8Yv0SLlagrzCiHDvvUf6TZTYZZJreekkoKXP1O3mUzfOi8J0KRZgqpOgH0JA==";
-       
+
 
         $headers = [
             'Accept: application/json',
@@ -384,6 +384,48 @@ class BookingController extends Controller
             'status' => $httpCode,
             'response' => json_decode($response, true),
         ]);
+    }
+
+
+    public function actionCheckRequest()
+    {
+        $projectId = Booking::MERCHANT_ID; // Your real project ID
+        $requestId = '6d6b529f1602423909b8520ee95702d3dd0d5bd4-3eb480dd17a465be5573c80b07db0f2b43205aca-05031457'; // Your refund request ID
+        $secretKey = Booking::SECRET_KEY; // Your project secret
+
+        $payloadData = [
+            'project_id' => $projectId,
+            'request_id' => $requestId,
+        ];
+
+        // Encode JSON with no pretty print or extra spaces
+        $jsonPayload = json_encode($payloadData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        // Signature = md5(json + secretKey), uppercased
+        $signature = strtoupper(md5($jsonPayload . $secretKey));
+
+        // Add signature to the payload
+        $payloadData['signature'] = "ZsNz0/8QWMeJ9FWp7FpXBcUEFT8Yv0SLlagrzCiHDvvUf6TZTYZZJreekkoKXP1O3mUzfOi8J0KRZgqpOgH0JA==";
+
+        $ch = curl_init('https://gateway.flashpay.kg/v2/payment/status/request');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Accept: application/json',
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payloadData));
+
+        $response = curl_exec($ch);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            return $this->asJson(['success' => false, 'error' => $error]);
+        }
+
+        return $this->asJson(json_decode($response, true));
+        //6d6b529f1602423909b8520ee95702d3dd0d5bd4-3eb480dd17a465be5573c80b07db0f2b43205aca-05031457
     }
 
 
