@@ -218,7 +218,6 @@ class BookingController extends Controller
     {
         $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
         $model = Booking::findOne($id);
-        echo $this->generateSignature($id);die();
 
         $data = [
             "general" => [
@@ -313,9 +312,7 @@ class BookingController extends Controller
             ]
         ];
 
-        // Generate the signature *after* the $data array is fully assembled
-        $data["general"]["signature"] = "ZsNz0/8QWMeJ9FWp7FpXBcUEFT8Yv0SLlagrzCiHDvvUf6TZTYZZJreekkoKXP1O3mUzfOi8J0KRZgqpOgH0JA==";
-
+        
 
         $headers = [
             'Accept: application/json',
