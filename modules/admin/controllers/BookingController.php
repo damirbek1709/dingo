@@ -218,6 +218,7 @@ class BookingController extends Controller
     {
         $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
         $model = Booking::findOne($id);
+        echo $this->generateSignature($id);
 
         $data = [
             "general" => [
@@ -368,6 +369,8 @@ class BookingController extends Controller
 
         // Join with semicolon
         $stringToSign = implode(';', $fields);
+
+        return $stringToSign;
 
         // Generate HMAC SHA-512 and base64 encode it
         $signature = base64_encode(hash_hmac('sha512', $stringToSign, Booking::SECRET_KEY, true));
