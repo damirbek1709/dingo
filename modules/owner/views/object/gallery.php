@@ -4,7 +4,7 @@ use yii\helpers\Html;
 
 Modal::begin([
     'id' => 'photosModal',
-    'size' => 'modal-md',
+    'size' => Modal::SIZE_DEFAULT,
     'header' => "<h4>".Yii::t('app','Все фотографии')."</h4>",
     'options' => ['class' => 'photo-gallery-modal'],
 ]);

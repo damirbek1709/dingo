@@ -162,8 +162,6 @@ class BookingController extends BaseController
         $model->cancellation_type = $tariff->cancellation;
         $model->cancellation_penalty_sum = $model->sum / 100 * $tariff->penalty_sum;
 
-
-
         if ($model->save()) {
             $arr = [
                 'sum' => $model->sum * 100,

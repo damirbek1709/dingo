@@ -444,9 +444,11 @@ a.desc:after {
     font-family: Inter;
     /* font-weight: 500; */
     font-size: 16px;
-    line-height: 24px;
+    line-height: 15px;
     letter-spacing: 0px;
     padding-bottom: 15px;
+    margin-top: 0;
+    width: auto;
 }
 
 .container-fluid {
@@ -597,6 +599,7 @@ a.desc:after {
     /* border-radius: 8px; */
     overflow: hidden;
     position: relative;
+    /* text-align: center; */
 }
 
 .photo-item img {
@@ -941,6 +944,7 @@ a.desc:after {
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    color: #333;
 }
 
 .img-main:hover,
@@ -1941,6 +1945,24 @@ a.logout-button:hover {
     .contact-section {
         padding: 20px;
     }
+
+    .top_nav{
+        display:grid;
+        padding-bottom: 0;
+    }
+    .mob_card_cover{
+        margin:15px -10px 0 -15px;
+        
+    }
+
+    .top_nav a{
+    font-size: 16px;
+    line-height: 15px;
+    letter-spacing: 0px;
+    padding-bottom: 15px;
+    margin-top: 0;
+    width: auto;
+    }
     
     .section-title {
         font-size: 18px;
@@ -1949,6 +1971,15 @@ a.logout-button:hover {
     .contact-text,
     .policy-text {
         font-size: 15px;
+    }
+    .photo-grid{
+        display: inline-block;
+        float: none;
+        text-align: center;
+        width: auto;
+    }
+    .modal-body{
+        padding:20px 0;
     }
 }
 

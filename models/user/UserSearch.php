@@ -23,7 +23,7 @@ class UserSearch extends BaseUser
     public function search($params)
     {
         $query = $this->finder->getUserQuery()->alias('u');
-        $query->joinWith(['authAssignments aa']);
+        //$query->joinWith(['authAssignments aa']);
         
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
