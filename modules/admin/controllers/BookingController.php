@@ -213,51 +213,7 @@ class BookingController extends Controller
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 
-    protected function generateSignature(array $data): string
-    {
-        $secretKey = Booking::SECRET_KEY; // Example: 'your_actual_secret_key_here'
-
-        $sortedData = $this->sortRecursive($data);
-        $stringToSign = json_encode($sortedData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-
-        // It's good practice to check for JSON encoding errors.
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \Exception('JSON encoding error: ' . json_last_error_msg());
-        }
-        $hmac = hash_hmac('sha512', $stringToSign, $secretKey, true);
-
-        // Step 4: Base64 encode the HMAC result.
-        $signature = base64_encode($hmac);
-
-        return $signature;
-    }
-
-    /**
-     * Recursively sorts the keys of an array in natural order.
-     * This helper function is used to ensure all nested array/object keys are sorted alphabetically,
-     * which is essential for creating a canonical string for signature generation.
-     *
-     * @param array $array The array to sort.
-     * @return array The array with its keys (and sub-keys) sorted.
-     */
-    private function sortRecursive(array $array): array
-    {
-        // Sorts the array by key using a "natural order" algorithm.
-        // This handles keys like 'param1', 'param10', 'param2' correctly (e.g., 'param1', 'param2', 'param10').
-        ksort($array, SORT_NATURAL);
-
-        foreach ($array as $key => $value) {
-            // If the value is an array, recursively sort its keys.
-            if (is_array($value)) {
-                $array[$key] = $this->sortRecursive($value);
-            }
-        }
-        return $array;
-    }
-
-    // ... your existing public function actionRefund($id) and other methods ...
-
-    // Example of how to integrate it into your actionRefund:
+    
     public function actionRefund($id)
     {
         $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
@@ -267,7 +223,7 @@ class BookingController extends Controller
             "general" => [
                 "project_id" => Booking::MERCHANT_ID,
                 "payment_id" => $model->transaction_number, // Required: actual payment ID
-                // "signature" will be added after 'data' is fully prepared
+                "signature"=> $this->generateSignature($id),
                 "terminal_callback_url" => "https://dev.digno.kg/booking/terminal-callback",
                 "referrer_url" => "https://dev.digno.kg",
                 "merchant_callback_url" => "https://dev.digno.kg//booking/merchant-callback",
@@ -387,9 +343,42 @@ class BookingController extends Controller
     }
 
 
+    function generateSignature($id): string
+    {
+        $model = Booking::findOne($id);
+        $fields = [
+            'customer:address:' . "loremipsumdolorsitamet",
+            'customer:email:' . $model->guest_email,
+            'customer:first_name:' . $model->guest_name,
+            'customer:id:' . $model->user_id,
+            'general:payment_id:' . $model->transaction_number,
+            'general:project_id:' . Booking::MERCHANT_ID,
+            'payment:amount:' . $model->sum,
+            'payment:currency:' . $model->currency,
+            'payment:description:' . "lorem ipsum dolor sit amet",
+            'receipt_data:positions:0:amount:' . $model->guestAmount(),
+            'receipt_data:positions:0:description:' . $model->special_comment,
+            'receipt_data:positions:0:quantity:' . $model->guestAmount(),
+            'return_url:decline:' . "https://dev.digno.kg/booking/terminal-callback-declide",
+            'return_url:success:' . "https://dev.digno.kg/booking/terminal-callback-success"
+        ];
+
+        // Natural sort
+        natsort($fields);
+
+        // Join with semicolon
+        $stringToSign = implode(';', $fields);
+
+        // Generate HMAC SHA-512 and base64 encode it
+        $signature = base64_encode(hash_hmac('sha512', $stringToSign, Booking::SECRET_KEY, true));
+
+        return $signature;
+    }
+
+
     public function actionCheckRequest()
     {
-        $projectId = (int)Booking::MERCHANT_ID; // Your real project ID
+        $projectId = (int) Booking::MERCHANT_ID; // Your real project ID
         $requestId = '6d6b529f1602423909b8520ee95702d3dd0d5bd4-3eb480dd17a465be5573c80b07db0f2b43205aca-05031457'; // Your refund request ID
         $secretKey = Booking::SECRET_KEY; // Your project secret
 
