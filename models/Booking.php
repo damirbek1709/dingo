@@ -52,6 +52,7 @@ class Booking extends \yii\db\ActiveRecord
     public $income;
 
     public $refund_status;
+    public $refund_request_date;
     /**
      * {@inheritdoc}
      */
