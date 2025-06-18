@@ -292,6 +292,8 @@ class BookingController extends Controller
         // Generate signature and attach it
         $payload['general']['signature'] = $this->generateFlashPaySignature($payload, $secretKey);
 
+        print_r(json_encode($payload));die();
+
         // Logging request
         Yii::info('FlashPay refund request: ' . json_encode($payload), 'flashpay');
 
