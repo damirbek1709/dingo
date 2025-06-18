@@ -294,8 +294,7 @@ class BookingController extends Controller
         $signatureData = $this->flattenArrayForSignature($data);
 
         // Generate signature
-        $signatureGenerator = new FlashPaySignatureGenerator(self::FLASHPAY_SECRET_KEY);
-        $signature = $signatureGenerator->generateSignature($signatureData);
+        $signature = Booking::generateSignature($signatureData);
 
         // Add signature to the request
         $data['general']['signature'] = $signature;
