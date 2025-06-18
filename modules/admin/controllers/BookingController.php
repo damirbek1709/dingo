@@ -389,7 +389,7 @@ class BookingController extends Controller
 
     public function actionCheckRequest()
     {
-        $projectId = Booking::MERCHANT_ID; // Your real project ID
+        $projectId = (int)Booking::MERCHANT_ID; // Your real project ID
         $requestId = '6d6b529f1602423909b8520ee95702d3dd0d5bd4-3eb480dd17a465be5573c80b07db0f2b43205aca-05031457'; // Your refund request ID
         $secretKey = Booking::SECRET_KEY; // Your project secret
 
