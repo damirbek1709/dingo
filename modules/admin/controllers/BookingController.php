@@ -223,18 +223,20 @@ class BookingController extends Controller
             return $this->asJson(['error' => 'Booking not found']);
         }
 
-        // Ensure we have the required transaction data
         if (empty($model->transaction_number)) {
             return $this->asJson(['error' => 'No transaction number found for this booking']);
         }
 
-        $refundAmount = $model->sum; // Make sure this is in the correct currency unit
+        $refundAmount = $model->sum;
 
+        $secretKey = 'YOUR_SECRET_KEY'; // ⚠️ Replace with your actual FlashPay secret key
+        $projectId = Booking::MERCHANT_ID;
+
+        // Prepare full request data (without signature yet)
         $data = [
             "general" => [
-                "project_id" => Booking::MERCHANT_ID,
+                "project_id" => $projectId,
                 "payment_id" => $model->transaction_number,
-                "signature" => $this->calculateSignature($model->transaction_number, $refundAmount),
                 "terminal_callback_url" => "https://dev.digno.kg/api/booking/terminal-callback",
                 "referrer_url" => "https://dev.digno.kg",
                 "merchant_callback_url" => "https://dev.digno.kg/api/booking/refund-callback",
@@ -247,7 +249,7 @@ class BookingController extends Controller
             ],
             "cash_voucher_data" => [
                 "email" => $model->guest_email,
-                "inn" => "123456789012", // Use actual INN if available
+                "inn" => "123456789012",
                 "taxation_system" => 0,
                 "payment_address" => "Your business address",
                 "positions" => [
@@ -264,7 +266,7 @@ class BookingController extends Controller
                 "payments" => [
                     [
                         "payment_type" => 1,
-                        "amount" => $refundAmount // Fixed: use actual amount
+                        "amount" => $refundAmount
                     ]
                 ],
                 "order_id" => $model->id,
@@ -286,11 +288,13 @@ class BookingController extends Controller
             ],
             "callback" => [
                 "delay" => 0,
-                "force_disable" => false // Changed to false to receive callbacks
+                "force_disable" => false
             ]
         ];
 
-        // Add logging for debugging
+        // Generate signature
+        $data['general']['signature'] = $this->calculateSignature($data, $secretKey);
+
         Yii::info('FlashPay refund request: ' . json_encode($data), 'flashpay');
 
         $headers = [
@@ -321,15 +325,9 @@ class BookingController extends Controller
 
         $responseData = json_decode($response, true);
 
-        echo "<pre>";print_r($response);echo "</pre>";die();
-
-
-        // Log the response for debugging
         Yii::info('FlashPay refund response: ' . $response, 'flashpay');
 
-        // Check if the refund was accepted
         if ($httpCode === 200 && isset($responseData['status']) && $responseData['status'] === 'success') {
-            // Update booking status
             $model->refund_status = 'processing';
             $model->refund_request_date = date('Y-m-d H:i:s');
             $model->save();
@@ -341,7 +339,6 @@ class BookingController extends Controller
                 'status' => $responseData['status'] ?? 'unknown'
             ]);
         } else {
-            // Handle error response
             return $this->asJson([
                 'success' => false,
                 'status' => $httpCode,
@@ -351,22 +348,34 @@ class BookingController extends Controller
         }
     }
 
+
     /**
      * Calculate signature for FlashPay API
      * You need to implement this according to FlashPay's specification
      */
-    private function calculateSignature($paymentId, $amount)
+    private function calculateSignature(array $data, string $secretKey): string
     {
-        // This is a placeholder - you need to implement according to FlashPay docs
-        // Common pattern is: hash(project_id + payment_id + amount + secret_key)
-
-        $secretKey = 'YOUR_SECRET_KEY'; // Get this from your FlashPay account
-        $projectId = Booking::MERCHANT_ID;
-
-        $signatureString = $projectId . $paymentId . $amount . $secretKey;
-
-        return hash('sha256', $signatureString);
+        $flattened = $this->flattenAndSort($data);
+        $queryString = http_build_query($flattened, '', '&', PHP_QUERY_RFC3986);
+        $stringToHash = $queryString . $secretKey;
+        return hash('sha256', $stringToHash);
     }
+
+    private function flattenAndSort(array $data, string $prefix = ''): array
+    {
+        $result = [];
+        ksort($data);
+        foreach ($data as $key => $value) {
+            $composedKey = $prefix === '' ? $key : "{$prefix}[{$key}]";
+            if (is_array($value)) {
+                $result += $this->flattenAndSort($value, $composedKey);
+            } else {
+                $result[$composedKey] = (string) $value;
+            }
+        }
+        return $result;
+    }
+
 
     /**
      * Handle refund callback from FlashPay
