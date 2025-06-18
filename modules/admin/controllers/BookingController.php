@@ -212,6 +212,7 @@ class BookingController extends Controller
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+    
 
     public function actionRefund($id)
     {
@@ -223,8 +224,8 @@ class BookingController extends Controller
                 "project_id" => Booking::MERCHANT_ID,
                 "payment_id" => $model->transaction_number, // Required: actual payment ID
                 "signature" => "your_signature", // Required: calculated as per API spec
-                "terminal_callback_url" => "https://partner.digno.kg/api/booking/terminal-callback",
-                "referrer_url" => "https://partner.digno.kg",
+                "terminal_callback_url" => "https://dev.digno.kg/api/booking/terminal-callback",
+                "referrer_url" => "https://dev.digno.kg",
                 "merchant_callback_url" => "https://yourdomain.com/merchant-callback",
             ],
             "merchant" => [
