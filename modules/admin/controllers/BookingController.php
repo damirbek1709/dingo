@@ -112,7 +112,7 @@ class BookingController extends Controller
             'date_from' => $date_from,
             'date_to' => $date_to,
             'date_book' => $date_book,
-            'object'=>$object
+            'object' => $object
         ]);
     }
 
@@ -212,67 +212,73 @@ class BookingController extends Controller
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
-    
+
 
     public function actionRefund($id)
     {
         $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
         $model = Booking::findOne($id);
 
+        if (!$model) {
+            return $this->asJson(['error' => 'Booking not found']);
+        }
+
+        // Ensure we have the required transaction data
+        if (empty($model->transaction_number)) {
+            return $this->asJson(['error' => 'No transaction number found for this booking']);
+        }
+
+        $refundAmount = $model->sum; // Make sure this is in the correct currency unit
+
         $data = [
             "general" => [
                 "project_id" => Booking::MERCHANT_ID,
-                "payment_id" => $model->transaction_number, // Required: actual payment ID
-                "signature" => "your_signature", // Required: calculated as per API spec
+                "payment_id" => $model->transaction_number,
+                "signature" => $this->calculateSignature($model->transaction_number, $refundAmount),
                 "terminal_callback_url" => "https://dev.digno.kg/api/booking/terminal-callback",
                 "referrer_url" => "https://dev.digno.kg",
-                "merchant_callback_url" => "https://yourdomain.com/merchant-callback",
+                "merchant_callback_url" => "https://dev.digno.kg/api/booking/refund-callback",
             ],
-            "merchant" => [
-                "descriptor" => "Refund Descriptor",
-                "data" => "Custom merchant data",
+            "payment" => [
+                "amount" => $refundAmount,
+                "currency" => $model->currency ?? 'KGS',
+                "description" => "Booking refund for reservation #" . $model->id,
+                "merchant_refund_id" => "REFUND_" . $model->id . "_" . time()
             ],
             "cash_voucher_data" => [
                 "email" => $model->guest_email,
-                "inn" => "123456789012",
-                "group" => "group_id",
+                "inn" => "123456789012", // Use actual INN if available
                 "taxation_system" => 0,
-                "payment_address" => "Your shop address",
+                "payment_address" => "Your business address",
                 "positions" => [
                     [
                         "quantity" => 1,
-                        "price" => $model->sum, // in tyiyn
+                        "price" => $refundAmount,
                         "position_description" => $model->bookingRoomTitle(),
                         "tax" => 1,
                         "payment_method_type" => 1,
                         "payment_subject_type" => 1,
-                        "nomenclature_code" => "ABC123"
+                        "nomenclature_code" => "ROOM_" . $model->id
                     ]
                 ],
                 "payments" => [
                     [
                         "payment_type" => 1,
-                        "amount" => 1000
+                        "amount" => $refundAmount // Fixed: use actual amount
                     ]
                 ],
                 "order_id" => $model->id,
                 "send_cash_voucher" => true
-            ],
-            "payment" => [
-                "amount" => $model->sum,
-                "currency" => $model->currency,
-                "description" => "Customer refund",
-                "merchant_refund_id" => $model->user_id
             ],
             "interface_type" => 0,
             "receipt_data" => [
                 "positions" => [
                     [
                         "quantity" => 1,
-                        "amount" => $model->sum,
+                        "amount" => $refundAmount,
                         "tax" => 1,
                         "tax_amount" => 0,
-                        "description" => "Refunded Item"
+                        "description" => "Refund: " . $model->bookingRoomTitle()
                     ]
                 ],
                 "total_tax_amount" => 0,
@@ -280,41 +286,17 @@ class BookingController extends Controller
             ],
             "callback" => [
                 "delay" => 0,
-                "force_disable" => true
-            ],
-            "addendum" => [
-                "lodging" => [
-                    "check_out_date" => "2025-05-19",
-                    "room" => [
-                        "rate" => 999999999999,
-                        "number_of_nights" => 1
-                    ],
-                    "total_tax" => 0,
-                    "charges" => [
-                        "room_service" => 0,
-                        "bar_or_lounge" => 0,
-                        // ... other charges
-                        "health_club" => 0
-                    ]
-                ]
-            ],
-            "booking_info" => [
-                "firstname" => "John",
-                "surname" => "Doe",
-                "email" => "john@example.com",
-                "start_date" => "2025-05-10",
-                "end_date" => "2025-05-12",
-                "description" => "Hotel booking refund",
-                "total" => 1000,
-                "pax" => 2,
-                "reference" => "REF123",
-                "id" => "BKID001"
+                "force_disable" => false // Changed to false to receive callbacks
             ]
         ];
 
+        // Add logging for debugging
+        Yii::info('FlashPay refund request: ' . json_encode($data), 'flashpay');
+
         $headers = [
             'Accept: application/json',
-            'Content-Type: application/json'
+            'Content-Type: application/json',
+            'User-Agent: DignoKG/1.0'
         ];
 
         $ch = curl_init($url);
@@ -322,20 +304,92 @@ class BookingController extends Controller
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if (curl_errno($ch)) {
-            return $this->asJson(['error' => curl_error($ch)]);
+            $error = curl_error($ch);
+            curl_close($ch);
+            Yii::error('FlashPay refund cURL error: ' . $error, 'flashpay');
+            return $this->asJson(['error' => 'Connection error: ' . $error]);
         }
 
         curl_close($ch);
 
-        return $this->asJson([
-            'status' => $httpCode,
-            'response' => json_decode($response, true),
-        ]);
+        $responseData = json_decode($response, true);
+
+        // Log the response for debugging
+        Yii::info('FlashPay refund response: ' . $response, 'flashpay');
+
+        // Check if the refund was accepted
+        if ($httpCode === 200 && isset($responseData['status']) && $responseData['status'] === 'success') {
+            // Update booking status
+            $model->refund_status = 'processing';
+            $model->refund_request_date = date('Y-m-d H:i:s');
+            $model->save();
+
+            return $this->asJson([
+                'success' => true,
+                'message' => 'Refund request submitted successfully',
+                'refund_id' => $responseData['refund_id'] ?? null,
+                'status' => $responseData['status'] ?? 'unknown'
+            ]);
+        } else {
+            // Handle error response
+            return $this->asJson([
+                'success' => false,
+                'status' => $httpCode,
+                'error' => $responseData['message'] ?? 'Refund failed',
+                'response' => $responseData,
+            ]);
+        }
+    }
+
+    /**
+     * Calculate signature for FlashPay API
+     * You need to implement this according to FlashPay's specification
+     */
+    private function calculateSignature($paymentId, $amount)
+    {
+        // This is a placeholder - you need to implement according to FlashPay docs
+        // Common pattern is: hash(project_id + payment_id + amount + secret_key)
+
+        $secretKey = 'YOUR_SECRET_KEY'; // Get this from your FlashPay account
+        $projectId = Booking::MERCHANT_ID;
+
+        $signatureString = $projectId . $paymentId . $amount . $secretKey;
+
+        return hash('sha256', $signatureString);
+    }
+
+    /**
+     * Handle refund callback from FlashPay
+     */
+    public function actionRefundCallback()
+    {
+        $request = \Yii::$app->request;
+        $data = json_decode($request->getRawBody(), true);
+
+        Yii::info('FlashPay refund callback: ' . json_encode($data), 'flashpay');
+
+        // Verify the callback signature here
+
+        if (isset($data['payment_id']) && isset($data['status'])) {
+            $booking = Booking::find()
+                ->where(['transaction_number' => $data['payment_id']])
+                ->one();
+
+            if ($booking) {
+                $booking->refund_status = $data['status'];
+                $booking->refund_completion_date = date('Y-m-d H:i:s');
+                $booking->save();
+            }
+        }
+
+        return $this->asJson(['status' => 'ok']);
     }
 
 
