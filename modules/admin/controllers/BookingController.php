@@ -329,7 +329,7 @@ class BookingController extends Controller
     {
         $data = [
             'general' => [
-                'project_id' => Booking::MERCHANT_ID,
+                'project_id' => (int)Booking::MERCHANT_ID,
                 'payment_id' => (string) $paymentId,
                 // signature will be added later
             ],
