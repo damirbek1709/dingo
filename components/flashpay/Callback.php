@@ -2,9 +2,9 @@
 
 namespace app\components\flashpay;
 
-use flashpay\exception\ProcessException;
+use exception\ProcessException;
 
-use flashpay\exception\SdkException;
+use exception\SdkException;
 
 use function is_array;
 

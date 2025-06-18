@@ -7,6 +7,7 @@ use app\models\BookingSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\Json;
 
 /**
  * BookingController implements the CRUD actions for Booking model.
@@ -213,8 +214,213 @@ class BookingController extends Controller
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 
-    
     public function actionRefund($id)
+    {
+        try {
+            $model = Booking::findOne($id);
+            // Prepare request data
+            $requestData = $this->prepareRefundData($model->transaction_number, $model->sum, 'KGS', $model->special_comment, Booking::MERCHANT_ID);
+
+            // Generate signature
+            $signature = $this->generateSignature($requestData);
+            $requestData['general']['signature'] = $signature;
+
+            // Send request to Flash Pay
+            $response = $this->sendRefundRequest($requestData);
+
+            return [
+                'success' => true,
+                'data' => $response,
+                'request_data' => $requestData // For debugging
+            ];
+
+        } catch (\Exception $e) {
+            Yii::error('Flash Pay refund error: ' . $e->getMessage(), __METHOD__);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Prepare refund request data
+     */
+    private function prepareRefundData($paymentId, $amount, $currency, $description, $merchantRefundId)
+    {
+        $data = [
+            'general' => [
+                'project_id' => Booking::MERCHANT_ID,
+                'payment_id' => (string)$paymentId,
+                // signature will be added later
+            ],
+            'payment' => [
+                'currency' => (string)$currency,
+                'description' => (string)$description,
+            ]
+        ];
+
+        // Add amount if specified (for partial refund)
+        if ($amount !== null) {
+            $data['payment']['amount'] = (int)$amount;
+        }
+
+        // Add merchant refund ID if specified
+        if ($merchantRefundId !== null) {
+            $data['payment']['merchant_refund_id'] = (string)$merchantRefundId;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Generate signature according to Flash Pay documentation
+     * Critical: This must follow the exact algorithm from the docs
+     */
+    private function generateSignature($data)
+    {
+        // Step 1: Remove signature parameter if it exists
+        $signData = $data;
+        if (isset($signData['general']['signature'])) {
+            unset($signData['general']['signature']);
+        }
+
+        // Step 2: Convert to parameter strings with full path notation
+        $paramStrings = $this->convertToParameterStrings($signData);
+
+        // Step 3: Sort strings in natural order
+        sort($paramStrings, SORT_NATURAL);
+
+        // Step 4: Join with semicolons
+        $signString = implode(';', $paramStrings);
+
+        // Step 5: Calculate HMAC-SHA512
+        $hmac = hash_hmac('sha512', $signString, Booking::SECRET_KEY, true);
+
+        // Step 6: Base64 encode
+        return base64_encode($hmac);
+    }
+
+    /**
+     * Convert data array to parameter strings with full path notation
+     * Format: parent:child:value
+     */
+    private function convertToParameterStrings($data, $parentPath = '')
+    {
+        $strings = [];
+
+        foreach ($data as $key => $value) {
+            $currentPath = $parentPath ? $parentPath . ':' . $key : $key;
+
+            if (is_array($value)) {
+                // Handle arrays with numeric indices
+                if (array_keys($value) === range(0, count($value) - 1)) {
+                    // Sequential array
+                    foreach ($value as $index => $item) {
+                        if (is_array($item)) {
+                            $strings = array_merge($strings, $this->convertToParameterStrings($item, $currentPath . ':' . $index));
+                        } else {
+                            $strings[] = $currentPath . ':' . $index . ':' . $this->formatValue($item);
+                        }
+                    }
+                } else {
+                    // Associative array
+                    $strings = array_merge($strings, $this->convertToParameterStrings($value, $currentPath));
+                }
+            } else {
+                $strings[] = $currentPath . ':' . $this->formatValue($value);
+            }
+        }
+
+        return $strings;
+    }
+
+    /**
+     * Format value according to Flash Pay rules
+     */
+    private function formatValue($value)
+    {
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        if ($value === null) {
+            return '';
+        }
+
+        if ($value === '') {
+            return '';
+        }
+
+        return (string)$value;
+    }
+
+    /**
+     * Send refund request to Flash Pay API
+     */
+    private function sendRefundRequest($data)
+    {
+        $jsonData = Json::encode($data);
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => 'https://gateway.flashpay.kg/v2/payment/card/refund',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $jsonData,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'Content-Length: ' . strlen($jsonData)
+            ],
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_TIMEOUT => 30,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new \Exception('CURL Error: ' . $error);
+        }
+
+        if ($httpCode !== 200) {
+            throw new \Exception('HTTP Error: ' . $httpCode . ' Response: ' . $response);
+        }
+
+        $responseData = Json::decode($response);
+
+        if (!$responseData) {
+            throw new \Exception('Invalid JSON response: ' . $response);
+        }
+
+        return $responseData;
+    }
+
+    /**
+     * Verify signature of Flash Pay callback/response (optional but recommended)
+     */
+    public function verifySignature($data, $receivedSignature)
+    {
+        // Remove signature from data
+        $dataToVerify = $data;
+        if (isset($dataToVerify['signature'])) {
+            unset($dataToVerify['signature']);
+        }
+
+        // Generate signature for verification
+        $expectedSignature = $this->generateSignature(['data' => $dataToVerify])['data'];
+
+        return hash_equals($expectedSignature, $receivedSignature);
+    }
+
+    
+
+    
+    public function actionRefund2($id)
     {
         $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
         $model = Booking::findOne($id);
@@ -339,77 +545,4 @@ class BookingController extends Controller
             'response' => json_decode($response, true),
         ]);
     }
-
-
-    function generateSignature($id): string
-    {
-        $model = Booking::findOne($id);
-        $fields = [
-            'customer:address:' . "loremipsumdolorsitamet",
-            'customer:email:' . $model->guest_email,
-            'customer:first_name:' . $model->guest_name,
-            'customer:id:' . $model->user_id,
-            'general:payment_id:' . $model->transaction_number,
-            'general:project_id:' . Booking::MERCHANT_ID,
-            'payment:amount:' . $model->sum,
-            'payment:currency:' . $model->currency,
-            'payment:description:' . "lorem ipsum dolor sit amet",
-            'receipt_data:positions:0:amount:' . $model->guestAmount(),
-            'receipt_data:positions:0:description:' . $model->special_comment,
-            'receipt_data:positions:0:quantity:' . $model->guestAmount(),
-            'return_url:decline:' . "https://dev.digno.kg/booking/terminal-callback-declide",
-            'return_url:success:' . "https://dev.digno.kg/booking/terminal-callback-success"
-        ];
-
-        // Natural sort
-        natsort($fields);
-
-        // Join with semicolon
-        $stringToSign = implode(';', $fields);
-
-        // Generate HMAC SHA-512 and base64 encode it
-        $signature = base64_encode(hash_hmac('sha512', $stringToSign, Booking::SECRET_KEY, true));
-
-        return $signature;
-    }
-
-
-    public function actionCheckRequest()
-    {
-        $projectId = (int) Booking::MERCHANT_ID; // Your real project ID
-        $requestId = '0442fc3421e049a635a6c1d8f4464a73ac175567-cb0aab66172a6d75af22bf496c009459f17a473d-05010995'; // Your refund request ID
-        $secretKey = Booking::SECRET_KEY; // Your project secret
-
-        $payloadData = [
-            'project_id' => $projectId,
-            'request_id' => $requestId,
-            'signature'=>$this->generateSignature(73),
-        ];
-
-        // Encode JSON with no pretty print or extra spaces
-        
-        
-
-        $ch = curl_init('https://gateway.flashpay.kg/v2/payment/status/request');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'Content-Type: application/json',
-            'Accept: application/json',
-        ]);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payloadData));
-
-        $response = curl_exec($ch);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($error) {
-            return $this->asJson(['success' => false, 'error' => $error]);
-        }
-
-        return $this->asJson(json_decode($response, true));
-    }
-
-
-
 }
