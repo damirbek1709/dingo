@@ -343,6 +343,74 @@ class BookingController extends Controller
         }
     }
 
+    public function actionCheckStatus($transactionId)
+    {
+        $projectId = Booking::MERCHANT_ID;
+        $secretKey = Booking::SECRET_KEY; // Replace with your FlashPay secret key
+
+        // Generate signature
+        $signature = $this->generateStatusSignature($projectId, $transactionId, $secretKey);
+
+        $payload = [
+            'project_id' => $projectId,
+            'payment_id' => $transactionId,
+            'signature' => $signature,
+        ];
+
+        Yii::info('FlashPay status check request: ' . json_encode($payload), 'flashpay');
+
+        $ch = curl_init("https://gateway.flashpay.kg/v2/payment/status");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'User-Agent: DignoKG/1.0'
+        ]);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+
+        $responseRaw = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($ch)) {
+            $error = curl_error($ch);
+            curl_close($ch);
+            Yii::error('FlashPay status check cURL error: ' . $error, 'flashpay');
+            return $this->asJson(['error' => 'Connection error: ' . $error]);
+        }
+
+        curl_close($ch);
+        $response = json_decode($responseRaw, true);
+
+        Yii::info('FlashPay status check response: ' . $responseRaw, 'flashpay');
+
+        if ($httpCode === 200 && isset($response['status'])) {
+            return $this->asJson([
+                'success' => true,
+                'status' => $response['status'],
+                'data' => $response,
+            ]);
+        } else {
+            return $this->asJson([
+                'success' => false,
+                'http_code' => $httpCode,
+                'error' => $response['message'] ?? 'Unknown error',
+                'response' => $response,
+            ]);
+        }
+    }
+
+    private function generateStatusSignature(string $projectId, string $paymentId, string $secretKey): string
+    {
+        $data = $projectId . $paymentId . $secretKey;
+        return base64_encode(hash_hmac('sha512', $data, $secretKey, true));
+    }
+
+
+
+
 
     private function generateFlashPaySignature(array $payload, string $secretKey): string
     {
