@@ -216,165 +216,114 @@ class BookingController extends Controller
 
     public function actionRefund($id)
     {
-        $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
+        // Fetch booking
         $model = Booking::findOne($id);
-
-        if (!$model) {
+        if (!$model)
             return $this->asJson(['error' => 'Booking not found']);
-        }
-
         if (empty($model->transaction_number)) {
-            return $this->asJson(['error' => 'No transaction number found for this booking']);
+            return $this->asJson(['error' => 'No transaction number found']);
         }
 
-        $refundAmount = $model->sum;
-
-        $secretKey = 'YOUR_SECRET_KEY'; // ⚠️ Replace with your actual FlashPay secret key
+        $secretKey = Booking::SECRET_KEY; // Replace this!
         $projectId = Booking::MERCHANT_ID;
+        $amount = $model->sum;
 
-        // Prepare full request data (without signature yet)
-        $data = [
-            "general" => [
-                "project_id" => $projectId,
-                "payment_id" => $model->transaction_number,
-                "terminal_callback_url" => "https://dev.digno.kg/api/booking/terminal-callback",
-                "referrer_url" => "https://dev.digno.kg",
-                "merchant_callback_url" => "https://dev.digno.kg/api/booking/refund-callback",
+        // 1. Prepare request payload WITHOUT signature
+        $payload = [
+            'general' => [
+                'project_id' => $projectId,
+                'payment_id' => $model->transaction_number,
+                'terminal_callback_url' => 'https://dev.digno.kg/api/booking/terminal-callback',
+                'referrer_url' => 'https://dev.digno.kg',
+                'merchant_callback_url' => 'https://dev.digno.kg/api/booking/refund-callback',
             ],
-            "payment" => [
-                "amount" => $refundAmount,
-                "currency" => $model->currency ?? 'KGS',
-                "description" => "Booking refund for reservation #" . $model->id,
-                "merchant_refund_id" => "REFUND_" . $model->id . "_" . time()
+            'payment' => [
+                'amount' => $amount,
+                'currency' => $model->currency ?? 'KGS',
+                'description' => 'Booking refund #' . $model->id,
+                'merchant_refund_id' => 'REFUND_' . $model->id . '_' . time(),
             ],
-            "cash_voucher_data" => [
-                "email" => $model->guest_email,
-                "inn" => "123456789012",
-                "taxation_system" => 0,
-                "payment_address" => "Your business address",
-                "positions" => [
-                    [
-                        "quantity" => 1,
-                        "price" => $refundAmount,
-                        "position_description" => $model->bookingRoomTitle(),
-                        "tax" => 1,
-                        "payment_method_type" => 1,
-                        "payment_subject_type" => 1,
-                        "nomenclature_code" => "ROOM_" . $model->id
-                    ]
-                ],
-                "payments" => [
-                    [
-                        "payment_type" => 1,
-                        "amount" => $refundAmount
-                    ]
-                ],
-                "order_id" => $model->id,
-                "send_cash_voucher" => true
-            ],
-            "interface_type" => 0,
-            "receipt_data" => [
-                "positions" => [
-                    [
-                        "quantity" => 1,
-                        "amount" => $refundAmount,
-                        "tax" => 1,
-                        "tax_amount" => 0,
-                        "description" => "Refund: " . $model->bookingRoomTitle()
-                    ]
-                ],
-                "total_tax_amount" => 0,
-                "common_tax" => 0
-            ],
-            "callback" => [
-                "delay" => 0,
-                "force_disable" => false
-            ]
+            // add any other fields (e.g. customer data, receipt_data) here...
         ];
 
-        // Generate signature
-        $data['general']['signature'] = $this->calculateSignature($data, $secretKey);
+        // 2. Generate signature and add it into general block
+        $payload['general']['signature'] = $this->generateFlashPaySignature($payload, $secretKey);
+        echo $payload['general']['signature'];die();
 
-        Yii::info('FlashPay refund request: ' . json_encode($data), 'flashpay');
+        // Send to FlashPay
+        Yii::info('Refund request: ' . json_encode($payload), 'flashpay');
+        $response = Yii::$app->httpClient
+            ->post('https://gateway.flashpay.kg/v2/payment/card/refund', json_encode($payload))
+            ->setHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'User-Agent' => 'DignoKG/1.0',
+            ])
+            ->send();
 
-        $headers = [
-            'Accept: application/json',
-            'Content-Type: application/json',
-            'User-Agent: DignoKG/1.0'
-        ];
+        Yii::info('Refund response: ' . $response->body, 'flashpay');
 
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if (curl_errno($ch)) {
-            $error = curl_error($ch);
-            curl_close($ch);
-            Yii::error('FlashPay refund cURL error: ' . $error, 'flashpay');
-            return $this->asJson(['error' => 'Connection error: ' . $error]);
-        }
-
-        curl_close($ch);
-
-        $responseData = json_decode($response, true);
-
-        Yii::info('FlashPay refund response: ' . $response, 'flashpay');
-
-        if ($httpCode === 200 && isset($responseData['status']) && $responseData['status'] === 'success') {
+        $data = $response->data;
+        if ($response->isOk && @$data['status'] === 'success') {
             $model->refund_status = 'processing';
             $model->refund_request_date = date('Y-m-d H:i:s');
-            $model->save();
-
+            $model->save(false);
             return $this->asJson([
                 'success' => true,
-                'message' => 'Refund request submitted successfully',
-                'refund_id' => $responseData['refund_id'] ?? null,
-                'status' => $responseData['status'] ?? 'unknown'
-            ]);
-        } else {
-            return $this->asJson([
-                'success' => false,
-                'status' => $httpCode,
-                'error' => $responseData['message'] ?? 'Refund failed',
-                'response' => $responseData,
+                'refund_id' => $data['refund_id'] ?? null,
             ]);
         }
-    }
 
+        return $this->asJson(['success' => false, 'response' => $data]);
+    }
 
     /**
-     * Calculate signature for FlashPay API
-     * You need to implement this according to FlashPay's specification
+     * Build signature per FlashPay Gate API specification:
+     * Flatten, sort, join with semicolons, HMAC-SHA512 + Base64.
+     *
+     * @param array  $payload   Request data WITHOUT signature field
+     * @param string $secretKey Your secret key
+     * @return string           Base64-encoded signature
      */
-    private function calculateSignature(array $data, string $secretKey): string
+    private function generateFlashPaySignature(array $payload, string $secretKey): string
     {
-        $flattened = $this->flattenAndSort($data);
-        $queryString = http_build_query($flattened, '', '&', PHP_QUERY_RFC3986);
-        $stringToHash = $queryString . $secretKey;
-        return hash('sha256', $stringToHash);
+        $lines = $this->flattenKeys($payload);
+        sort($lines, SORT_NATURAL);
+        $flat = implode(';', $lines);
+        $hmac = hash_hmac('sha512', $flat, $secretKey, true);
+        return base64_encode($hmac);
     }
 
-    private function flattenAndSort(array $data, string $prefix = ''): array
+    /**
+     * Recursively flatten array into "parent:…:key:value" lines.
+     * Includes array indices for each element.
+     *
+     * @param array  $data
+     * @param string $prefix
+     * @return array
+     */
+    private function flattenKeys(array $data, string $prefix = ''): array
     {
-        $result = [];
-        ksort($data);
-        foreach ($data as $key => $value) {
-            $composedKey = $prefix === '' ? $key : "{$prefix}[{$key}]";
-            if (is_array($value)) {
-                $result += $this->flattenAndSort($value, $composedKey);
+        $out = [];
+        foreach ($data as $key => $val) {
+            $path = $prefix === '' ? $key : "{$prefix}:{$key}";
+            if (is_array($val)) {
+                // numeric arrays – include index
+                if (array_values($val) === $val) {
+                    foreach ($val as $i => $elem) {
+                        $out = array_merge($out, $this->flattenKeys([$i => $elem], $path));
+                    }
+                } else {
+                    $out = array_merge($out, $this->flattenKeys($val, $path));
+                }
             } else {
-                $result[$composedKey] = (string) $value;
+                $value = $val === true ? '1' : ($val === false ? '0' : (string) $val);
+                $out[] = "{$path}:{$value}";
             }
         }
-        return $result;
+        return $out;
     }
+
 
 
     /**
