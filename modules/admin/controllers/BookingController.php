@@ -230,11 +230,13 @@ class BookingController extends Controller
             // Send request to Flash Pay
             $response = $this->sendRefundRequest($requestData);
 
-            return [
-                'success' => true,
-                'data' => $response,
-                'request_data' => $requestData // For debugging
-            ];
+            return $response;
+
+            // return [
+            //     'success' => true,
+            //     'data' => $response,
+            //     'request_data' => $requestData // For debugging
+            // ];
 
         } catch (\Exception $e) {
             Yii::error('Flash Pay refund error: ' . $e->getMessage(), __METHOD__);
@@ -493,134 +495,5 @@ class BookingController extends Controller
         $expectedSignature = $this->generateSignature(['data' => $dataToVerify])['data'];
 
         return hash_equals($expectedSignature, $receivedSignature);
-    }
-
-
-
-
-    public function actionRefund2($id)
-    {
-        $url = "https://gateway.flashpay.kg/v2/payment/card/refund";
-        $model = Booking::findOne($id);
-
-        $data = [
-            "general" => [
-                "project_id" => Booking::MERCHANT_ID,
-                "payment_id" => $model->transaction_number, // Required: actual payment ID
-                "signature" => $this->generateSignature($id),
-                "terminal_callback_url" => "https://dev.digno.kg/booking/terminal-callback",
-                "referrer_url" => "https://dev.digno.kg",
-                "merchant_callback_url" => "https://dev.digno.kg//booking/merchant-callback",
-            ],
-            "merchant" => [
-                "descriptor" => "Refund Descriptor",
-                "data" => "Custom merchant data",
-            ],
-            "cash_voucher_data" => [
-                "email" => $model->guest_email,
-                "inn" => "123456789012",
-                "group" => "group_id",
-                "taxation_system" => 0,
-                "payment_address" => "Your shop address",
-                "positions" => [
-                    [
-                        "quantity" => 1,
-                        "price" => $model->sum, // in tyiyn
-                        "position_description" => $model->bookingRoomTitle(),
-                        "tax" => 1,
-                        "payment_method_type" => 1,
-                        "payment_subject_type" => 1,
-                        "nomenclature_code" => "ABC123"
-                    ]
-                ],
-                "payments" => [
-                    [
-                        "payment_type" => 1,
-                        "amount" => 1000
-                    ]
-                ],
-                "order_id" => $model->id,
-                "send_cash_voucher" => true
-            ],
-            "payment" => [
-                "amount" => $model->sum,
-                "currency" => $model->currency,
-                "description" => "Customer refund",
-                "merchant_refund_id" => $model->user_id
-            ],
-            "interface_type" => 0,
-            "receipt_data" => [
-                "positions" => [
-                    [
-                        "quantity" => 1,
-                        "amount" => $model->sum,
-                        "tax" => 1,
-                        "tax_amount" => 0,
-                        "description" => "Refunded Item"
-                    ]
-                ],
-                "total_tax_amount" => 0,
-                "common_tax" => 0
-            ],
-            "callback" => [
-                "delay" => 0,
-                "force_disable" => true
-            ],
-            "addendum" => [
-                "lodging" => [
-                    "check_out_date" => "2025-05-19",
-                    "room" => [
-                        "rate" => 999999999999,
-                        "number_of_nights" => 1
-                    ],
-                    "total_tax" => 0,
-                    "charges" => [
-                        "room_service" => 0,
-                        "bar_or_lounge" => 0,
-                        // ... other charges
-                        "health_club" => 0
-                    ]
-                ]
-            ],
-            "booking_info" => [
-                "firstname" => "John",
-                "surname" => "Doe",
-                "email" => "john@example.com",
-                "start_date" => "2025-05-10",
-                "end_date" => "2025-05-12",
-                "description" => "Hotel booking refund",
-                "total" => 1000,
-                "pax" => 2,
-                "reference" => "REF123",
-                "id" => "BKID001"
-            ]
-        ];
-
-
-
-        $headers = [
-            'Accept: application/json',
-            'Content-Type: application/json'
-        ];
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-        if (curl_errno($ch)) {
-            return $this->asJson(['error' => curl_error($ch)]);
-        }
-
-        curl_close($ch);
-
-        return $this->asJson([
-            'status' => $httpCode,
-            'response' => json_decode($response, true),
-        ]);
     }
 }
