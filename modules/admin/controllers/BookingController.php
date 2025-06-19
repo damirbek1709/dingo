@@ -242,7 +242,8 @@ class BookingController extends Controller
                 $transaction_signature = $this->generateSignature($transactionRequestData);
                 $transactionRequestData['general']['signature'] = $transaction_signature;
                 $transaction_response = $this->sendTransactionRequest($transactionRequestData);
-                return $transaction_response;
+                echo "<pre>" . print_r($transaction_response) . "</pre>";
+                die();
             }
 
             return $response['status'];
