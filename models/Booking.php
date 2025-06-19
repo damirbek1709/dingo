@@ -85,7 +85,7 @@ class Booking extends \yii\db\ActiveRecord
         $arr = [
             self::CANCEL_REASON_PLANS_CHANGED => [
                 'Мои планы изменились',
-                'My planse are changed',
+                'My plans are changed',
                 'Менин пландарым өзгөрдү'
             ],
             self::CANCEL_REASON_BETTER_OPTION => [
