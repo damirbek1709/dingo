@@ -231,8 +231,11 @@ class BookingController extends Controller
             $response = $this->sendRefundRequest($requestData);
             if (array_key_exists('status', $response) && $response['status'] == "success") {
                 $transactionRequestData = [
-                    'project_id' => (int) Booking::MERCHANT_ID,
-                    'payment_id' => (string) $id,
+                    'general' => [
+                        'project_id' => (int) Booking::MERCHANT_ID,
+                        'payment_id' => (string) $id,
+                    ],
+                    'destination' => 'merchant'
                 ];
 
                 // Generate signature
