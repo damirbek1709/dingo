@@ -240,7 +240,7 @@ class BookingController extends Controller
 
                 // Generate signature
                 $transaction_signature = $this->generateSignature($transactionRequestData);
-                $transactionRequestData['signature'] = $transaction_signature;
+                $transactionRequestData['general']['signature'] = $transaction_signature;
                 $transaction_response = $this->sendTransactionRequest($transactionRequestData);
                 return $transaction_response;
             }
