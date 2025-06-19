@@ -233,7 +233,7 @@ class BookingController extends Controller
                 $transactionRequestData = [
                     'general' => [
                         'project_id' => (int) Booking::MERCHANT_ID,
-                        'payment_id' => (string) $id,
+                        'payment_id' => (string) $model->transaction_number,
                     ],
                     'destination' => 'merchant'
                 ];
