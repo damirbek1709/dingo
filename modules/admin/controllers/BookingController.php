@@ -229,17 +229,44 @@ class BookingController extends Controller
 
             // Send request to Flash Pay
             $response = $this->sendRefundRequest($requestData);
+            // if($response->status == "success"){
+                
+            // }
 
-            return $response;
-
-            // return [
-            //     'success' => true,
-            //     'data' => $response,
-            //     'request_data' => $requestData // For debugging
-            // ];
-
+            return $response->status;
         } catch (\Exception $e) {
             Yii::error('Flash Pay refund error: ' . $e->getMessage(), __METHOD__);
+
+            return [
+                'success' => false,
+                'error' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function actionTransactionStatus($transaction_number){
+        try {
+            // Prepare status request data
+            $requestData = [
+                'project_id' => (int) Booking::MERCHANT_ID,
+                'payment_id' => (string) $transaction_number,
+            ];
+
+            // Generate signature
+            $signature = $this->generateSignature($requestData);
+            $requestData['signature'] = $signature;
+
+            // Send status request to Flash Pay
+            $response = $this->sendTransactionRequest($requestData);
+
+            return [
+                'success' => true,
+                'data' => $response,
+                'request_data' => $requestData // For debugging
+            ];
+
+        } catch (\Exception $e) {
+            Yii::error('Flash Pay status check error: ' . $e->getMessage(), __METHOD__);
 
             return [
                 'success' => false,
@@ -324,6 +351,47 @@ class BookingController extends Controller
         return $responseData;
     }
 
+    private function sendTransactionRequest($data)
+    {
+        $jsonData = Json::encode($data);
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => 'https://gateway.flashpay.kg/v2/payment/status',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $jsonData,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'Content-Length: ' . strlen($jsonData)
+            ],
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_TIMEOUT => 30,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new \Exception('CURL Error: ' . $error);
+        }
+
+        if ($httpCode !== 200) {
+            throw new \Exception('HTTP Error: ' . $httpCode . ' Response: ' . $response);
+        }
+
+        $responseData = Json::decode($response);
+
+        if (!$responseData) {
+            throw new \Exception('Invalid JSON response: ' . $response);
+        }
+
+        return $responseData;
+    }
+
     /**
      * Prepare refund request data
      */
@@ -331,26 +399,17 @@ class BookingController extends Controller
     {
         $data = [
             'general' => [
-                'project_id' => (int)Booking::MERCHANT_ID,
+                'project_id' => (int) Booking::MERCHANT_ID,
                 'payment_id' => (string) $paymentId,
-                // signature will be added later
             ],
             'payment' => [
                 'currency' => (string) $currency,
                 'description' => (string) $description,
             ]
         ];
-
-        // Add amount if specified (for partial refund)
         if ($amount !== null) {
             $data['payment']['amount'] = (int) $amount;
         }
-
-        // Add merchant refund ID if specified
-        // if ($merchantRefundId !== null) {
-        //     $data['payment']['merchant_refund_id'] = (string) $merchantRefundId;
-        // }
-
         return $data;
     }
 
