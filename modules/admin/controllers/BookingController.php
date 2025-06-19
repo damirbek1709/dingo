@@ -233,7 +233,7 @@ class BookingController extends Controller
                 
             // }
 
-            return $response->status;
+            return $response['status'];
         } catch (\Exception $e) {
             Yii::error('Flash Pay refund error: ' . $e->getMessage(), __METHOD__);
 
