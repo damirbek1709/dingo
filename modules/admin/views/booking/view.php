@@ -74,15 +74,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     ],
                     'guest_email:email',
                     'guest_phone',
-                    'guest_name',
-                    'date_from',
-
-                    'status',
                     'other_guests',
-                    'cancellation_type',
-                    'cancellation_penalty_sum',
-                    'user_id',
-                    'special_comment',
                 ],
             ]) ?>
 
