@@ -76,11 +76,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     'guest_phone',
                     'other_guests',
                     [
-                        [
-                            'attribute' => 'refund_status',
-                            'value' => $payment_status
-                        ],
-                    ]
+                        'attribute' => 'refund_status',
+                        'value' => $payment_status
+                    ],
+
                 ],
             ]) ?>
 
