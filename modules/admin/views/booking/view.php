@@ -66,12 +66,12 @@ $this->params['breadcrumbs'][] = $this->title;
                                         return $model->sum . " " . $model->currency;
                                     }
                     ],
-                    [
-                        'attribute' => 'status',
-                        'value' => function ($model) {
-                                        return $model->bookingStatusString();
-                                    }
-                    ],
+                    // [
+                    //     'attribute' => 'status',
+                    //     'value' => function ($model) {
+                    //                     return $model->bookingStatusString();
+                    //                 }
+                    // ],
                     'guest_email:email',
                     'guest_phone',
                     'guest_name',
