@@ -116,12 +116,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Url::toRoute([$action, 'id' => $model->id]);
                 }
                 ],
-                [
-                    [
-                        'attribute' => 'refund_status',
-                        'value' => $payment_status
-                    ],
-                ]
+               
             ],
         ]); ?>
 
