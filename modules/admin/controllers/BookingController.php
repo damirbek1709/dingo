@@ -126,6 +126,21 @@ class BookingController extends Controller
      */
     public function actionView($id)
     {
+        $model = Booking::findOne($id);
+
+        $transactionRequestData = [
+            'general' => [
+                'project_id' => (int) Booking::MERCHANT_ID,
+                'payment_id' => (string) $model->transaction_number,
+            ],
+            'destination' => 'merchant'
+        ];
+
+        $transaction_signature = $this->generateSignature($transactionRequestData);
+        $transactionRequestData['general']['signature'] = $transaction_signature;
+        $transaction_response = $this->sendTransactionRequest($transactionRequestData);
+        
+        echo "<pre>";print($transaction_response);echo "</pre>";die();
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
@@ -229,30 +244,7 @@ class BookingController extends Controller
 
             // Send request to Flash Pay
             $response = $this->sendRefundRequest($requestData);
-            if (array_key_exists('status', $response) && $response['status'] == "success") {
-                $transactionRequestData = [
-                    'general' => [
-                        'project_id' => (int) Booking::MERCHANT_ID,
-                        'payment_id' => (string) $model->transaction_number,
-                    ],
-                    'destination' => 'merchant'
-                ];
-
-                $transaction_signature = $this->generateSignature($transactionRequestData);
-                $transactionRequestData['general']['signature'] = $transaction_signature;
-                //$transaction_response = $this->sendTransactionRequest($transactionRequestData);
-                // if(array_key_exists('operations',$transaction_response)){
-                //     foreach($transaction_response['operations'] as $operation){
-                //         if($operation["type"]){
-
-                //         }
-                //     }
-                // }
-
-                return $this->redirect(['view', 'id' => $id]);
-            }
-
-            return $response['status'];
+            return $this->redirect(['view', 'id' => $id]);
         } catch (\Exception $e) {
             Yii::error('Flash Pay refund error: ' . $e->getMessage(), __METHOD__);
 

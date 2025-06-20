@@ -80,7 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="margin_30" style="margin-top:30px">
                 <?php
-                if ($model->status == Booking::PAID_STATUS_CANCEL_INQUIRY) {
+                if ($model->status == Booking::PAID_STATUS_CANCELED) {
                     echo Html::a(Yii::t('app', 'Возврат средств'), ['refund', 'id' => $model->id], ['class' => 'save-button']);
                 } ?>
             </div>
