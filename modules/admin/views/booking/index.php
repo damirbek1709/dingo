@@ -13,7 +13,7 @@ use yii\widgets\ActiveForm;
 
 $this->title = Yii::t('app', 'Бронирования');
 $this->params['breadcrumbs'][] = ['label' => 'Назад к списку', 'url' => ['/admin']];
-$this->params['breadcrumbs'][] = ['label' => $object['name'][0], 'url' => ['/admin/object/view','object_id'=>$object_id]];
+$this->params['breadcrumbs'][] = ['label' => $object['name'][0], 'url' => ['/admin/object/view', 'object_id' => $object_id]];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -108,7 +108,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return $model->bookingStatusString()['string'];
                 }
                 ],
-               
+
                 [
                     'class' => ActionColumn::className(),
                     'template' => '{view}',
@@ -116,6 +116,12 @@ $this->params['breadcrumbs'][] = $this->title;
                     return Url::toRoute([$action, 'id' => $model->id]);
                 }
                 ],
+                [
+                    [
+                        'attribute' => 'refund_status',
+                        'value' => $payment_status
+                    ],
+                ]
             ],
         ]); ?>
 
