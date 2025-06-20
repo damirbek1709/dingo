@@ -140,7 +140,7 @@ class BookingController extends Controller
         $transactionRequestData['general']['signature'] = $transaction_signature;
         $transaction_response = $this->sendTransactionRequest($transactionRequestData);
         
-        echo "<pre>";print($transaction_response);echo "</pre>";die();
+        echo "<pre>";print_r($transaction_response);echo "</pre>";die();
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
