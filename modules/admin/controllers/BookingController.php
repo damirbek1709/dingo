@@ -136,13 +136,19 @@ class BookingController extends Controller
             'destination' => 'merchant'
         ];
 
+        $status = "";
+
         $transaction_signature = $this->generateSignature($transactionRequestData);
         $transactionRequestData['general']['signature'] = $transaction_signature;
         $transaction_response = $this->sendTransactionRequest($transactionRequestData);
-        
-        echo "<pre>";print_r($transaction_response);echo "</pre>";die();
+
+        if($transaction_response && array_key_exists('payment',$transaction_response)){
+            $status = $transaction_response['payment']['status'];
+        }
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'payment_status' => $status
         ]);
     }
 
