@@ -1,8 +1,10 @@
 <?php
+use app\models\Tariff;
 use Yii;
 use app\models\Booking;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
+use yii\bootstrap\Modal;
 
 /** @var yii\web\View $this */
 /** @var app\models\Booking $model */
@@ -85,10 +87,59 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="margin_30" style="margin-top:30px">
                 <?php
-                if ($model->status == Booking::PAID_STATUS_CANCELED) {
-                    echo Html::a(Yii::t('app', 'Возврат средств'), ['refund', 'id' => $model->id], ['class' => 'save-button']);
-                } ?>
+                if ($model->tariff->cancellation && $model->tariff->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
+                    if ($model->status == Booking::PAID_STATUS_CANCELED) {
+                        echo Html::button(Yii::t('app', 'Возврат средств'), [
+                            'class' => 'save-button btn-refund',
+                            'data-id' => $model->id,
+                        ]);
+                    }
+                }
+                ?>
             </div>
         </div>
     </div>
 </div>
+
+<?php
+Modal::begin([
+    'id' => 'refund-modal',
+    'header' => '<h4>' . Yii::t('app', 'Подтверждение возврата') . '</h4>',
+    'footer' =>
+        Html::button(Yii::t('app', 'Да, вернуть'), ['class' => 'btn btn-danger', 'id' => 'confirm-refund']) .
+        Html::button(Yii::t('app', 'Отмена'), ['class' => 'btn btn-secondary', 'data-dismiss' => 'modal']),
+]);
+
+echo "<p>" . Yii::t('app', 'Вы уверены, что хотите вернуть средства?') . "</p>";
+
+Modal::end();
+?>
+
+<script>
+    let refundId = null;
+
+    $(document).on('click', '.btn-refund', function () {
+        refundId = $(this).data('id');
+        $('#refund-modal').modal('show');
+    });
+
+    $('#confirm-refund').on('click', function () {
+        if (!refundId) return;
+
+        $.ajax({
+            url: '$refundUrl',
+            type: 'POST',
+            data: {
+                id: refundId,
+                _csrf: yii.getCsrfToken()
+            },
+            success: function (response) {
+                $('#refund-modal').modal('hide');
+                location.reload(); // or show a success message
+            },
+            error: function () {
+                alert('Ошибка при возврате средств.');
+            }
+        });
+    });
+</script>

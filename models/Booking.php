@@ -296,6 +296,15 @@ class Booking extends \yii\db\ActiveRecord
         return $room_title;
     }
 
+    public function getTariff()
+    {
+        $rel = $this->hasOne(Tariff::class, ['id' => 'tariff_id']);
+        if ($rel->exists()) {
+            return $rel;
+        }
+        return null;
+    }
+
     public static function getRoomList($object_id)
     {
         $client = Yii::$app->meili->connect();
