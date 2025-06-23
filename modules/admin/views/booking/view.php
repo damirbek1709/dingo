@@ -134,7 +134,7 @@ Modal::end();
         $('#confirm-refund').prop('disabled', true); // Disable button
 
         $.ajax({
-            url: "<?=Yii::$app->urlManager->createUrl('/admin/booking/refund')?>",
+            url: "<?=Yii::$app->urlManager->createUrl("/admin/booking/refund?id=$model->id")?>",
             type: 'POST',
             data: {
                 id: refundId,
