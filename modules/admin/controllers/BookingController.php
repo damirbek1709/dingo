@@ -142,7 +142,7 @@ class BookingController extends Controller
         $transactionRequestData['general']['signature'] = $transaction_signature;
         $transaction_response = $this->sendTransactionRequest($transactionRequestData);
 
-        if($transaction_response && array_key_exists('payment',$transaction_response)){
+        if ($transaction_response && array_key_exists('payment', $transaction_response)) {
             $status = $transaction_response['payment']['status'];
         }
 
@@ -238,11 +238,22 @@ class BookingController extends Controller
 
     public function actionRefund($id)
     {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
         try {
-            $this->response->format = Response::FORMAT_JSON;
             $model = Booking::findOne($id);
+            if (!$model) {
+                throw new \Exception('Бронирование не найдено');
+            }
+
             // Prepare request data
-            $requestData = $this->prepareRefundData($model->transaction_number, $model->sum, 'KGS', $model->special_comment, Booking::MERCHANT_ID);
+            $requestData = $this->prepareRefundData(
+                $model->transaction_number,
+                $model->sum,
+                'KGS',
+                $model->special_comment,
+                Booking::MERCHANT_ID
+            );
 
             // Generate signature
             $signature = $this->generateSignature($requestData);
@@ -250,16 +261,22 @@ class BookingController extends Controller
 
             // Send request to Flash Pay
             $response = $this->sendRefundRequest($requestData);
-            return $this->redirect(['view', 'id' => $id]);
+
+            // You can check $response content here before deciding success
+            return [
+                'success' => true,
+                'message' => 'Заявка на возврат средств оформлена',
+            ];
         } catch (\Exception $e) {
             Yii::error('Flash Pay refund error: ' . $e->getMessage(), __METHOD__);
 
             return [
                 'success' => false,
-                'error' => $e->getMessage()
+                'message' => 'Ошибка: ' . $e->getMessage(),
             ];
         }
     }
+
 
     private function sendTransactionRequest($data)
     {

@@ -111,6 +111,9 @@ Modal::begin([
 ]);
 
 echo "<p>" . Yii::t('app', 'Вы уверены, что хотите вернуть средства?') . "</p>";
+echo '<div id="refund-loading" style="display:none; text-align:center; margin-bottom: 15px;">' .
+    Html::img('@web/images/site/loading.gif', ['alt' => 'Loading...', 'style' => 'width:50px;']) .
+    '</div>';
 
 Modal::end();
 ?>
@@ -126,6 +129,9 @@ Modal::end();
     $('#confirm-refund').on('click', function () {
         if (!refundId) return;
 
+        $('#refund-loading').show(); // Show loading
+        $('#confirm-refund').prop('disabled', true); // Disable button
+
         $.ajax({
             url: '$refundUrl',
             type: 'POST',
@@ -134,12 +140,21 @@ Modal::end();
                 _csrf: yii.getCsrfToken()
             },
             success: function (response) {
-                $('#refund-modal').modal('hide');
-                location.reload(); // or show a success message
+                $('#refund-loading').hide(); // Hide loading
+                if (response.success) {
+                    $('#refund-modal .modal-body').html('<div class="alert alert-success">' + response.message + '</div>');
+                    $('#confirm-refund').hide();
+                } else {
+                    $('#refund-modal .modal-body').html('<div class="alert alert-danger">' + response.message + '</div>');
+                    $('#confirm-refund').prop('disabled', false);
+                }
             },
             error: function () {
-                alert('Ошибка при возврате средств.');
+                $('#refund-loading').hide(); // Hide loading
+                $('#refund-modal .modal-body').html('<div class="alert alert-danger">Ошибка при возврате средств.</div>');
+                $('#confirm-refund').prop('disabled', false);
             }
         });
     });
+
 </script>
