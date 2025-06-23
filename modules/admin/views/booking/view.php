@@ -1,5 +1,6 @@
 <?php
 use app\models\Tariff;
+use GuzzleHttp\Psr7\Uri;
 use Yii;
 use app\models\Booking;
 use yii\helpers\Html;
@@ -133,7 +134,7 @@ Modal::end();
         $('#confirm-refund').prop('disabled', true); // Disable button
 
         $.ajax({
-            url: '$refundUrl',
+            url: "<?=Yii::$app->urlManager->createUrl('/admin/booking/refund')?>",
             type: 'POST',
             data: {
                 id: refundId,
