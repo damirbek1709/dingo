@@ -272,7 +272,7 @@ class BookingController extends Controller
             // Send request to Flash Pay
             $response = $this->sendRefundRequest($requestData);
             if ($response) {
-                $status_data = $this->sendTransactionRequest($model->transaction_number);
+                $status_data = $this->sendTransactionRequest($requestData);
                 if($status_data){
                     return $status_data;
                 }
