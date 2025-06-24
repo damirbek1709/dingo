@@ -271,6 +271,13 @@ class BookingController extends Controller
 
             // Send request to Flash Pay
             $response = $this->sendRefundRequest($requestData);
+            if ($response) {
+                $status_data = $this->sendTransactionRequest($model->transaction_number);
+                if ($status_data && $status_data['method'] == 'card') {
+                    $model->payment_type = $status_data['account']['type'];
+                    $model->save(false);
+                }
+            }
 
             // You can check $response content here before deciding success
             return [
@@ -287,6 +294,59 @@ class BookingController extends Controller
 
             ];
         }
+    }
+
+    private function checkTransactionStatus($transaction_number)
+    {
+        $transactionRequestData = [
+            'general' => [
+                'project_id' => (int) Booking::MERCHANT_ID,
+                'payment_id' => (string) $transaction_number,
+            ],
+            'destination' => 'merchant'
+        ];
+
+        $status = "";
+
+        $transaction_signature = $this->generateSignature($transactionRequestData);
+        $transactionRequestData['general']['signature'] = $transaction_signature;
+        $jsonData = Json::encode($transactionRequestData);
+
+        $ch = curl_init();
+        curl_setopt_array($ch, [
+            CURLOPT_URL => 'https://gateway.flashpay.kg/v2/payment/status',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $jsonData,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Accept: application/json',
+                'Content-Length: ' . strlen($jsonData)
+            ],
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_TIMEOUT => 30,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new \Exception('CURL Error: ' . $error);
+        }
+
+        if ($httpCode !== 200) {
+            throw new \Exception('HTTP Error: ' . $httpCode . ' Response: ' . $response);
+        }
+
+        //$responseData = Json::decode($response);
+
+        if ($response) {
+            throw new \Exception('Invalid JSON response: ' . $response);
+        }
+
+        return $response;
     }
 
     public function actionFinance()
@@ -389,52 +449,7 @@ class BookingController extends Controller
         return $responseData;
     }
 
-    public function actionCheckTransactionStatus($transaction_number)
-    {
-        $transactionRequestData = [
-            'general' => [
-                'project_id' => (int) Booking::MERCHANT_ID,
-                'payment_id' => (string) $transaction_number,
-            ],
-            'destination' => 'merchant'
-        ];
 
-        $status = "";
-
-        $transaction_signature = $this->generateSignature($transactionRequestData);
-        $transactionRequestData['general']['signature'] = $transaction_signature;
-        $jsonData = Json::encode($transactionRequestData);
-
-        $ch = curl_init();
-        curl_setopt_array($ch, [
-            CURLOPT_URL => 'https://gateway.flashpay.kg/v2/payment/status',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $jsonData,
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Accept: application/json',
-                'Content-Length: ' . strlen($jsonData)
-            ],
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_TIMEOUT => 30,
-        ]);
-
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($error) {
-            throw new \Exception('CURL Error: ' . $error);
-        }
-
-        if ($httpCode !== 200) {
-            throw new \Exception('HTTP Error: ' . $httpCode . ' Response: ' . $response);
-        }
-
-        echo "<pre>";print_r($response);echo "</pre>";die();
-    }
 
 
     public function actionCheckStatus($requestId)
