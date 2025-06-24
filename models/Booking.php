@@ -53,6 +53,8 @@ class Booking extends \yii\db\ActiveRecord
 
     public $refund_status;
     public $refund_request_date;
+    public $date_range;
+    public $payment_type;
     /**
      * {@inheritdoc}
      */
@@ -294,6 +296,15 @@ class Booking extends \yii\db\ActiveRecord
             }
         }
         return $room_title;
+    }
+
+    public function bookingOwnerTitle()
+    {
+        $user = User::findOne($this->owner_id);
+        if ($user->name) {
+            return $user->name;
+        }
+        return $user->username;
     }
 
     public function getTariff()

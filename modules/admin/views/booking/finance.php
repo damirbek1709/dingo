@@ -24,9 +24,9 @@ $this->params['breadcrumbs'][] = $this->title;
             'method' => 'get',
             'options' => ['class' => 'search-filter-form'],
         ]); ?>
-        
+
         <?php $form->end(); ?>
-       
+
     </div>
 
     <div class="booking-index">
@@ -35,65 +35,56 @@ $this->params['breadcrumbs'][] = $this->title;
             //'filterModel' => $searchModel,
             'summary' => false,
             'columns' => [
-                'guest_name',
-                [
-                    'attribute' => 'date_from',
-                    'value' => function ($model) {
-                    return $model->dateFormat($model->date_from);
-                }
-                ],
-                [
-                    'attribute' => 'date_to',
-                    'value' => function ($model) {
-                    return $model->dateFormat($model->date_to);
-                }
-                ],
-                [
-                    'attribute' => 'room_id',
-                    'value' => function ($model) {
-                    return $model->bookingRoomTitle();
-                }
-                ],
                 [
                     'attribute' => 'object_id',
                     'value' => function ($model) {
-                    return $model->bookingObjectTitle();
-                }
+                        return $model->bookingObjectTitle();
+                    }
                 ],
+                [
+                    'attribute' => 'owner_id',
+                    'value' => function ($model) {
+                        return $model->bookingOwnerTitle();
+                    }
+                ],
+
                 [
                     'attribute' => 'tariff_id',
                     'value' => function ($model) {
-                    return $model->bookingTariffTitle();
-                }
+                        return $model->bookingTariffTitle();
+                    }
                 ],
-                'special_comment',
                 [
-                    'attribute' => 'created_at',
+                    'attribute' => 'date_range',
+                    'format'=>'raw',
                     'value' => function ($model) {
-                    return $model->dateFormat($model->created_at);
-                }
+                        return $model->dateFormat($model->date_from)." - <br>".$model->dateFormat($model->date_to);
+                    }
+
                 ],
+                'transaction_number',
+                'currency',
                 [
                     'attribute' => 'sum',
                     'value' => function ($model) {
-                    return $model->sum . " " . $model->currency;
-                }
+                        return $model->sum . " " . $model->currency;
+                    }
                 ],
                 [
                     'attribute' => 'status',
                     'value' => function ($model) {
-                    return $model->bookingStatusString()['string'];
-                }
+                        return $model->bookingStatusString()['string'];
+                    }
                 ],
 
                 [
                     'class' => ActionColumn::className(),
                     'template' => '{view}',
                     'urlCreator' => function ($action, Booking $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                }
+                        return Url::toRoute([$action, 'id' => $model->id]);
+                    }
                 ],
-               
+
             ],
         ]); ?>
 
