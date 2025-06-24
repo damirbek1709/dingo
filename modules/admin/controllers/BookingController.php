@@ -274,6 +274,7 @@ class BookingController extends Controller
             return [
                 'success' => true,
                 'message' => 'Заявка на возврат средств оформлена',
+                'response'=>$response
             ];
         } catch (\Exception $e) {
             Yii::error('Flash Pay refund error: ' . $e->getMessage(), __METHOD__);
@@ -281,6 +282,7 @@ class BookingController extends Controller
             return [
                 'success' => false,
                 'message' => 'Ошибка: ' . $e->getMessage(),
+
             ];
         }
     }
