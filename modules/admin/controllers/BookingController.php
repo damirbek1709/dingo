@@ -254,7 +254,7 @@ class BookingController extends Controller
                 $fee = $user_fee;
             }
             $percent_sum = $sum / 100 * $fee;
-            $return_sum = $sum - $percent_sum;
+            $return_sum = ($sum - $percent_sum) * 100;
             
             // Prepare request data
             $requestData = $this->prepareRefundData(
