@@ -433,13 +433,7 @@ class BookingController extends Controller
             throw new \Exception('HTTP Error: ' . $httpCode . ' Response: ' . $response);
         }
 
-        $responseData = Json::decode($response);
-
-        if (!$responseData) {
-            throw new \Exception('Invalid JSON response: ' . $response);
-        }
-
-        return $responseData;
+        return $response;
     }
 
 
