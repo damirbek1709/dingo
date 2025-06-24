@@ -54,7 +54,6 @@ class Booking extends \yii\db\ActiveRecord
     public $refund_status;
     public $refund_request_date;
     public $date_range;
-    public $payment_type;
     /**
      * {@inheritdoc}
      */
@@ -76,7 +75,7 @@ class Booking extends \yii\db\ActiveRecord
             [['sum', 'cancellation_penalty_sum'], 'number'],
             [['date_from', 'date_to', 'cancel_date', 'comission', 'income'], 'safe'],
             [['tariff_id', 'currency'], 'string', 'max' => 11],
-            [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number'], 'string', 'max' => 255],
+            [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number','paymnet_type'], 'string', 'max' => 255],
             [['other_guests'], 'string', 'max' => 500],
         ];
     }

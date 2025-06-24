@@ -273,8 +273,7 @@ class BookingController extends Controller
             $response = $this->sendRefundRequest($requestData);
             if ($response) {
                 $status_data = $this->sendTransactionRequest($requestData);
-                
-                if ($status_data && $status_data['method'] == 'card') {
+                if ($status_data && $status_data['payment']['method'] == 'card') {
                     $model->payment_type = $status_data['account']['type'];
                     $model->save(false);
                 }
