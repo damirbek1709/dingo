@@ -89,12 +89,12 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="margin_30" style="margin-top:30px">
                 <?php
                 if ($model->tariff->cancellation && $model->tariff->cancellation == Tariff::FREE_CANCELLATION_WITH_PENALTY) {
-                    if ($model->status == Booking::PAID_STATUS_CANCELED) {
+                    //if ($model->status == Booking::PAID_STATUS_CANCELED) {
                         echo Html::button(Yii::t('app', 'Возврат средств'), [
                             'class' => 'save-button btn-refund',
                             'data-id' => $model->id,
                         ]);
-                    }
+                    //}
                 }
                 ?>
             </div>
