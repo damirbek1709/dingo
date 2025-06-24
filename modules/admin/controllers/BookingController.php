@@ -9,6 +9,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use yii\web\Response;
+use app\models\user\User;
 
 /**
  * BookingController implements the CRUD actions for Booking model.
@@ -246,10 +247,17 @@ class BookingController extends Controller
                 throw new \Exception('Бронирование не найдено');
             }
 
+            $sum = $model->sum;
+            $fee = User::findOne($model->owner_id);
+            $percent_sum = $sum / 100 * $fee;
+            $return_sum = ($sum - $percent_sum) * 100;
+
+
+
             // Prepare request data
             $requestData = $this->prepareRefundData(
                 $model->transaction_number,
-                $model->sum,
+                $return_sum,
                 'KGS',
                 $model->special_comment,
                 Booking::MERCHANT_ID
