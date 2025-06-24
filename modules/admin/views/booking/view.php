@@ -145,6 +145,7 @@ Modal::end();
                 if (response.success) {
                     $('#refund-modal .modal-body').html('<div class="alert alert-success">' + response.message + '</div>');
                     $('#confirm-refund').hide();
+                    console.log(response.response);
                 } else {
                     $('#refund-modal .modal-body').html('<div class="alert alert-danger">' + response.message + '</div>');
                     $('#confirm-refund').prop('disabled', false);
