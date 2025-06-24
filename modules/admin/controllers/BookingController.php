@@ -433,7 +433,7 @@ class BookingController extends Controller
             throw new \Exception('HTTP Error: ' . $httpCode . ' Response: ' . $response);
         }
 
-        return $response;
+        echo "<pre>";print_r($response);echo "</pre>";die();
     }
 
 
