@@ -250,11 +250,11 @@ class BookingController extends Controller
             $sum = $model->sum;
             $fee = 10;
             $user = User::findOne($model->owner_id);
-            if($user){
+            if ($user) {
                 $fee = $user->fee_percent;
             }
             $percent_sum = $sum / 100 * $fee;
-            $return_sum = ($sum - $percent_sum) * 100;
+            $return_sum = ($sum - $percent_sum);
 
 
 
