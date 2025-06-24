@@ -26,9 +26,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
         
         <?php $form->end(); ?>
-        <button class="filter-button" id="open-filters">
-            <?= Yii::t('app', 'Фильтры') ?>
-        </button>
+       
     </div>
 
     <div class="booking-index">
