@@ -249,15 +249,13 @@ class BookingController extends Controller
 
             $sum = $model->sum;
             $fee = 10;
-            $user = User::findOne($model->owner_id);
-            if ($user) {
-                $fee = $user->fee_percent;
+            $user_fee = User::findOne($model->owner_id)->fee_percent;
+            if ($user_fee) {
+                $fee = $user_fee;
             }
             $percent_sum = $sum / 100 * $fee;
-            $return_sum = ($sum - $percent_sum);
-
-
-
+            $return_sum = $sum - $percent_sum;
+            
             // Prepare request data
             $requestData = $this->prepareRefundData(
                 $model->transaction_number,
