@@ -289,6 +289,63 @@ class BookingController extends Controller
         }
     }
 
+    public function actionFinance(){
+        $client = Yii::$app->meili->connect();
+        $index = $client->index('object');
+        $searchModel = new BookingSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
+        //$current_date = date('Y-m-d');
+        $active = "all_active";
+
+        $date_from = Yii::$app->request->get('date_from') ? Yii::$app->request->get('date_from') : null;
+        if ($date_from) {
+            $dataProvider->query->andFilterWhere(['>=', 'date_from', $date_from]);
+        }
+
+        $date_to = Yii::$app->request->get('date_to') ? Yii::$app->request->get('date_to') : null;
+        if ($date_to) {
+            $dataProvider->query->andFilterWhere(['<', 'date_to', $date_to]);
+        }
+
+        $date_book = Yii::$app->request->get('book_date') ? Yii::$app->request->get('book_date') : null;
+        if ($date_book) {
+            $dataProvider->query->andFilterWhere(['created_at' => $date_book]);
+        }
+
+        // $status_arr = Yii::$app->request->get('status', []);
+        // if ($status_arr) {
+        //     $dataProvider->query->andFilterWhere(['status' => $status_arr]);
+        // }
+        // if ($status_arr) {
+        //     switch ($status) {
+        //         case "future":
+        //             $dataProvider->query->andFilterWhere(['>=', 'date_from', $current_date]);
+        //             $active = "future_active";
+        //             break;
+        //         case "past":
+        //             $dataProvider->query->andFilterWhere(['<', 'date_to', $current_date]);
+        //             $active = "past_active";
+        //             break;
+        //         case "canceled":
+        //             $dataProvider->query->andFilterWhere(['status' => Booking::PAID_STATUS_CANCELED]);
+        //             $active = "cancel_active";
+        //             break;
+        //         default:
+        //             $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
+
+        //     }
+        // }
+
+        return $this->render('finance', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'active' => $active,
+            'date_from' => $date_from,
+            'date_to' => $date_to,
+            'date_book' => $date_book,
+        ]);
+    }
+
 
     private function sendTransactionRequest($data)
     {
