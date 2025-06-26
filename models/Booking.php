@@ -473,28 +473,28 @@ class Booking extends \yii\db\ActiveRecord
         $action = Yii::$app->urlManager->createUrl("/admin/booking/refund?id=$this->id");
         $action_string = 'Выплатить';
 
-        if ($this->refund_status == self::REFUND_STATUS_RETURNED) {
+        if ($this->return_status == self::REFUND_STATUS_RETURNED) {
             $string = Yii::t('app', 'Произведен возврат');
             $color = '#52c41a';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/view?id=$this->id");
             $action_string = 'Детали';
         }
 
-        if ($this->refund_status == self::REFUND_STATUS_PAID) {
+        if ($this->return_status == self::REFUND_STATUS_PAID) {
             $string = Yii::t('app', 'Выплачен');
             $color = '#52c41a';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/view?id=$this->id");
             $action_string = 'Детали';
         }
 
-        if ($this->refund_status == self::REFUND_STATUS_EXPECTING) {
+        if ($this->return_status == self::REFUND_STATUS_EXPECTING) {
             $string = Yii::t('app', 'В ожиданииы выплаты');
             $color = '#52c41a';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/pay?id=$this->id");
             $action_string = 'Выплатить';
         }
 
-        if ($this->refund_status == self::REFUND_STATUS_QUERY) {
+        if ($this->return_status == self::REFUND_STATUS_QUERY) {
             $string = Yii::t('app', 'В ожидании возврата');
             $color = '#52c41a';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/refund?id=$this->id");
