@@ -85,7 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'label' => 'Статус',
                     'value' => function ($model) {
                         $color = $model->refundStatusString()['color'];
-                        return "<span style='color:$color;border:1px solid $color;background-color:rgba(113, 111, 243, 0.08);padding:2px 3px;border-radius:4px'>" . $model->refundStatusString()['string'] . "</span>";
+                        return "<span style='color:$color;border:1px solid $color;background-color:rgba(113, 111, 243, 0.05);padding:2px 3px;border-radius:4px'>" . $model->refundStatusString()['string'] . "</span>";
                     }
                 ],
                 [
