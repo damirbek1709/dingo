@@ -496,7 +496,7 @@ class Booking extends \yii\db\ActiveRecord
 
         if ($this->return_status == self::REFUND_STATUS_QUERY) {
             $string = Yii::t('app', 'В ожидании возврата');
-            $color = '#52c41a';
+            $color = '#716FF3';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/refund?id=$this->id");
             $action_string = 'Выплатить';
         }
