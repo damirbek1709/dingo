@@ -85,7 +85,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'label' => 'Статус',
                     'value' => function ($model) {
                         $color = $model->refundStatusString()['color'];
-                        return "<span style='color:$color;border:1px solid $color;background-color:rgba(113, 111, 243, 0.05);padding:2px 3px;border-radius:4px'>" . $model->refundStatusString()['string'] . "</span>";
+                        return "<span style='color:$color;border:1px solid $color;background-color:rgba(113, 111, 243, 0.05);padding:2px 3px;border-radius:4px'><span>" . $model->refundStatusString()['string'] . "</span></span>";
                     }
                 ],
                 [
@@ -94,7 +94,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'header' => Yii::t('app', 'Действие'),
                     'buttons' => [
                         'view' => function ($url, $model) {
-                            return Html::tag('div', $model->refundStatusString()['action_string'], [
+                            return Html::tag('span', $model->refundStatusString()['action_string'], [
                                 'class' => 'table_action_button',
                                 'action' => $model->refundStatusString()['action']
                             ]);
