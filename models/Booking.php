@@ -307,7 +307,7 @@ class Booking extends \yii\db\ActiveRecord
     {
         $user = User::findOne($this->owner_id)->name;
         if ($user) {
-            return $user->name;
+            return $user;
         }
     }
 
