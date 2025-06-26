@@ -56,43 +56,51 @@ $this->params['breadcrumbs'][] = $this->title;
                 ],
                 [
                     'attribute' => 'date_range',
-                    'format'=>'raw',
+                    'format' => 'raw',
                     'value' => function ($model) {
-                        return $model->dateFormat($model->date_from)." - <br>".$model->dateFormat($model->date_to);
+                        return $model->dateFormat($model->date_from) . " - <br>" . $model->dateFormat($model->date_to);
                     }
 
                 ],
                 'transaction_number',
                 'currency',
                 [
-                    'attribute'=>'payment_type',
-                    'value'=>function ($model) {
-                        return "<span class='payment_type'>".$model->payment_type."</span>";
+                    'attribute' => 'payment_type',
+                    'value' => function ($model) {
+                        return "<span class='payment_type'>" . $model->payment_type . "</span>";
                     },
-                    'format'=>'raw'
+                    'format' => 'raw'
                 ],
-                
+
                 [
                     'attribute' => 'sum',
-                    'format'=>'raw',
+                    'format' => 'raw',
                     'value' => function ($model) {
                         return $model->sum . "<br>" . $model->currency;
                     }
                 ],
                 [
-                    'attribute' => 'retrun_status',
+                    'attribute' => 'return_status',
+                    'format' => 'raw',
+                    'label' => 'Статус',
                     'value' => function ($model) {
-                        return $model->refundStatusString()['string'];
+                        $color = $model->refundStatusString()['color'];
+                        return "<span style='color:$color;border:1px solid $color;background-color:rgba(113, 111, 243, 0.08);padding:2px 3px;border-radius:4px'>" . $model->refundStatusString()['string'] . "</span>";
                     }
                 ],
                 [
                     'class' => ActionColumn::className(),
                     'template' => '{view}',
-                    'urlCreator' => function ($action, Booking $model, $key, $index, $column) {
-                        return Url::toRoute([$action, 'id' => $model->id]);
-                    }
+                    'header' => Yii::t('app', 'Действие'),
+                    'buttons' => [
+                        'view' => function ($url, $model) {
+                            return Html::tag('span', $model->refundStatusString()['action_string'], [
+                                'class' => 'table_action_button',
+                                'action' => $model->refundStatusString()['action']
+                            ]);
+                        },
+                    ]
                 ],
-
             ],
         ]); ?>
 
@@ -110,9 +118,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php $form->end(); ?>
 
 <style>
-    .payment_type{
+    .payment_type {
         text-transform: uppercase;
     }
+
     .search-filter-form {
         width: 100%;
     }

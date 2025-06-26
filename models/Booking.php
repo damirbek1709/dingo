@@ -74,13 +74,13 @@ class Booking extends \yii\db\ActiveRecord
     {
         return [
             [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status', 'owner_id'], 'required'],
-            [['object_id', 'room_id', 'status', 'cancellation_type', 'cancel_reason_id','refund_status'], 'integer'],
+            [['object_id', 'room_id', 'status', 'cancellation_type', 'cancel_reason_id', 'refund_status'], 'integer'],
             [['status'], 'default', 'value' => 1],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
             [['date_from', 'date_to', 'cancel_date', 'comission', 'income'], 'safe'],
             [['tariff_id', 'currency'], 'string', 'max' => 11],
-            [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number','payment_type'], 'string', 'max' => 255],
+            [['guest_email', 'guest_phone', 'guest_name', 'special_comment', 'transaction_number', 'payment_type'], 'string', 'max' => 255],
             [['other_guests'], 'string', 'max' => 500],
         ];
     }
@@ -159,8 +159,8 @@ class Booking extends \yii\db\ActiveRecord
             'comission' => Yii::t('app', 'Комиссия'),
             'income' => Yii::t('app', 'Прибыль'),
             'cancel_reason_id' => Yii::t('app', 'Причина отмены'),
-            'payment_type'=>Yii::t('app', 'Тип оплаты'),
-            'date_range'=>Yii::t('app', 'Даты'),
+            'payment_type' => Yii::t('app', 'Тип оплаты'),
+            'date_range' => Yii::t('app', 'Даты'),
         ];
     }
 
@@ -469,38 +469,37 @@ class Booking extends \yii\db\ActiveRecord
     {
         $string = Yii::t('app', 'В ожидании');
         $color = '#716FF3';
+        $action = Yii::$app->urlManager->createUrl("/admin/booking/refund?id=$this->id");
+        $action_string = 'Выплатить';
 
         if ($this->refund_status == self::REFUND_STATUS_RETURNED) {
             $string = Yii::t('app', 'Произведен возврат');
             $color = '#52c41a';
+            $action = Yii::$app->urlManager->createUrl("/admin/booking/view?id=$this->id");
+            $action_string = 'Детали';
         }
 
         if ($this->refund_status == self::REFUND_STATUS_PAID) {
             $string = Yii::t('app', 'Выплачен');
             $color = '#52c41a';
+            $action = Yii::$app->urlManager->createUrl("/admin/booking/view?id=$this->id");
+            $action_string = 'Детали';
+        }
+
+        if ($this->refund_status == self::REFUND_STATUS_EXPECTING) {
+            $string = Yii::t('app', 'В ожиданииы выплаты');
+            $color = '#52c41a';
+            $action = Yii::$app->urlManager->createUrl("/admin/booking/pay?id=$this->id");
+            $action_string = 'Выплатить';
         }
 
         if ($this->refund_status == self::REFUND_STATUS_QUERY) {
             $string = Yii::t('app', 'В ожидании возврата');
             $color = '#52c41a';
+            $action = Yii::$app->urlManager->createUrl("/admin/booking/refund?id=$this->id");
+            $action_string = 'Выплатить';
         }
-
-        if ($this->date_to < date('Y-m-d')) {
-            $string = Yii::t('app', 'Завершен');
-            $color = '#000000e0';
-        }
-
-        if ($this->date_from > date('Y-m-d')) {
-            $string = Yii::t('app', 'В ожидании');
-            $color = '#fa8c16';
-
-        }
-
-        if ($this->status == self::PAID_STATUS_CANCELED) {
-            $string = Yii::t('app', 'Отменен');
-            $color = '#f5222d';
-        }
-        return ["string" => $string, "color" => $color];
+        return ["string" => $string, "color" => $color, "action" => $action, "action_string" => $action_string];
     }
 
     public function cancelText()
