@@ -306,10 +306,11 @@ class Booking extends \yii\db\ActiveRecord
     public function bookingOwnerTitle()
     {
         $user = User::findOne($this->owner_id);
-        if ($user->name == null) {
-            return $user->username;
+        if (!$user) {
+            return null; // or return 'Unknown User'; depending on your needs
         }
-        return $user->name;
+
+        return $user->name ?? $user->username;
     }
 
     public function getTariff()
