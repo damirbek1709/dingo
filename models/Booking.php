@@ -310,7 +310,7 @@ class Booking extends \yii\db\ActiveRecord
             return null; // or return 'Unknown User'; depending on your needs
         }
 
-        return $user->name ?? $user->username;
+        return $user->name ?? $user->email;
     }
 
     public function getTariff()
