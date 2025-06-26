@@ -305,11 +305,10 @@ class Booking extends \yii\db\ActiveRecord
 
     public function bookingOwnerTitle()
     {
-        $user = User::findOne($this->owner_id);
-        if ($user->name) {
+        $user = User::findOne($this->owner_id)->name;
+        if ($user) {
             return $user->name;
         }
-        return $user->username;
     }
 
     public function getTariff()
