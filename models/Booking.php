@@ -468,14 +468,14 @@ class Booking extends \yii\db\ActiveRecord
 
     public function refundStatusString()
     {
-        $string = Yii::t('app', 'В ожидании выплаты');
+        $string = Yii::t('app', 'В ожидании <br>выплаты');
         $color = '#FA8C16';
         $action = Yii::$app->urlManager->createUrl("/admin/booking/refund?id=$this->id");
         $action_string = 'Выплатить';
 
         if ($this->return_status == self::REFUND_STATUS_RETURNED) {
-            $string = Yii::t('app', 'Произведен возврат');
-            $color = '#333';
+            $string = Yii::t('app', 'Произведен<br> возврат');
+            $color = '#52C41A';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/view?id=$this->id");
             $action_string = 'Детали';
         }
@@ -488,14 +488,14 @@ class Booking extends \yii\db\ActiveRecord
         }
 
         if ($this->return_status == self::REFUND_STATUS_EXPECTING) {
-            $string = Yii::t('app', 'В ожидании выплаты');
+            $string = Yii::t('app', 'В ожидании <br>выплаты');
             $color = '#FA8C16';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/pay?id=$this->id");
             $action_string = 'Выплатить';
         }
 
         if ($this->return_status == self::REFUND_STATUS_QUERY) {
-            $string = Yii::t('app', 'В ожидании возврата');
+            $string = Yii::t('app', 'В ожидании <br>возврата');
             $color = '#716FF3';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/refund?id=$this->id");
             $action_string = 'Выплатить';

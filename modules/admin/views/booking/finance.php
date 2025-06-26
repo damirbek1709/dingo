@@ -94,7 +94,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'header' => Yii::t('app', 'Действие'),
                     'buttons' => [
                         'view' => function ($url, $model) {
-                            return Html::tag('span', $model->refundStatusString()['action_string'], [
+                            return Html::tag('div', $model->refundStatusString()['action_string'], [
                                 'class' => 'table_action_button',
                                 'action' => $model->refundStatusString()['action']
                             ]);
