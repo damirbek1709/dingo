@@ -65,18 +65,26 @@ $this->params['breadcrumbs'][] = $this->title;
                 'transaction_number',
                 'currency',
                 [
+                    'attribute'=>'payment_type',
+                    'value'=>function ($model) {
+                        return "<span class='payment_type'>".$model->payment_type."</span>";
+                    },
+                    'format'=>'raw'
+                ],
+                
+                [
                     'attribute' => 'sum',
+                    'format'=>'raw',
                     'value' => function ($model) {
-                        return $model->sum . " " . $model->currency;
+                        return $model->sum . "<br>" . $model->currency;
                     }
                 ],
                 [
-                    'attribute' => 'status',
+                    'attribute' => 'retrun_status',
                     'value' => function ($model) {
-                        return $model->bookingStatusString()['string'];
+                        return $model->refundStatusString()['string'];
                     }
                 ],
-
                 [
                     'class' => ActionColumn::className(),
                     'template' => '{view}',
@@ -102,6 +110,9 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php $form->end(); ?>
 
 <style>
+    .payment_type{
+        text-transform: uppercase;
+    }
     .search-filter-form {
         width: 100%;
     }
