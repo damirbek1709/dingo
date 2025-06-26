@@ -300,7 +300,7 @@ class BookingController extends BaseController
         if ($model) {
             $model->cancel_date = date('Y-m-d');
             $model->status = Booking::PAID_STATUS_CANCELED;
-            $model->refund_status = Booking::REFUND_STATUS_QUERY;
+            $model->return_status = Booking::REFUND_STATUS_QUERY;
             $model->cancel_reason_id = $reason_id;
             if ($model->save(false)) {
                 $response['success'] = true;
