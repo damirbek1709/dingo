@@ -278,7 +278,7 @@ class BookingController extends Controller
                         $model->payment_type = $status_data['account']['type'];
                     }
                     if ($status_data['payment']['status'] == 'partially refunded' || $status_data['payment']['status'] == 'refunded') {
-                        $model->refund_status = Booking::REFUND_STATUS_RETURNED;
+                        $model->return_status = Booking::REFUND_STATUS_RETURNED;
                     }
                     $model->save(false);
                 }
