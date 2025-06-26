@@ -489,7 +489,7 @@ class Booking extends \yii\db\ActiveRecord
 
         if ($this->return_status == self::REFUND_STATUS_EXPECTING) {
             $string = Yii::t('app', 'В ожиданииы выплаты');
-            $color = '#52C41A';
+            $color = '#FA8C16';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/pay?id=$this->id");
             $action_string = 'Выплатить';
         }
