@@ -306,7 +306,7 @@ class Booking extends \yii\db\ActiveRecord
     public function bookingOwnerTitle()
     {
         $user = User::findOne($this->owner_id);
-        if ($user->name != '') {
+        if ($user->name !== '') {
             return $user->name;
         }
         return $user->username;
