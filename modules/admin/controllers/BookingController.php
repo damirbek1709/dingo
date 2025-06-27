@@ -1,6 +1,7 @@
 <?php
 
 namespace app\modules\admin\controllers;
+use app\models\Tariff;
 use Yii;
 use app\models\Booking;
 use app\models\BookingSearch;
@@ -10,6 +11,7 @@ use yii\filters\VerbFilter;
 use yii\helpers\Json;
 use yii\web\Response;
 use app\models\user\User;
+use DateTime;
 
 /**
  * BookingController implements the CRUD actions for Booking model.
@@ -248,18 +250,26 @@ class BookingController extends Controller
             }
 
             $sum = $model->sum;
-            $fee = 10;
-            $user_fee = User::findOne($model->owner_id)->fee_percent;
-            if ($user_fee) {
-                $fee = $user_fee;
+            $tariff = Tariff::findOne($model->tariff_id);
+            if ($tariff) {
+                $current_date = date('Y-m-d');
+                $book_checkin_date = $model->date_from;
+
+                $checkin = new DateTime($book_checkin_date);
+                $current = new DateTime($current_date);
+                $interval = $checkin->diff($current);
+                $sub_days = (int) $interval->format('%r%a');
+                if ($sub_days < $tariff->penalty_days) {
+                    $comission = $model->sum / 100 * $tariff->penalty_sum;
+                    $sum = $model->sum - $comission;
+                }
             }
-            $percent_sum = $sum / 100 * $fee;
-            $return_sum = ($sum - $percent_sum) * 100;
+            
 
             // Prepare request data
             $requestData = $this->prepareRefundData(
                 $model->transaction_number,
-                $return_sum,
+                $sum,
                 'KGS',
                 $model->special_comment,
                 Booking::MERCHANT_ID
