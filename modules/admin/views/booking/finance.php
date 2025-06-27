@@ -18,6 +18,57 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 <div class="oblast-update">
+    <div class="stats-grid">
+        <div class="stat-card">
+
+            <div class="stat-content">
+                <div class="label">Общий оборот</div>
+                <h3><?= Booking::totalPayments(); ?></h3>
+                <div class="stat-change positive">↗ 8.5% чем за прошлый месяц</div>
+            </div>
+            <div class="stat-icon calendar">📅</div>
+        </div>
+        <div class="stat-card">
+
+            <div class="stat-content">
+                <div class="label">Выплаты хостам</div>
+                <h3>1 056 418</h3>
+                <div class="stat-change positive">↗ 8.5% чем за прошлый месяц</div>
+            </div>
+            <div class="stat-icon host">🏠</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="label">Комиссия платформы</div>
+                <h3><?=Booking::totalComission()?></h3>
+                <div class="stat-change negative">↘ 4.3% чем за прошлый месяц</div>
+            </div>
+            <div class="stat-icon commission">💰</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-content">
+                <div class="label">Возвраты</div>
+                <h3>
+                    <?= Booking::totalRefunds(); ?>
+                    <!-- <span class="currency">KGS</span> -->
+                </h3>
+                <div class="stat-change negative">↘ 4.3% чем за прошлый месяц</div>
+            </div>
+            <div class="stat-icon refund">↩️</div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <div class="search-box">
+            <input type="text" placeholder="Поиск по № брони и названию объекта">
+        </div>
+        <div class="date-range">
+            08 Авг 2025 → 10 Сен 2025 📅
+        </div>
+        <button class="btn btn-secondary">Импорт в Excel</button>
+        <button class="btn btn-primary">⚙️ Фильтры</button>
+    </div>
 
     <div class="search-filter-bar">
         <?php $form = ActiveForm::begin([
@@ -95,7 +146,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     'buttons' => [
                         'view' => function ($url, $model) {
                             return Html::tag('span', $model->refundStatusString()['action_string'], [
-                                'class' => 'table_action_button',
+                                'class' => 'table_action_button payback',
                                 'action' => $model->refundStatusString()['action']
                             ]);
                         },
@@ -118,6 +169,14 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php $form->end(); ?>
 
 <style>
+    .payback {
+        background-color: #3676BC;
+        color: #fff;
+        padding: 3px 5px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
     .payment_type {
         text-transform: uppercase;
     }
@@ -314,6 +373,316 @@ $this->params['breadcrumbs'][] = $this->title;
         background: #2563eb;
         color: #fff;
         border-color: #2563eb;
+    }
+
+    .dashboard {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        display: flex;
+        /* align-items: center; */
+        gap: 15px;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-left: auto;
+    }
+
+    .stat-icon.calendar {
+        background-color: #e8f5e8;
+        color: #4a7c59;
+    }
+
+    .stat-icon.host {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .stat-icon.commission {
+        background-color: #cce7ff;
+        color: #0066cc;
+    }
+
+    .stat-icon.refund {
+        background-color: #e6e6fa;
+        color: #6a5acd;
+    }
+
+    .stat-content h3 {
+        font-size: 24px;
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 4px;
+    }
+
+    .stat-content .label {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+        font-weight: 400;
+        padding: 0;
+    }
+
+    .stat-change {
+        font-size: 12px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .stat-change.positive {
+        color: #22c55e;
+    }
+
+    .stat-change.negative {
+        color: #ef4444;
+    }
+
+    /* Controls */
+    .controls {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 12px 40px 12px 16px;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+    }
+
+    .search-box::after {
+        content: "🔍";
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+    }
+
+    .date-range {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        border: 1px solid #e1e5e9;
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 14px;
+        color: #333;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #2563eb;
+        border: 1px solid #e1e5e9;
+    }
+
+    .btn-secondary:hover {
+        background: #f8fafc;
+    }
+
+    /* Table */
+    .table-container {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        background: #f8f9fa;
+        padding: 16px 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    td {
+        padding: 16px 12px;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+
+    tr:hover {
+        background: #f9fafb;
+    }
+
+    .property-name {
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 2px;
+    }
+
+    .property-type {
+        color: #6b7280;
+        font-size: 12px;
+    }
+
+    .guest-name {
+        font-weight: 500;
+        color: #1f2937;
+    }
+
+    .tariff-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .tariff-non-refundable {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .tariff-refundable {
+        background: #dcfce7;
+        color: #16a34a;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .status-awaiting {
+        background: #e0e7ff;
+        color: #3730a3;
+    }
+
+    .status-awaiting-payment {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .status-upcoming {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .amount {
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .currency {
+        color: #6b7280;
+        font-size: 12px;
+        margin-left: 4px;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-payout {
+        background: #2563eb;
+        color: white;
+    }
+
+    .btn-payout:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-details {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .btn-details:hover {
+        background: #e5e7eb;
+    }
+
+    @media (max-width: 768px) {
+        .controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-box {
+            min-width: auto;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            min-width: 800px;
+        }
     }
 </style>
 

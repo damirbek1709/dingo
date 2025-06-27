@@ -85,6 +85,31 @@ class Booking extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function totalPayments()
+    {
+        return Booking::find()->where(['return_status' => null])->sum('sum');
+    }
+
+    public static function totalRefunds()
+    {
+        return Booking::find()->where(['return_status' => self::REFUND_STATUS_RETURNED])->sum('sum') ?? 0;
+    }
+
+    public static function totalComission()
+    {
+        $sum = 0;
+        $bookings = Booking::find()->where(['status' => [self::PAID_STATUS_PAID]])->all();
+        foreach ($bookings as $booking) {
+            $percent_fee = User::findOne($booking->owner_id)->fee_percent ?? 10;
+            $commision = $booking->sum / 100 * $percent_fee;
+            // if($booking->tariff->cancellation == Tariff::NO_CANCELLATION){
+            //     $commision = 0;
+            // }
+            $sum += $commision;
+        }
+        return $sum;
+    }
+
 
     public function getCancelReasonArray()
     {
