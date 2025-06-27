@@ -260,7 +260,7 @@ class BookingController extends Controller
                 $interval = $checkin->diff($current);
                 $sub_days = (int) $interval->format('%r%a');
                 if ($sub_days < $tariff->penalty_days) {
-                    $comission = $model->sum / 100 * $tariff->penalty_sum;
+                    $comission = $model->sum * $tariff->penalty_sum;
                     $sum = $model->sum - $comission;
                 }
             }

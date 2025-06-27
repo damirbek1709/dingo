@@ -195,7 +195,7 @@ class BookingController extends BaseController
         if ($status == 'success') {
             $booking = Booking::find()->where(['transaction_number' => $jsonData['payment']['id']])->one();
             $booking->status = Booking::PAID_STATUS_PAID;
-            $booking->return_status = Booking::REFUND_STATUS_EXPECTING;
+            //$booking->return_status = Booking::REFUND_STATUS_EXPECTING;
             $booking->save(false);
         }
         Yii::info('Webhook data received: ' . print_r($jsonData, true), 'webhook');
