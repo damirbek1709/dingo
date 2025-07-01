@@ -87,7 +87,7 @@ class Booking extends \yii\db\ActiveRecord
 
     public static function totalPayments()
     {
-        $bookings = Booking::find()->sum('sum') ?? 0;
+        $bookings = Booking::find()->where(['paid_status'=>self::PAID_STATUS_PAID])->sum('sum') ?? 0;
         $refunded = Booking::find()->where(['return_status' => self::REFUND_STATUS_RETURNED])->sum('cancellation_penalty_sum') ?? 0;
         return $bookings - $refunded;
     }
