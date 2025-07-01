@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="stat-content">
                 <div class="label">Выплаты хостам</div>
-                <h3>1 056 418</h3>
+                <h3>0</h3>
                 <div class="stat-change positive">↗ 8.5% чем за прошлый месяц</div>
             </div>
             <div class="stat-icon host">🏠</div>
