@@ -408,13 +408,26 @@ class ObjectController extends Controller
         $model = new Objects();
         $model->link_id = 1;
 
+        // Init city text for Select2 (used if validation fails)
+        $initCityText = '';
 
+        if ($model->load($this->request->post())) {
+            // Fetch city display name even before validation (to preserve on re-render)
+            if ($model->city_id) {
+                try {
+                    $city = Yii::$app->meili->connect()->index('region')->getDocument($model->city_id);
+                    $initCityText = $city['name'] ?? '';
+                    if (!empty($city['region'])) {
+                        $initCityText .= ' (' . $city['region'] . ')';
+                    }
+                } catch (\Throwable $e) {
+                    Yii::warning("Meilisearch city fetch failed: " . $e->getMessage(), 'meilisearch');
+                }
+            }
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->validate()) {
-                if ($model->city_id) {
-                    $client = Yii::$app->meili->connect();
-                    $city = $client->index('region')->getDocument($model->city_id);
+            // Continue with validation and save logic
+            if ($model->validate()) {
+                if ($model->city_id && isset($city)) {
                     $model->city = [
                         $city['name'] ?? '',
                         $city['name_en'] ?? '',
@@ -426,6 +439,7 @@ class ObjectController extends Controller
                         $this->translateOblast($city['region'])[1]
                     ];
                 }
+
                 if ($model->save(false)) {
                     $model->images = UploadedFile::getInstances($model, 'images');
                     if ($model->images) {
@@ -436,8 +450,10 @@ class ObjectController extends Controller
                             @unlink($path);
                         }
                     }
+
                     $model->ceo_doc = UploadedFile::getInstance($model, 'ceo_doc');
                     $model->financial_doc = UploadedFile::getInstance($model, 'financial_doc');
+
                     if ($model->ceo_doc) {
                         $dir = Yii::getAlias('@webroot/uploads/documents/' . $model->id . '/ceo');
                         if (!is_dir($dir)) {
@@ -445,9 +461,8 @@ class ObjectController extends Controller
                         }
                         $fileName = 'ceo_doc_' . time() . '.' . $model->ceo_doc->extension;
                         $uploadPath = $dir . '/' . $fileName;
-
                         if ($model->ceo_doc->saveAs($uploadPath)) {
-                            $model->ceo_doc = $fileName; // Save file name into DB (optional)
+                            $model->ceo_doc = $fileName;
                         }
                     }
 
@@ -458,65 +473,58 @@ class ObjectController extends Controller
                         }
                         $fileName = 'financial_doc_' . time() . '.' . $model->financial_doc->extension;
                         $uploadPath = $dir . '/' . $fileName;
-
                         if ($model->financial_doc->saveAs($uploadPath)) {
-                            $model->financial_doc = $fileName; // Save file name into DB (optional)
+                            $model->financial_doc = $fileName;
                         }
                     }
-                }
-                $object_arr = [
-                    'id' => $model->id,
-                    'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
-                    'type' => (int) $model->type,
-                    'reception' => (int) $model->reception,
-                    'city' => $model->city,
-                    'address' => [$model->address, $model->address_en, $model->address_ky],
-                    'description' => ["<div>" . $model->description . "</div>", "<div>" . $model->description_en . "</div>", "<div>" . $model->description_ky . "</div>"],
-                    'currency' => $model->currency,
-                    'phone' => $model->phone,
-                    'site' => $model->site,
-                    'check_in' => $model->check_in,
-                    'check_out' => $model->check_out,
-                    'lat' => (float) $model->lat,
-                    'lon' => (float) $model->lon,
-                    'early_check_in' => (bool) $model->early_check_in,
-                    'late_check_in' => (bool) $model->late_check_in,
-                    'internet_public' => (bool) $model->internet_public,
-                    'user_id' => (int) Yii::$app->user->id,
-                    'email' => $model->email,
-                    'features' => $model->features ?? [],
-                    'images' => $model->getPictures(),
-                    'general_room_count' => (int) $model->general_room_count,
-                    'status' => 0,
-                    'city_id' => (int) $model->city_id,
-                    'oblast_id' => $model->oblast_id,
-                ];
 
-                if ($index->addDocuments($object_arr)) {
-                    Yii::$app->session->set('new_object_data', $object_arr);
-                    return $this->redirect(['view', 'object_id' => $model->id]);
-                }
-            }
-        }
+                    // Push to Meilisearch
+                    $object_arr = [
+                        'id' => $model->id,
+                        'name' => array_values([$model->name, $model->name_en, $model->name_ky]),
+                        'type' => (int) $model->type,
+                        'reception' => (int) $model->reception,
+                        'city' => $model->city,
+                        'address' => [$model->address, $model->address_en, $model->address_ky],
+                        'description' => [
+                            "<div>" . $model->description . "</div>",
+                            "<div>" . $model->description_en . "</div>",
+                            "<div>" . $model->description_ky . "</div>"
+                        ],
+                        'currency' => $model->currency,
+                        'phone' => $model->phone,
+                        'site' => $model->site,
+                        'check_in' => $model->check_in,
+                        'check_out' => $model->check_out,
+                        'lat' => (float) $model->lat,
+                        'lon' => (float) $model->lon,
+                        'early_check_in' => (bool) $model->early_check_in,
+                        'late_check_in' => (bool) $model->late_check_in,
+                        'internet_public' => (bool) $model->internet_public,
+                        'user_id' => (int) Yii::$app->user->id,
+                        'email' => $model->email,
+                        'features' => $model->features ?? [],
+                        'images' => $model->getPictures(),
+                        'general_room_count' => (int) $model->general_room_count,
+                        'status' => 0,
+                        'city_id' => (int) $model->city_id,
+                        'oblast_id' => $model->oblast_id,
+                    ];
 
-        $initCityText = '';
-        if ($model->city_id) {
-            try {
-                $city = Yii::$app->meili->connect()->index('region')->getDocument($model->city_id);
-                $initCityText = $city['name'] ?? '';
-                if (!empty($city['region'])) {
-                    $initCityText .= ' (' . $city['region'] . ')';
+                    if ($index->addDocuments($object_arr)) {
+                        Yii::$app->session->set('new_object_data', $object_arr);
+                        return $this->redirect(['view', 'object_id' => $model->id]);
+                    }
                 }
-            } catch (\Throwable $e) {
-                Yii::warning("MeiliSearch fetch failed: " . $e->getMessage(), 'meilisearch');
             }
         }
 
         return $this->render('create', [
             'model' => $model,
-            'initCityText' => $initCityText,
+            'initCityText' => $initCityText, // ✅ needed for Select2 on re-render
         ]);
     }
+
 
     public function lastIncrement()
     {
