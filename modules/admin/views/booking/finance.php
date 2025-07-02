@@ -1,6 +1,8 @@
 <?php
 
 use app\models\Booking;
+use app\models\Objects;
+use app\models\Tariff;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
@@ -15,7 +17,9 @@ $this->title = Yii::t('app', 'Финансы');
 $this->params['breadcrumbs'][] = ['label' => 'Назад к списку', 'url' => ['/admin']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<!-- Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <div class="oblast-update">
     <div class="stats-grid">
@@ -23,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="stat-content">
                 <div class="label">Общий оборот</div>
-                <h3><?= Booking::totalPayments(); ?></h3>
+                <h3><?= Booking::totalPayments(); ?> KGS</h3>
                 <div class="stat-change positive">↗ 8.5% чем за прошлый месяц</div>
             </div>
             <div class="stat-icon calendar">📅</div>
@@ -32,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
             <div class="stat-content">
                 <div class="label">Выплаты хостам</div>
-                <h3>0</h3>
+                <h3>0 KGS</h3>
                 <div class="stat-change positive">↗ 8.5% чем за прошлый месяц</div>
             </div>
             <div class="stat-icon host">🏠</div>
@@ -40,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="stat-card">
             <div class="stat-content">
                 <div class="label">Комиссия платформы</div>
-                <h3><?=Booking::totalComission()?></h3>
+                <h3><?= Booking::totalComission() ?> KGS</h3>
                 <div class="stat-change negative">↘ 4.3% чем за прошлый месяц</div>
             </div>
             <div class="stat-icon commission">💰</div>
@@ -49,7 +53,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <div class="stat-content">
                 <div class="label">Возвраты</div>
                 <h3>
-                    <?= Booking::totalRefunds(); ?>
+                    <?= Booking::totalRefunds(); ?> KGS
                     <!-- <span class="currency">KGS</span> -->
                 </h3>
                 <div class="stat-change negative">↘ 4.3% чем за прошлый месяц</div>
@@ -58,28 +62,113 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
     </div>
 
+    <div class="filter-drawer" id="filterDrawer">
+        <div class="filter-header">
+            <span class="close-filters" id="closeFilters">&times;</span>
+            <h3><?php echo Yii::t('app', 'Фильтры') ?></h3>
+        </div>
+
+        <div class="filter-body">
+            <label><?php echo Yii::t('app', 'Статус') ?></label>
+            <?php
+            $statusOptions = [
+                Booking::REFUND_STATUS_QUERY => Yii::t('app', 'В ожидании возврата'),
+                Booking::REFUND_STATUS_PAID => Yii::t('app', 'В ожидании выплаты'),
+                Booking::REFUND_STATUS_RETURNED => Yii::t('app', 'Выплачен'),
+            ];
+            ?>
+
+            <?php $selectedStatuses = Yii::$app->request->get('status', []); ?>
+
+            <div class="status-tags">
+                <?php foreach ($statusOptions as $value => $label): ?>
+                    <label class="status-toggle">
+                        <input type="checkbox" name="status[]" value="<?= $value ?>" style="display: none;"
+                            class="status-checkbox" <?= in_array($value, $selectedStatuses) ? 'checked' : '' ?>>
+                        <span class="status-button<?= in_array($value, $selectedStatuses) ? ' active' : '' ?>">
+                            <?= $label ?>
+                        </span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+
+            <label><?= Yii::t('app', 'Тариф') ?></label>
+            <?php
+            $tariffOptions = [
+                Tariff::FREE_CANCELLATION_WITH_PENALTY => Yii::t('app', 'Возвратный'),
+                Tariff::NO_CANCELLATION => Yii::t('app', 'Не возвратный'),
+            ];
+            ?>
+
+            <?php $selectedTariff = Yii::$app->request->get('tariff', []); ?>
+
+            <div class="status-tags">
+                <?php foreach ($tariffOptions as $value => $label): ?>
+                    <label class="tariff-toggle">
+                        <input type="radio" name="tariff[]" value="<?= $value ?>" style="display: none;"
+                            class="tariff-checkbox" <?= in_array($value, $selectedTariff) ? 'checked' : '' ?>>
+                        <span class="tariff-button<?= in_array($value, $selectedTariff) ? ' active' : '' ?>">
+                            <?= $label ?>
+                        </span>
+                    </label>
+                <?php endforeach; ?>
+            </div>
+
+
+            <label><?= Yii::t('app', 'Тип оплаты') ?></label>
+            <?= Html::dropDownList('payment_id', '', Objects::paymentListString(), [
+                'prompt' => 'Выберите тип оплаты',
+                'class' => 'filter-input',
+                'id' => 'payment-select',
+                'data-object' => ''
+            ]) ?>
+
+            <label><?php echo Yii::t('app', 'Дата прибытия') ?></label>
+            <input type="date" name="date_from" value="<?= $date_from ?>" class="filter-input" />
+
+            <label><?php echo Yii::t('app', 'Дата выезда') ?></label>
+            <input type="date" name="date_to" value="<?= $date_to ?>" class="filter-input" />
+
+            <div class="reset-filters">
+                <button type="submit" class="save-button"
+                    style="margin:0 20px 0 0"><?php echo Yii::t('app', 'Применить') ?></button>
+
+                <a href="#" class="reset-filter-link"><?php echo Yii::t('app', 'Сбросить все фильтры') ?></a>
+            </div>
+        </div>
+    </div>
+
     <!-- Controls -->
+    <?php $form = ActiveForm::begin([
+        'action' => ['booking/finance'],
+        'method' => 'get',
+        'options' => ['class' => 'search-filter-form'],
+    ]); ?>
     <div class="controls">
         <div class="search-box">
-            <input type="text" placeholder="Поиск по № брони и названию объекта">
+            <?= Html::textInput('query_word', $query_word, [
+                'placeholder' => 'Поиск по № брони и названию объекта',
+                'class' => 'guest-input'
+            ]) ?>
+            <button type="submit" class="search-icon"></button>
         </div>
-        <div class="date-range">
-            08 Авг 2025 → 10 Сен 2025 📅
+
+        <div class="date-range-container">
+            <div class="date-range-inputs">
+                <input type="date" name="checkin" id="checkin" class="date-input" placeholder="<?= $date_from_string ?>" value="<?= $date_from ?>">
+                <span class="date-separator">→</span>
+                <input type="date" name="checkout" id="checkout" class="date-input" placeholder="<?= $date_to_string; ?>" value="<?= $date_to; ?>">
+                <span class="calendar-icon">📅</span>
+            </div>
         </div>
-        <button class="btn btn-secondary">Импорт в Excel</button>
-        <button class="btn btn-primary">⚙️ Фильтры</button>
+        <button class="btn btn-secondary btn-excel">Импорт в Excel</button>
+        <span class="filter-button" id="open-filters">
+            <?= Yii::t('app', 'Фильтры') ?>
+        </span>
     </div>
+    <?php $form->end(); ?>
 
-    <div class="search-filter-bar">
-        <?php $form = ActiveForm::begin([
-            'method' => 'get',
-            'options' => ['class' => 'search-filter-form'],
-        ]); ?>
-
-        <?php $form->end(); ?>
-
-    </div>
-
+   
     <div class="booking-index">
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
@@ -169,6 +258,10 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php $form->end(); ?>
 
 <style>
+    .btn-excel {
+        border-radius: 20px !important;
+    }
+
     .payback {
         background-color: #3676BC;
         color: #fff;
@@ -344,7 +437,6 @@ $this->params['breadcrumbs'][] = $this->title;
     .filter-body label {
         font-weight: normal;
         font-size: 16px;
-        margin-bottom: 0;
     }
 
     .status-tags {
@@ -356,6 +448,7 @@ $this->params['breadcrumbs'][] = $this->title;
     .status-toggle {
         display: inline-block;
         position: relative;
+        margin-bottom: 10px;
     }
 
     .status-button {
@@ -367,9 +460,28 @@ $this->params['breadcrumbs'][] = $this->title;
         color: #444;
         background: #fff;
         user-select: none;
+        font-weight: 400;
+    }
+
+    .tariff-button {
+        padding: 6px 14px;
+        border: 1px solid #ccc;
+        border-radius: 16px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #444;
+        background: #fff;
+        user-select: none;
+        font-weight: 400;
     }
 
     .status-toggle input:checked+.status-button {
+        background: #2563eb;
+        color: #fff;
+        border-color: #2563eb;
+    }
+
+    .tariff-toggle input:checked+.tariff-button {
         background: #2563eb;
         color: #fff;
         border-color: #2563eb;
@@ -476,23 +588,6 @@ $this->params['breadcrumbs'][] = $this->title;
         position: relative;
     }
 
-    .search-box input {
-        width: 100%;
-        padding: 12px 40px 12px 16px;
-        border: 1px solid #e1e5e9;
-        border-radius: 8px;
-        font-size: 14px;
-        background: white;
-    }
-
-    .search-box::after {
-        content: "🔍";
-        position: absolute;
-        right: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #999;
-    }
 
     .date-range {
         display: flex;
@@ -666,6 +761,68 @@ $this->params['breadcrumbs'][] = $this->title;
         background: #e5e7eb;
     }
 
+    .search-filter-form {
+        width: 100%;
+    }
+
+    .search-filter-bar {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 25px;
+        background: #f9f9f9;
+        font-family: sans-serif;
+    }
+
+    .modal-body {
+        padding: 0 !important;
+    }
+
+    .date-range-container {
+        font-family: sans-serif;
+        max-width: 400px;
+    }
+
+    .date-range-label {
+        margin-bottom: 8px;
+        color: #666;
+        font-size: 14px;
+    }
+
+    .date-range-inputs {
+        display: flex;
+        align-items: center;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        padding: 8px 12px;
+        background: #fff;
+    }
+
+    .date-input {
+        border: none;
+        background: transparent;
+        outline: none;
+        font-size: 14px;
+        color: #555;
+        width: 100%;
+    }
+
+    .date-separator {
+        margin: 0 8px;
+        color: #999;
+        font-size: 16px;
+    }
+
+    .calendar-icon {
+        margin-left: 8px;
+        color: #aaa;
+        font-size: 16px;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        opacity: 0;
+    }
+
     @media (max-width: 768px) {
         .controls {
             flex-direction: column;
@@ -687,6 +844,12 @@ $this->params['breadcrumbs'][] = $this->title;
 </style>
 
 <script>
+    const today = new Date();
+
+    let loadedMonths = 0;
+    let allDays = [];
+    let monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+
     $(document).ready(function () {
         $('#open-filters').on('click', function () {
             $('#filterDrawer').addClass('open');
@@ -740,6 +903,14 @@ $this->params['breadcrumbs'][] = $this->title;
             $(this).toggleClass('active', !isChecked);
         });
 
+        $(document).on('click', '.tariff-button', function (e) {
+            e.preventDefault();
+            const $checkbox = $(this).siblings('input[type=radio]');
+            const isChecked = $checkbox.prop('checked');
+
+            $checkbox.prop('checked', !isChecked);
+        });
+
         $('.reset-filter-link').on('click', function (e) {
             e.preventDefault();
 
@@ -767,5 +938,56 @@ $this->params['breadcrumbs'][] = $this->title;
                 $drawer.removeClass('open');
             }
         });
+    });
+
+    function isDateInRange(dateStr, from, to) {
+        const parse = str => new Date(str.split('-').reverse().join('-'));
+        const d = parse(dateStr);
+        return d >= parse(from) && d <= parse(to);
+    }
+
+    function generateMonthData(offset) {
+        const baseDate = new Date(today.getFullYear(), today.getMonth() + offset, 1);
+        const year = baseDate.getFullYear();
+        const month = baseDate.getMonth();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const days = [];
+        const start = (year === today.getFullYear() && month === today.getMonth()) ? today.getDate() : 1;
+        for (let d = start; d <= daysInMonth; d++) {
+            const date = new Date(year, month, d);
+            const dayName = date.toLocaleDateString('ru', { weekday: 'short' });
+            const fullDate = `${String(d).padStart(2, '0')}-${String(month + 1).padStart(2, '0')}-${year}`;
+            days.push({ date: d, dayName: dayName.charAt(0).toUpperCase() + dayName.slice(1), fullDate, isToday: date.toDateString() === today.toDateString(), month, year });
+        }
+        return days;
+    }
+
+    function updateMonthHeader(scrollLeft) {
+        const dayHeaders = document.querySelectorAll('#day-headers .day-header');
+        for (let i = 0; i < dayHeaders.length; i++) {
+            const rect = dayHeaders[i].getBoundingClientRect();
+            const parentRect = document.getElementById('scroll-wrapper').getBoundingClientRect();
+            if (rect.right > parentRect.left + 60) {
+                const monthIndex = allDays[i].month;
+                const year = allDays[i].year;
+                document.getElementById('month-header').textContent = `${monthNames[monthIndex]} ${year}`;
+                break;
+            }
+        }
+    }
+
+    flatpickr("#checkin", {
+        dateFormat: "d-m-Y",
+        locale: "ru",
+        //minDate: "today", // ⛔ Prevent past dates
+        onChange: function (selectedDates, dateStr, instance) {
+            checkoutCalendar.set('minDate', dateStr); // ✅ Set checkout min date
+        }
+    });
+
+    const checkoutCalendar = flatpickr("#checkout", {
+        dateFormat: "d-m-Y",
+        locale: "ru",
+        //minDate: "today" // ⛔ Prevent past dates
     });
 </script>

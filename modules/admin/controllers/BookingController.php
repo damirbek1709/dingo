@@ -264,7 +264,7 @@ class BookingController extends Controller
                     $sum = $model->sum - $comission;
                 }
             }
-            
+
 
             // Prepare request data
             $requestData = $this->prepareRefundData(
@@ -366,26 +366,41 @@ class BookingController extends Controller
 
     public function actionFinance()
     {
+        $query_word = Yii::$app->request->get('query_word') ?? "";
         $client = Yii::$app->meili->connect();
-        $index = $client->index('object');
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
-        //$current_date = date('Y-m-d');
         $active = "all_active";
+        $client = Yii::$app->meili->connect();
+        $res = $client->index('object')->search($query_word, [
+            'limit' => 10000
+        ]);
 
-        $date_from = Yii::$app->request->get('date_from') ? Yii::$app->request->get('date_from') : null;
-        if ($date_from) {
+        $object_arr = [];
+        $hits = $res->getHits();
+        foreach ($hits as $item) {
+            $object_arr[] = $item['id'];
+        }
+
+        $dataProvider->query->andFilterWhere(['object_id' => $object_arr])
+            ->orFilterWhere(['transaction_number' => $query_word]);
+
+        if (Yii::$app->request->get('checkin')) {
+            $date_from = date('Y-m-d', strtotime(Yii::$app->request->get('checkin')));
             $dataProvider->query->andFilterWhere(['>=', 'date_from', $date_from]);
+            $date_from_string = Yii::$app->request->get('checkin');
+        } else {
+            $date_from = null;
+            $date_from_string = "От";
         }
 
-        $date_to = Yii::$app->request->get('date_to') ? Yii::$app->request->get('date_to') : null;
-        if ($date_to) {
-            $dataProvider->query->andFilterWhere(['<', 'date_to', $date_to]);
-        }
-
-        $date_book = Yii::$app->request->get('book_date') ? Yii::$app->request->get('book_date') : null;
-        if ($date_book) {
-            $dataProvider->query->andFilterWhere(['created_at' => $date_book]);
+        if (Yii::$app->request->get('checkout')) {
+            $date_to = date('Y-m-d', strtotime(Yii::$app->request->get('checkout')));
+            $dataProvider->query->andFilterWhere(['<=', 'date_to', $date_to]);
+            $date_to_string = Yii::$app->request->get('checkout');
+        } else {
+            $date_to = null;
+            $date_to_string = "До";
         }
 
         // $status_arr = Yii::$app->request->get('status', []);
@@ -418,7 +433,9 @@ class BookingController extends Controller
             'active' => $active,
             'date_from' => $date_from,
             'date_to' => $date_to,
-            'date_book' => $date_book,
+            'date_from_string' => $date_from_string,
+            'date_to_string' => $date_to_string,
+            'query_word' => $query_word
         ]);
     }
 

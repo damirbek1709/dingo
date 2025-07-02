@@ -598,7 +598,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
         color: red;
     }
 
-    <style>.date-range-container {
+    .date-range-container {
         font-family: sans-serif;
         max-width: 400px;
     }

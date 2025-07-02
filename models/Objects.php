@@ -635,6 +635,11 @@ class Objects extends \yii\db\ActiveRecord
         return ArrayHelper::map(PaymentType::find()->all(), 'id', 'id');
     }
 
+    public static function paymentListString()
+    {
+        return ArrayHelper::map(PaymentType::find()->all(), 'id', 'title');
+    }
+
     public function getImageById($id)
     {
         $imageQuery = self::find();
