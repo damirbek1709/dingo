@@ -11,7 +11,7 @@ use kartik\select2\Select2;
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
 /** @var yii\widgets\ActiveForm $form */
-$model->city_id = $model->city ? $model->city[0] : "";
+//$model->city_id = $model->city ? $model->city[0] : "";
 ?>
 
 
@@ -47,7 +47,7 @@ $model->city_id = $model->city ? $model->city[0] : "";
 
 
         <?= $form->field($model, 'city_id')->widget(Select2::class, [
-            'initValueText' => $initCityText, // ✅ keeps display name visible on failed form submit
+            'initValueText' => $initCityText,
             'options' => [
                 'placeholder' => 'Введите город или село...',
                 'class' => 'form-input'
