@@ -499,8 +499,22 @@ class ObjectController extends Controller
             }
         }
 
+        $initCityText = '';
+        if ($model->city_id) {
+            try {
+                $city = Yii::$app->meili->connect()->index('region')->getDocument($model->city_id);
+                $initCityText = $city['name'] ?? '';
+                if (!empty($city['region'])) {
+                    $initCityText .= ' (' . $city['region'] . ')';
+                }
+            } catch (\Throwable $e) {
+                Yii::warning("MeiliSearch fetch failed: " . $e->getMessage(), 'meilisearch');
+            }
+        }
+
         return $this->render('create', [
-            'model' => $model
+            'model' => $model,
+            'initCityText' => $initCityText,
         ]);
     }
 

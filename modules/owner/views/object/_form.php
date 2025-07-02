@@ -45,27 +45,9 @@ $model->city_id = $model->city ? $model->city[0] : "";
             ]
         ) ?>
 
-        <?php
-        $initCityText = '';
-        if (!empty($model->city_id)) {
-            try {
-                $client = Yii::$app->meili->connect();
-                $index = $client->index('region');
-                $searchResult = $index->getDocument($model->city_id);
 
-                if (isset($searchResult['name'])) {
-                    $initCityText = $searchResult['name'];
-                    if (!empty($searchResult['region'])) {
-                        $initCityText .= ' (' . $searchResult['region'] . ')';
-                    }
-                }
-            } catch (\Exception $e) {
-                Yii::error("Failed to get Meilisearch region name: " . $e->getMessage(), 'meilisearch');
-            }
-        }
-        ?>
         <?= $form->field($model, 'city_id')->widget(Select2::class, [
-            'initValueText' => $initCityText, // ✅ this keeps the selection after failed validation
+            'initValueText' => $initCityText, // ✅ keeps display name visible on failed form submit
             'options' => [
                 'placeholder' => 'Введите город или село...',
                 'class' => 'form-input'
