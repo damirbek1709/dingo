@@ -486,4 +486,11 @@ $cityName = $model->city ? $model->city[0] : "";
         margin-bottom: 30px;
         margin-top: -20px;
     }
+
+    .help-block {
+        color: #dc3545;
+        font-size: 14px;
+        margin: 5px 0 25px;
+        padding-left: 20px;
+    }
 </style>

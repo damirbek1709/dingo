@@ -394,7 +394,7 @@ use kartik\select2\Select2;
     .help-block {
         color: #dc3545;
         font-size: 14px;
-        margin-top: 5px;
+        margin: 5px 0 25px;
         padding-left: 20px;
     }
 
