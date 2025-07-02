@@ -44,9 +44,28 @@ $model->city_id = $model->city ? $model->city[0] : "";
                 'class' => 'form-input'
             ]
         ) ?>
-        
 
-        <?php echo $form->field($model, 'city_id')->widget(Select2::class, [
+        <?php
+        $initCityText = '';
+        if (!empty($model->city_id)) {
+            try {
+                $client = Yii::$app->meili->connect();
+                $index = $client->index('region');
+                $searchResult = $index->getDocument($model->city_id);
+
+                if (isset($searchResult['name'])) {
+                    $initCityText = $searchResult['name'];
+                    if (!empty($searchResult['region'])) {
+                        $initCityText .= ' (' . $searchResult['region'] . ')';
+                    }
+                }
+            } catch (\Exception $e) {
+                Yii::error("Failed to get Meilisearch region name: " . $e->getMessage(), 'meilisearch');
+            }
+        }
+        ?>
+        <?= $form->field($model, 'city_id')->widget(Select2::class, [
+            'initValueText' => $initCityText, // ✅ this keeps the selection after failed validation
             'options' => [
                 'placeholder' => 'Введите город или село...',
                 'class' => 'form-input'
@@ -59,19 +78,18 @@ $model->city_id = $model->city ? $model->city[0] : "";
                     'delay' => 250,
                     'data' => new JsExpression('function(params) { return {q:params.term}; }'),
                     'processResults' => new JsExpression('function (data) {
+                return {
+                    results: $.map(data.results, function (item) {
                         return {
-                            results: $.map(data.results, function (item) {
-                                return {
-                                    id: item.id,
-                                    text: item.display // <- Make sure this goes into `text`
-                                };
-                            })
+                            id: item.id,
+                            text: item.display
                         };
-                    }'),
+                    })
+                };
+            }'),
                 ],
             ],
-        ]);
-        ?>
+        ]) ?>
 
         <?= $form->field($model, 'address')->textInput(['maxlength' => true, 'placeholder' => Yii::t('app', 'Укажите адрес')]) ?>
         <div class="address_hint"><b>Пример:</b>Улица Комсомольская 27</div>
