@@ -41,6 +41,7 @@ class Booking extends \yii\db\ActiveRecord
     const PAID_STATUS_CANCELED = 2;
     const PAID_STATUS_CANCEL_INQUIRY = 3;
 
+    const REFUND_STATUS_DEFAULT = 0;
     const REFUND_STATUS_EXPECTING = 1;
     const REFUND_STATUS_RETURNED = 2;
     const REFUND_STATUS_PAID = 3;
@@ -75,7 +76,8 @@ class Booking extends \yii\db\ActiveRecord
         return [
             [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status', 'owner_id'], 'required'],
             [['object_id', 'room_id', 'status', 'cancellation_type', 'cancel_reason_id', 'return_status'], 'integer'],
-            [['status','return_status'], 'default', 'value' => 1],
+            [['status'], 'default', 'value' => 1],
+            [['return_status'], 'default', 'value' => 0],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
             [['date_from', 'date_to', 'cancel_date', 'comission', 'income'], 'safe'],
