@@ -403,9 +403,11 @@ class BookingController extends Controller
             $date_to_string = "До";
         }
 
-        $status_arr = Yii::$app->request->get('status', null);
+        $status_arr = Yii::$app->request->get('status', []);
         if ($status_arr) {
             $dataProvider->query->andFilterWhere(['return_status' => $status_arr]);
+        } else {
+            $dataProvider->query->andFilterWhere(['return_status' => null]);
         }
         return $this->render('finance', [
             'searchModel' => $searchModel,
@@ -431,10 +433,10 @@ class BookingController extends Controller
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $jsonData,
             CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Accept: application/json',
-                'Content-Length: ' . strlen($jsonData)
-            ],
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    'Content-Length: ' . strlen($jsonData)
+                ],
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_TIMEOUT => 30,
         ]);
@@ -510,10 +512,10 @@ class BookingController extends Controller
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $jsonData,
             CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Accept: application/json',
-                'Content-Length: ' . strlen($jsonData)
-            ],
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    'Content-Length: ' . strlen($jsonData)
+                ],
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_TIMEOUT => 30,
         ]);
@@ -659,10 +661,10 @@ class BookingController extends Controller
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $jsonData,
             CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-                'Accept: application/json',
-                'Content-Length: ' . strlen($jsonData)
-            ],
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    'Content-Length: ' . strlen($jsonData)
+                ],
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_TIMEOUT => 30,
         ]);

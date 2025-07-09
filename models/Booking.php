@@ -75,7 +75,7 @@ class Booking extends \yii\db\ActiveRecord
         return [
             [['object_id', 'room_id', 'tariff_id', 'sum', 'date_from', 'date_to', 'status', 'owner_id'], 'required'],
             [['object_id', 'room_id', 'status', 'cancellation_type', 'cancel_reason_id', 'return_status'], 'integer'],
-            [['status'], 'default', 'value' => 1],
+            [['status','return_status'], 'default', 'value' => 1],
             [['created_at'], 'default', 'value' => date('Y-m-d')],
             [['sum', 'cancellation_penalty_sum'], 'number'],
             [['date_from', 'date_to', 'cancel_date', 'comission', 'income'], 'safe'],
