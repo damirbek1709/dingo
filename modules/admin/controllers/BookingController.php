@@ -385,48 +385,28 @@ class BookingController extends Controller
         $dataProvider->query->andFilterWhere(['object_id' => $object_arr])
             ->orFilterWhere(['transaction_number' => $query_word]);
 
-        if (Yii::$app->request->get('checkin')) {
-            $date_from = date('Y-m-d', strtotime(Yii::$app->request->get('checkin')));
+        if (Yii::$app->request->get('date_from')) {
+            $date_from = date('Y-m-d', strtotime(Yii::$app->request->get('date_from')));
             $dataProvider->query->andFilterWhere(['>=', 'date_from', $date_from]);
-            $date_from_string = Yii::$app->request->get('checkin');
+            $date_from_string = Yii::$app->request->get('date_from');
         } else {
             $date_from = null;
             $date_from_string = "От";
         }
 
-        if (Yii::$app->request->get('checkout')) {
-            $date_to = date('Y-m-d', strtotime(Yii::$app->request->get('checkout')));
+        if (Yii::$app->request->get('date_to')) {
+            $date_to = date('Y-m-d', strtotime(Yii::$app->request->get('date_to')));
             $dataProvider->query->andFilterWhere(['<=', 'date_to', $date_to]);
-            $date_to_string = Yii::$app->request->get('checkout');
+            $date_to_string = Yii::$app->request->get('date_to');
         } else {
             $date_to = null;
             $date_to_string = "До";
         }
 
-        // $status_arr = Yii::$app->request->get('status', []);
-        // if ($status_arr) {
-        //     $dataProvider->query->andFilterWhere(['status' => $status_arr]);
-        // }
-        // if ($status_arr) {
-        //     switch ($status) {
-        //         case "future":
-        //             $dataProvider->query->andFilterWhere(['>=', 'date_from', $current_date]);
-        //             $active = "future_active";
-        //             break;
-        //         case "past":
-        //             $dataProvider->query->andFilterWhere(['<', 'date_to', $current_date]);
-        //             $active = "past_active";
-        //             break;
-        //         case "canceled":
-        //             $dataProvider->query->andFilterWhere(['status' => Booking::PAID_STATUS_CANCELED]);
-        //             $active = "cancel_active";
-        //             break;
-        //         default:
-        //             $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
-
-        //     }
-        // }
-
+        $status_arr = Yii::$app->request->get('status', null);
+        if ($status_arr) {
+            $dataProvider->query->andFilterWhere(['return_status' => $status_arr]);
+        }
         return $this->render('finance', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

@@ -55,7 +55,6 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
 <script>
     const rooms = <?php echo json_encode($rooms, JSON_UNESCAPED_UNICODE); ?>;
-    console.log(rooms);
     const today = new Date();
     let tariff_list = {};
 

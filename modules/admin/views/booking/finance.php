@@ -22,6 +22,11 @@ $this->params['breadcrumbs'][] = $this->title;
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <div class="oblast-update">
+    <?php $form = ActiveForm::begin([
+        'action' => ['booking/finance'],
+        'method' => 'get',
+        'options' => ['class' => 'search-filter-form'],
+    ]); ?>
     <div class="stats-grid">
         <div class="stat-card">
 
@@ -124,10 +129,11 @@ $this->params['breadcrumbs'][] = $this->title;
             ]) ?>
 
             <label><?php echo Yii::t('app', 'Дата прибытия') ?></label>
-            <input type="date" name="date_from" value="<?= $date_from ?>" class="filter-input" />
+            <input lang="ru" type="date" name="checkin" value="<?= $date_from ?>" class="filter-input" />
 
             <label><?php echo Yii::t('app', 'Дата выезда') ?></label>
-            <input type="date" name="date_to" value="<?= $date_to ?>" class="filter-input" />
+            <input lang="ru" type="date" name="checkout" value="<?= $date_to ?>" class="filter-input" />
+
 
             <div class="reset-filters">
                 <button type="submit" class="save-button"
@@ -139,11 +145,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 
     <!-- Controls -->
-    <?php $form = ActiveForm::begin([
-        'action' => ['booking/finance'],
-        'method' => 'get',
-        'options' => ['class' => 'search-filter-form'],
-    ]); ?>
+
     <div class="controls">
         <div class="search-box">
             <?= Html::textInput('query_word', $query_word, [
@@ -155,10 +157,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="date-range-container">
             <div class="date-range-inputs">
-                <input type="date" name="checkin" id="checkin" class="date-input" placeholder="<?= $date_from_string ?>" value="<?= $date_from ?>">
+                <input lang="ru" type="date" name="date_from" id="checkin" class="date-input"
+                    placeholder="<?= $date_from_string ?>"
+                    value="<?= $date_from ? date('Y-m-d', strtotime($date_from)) : 'От' ?>">
+
                 <span class="date-separator">→</span>
-                <input type="date" name="checkout" id="checkout" class="date-input" placeholder="<?= $date_to_string; ?>" value="<?= $date_to; ?>">
-                <span class="calendar-icon">📅</span>
+
+                <input lang="ru" type="date" name="date_to" id="checkout" class="date-input" placeholder="<?= $date_to_string ?>"
+                    value="<?= $date_to ? date('Y-m-d', strtotime($date_to)) : 'До' ?>">
+
+                <span class="calendar-icon"></span>
             </div>
         </div>
         <button class="btn btn-secondary btn-excel">Импорт в Excel</button>
@@ -168,7 +176,7 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     <?php $form->end(); ?>
 
-   
+
     <div class="booking-index">
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
@@ -178,28 +186,28 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'attribute' => 'object_id',
                     'value' => function ($model) {
-                        return $model->bookingObjectTitle();
-                    }
+                    return $model->bookingObjectTitle();
+                }
                 ],
                 [
                     'attribute' => 'owner_id',
                     'value' => function ($model) {
-                        return $model->bookingOwnerTitle();
-                    }
+                    return $model->bookingOwnerTitle();
+                }
                 ],
 
                 [
                     'attribute' => 'tariff_id',
                     'value' => function ($model) {
-                        return $model->bookingTariffTitle();
-                    }
+                    return $model->bookingTariffTitle();
+                }
                 ],
                 [
                     'attribute' => 'date_range',
                     'format' => 'raw',
                     'value' => function ($model) {
-                        return $model->dateFormat($model->date_from) . " - <br>" . $model->dateFormat($model->date_to);
-                    }
+                    return $model->dateFormat($model->date_from) . " - <br>" . $model->dateFormat($model->date_to);
+                }
 
                 ],
                 'transaction_number',
@@ -207,8 +215,8 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'attribute' => 'payment_type',
                     'value' => function ($model) {
-                        return "<span class='payment_type'>" . $model->payment_type . "</span>";
-                    },
+                    return "<span class='payment_type'>" . $model->payment_type . "</span>";
+                },
                     'format' => 'raw'
                 ],
 
@@ -216,17 +224,17 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'sum',
                     'format' => 'raw',
                     'value' => function ($model) {
-                        return $model->sum . "<br>" . $model->currency;
-                    }
+                    return $model->sum . "<br>" . $model->currency;
+                }
                 ],
                 [
                     'attribute' => 'return_status',
                     'format' => 'raw',
                     'label' => 'Статус',
                     'value' => function ($model) {
-                        $color = $model->refundStatusString()['color'];
-                        return "<div style='color:$color;border:1px solid $color;display:inline-block;background-color:rgba(113, 111, 243, 0.05);padding:2px 3px;border-radius:4px'><span>" . $model->refundStatusString()['string'] . "</span></div>";
-                    }
+                    $color = $model->refundStatusString()['color'];
+                    return "<div style='color:$color;border:1px solid $color;display:inline-block;background-color:rgba(113, 111, 243, 0.05);padding:2px 3px;border-radius:4px'><span>" . $model->refundStatusString()['string'] . "</span></div>";
+                }
                 ],
                 [
                     'class' => ActionColumn::className(),
@@ -234,11 +242,11 @@ $this->params['breadcrumbs'][] = $this->title;
                     'header' => Yii::t('app', 'Действие'),
                     'buttons' => [
                         'view' => function ($url, $model) {
-                            return Html::tag('span', $model->refundStatusString()['action_string'], [
-                                'class' => 'table_action_button payback',
-                                'action' => $model->refundStatusString()['action']
-                            ]);
-                        },
+                        return Html::tag('span', $model->refundStatusString()['action_string'], [
+                            'class' => 'table_action_button payback',
+                            'action' => $model->refundStatusString()['action']
+                        ]);
+                    },
                     ]
                 ],
             ],
@@ -247,19 +255,14 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
 </div>
 
-<?php $form = ActiveForm::begin([
-    //'action' => ['booking/index', 'object_id' => $object_id],
-    'method' => 'get',
-    'options' => ['class' => 'search-filter-form'],
-]);
-?>
 
-
-<?php $form->end(); ?>
 
 <style>
     .btn-excel {
         border-radius: 20px !important;
+        padding: 10px 20px !important;
+        display: flex;
+        align-items: center;
     }
 
     .payback {
@@ -622,7 +625,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     .btn-secondary {
         background: white;
-        color: #2563eb;
+        color: #3676bc;
         border: 1px solid #e1e5e9;
     }
 
@@ -841,6 +844,24 @@ $this->params['breadcrumbs'][] = $this->title;
             min-width: 800px;
         }
     }
+
+    input[type="date"] {
+        position: relative;
+        cursor: pointer;
+    }
+
+    input[type="date"]::-webkit-calendar-picker-indicator {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: auto;
+        height: auto;
+        color: transparent;
+        background: transparent;
+        cursor: pointer;
+    }
 </style>
 
 <script>
@@ -976,18 +997,18 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     }
 
-    flatpickr("#checkin", {
-        dateFormat: "d-m-Y",
-        locale: "ru",
-        //minDate: "today", // ⛔ Prevent past dates
-        onChange: function (selectedDates, dateStr, instance) {
-            checkoutCalendar.set('minDate', dateStr); // ✅ Set checkout min date
-        }
-    });
+    // flatpickr("#checkin", {
+    //     dateFormat: "d-m-Y",
+    //     locale: "ru",
+    //     //minDate: "today", // ⛔ Prevent past dates
+    //     onChange: function (selectedDates, dateStr, instance) {
+    //         checkoutCalendar.set('minDate', dateStr); // ✅ Set checkout min date
+    //     }
+    // });
 
-    const checkoutCalendar = flatpickr("#checkout", {
-        dateFormat: "d-m-Y",
-        locale: "ru",
-        //minDate: "today" // ⛔ Prevent past dates
-    });
+    // const checkoutCalendar = flatpickr("#checkout", {
+    //     dateFormat: "d-m-Y",
+    //     locale: "ru",
+    //     //minDate: "today" // ⛔ Prevent past dates
+    // });
 </script>

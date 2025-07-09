@@ -600,6 +600,7 @@ a.desc:after {
     overflow: hidden;
     position: relative;
     /* text-align: center; */
+    margin-bottom: 15px;
 }
 
 .photo-item img {
@@ -1978,6 +1979,11 @@ a.logout-button:hover {
         text-align: center;
         width: auto;
     }
+
+    .modal-dialog {
+        width: 95%;
+        margin: 10px auto;
+    }
     .modal-body{
         padding:20px 0;
     }
@@ -2030,4 +2036,11 @@ a.logout-button:hover {
 
 .breadcrumb a{
     color:rgba(0, 0, 0, 0.45);
+}
+.calendar-icon{
+    width: 20px;
+    height: 20px;
+    background-image: url('calendar.svg');
+    background-repeat: no-repeat;
+    display: inline-block;
 }
