@@ -261,9 +261,6 @@ $this->params['breadcrumbs'][] = $this->title;
 <style>
     @media (max-width: 576px) {
         .grid-view {
-            border-radius: 10px;
-            border: 1px solid #ccc;
-            background-color: #00000005;
             overflow: hidden;
             width: 100%;
             display: inline-table;
