@@ -367,6 +367,8 @@ class BookingController extends Controller
     public function actionFinance()
     {
         $query_word = Yii::$app->request->get('query_word') ?? "";
+        $tariff = Yii::$app->request->get('tariff') ?? "";
+
         $client = Yii::$app->meili->connect();
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
@@ -380,6 +382,14 @@ class BookingController extends Controller
         $hits = $res->getHits();
         foreach ($hits as $item) {
             $object_arr[] = $item['id'];
+        }
+
+        if ($tariff) {
+            if ($tariff == Tariff::NO_CANCELLATION) {
+                $dataProvider->query->andFilterWhere(['cancellation_type' => Tariff::NO_CANCELLATION]);
+            } else {
+                $dataProvider->query->andFilterWhere(['!=', 'cancellation_type', Tariff::NO_CANCELLATION]);
+            }
         }
 
         $dataProvider->query->andFilterWhere(['object_id' => $object_arr])

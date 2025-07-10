@@ -29,7 +29,6 @@ $this->params['breadcrumbs'][] = $this->title;
     ]); ?>
     <div class="stats-grid">
         <div class="stat-card">
-
             <div class="stat-content">
                 <div class="label">Общий оборот</div>
                 <h3><?= Booking::totalPayments(); ?> KGS</h3>
@@ -78,8 +77,8 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php
             $statusOptions = [
                 Booking::REFUND_STATUS_QUERY => Yii::t('app', 'В ожидании возврата'),
-                Booking::REFUND_STATUS_PAID => Yii::t('app', 'В ожидании выплаты'),
-                Booking::REFUND_STATUS_RETURNED => Yii::t('app', 'Выплачен'),
+                Booking::REFUND_STATUS_DEFAULT => Yii::t('app', 'В ожидании выплаты'),
+                Booking::REFUND_STATUS_RETURNED => Yii::t('app', 'Осуществлен возврат'),
             ];
             ?>
 
@@ -105,14 +104,14 @@ $this->params['breadcrumbs'][] = $this->title;
             ];
             ?>
 
-            <?php $selectedTariff = Yii::$app->request->get('tariff', []); ?>
+            <?php $selectedTariff = Yii::$app->request->get('tariff', 0); ?>
 
             <div class="status-tags">
                 <?php foreach ($tariffOptions as $value => $label): ?>
                     <label class="tariff-toggle">
-                        <input type="radio" name="tariff[]" value="<?= $value ?>" style="display: none;"
-                            class="tariff-checkbox" <?= in_array($value, $selectedTariff) ? 'checked' : '' ?>>
-                        <span class="tariff-button<?= in_array($value, $selectedTariff) ? ' active' : '' ?>">
+                        <input type="radio" name="tariff" value="<?= $value ?>" style="display: none;"
+                            class="tariff-checkbox" <?= $value == $selectedTariff ? 'checked' : '' ?>>
+                        <span class="tariff-button<?= $value == $selectedTariff ? ' active' : '' ?>">
                             <?= $label ?>
                         </span>
                     </label>
@@ -163,7 +162,8 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <span class="date-separator">→</span>
 
-                <input lang="ru" type="date" name="date_to" id="checkout" class="date-input" placeholder="<?= $date_to_string ?>"
+                <input lang="ru" type="date" name="date_to" id="checkout" class="date-input"
+                    placeholder="<?= $date_to_string ?>"
                     value="<?= $date_to ? date('Y-m-d', strtotime($date_to)) : 'До' ?>">
 
                 <span class="calendar-icon"></span>
@@ -178,86 +178,100 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <div class="booking-index">
-        <?= GridView::widget([
-            'dataProvider' => $dataProvider,
-            //'filterModel' => $searchModel,
-            'summary' => false,
-            'columns' => [
-                [
-                    'attribute' => 'object_id',
-                    'value' => function ($model) {
-                    return $model->bookingObjectTitle();
-                }
-                ],
-                [
-                    'attribute' => 'owner_id',
-                    'value' => function ($model) {
-                    return $model->bookingOwnerTitle();
-                }
-                ],
+        <div class="table-responsive">
+            <?= GridView::widget([
+                'dataProvider' => $dataProvider,
+                //'filterModel' => $searchModel,
+                'summary' => false,
+                'columns' => [
+                    [
+                        'attribute' => 'object_id',
+                        'value' => function ($model) {
+                            return $model->bookingObjectTitle();
+                        }
+                    ],
+                    [
+                        'attribute' => 'owner_id',
+                        'value' => function ($model) {
+                            return $model->bookingOwnerTitle();
+                        }
+                    ],
 
-                [
-                    'attribute' => 'tariff_id',
-                    'value' => function ($model) {
-                    return $model->bookingTariffTitle();
-                }
-                ],
-                [
-                    'attribute' => 'date_range',
-                    'format' => 'raw',
-                    'value' => function ($model) {
-                    return $model->dateFormat($model->date_from) . " - <br>" . $model->dateFormat($model->date_to);
-                }
+                    [
+                        'attribute' => 'tariff_id',
+                        'value' => function ($model) {
+                            return $model->bookingTariffTitle();
+                        }
+                    ],
+                    [
+                        'attribute' => 'date_range',
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            return $model->dateFormat($model->date_from) . " - <br>" . $model->dateFormat($model->date_to);
+                        }
 
-                ],
-                'transaction_number',
-                'currency',
-                [
-                    'attribute' => 'payment_type',
-                    'value' => function ($model) {
-                    return "<span class='payment_type'>" . $model->payment_type . "</span>";
-                },
-                    'format' => 'raw'
-                ],
+                    ],
+                    'transaction_number',
+                    'currency',
+                    [
+                        'attribute' => 'payment_type',
+                        'value' => function ($model) {
+                            return "<span class='payment_type'>" . $model->payment_type . "</span>";
+                        },
+                        'format' => 'raw'
+                    ],
 
-                [
-                    'attribute' => 'sum',
-                    'format' => 'raw',
-                    'value' => function ($model) {
-                    return $model->sum . "<br>" . $model->currency;
-                }
+                    [
+                        'attribute' => 'sum',
+                        'format' => 'raw',
+                        'value' => function ($model) {
+                            return $model->sum . "<br>" . $model->currency;
+                        }
+                    ],
+                    [
+                        'attribute' => 'return_status',
+                        'format' => 'raw',
+                        'label' => 'Статус',
+                        'value' => function ($model) {
+                            $color = $model->refundStatusString()['color'];
+                            return "<div style='color:$color;border:1px solid $color;display:inline-block;background-color:rgba(113, 111, 243, 0.05);padding:2px 3px;border-radius:4px'><span>" . $model->refundStatusString()['string'] . "</span></div>";
+                        }
+                    ],
+                    [
+                        'class' => ActionColumn::className(),
+                        'template' => '{view}',
+                        'header' => Yii::t('app', 'Действие'),
+                        'buttons' => [
+                            'view' => function ($url, $model) {
+                                return Html::tag('span', $model->refundStatusString()['action_string'], [
+                                    'class' => 'table_action_button payback',
+                                    'action' => $model->refundStatusString()['action']
+                                ]);
+                            },
+                        ]
+                    ],
                 ],
-                [
-                    'attribute' => 'return_status',
-                    'format' => 'raw',
-                    'label' => 'Статус',
-                    'value' => function ($model) {
-                    $color = $model->refundStatusString()['color'];
-                    return "<div style='color:$color;border:1px solid $color;display:inline-block;background-color:rgba(113, 111, 243, 0.05);padding:2px 3px;border-radius:4px'><span>" . $model->refundStatusString()['string'] . "</span></div>";
-                }
-                ],
-                [
-                    'class' => ActionColumn::className(),
-                    'template' => '{view}',
-                    'header' => Yii::t('app', 'Действие'),
-                    'buttons' => [
-                        'view' => function ($url, $model) {
-                        return Html::tag('span', $model->refundStatusString()['action_string'], [
-                            'class' => 'table_action_button payback',
-                            'action' => $model->refundStatusString()['action']
-                        ]);
-                    },
-                    ]
-                ],
-            ],
-        ]); ?>
-
+            ]); ?>
+        </div>
     </div>
 </div>
 
 
 
 <style>
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* smooth scrolling on iOS */
+    }
+
+    .table-responsive table {
+        width: 100%;
+        min-width: 600px;
+        /* or whatever min width fits your columns */
+    }
+
     .btn-excel {
         border-radius: 20px !important;
         padding: 10px 20px !important;
@@ -926,10 +940,10 @@ $this->params['breadcrumbs'][] = $this->title;
 
         $(document).on('click', '.tariff-button', function (e) {
             e.preventDefault();
-            const $checkbox = $(this).siblings('input[type=radio]');
-            const isChecked = $checkbox.prop('checked');
+            const $radio = $(this).siblings('input[type=radio]');
+            const isChecked = $radio.prop('checked');
 
-            $checkbox.prop('checked', !isChecked);
+            $radio.prop('checked', !isChecked);
         });
 
         $('.reset-filter-link').on('click', function (e) {
