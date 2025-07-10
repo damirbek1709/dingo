@@ -178,7 +178,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <div class="booking-index">
-        <div class="table-responsive">
+        <div class="table-resp">
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 //'filterModel' => $searchModel,
@@ -267,21 +267,21 @@ $this->params['breadcrumbs'][] = $this->title;
         }
     }
 
-    .table-responsive {
+    .table-resp {
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         /* smooth scrolling on iOS */
     }
 
-    .table-responsive table {
+    .table-resp table {
         width: 100%;
         min-width: 600px;
         /* or whatever min width fits your columns */
     }
 
-    .table-responsive th,
-    .table-responsive td {
+    .table-resp th,
+    .table-resp td {
         white-space: nowrap;
     }
 
