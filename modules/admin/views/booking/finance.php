@@ -178,7 +178,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
     <div class="booking-index">
-        <div class="grid-scroll-wrapper">
+        <div class="table-responsive">
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 //'filterModel' => $searchModel,
@@ -260,28 +260,32 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <style>
     @media (max-width: 576px) {
-        .grid-scroll-wrapper table {
-            min-width: 1200px;
+        .grid-view {
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            background-color: #00000005;
+            overflow: hidden;
+            width: 100%;
+            display: inline-table;
         }
     }
-    
 
-    .grid-scroll-wrapper {
-        width: 1200px;
+    .table-responsive {
+        width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        /* smooth scrolling on iOS */
     }
 
-    .grid-scroll-wrapper table {
-        min-width: 800px;
-        /* adjust this to your table width needs */
-        border-collapse: collapse;
+    .table-responsive table {
+        width: 100%;
+        min-width: 600px;
+        /* or whatever min width fits your columns */
     }
 
-    .grid-scroll-wrapper th,
-    .grid-scroll-wrapper td {
+    .table-responsive th,
+    .table-responsive td {
         white-space: nowrap;
-        /* prevent text wrapping */
     }
 
     .btn-excel {
