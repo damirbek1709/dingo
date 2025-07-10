@@ -261,12 +261,13 @@ $this->params['breadcrumbs'][] = $this->title;
 <style>
     @media (max-width: 576px) {
         .grid-scroll-wrapper table {
-            min-width: 600px;
+            min-width: 1200px;
         }
     }
+    
 
     .grid-scroll-wrapper {
-        width: 100%;
+        width: 1200px;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
