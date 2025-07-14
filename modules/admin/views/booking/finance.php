@@ -22,234 +22,254 @@ $this->params['breadcrumbs'][] = $this->title;
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <div class="oblast-update">
-    <?php $form = ActiveForm::begin([
-        'action' => ['booking/finance'],
-        'method' => 'get',
-        'options' => ['class' => 'search-filter-form'],
-    ]); ?>
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-content">
-                <div class="label">Общий оборот</div>
-                <h3><?= Booking::totalPayments(); ?> KGS</h3>
-                <div class="stat-change positive">↗ 8.5% чем за прошлый месяц</div>
-            </div>
-            <div class="stat-icon calendar">📅</div>
-        </div>
-        <div class="stat-card">
-
-            <div class="stat-content">
-                <div class="label">Выплаты хостам</div>
-                <h3>0 KGS</h3>
-                <div class="stat-change positive">↗ 8.5% чем за прошлый месяц</div>
-            </div>
-            <div class="stat-icon host">🏠</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-content">
-                <div class="label">Комиссия платформы</div>
-                <h3><?= Booking::totalComission() ?> KGS</h3>
-                <div class="stat-change negative">↘ 4.3% чем за прошлый месяц</div>
-            </div>
-            <div class="stat-icon commission">💰</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-content">
-                <div class="label">Возвраты</div>
-                <h3>
-                    <?= Booking::totalRefunds(); ?> KGS
-                    <!-- <span class="currency">KGS</span> -->
-                </h3>
-                <div class="stat-change negative">↘ 4.3% чем за прошлый месяц</div>
-            </div>
-            <div class="stat-icon refund">↩️</div>
-        </div>
-    </div>
-
-    <div class="filter-drawer" id="filterDrawer">
-        <div class="filter-header">
-            <span class="close-filters" id="closeFilters">&times;</span>
-            <h3><?php echo Yii::t('app', 'Фильтры') ?></h3>
-        </div>
-
-        <div class="filter-body">
-            <label><?php echo Yii::t('app', 'Статус') ?></label>
-            <?php
-            $statusOptions = [
-                Booking::REFUND_STATUS_QUERY => Yii::t('app', 'В ожидании возврата'),
-                Booking::REFUND_STATUS_DEFAULT => Yii::t('app', 'В ожидании выплаты'),
-                Booking::REFUND_STATUS_RETURNED => Yii::t('app', 'Осуществлен возврат'),
-            ];
-            ?>
-
-            <?php $selectedStatuses = Yii::$app->request->get('status', []); ?>
-
-            <div class="status-tags">
-                <?php foreach ($statusOptions as $value => $label): ?>
-                    <label class="status-toggle">
-                        <input type="checkbox" name="status[]" value="<?= $value ?>" style="display: none;"
-                            class="status-checkbox" <?= in_array($value, $selectedStatuses) ? 'checked' : '' ?>>
-                        <span class="status-button<?= in_array($value, $selectedStatuses) ? ' active' : '' ?>">
-                            <?= $label ?>
-                        </span>
-                    </label>
-                <?php endforeach; ?>
+    <div class="col-md-12 terms_container">
+        <div class="row">
+            <div class="col-md-2">
+                <?php echo $this->render('../object/nav-left'); ?>
             </div>
 
-            <label><?= Yii::t('app', 'Тариф') ?></label>
-            <?php
-            $tariffOptions = [
-                Tariff::FREE_CANCELLATION_WITH_PENALTY => Yii::t('app', 'Возвратный'),
-                Tariff::NO_CANCELLATION => Yii::t('app', 'Не возвратный'),
-            ];
-            ?>
+            <div class="col-md-10">
+                <?php $form = ActiveForm::begin([
+                    'action' => ['booking/finance'],
+                    'method' => 'get',
+                    'options' => ['class' => 'search-filter-form'],
+                ]); ?>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <div class="label">Общий оборот</div>
+                            <h3><?= Booking::totalPayments(); ?> KGS</h3>
+                            <div class="stat-change positive">↗ 8.5% чем за прошлый месяц</div>
+                        </div>
+                        <div class="stat-icon calendar">📅</div>
+                    </div>
+                    <div class="stat-card">
 
-            <?php $selectedTariff = Yii::$app->request->get('tariff', 0); ?>
+                        <div class="stat-content">
+                            <div class="label">Выплаты хостам</div>
+                            <h3>0 KGS</h3>
+                            <div class="stat-change positive">↗ 8.5% чем за прошлый месяц</div>
+                        </div>
+                        <div class="stat-icon host">🏠</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <div class="label">Комиссия платформы</div>
+                            <h3><?= Booking::totalComission() ?> KGS</h3>
+                            <div class="stat-change negative">↘ 4.3% чем за прошлый месяц</div>
+                        </div>
+                        <div class="stat-icon commission">💰</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-content">
+                            <div class="label">Возвраты</div>
+                            <h3>
+                                <?= Booking::totalRefunds(); ?> KGS
+                                <!-- <span class="currency">KGS</span> -->
+                            </h3>
+                            <div class="stat-change negative">↘ 4.3% чем за прошлый месяц</div>
+                        </div>
+                        <div class="stat-icon refund">↩️</div>
+                    </div>
+                </div>
 
-            <div class="status-tags">
-                <?php foreach ($tariffOptions as $value => $label): ?>
-                    <label class="tariff-toggle">
-                        <input type="radio" name="tariff" value="<?= $value ?>" style="display: none;"
-                            class="tariff-checkbox" <?= $value == $selectedTariff ? 'checked' : '' ?>>
-                        <span class="tariff-button<?= $value == $selectedTariff ? ' active' : '' ?>">
-                            <?= $label ?>
-                        </span>
-                    </label>
-                <?php endforeach; ?>
+                <div class="filter-drawer" id="filterDrawer">
+                    <div class="filter-header">
+                        <span class="close-filters" id="closeFilters">&times;</span>
+                        <h3><?php echo Yii::t('app', 'Фильтры') ?></h3>
+                    </div>
+
+                    <div class="filter-body">
+                        <label><?php echo Yii::t('app', 'Статус') ?></label>
+                        <?php
+                        $statusOptions = [
+                            Booking::REFUND_STATUS_QUERY => Yii::t('app', 'В ожидании возврата'),
+                            Booking::REFUND_STATUS_DEFAULT => Yii::t('app', 'В ожидании выплаты'),
+                            Booking::REFUND_STATUS_RETURNED => Yii::t('app', 'Осуществлен возврат'),
+                        ];
+                        ?>
+
+                        <?php $selectedStatuses = Yii::$app->request->get('status', []); ?>
+
+                        <div class="status-tags">
+                            <?php foreach ($statusOptions as $value => $label): ?>
+                                <label class="status-toggle">
+                                    <input type="checkbox" name="status[]" value="<?= $value ?>" style="display: none;"
+                                        class="status-checkbox" <?= in_array($value, $selectedStatuses) ? 'checked' : '' ?>>
+                                    <span class="status-button<?= in_array($value, $selectedStatuses) ? ' active' : '' ?>">
+                                        <?= $label ?>
+                                    </span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <label><?= Yii::t('app', 'Тариф') ?></label>
+                        <?php
+                        $tariffOptions = [
+                            Tariff::FREE_CANCELLATION_WITH_PENALTY => Yii::t('app', 'Возвратный'),
+                            Tariff::NO_CANCELLATION => Yii::t('app', 'Не возвратный'),
+                        ];
+                        ?>
+
+                        <?php $selectedTariff = Yii::$app->request->get('tariff', 0); ?>
+
+                        <div class="status-tags">
+                            <?php foreach ($tariffOptions as $value => $label): ?>
+                                <label class="tariff-toggle">
+                                    <input type="radio" name="tariff" value="<?= $value ?>" style="display: none;"
+                                        class="tariff-checkbox" <?= $value == $selectedTariff ? 'checked' : '' ?>>
+                                    <span class="tariff-button<?= $value == $selectedTariff ? ' active' : '' ?>">
+                                        <?= $label ?>
+                                    </span>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+
+
+                        <label><?= Yii::t('app', 'Тип оплаты') ?></label>
+                        <?= Html::dropDownList('payment_id', '', Objects::paymentListString(), [
+                            'prompt' => 'Выберите тип оплаты',
+                            'class' => 'filter-input',
+                            'id' => 'payment-select',
+                            'data-object' => ''
+                        ]) ?>
+
+                        <label><?php echo Yii::t('app', 'Дата прибытия') ?></label>
+                        <input lang="ru" type="date" name="checkin" value="<?= $date_from_string ?>"
+                            class="filter-input" />
+
+                        <label><?php echo Yii::t('app', 'Дата выезда') ?></label>
+                        <input lang="ru" type="date" name="checkout" value="<?= $date_to_string ?>"
+                            class="filter-input" />
+
+
+                        <div class="reset-filters">
+                            <button type="submit" class="save-button"
+                                style="margin:0 20px 0 0"><?php echo Yii::t('app', 'Применить') ?></button>
+
+                            <a href="#"
+                                class="reset-filter-link"><?php echo Yii::t('app', 'Сбросить все фильтры') ?></a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+
+                <div class="controls">
+                    <div class="search-box">
+                        <?= Html::textInput('query_word', $query_word, [
+                            'placeholder' => 'Поиск по № брони и названию объекта',
+                            'class' => 'guest-input'
+                        ]) ?>
+                        <button type="submit" class="search-icon"></button>
+                    </div>
+
+                    <div class="date-range-container">
+                        <div class="date-range-inputs">
+                            <input lang="ru" type="date" name="date_from" id="checkin" class="date-input"
+                                value="<?= $date_from_string ? $date_from_string : 'От' ?>">
+
+                            <span class="date-separator">→</span>
+
+                            <input lang="ru" type="date" name="date_to" id="checkout" class="date-input"
+                                value="<?= $date_to_string ? $date_to_string : 'До' ?>">
+
+                            <span class="calendar-icon"></span>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary btn-excel">Импорт в Excel</button>
+                    <span class="filter-button" id="open-filters">
+                        <?= Yii::t('app', 'Фильтры') ?>
+                    </span>
+                </div>
+                <?php $form->end(); ?>
+                <div class="booking-index">
+                    <div class="table-resp">
+                        <?= GridView::widget([
+                            'dataProvider' => $dataProvider,
+                            //'filterModel' => $searchModel,
+                            'summary' => false,
+                            'columns' => [
+                                [
+                                    'attribute' => 'object_id',
+                                    'value' => function ($model) {
+                                        return $model->bookingObjectTitle();
+                                    },
+                                    'contentOptions' => [
+                                        'style' => 'max-width: 200px; white-space: normal; word-wrap: break-word;',
+                                    ],
+                                ],
+                                [
+                                    'attribute' => 'owner_id',
+                                    'value' => function ($model) {
+                                        return $model->bookingOwnerTitle();
+                                    },
+                                    'contentOptions' => [
+                                        'style' => 'max-width: 200px; white-space: normal; word-wrap: break-word;',
+                                    ],
+                                ],
+
+                                [
+                                    'attribute' => 'tariff_id',
+                                    'value' => function ($model) {
+                                        return $model->bookingTariffTitle();
+                                    },
+                                    'contentOptions' => [
+                                        'style' => 'max-width: 200px; white-space: normal; word-wrap: break-word;',
+                                    ],
+                                ],
+                                [
+                                    'attribute' => 'date_range',
+                                    'format' => 'raw',
+                                    'value' => function ($model) {
+                                        return $model->dateFormat($model->date_from) . " - <br>" . $model->dateFormat($model->date_to);
+                                    }
+
+                                ],
+                                'transaction_number',
+                                'currency',
+                                [
+                                    'attribute' => 'payment_type',
+                                    'value' => function ($model) {
+                                        return "<span class='payment_type'>" . $model->payment_type . "</span>";
+                                    },
+                                    'format' => 'raw'
+                                ],
+
+                                [
+                                    'attribute' => 'sum',
+                                    'format' => 'raw',
+                                    'value' => function ($model) {
+                                        return $model->sum . "<br>" . $model->currency;
+                                    }
+                                ],
+                                [
+                                    'attribute' => 'return_status',
+                                    'format' => 'raw',
+                                    'label' => 'Статус',
+                                    'value' => function ($model) {
+                                        $color = $model->refundStatusString()['color'];
+                                        return "<div style='color:$color;border:1px solid $color;display:inline-block;background-color:rgba(113, 111, 243, 0.05);padding:2px 3px;border-radius:4px'><span>" . $model->refundStatusString()['string'] . "</span></div>";
+                                    }
+                                ],
+                                [
+                                    'class' => ActionColumn::className(),
+                                    'template' => '{view}',
+                                    'header' => Yii::t('app', 'Действие'),
+                                    'buttons' => [
+                                        'view' => function ($url, $model) {
+                                            return Html::tag('span', $model->refundStatusString()['action_string'], [
+                                                'class' => 'table_action_button payback',
+                                                'action' => $model->refundStatusString()['action']
+                                            ]);
+                                        },
+                                    ]
+                                ],
+                            ],
+                        ]); ?>
+                    </div>
+                </div>
             </div>
-
-
-            <label><?= Yii::t('app', 'Тип оплаты') ?></label>
-            <?= Html::dropDownList('payment_id', '', Objects::paymentListString(), [
-                'prompt' => 'Выберите тип оплаты',
-                'class' => 'filter-input',
-                'id' => 'payment-select',
-                'data-object' => ''
-            ]) ?>
-
-            <label><?php echo Yii::t('app', 'Дата прибытия') ?></label>
-            <input lang="ru" type="date" name="checkin" value="<?= $date_from_string ?>" class="filter-input" />
-
-            <label><?php echo Yii::t('app', 'Дата выезда') ?></label>
-            <input lang="ru" type="date" name="checkout" value="<?= $date_to_string ?>" class="filter-input" />
-
-
-            <div class="reset-filters">
-                <button type="submit" class="save-button"
-                    style="margin:0 20px 0 0"><?php echo Yii::t('app', 'Применить') ?></button>
-
-                <a href="#" class="reset-filter-link"><?php echo Yii::t('app', 'Сбросить все фильтры') ?></a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Controls -->
-
-    <div class="controls">
-        <div class="search-box">
-            <?= Html::textInput('query_word', $query_word, [
-                'placeholder' => 'Поиск по № брони и названию объекта',
-                'class' => 'guest-input'
-            ]) ?>
-            <button type="submit" class="search-icon"></button>
-        </div>
-
-        <div class="date-range-container">
-            <div class="date-range-inputs">
-                <input lang="ru" type="date" name="date_from" id="checkin" class="date-input"
-                    value="<?= $date_from_string ? $date_from_string : 'От' ?>">
-
-                <span class="date-separator">→</span>
-
-                <input lang="ru" type="date" name="date_to" id="checkout" class="date-input"
-                    value="<?= $date_to_string ? $date_to_string : 'До' ?>">
-
-                <span class="calendar-icon"></span>
-            </div>
-        </div>
-        <button class="btn btn-secondary btn-excel">Импорт в Excel</button>
-        <span class="filter-button" id="open-filters">
-            <?= Yii::t('app', 'Фильтры') ?>
-        </span>
-    </div>
-    <?php $form->end(); ?>
-
-
-    <div class="booking-index">
-        <div class="table-resp">
-            <?= GridView::widget([
-                'dataProvider' => $dataProvider,
-                //'filterModel' => $searchModel,
-                'summary' => false,
-                'columns' => [
-                    [
-                        'attribute' => 'object_id',
-                        'value' => function ($model) {
-                            return $model->bookingObjectTitle();
-                        }
-                    ],
-                    [
-                        'attribute' => 'owner_id',
-                        'value' => function ($model) {
-                            return $model->bookingOwnerTitle();
-                        }
-                    ],
-
-                    [
-                        'attribute' => 'tariff_id',
-                        'value' => function ($model) {
-                            return $model->bookingTariffTitle();
-                        }
-                    ],
-                    [
-                        'attribute' => 'date_range',
-                        'format' => 'raw',
-                        'value' => function ($model) {
-                            return $model->dateFormat($model->date_from) . " - <br>" . $model->dateFormat($model->date_to);
-                        }
-
-                    ],
-                    'transaction_number',
-                    'currency',
-                    [
-                        'attribute' => 'payment_type',
-                        'value' => function ($model) {
-                            return "<span class='payment_type'>" . $model->payment_type . "</span>";
-                        },
-                        'format' => 'raw'
-                    ],
-
-                    [
-                        'attribute' => 'sum',
-                        'format' => 'raw',
-                        'value' => function ($model) {
-                            return $model->sum . "<br>" . $model->currency;
-                        }
-                    ],
-                    [
-                        'attribute' => 'return_status',
-                        'format' => 'raw',
-                        'label' => 'Статус',
-                        'value' => function ($model) {
-                            $color = $model->refundStatusString()['color'];
-                            return "<div style='color:$color;border:1px solid $color;display:inline-block;background-color:rgba(113, 111, 243, 0.05);padding:2px 3px;border-radius:4px'><span>" . $model->refundStatusString()['string'] . "</span></div>";
-                        }
-                    ],
-                    [
-                        'class' => ActionColumn::className(),
-                        'template' => '{view}',
-                        'header' => Yii::t('app', 'Действие'),
-                        'buttons' => [
-                            'view' => function ($url, $model) {
-                                return Html::tag('span', $model->refundStatusString()['action_string'], [
-                                    'class' => 'table_action_button payback',
-                                    'action' => $model->refundStatusString()['action']
-                                ]);
-                            },
-                        ]
-                    ],
-                ],
-            ]); ?>
         </div>
     </div>
 </div>
