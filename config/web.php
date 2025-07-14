@@ -147,6 +147,7 @@ $config = [
             'rules' => [
                 'contact' => 'site/contact',
                 'about' => 'site/about',
+                'admin/finance'=>'admin/booking/finance',
                 'shipment' => 'site/shipment',
                 'return' => 'site/return',
                 'privacy' => 'site/privacy',

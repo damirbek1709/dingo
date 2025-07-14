@@ -19,7 +19,7 @@ use yii\widgets\Pjax;
     </div>
 
     <div class="owner-nav-item owner-nav-item-terms">
-        <?= Html::a(Yii::t('app', 'Финансы'), '#'); ?>
+        <?= Html::a(Yii::t('app', 'Финансы'), '/admin/finance'); ?>
     </div>
 
     <div class="owner-nav-item owner-nav-item-crew">
