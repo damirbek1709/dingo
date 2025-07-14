@@ -12,41 +12,46 @@ $this->title = Yii::t('app', 'Доступность и цены');
 <div class="oblast-update">
 
     <?php echo $this->render('top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
-    <div class="sidebar" id="sidebar">
+    <div class="table_resp">
+        <div class="sidebar" id="sidebar">
 
-        <button class="sidebar-close" id="sidebar-close">&times;</button>
-        <div class="sidebar-inner">
-            <h3><?=Yii::t('app','Редактирование')?></h3>
+            <button class="sidebar-close" id="sidebar-close">&times;</button>
+            <div class="sidebar-inner">
+                <h3><?= Yii::t('app', 'Редактирование') ?></h3>
 
-            <form id="w0" method="post">
-                <div class="date-range-container" style="margin-top: 20px;">
-                    <div class="date-range-label"><?=Yii::t('app','Заезд и выезд')?></div>
-                    <div class="date-range-inputs">
-                        <input type="date" id="checkin" class="date-input" placeholder="От">
-                        <span class="date-separator">→</span>
-                        <input type="date" id="checkout" class="date-input" placeholder="До">
-                        <span class="calendar-icon">📅</span>
+                <form id="w0" method="post">
+                    <div class="date-range-container" style="margin-top: 20px;">
+                        <div class="date-range-label"><?= Yii::t('app', 'Заезд и выезд') ?></div>
+                        <div class="date-range-inputs">
+                            <input type="date" id="checkin" class="date-input" placeholder="От">
+                            <span class="date-separator">→</span>
+                            <input type="date" id="checkout" class="date-input" placeholder="До">
+                            <span class="calendar-icon">📅</span>
+                        </div>
                     </div>
-                </div>
-                <div id="sidebar-details"></div>
-                <div class="sidebar_submit">
-                    <div style="display:inline-block;float:right" class="save-button update-tariff"><?=Yii::t('app','Сохранить')?></div>
-                </div>
-            </form>
+                    <div id="sidebar-details"></div>
+                    <div class="sidebar_submit">
+                        <div style="display:inline-block;float:right" class="save-button update-tariff">
+                            <?= Yii::t('app', 'Сохранить') ?>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
-
-    <div class="calendar-cover">
-        <div class="calendar-layout">
-            <div class="fixed-column">
-                <div class="month-header-sticky" id="month-header"></div>
-                <div id="fixed-column"></div>
-            </div>
-            <div class="scroll-wrapper" id="scroll-wrapper">
-                <div class="scroll-container">
-                    <div class="days-row" id="day-headers"></div>
-                    <div id="data-rows"></div>
+    <div class="table-resp">
+        <div class="calendar-cover">
+            <div class="calendar-layout">
+                <div class="fixed-column">
+                    <div class="month-header-sticky" id="month-header"></div>
+                    <div id="fixed-column"></div>
+                </div>
+                <div class="scroll-wrapper" id="scroll-wrapper">
+                    <div class="scroll-container">
+                        <div class="days-row" id="day-headers"></div>
+                        <div id="data-rows"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -208,7 +213,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
         $('#checkout').val(convertToISO(date));
 
         let sidebar_title = `<h4 class="sidebar_title">${room.room_title[0]} </h4>`;
-        let  html = `<div class="form-group">
+        let html = `<div class="form-group">
                     <label>Доступно номеров </label>
                     <input class="form-control" type="text" id="similar_room_count" value="${room.similar_room_amount}">
                 </div>`;
@@ -592,6 +597,24 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
 
 <style>
+    .table-resp {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* smooth scrolling on iOS */
+    }
+
+    .table-resp table {
+        width: 100%;
+        min-width: 600px;
+        /* or whatever min width fits your columns */
+    }
+
+    .table-resp th,
+    .table-resp td {
+        white-space: nowrap;
+    }
+
     input:invalid {
         border-color: #db2a2a;
         color: red;

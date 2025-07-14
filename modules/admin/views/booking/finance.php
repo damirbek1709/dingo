@@ -128,10 +128,10 @@ $this->params['breadcrumbs'][] = $this->title;
             ]) ?>
 
             <label><?php echo Yii::t('app', 'Дата прибытия') ?></label>
-            <input lang="ru" type="date" name="checkin" value="<?= $date_from ?>" class="filter-input" />
+            <input lang="ru" type="date" name="checkin" value="<?= $date_from_string ?>" class="filter-input" />
 
             <label><?php echo Yii::t('app', 'Дата выезда') ?></label>
-            <input lang="ru" type="date" name="checkout" value="<?= $date_to ?>" class="filter-input" />
+            <input lang="ru" type="date" name="checkout" value="<?= $date_to_string ?>" class="filter-input" />
 
 
             <div class="reset-filters">
@@ -157,14 +157,12 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="date-range-container">
             <div class="date-range-inputs">
                 <input lang="ru" type="date" name="date_from" id="checkin" class="date-input"
-                    placeholder="<?= $date_from_string ?>"
-                    value="<?= $date_from ? date('Y-m-d', strtotime($date_from)) : 'От' ?>">
+                    value="<?= $date_from_string ? $date_from_string : 'От' ?>">
 
                 <span class="date-separator">→</span>
 
                 <input lang="ru" type="date" name="date_to" id="checkout" class="date-input"
-                    placeholder="<?= $date_to_string ?>"
-                    value="<?= $date_to ? date('Y-m-d', strtotime($date_to)) : 'До' ?>">
+                    value="<?= $date_to_string ? $date_to_string : 'До' ?>">
 
                 <span class="calendar-icon"></span>
             </div>
@@ -266,6 +264,8 @@ $this->params['breadcrumbs'][] = $this->title;
             display: inline-table;
         }
     }
+
+
 
     .table-resp {
         width: 100%;

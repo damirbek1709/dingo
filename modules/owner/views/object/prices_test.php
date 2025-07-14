@@ -12,8 +12,8 @@ $this->title = Yii::t('app', 'Доступность и цены');
 <div class="oblast-update">
 
     <?php echo $this->render('top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
-    <div class="sidebar" id="sidebar">
 
+    <div class="sidebar" id="sidebar">
         <button class="sidebar-close" id="sidebar-close">&times;</button>
         <div class="sidebar-inner">
             <h3><?= Yii::t('app', 'Редактирование') ?></h3>
@@ -38,17 +38,18 @@ $this->title = Yii::t('app', 'Доступность и цены');
         </div>
     </div>
 
-
-    <div class="calendar-cover">
-        <div class="calendar-layout">
-            <div class="fixed-column">
-                <div class="month-header-sticky" id="month-header"></div>
-                <div id="fixed-column"></div>
-            </div>
-            <div class="scroll-wrapper" id="scroll-wrapper">
-                <div class="scroll-container">
-                    <div class="days-row" id="day-headers"></div>
-                    <div id="data-rows"></div>
+    <div class="table_resp">
+        <div class="calendar-cover">
+            <div class="calendar-layout">
+                <div class="fixed-column">
+                    <div class="month-header-sticky" id="month-header"></div>
+                    <div id="fixed-column"></div>
+                </div>
+                <div class="scroll-wrapper" id="scroll-wrapper">
+                    <div class="scroll-container">
+                        <div class="days-row" id="day-headers"></div>
+                        <div id="data-rows"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -594,7 +595,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
     flatpickr("#checkin", {
         dateFormat: "Y-m-d",
-        locale: "ru",
+        //locale: "ru-RU",
         minDate: "today", // ⛔ Prevent past dates
         onChange: function (selectedDates, dateStr, instance) {
             checkoutCalendar.set('minDate', dateStr); // ✅ Set checkout min date
@@ -603,7 +604,7 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
     const checkoutCalendar = flatpickr("#checkout", {
         dateFormat: "Y-m-d",
-        locale: "ru",
+        //locale: "ru-RU",
         minDate: "today" // ⛔ Prevent past dates
     });
 
@@ -612,6 +613,24 @@ $this->title = Yii::t('app', 'Доступность и цены');
 
 
 <style>
+    .table-resp {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        /* smooth scrolling on iOS */
+    }
+
+    .table-resp table {
+        width: 100%;
+        min-width: 600px;
+        /* or whatever min width fits your columns */
+    }
+
+    .table-resp th,
+    .table-resp td {
+        white-space: nowrap;
+    }
+
     input:invalid {
         border-color: #db2a2a;
         color: red;

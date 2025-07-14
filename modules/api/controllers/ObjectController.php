@@ -6,6 +6,7 @@ use app\models\Comfort;
 use app\models\Oblast;
 use app\models\RoomComfort;
 use app\models\user\User;
+use app\models\Vocabulary;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -938,6 +939,9 @@ class ObjectController extends BaseController
     {
         $client = Yii::$app->meili->connect();
         $document = $client->index('object')->getDocument($id);
+        $type_id = $document['type'];
+        $type_string = Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_OBJECT, 'id' => $type_id])->one();
+        $document['type'] = [$type_string->title, $type_string->title_en, $type_string->title_ky];
         return $document;
     }
 

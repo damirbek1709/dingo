@@ -498,7 +498,7 @@ class Booking extends \yii\db\ActiveRecord
 
     public function refundStatusString()
     {
-        $string = Yii::t('app', 'В ожидании <br>выплаты');
+        $string = Yii::t('app', 'В ожидании');
         $color = '#FA8C16';
         $action = Yii::$app->urlManager->createUrl("/admin/booking/refund?id=$this->id");
         $action_string = 'Выплатить';
@@ -518,7 +518,7 @@ class Booking extends \yii\db\ActiveRecord
         }
 
         if ($this->return_status == self::REFUND_STATUS_EXPECTING) {
-            $string = Yii::t('app', 'В ожидании <br>выплаты');
+            $string = Yii::t('app', 'В ожидании');
             $color = '#FA8C16';
             $action = Yii::$app->urlManager->createUrl("/admin/booking/pay?id=$this->id");
             $action_string = 'Выплатить';

@@ -2038,9 +2038,22 @@ a.logout-button:hover {
     color:rgba(0, 0, 0, 0.45);
 }
 .calendar-icon{
-    width: 20px;
-    height: 20px;
-    background-image: url('calendar.svg');
+    width: 30px;
+    height: 15px;
+    background-image: url(calendar.svg);
     background-repeat: no-repeat;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+}
+.btn-excel::before {
+    background-image: url(/css/icons_2.svg);
+    height: 23px;
+    width: 14px;
+    display: flex;
+    content: '';
+    background-position: 159px -5px;
+    margin-right: 7px;
+    float: left;
+    justify-content: center;
+    align-items: center;
 }

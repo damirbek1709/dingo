@@ -24,6 +24,7 @@ class ModuleAsset extends AssetBundle
         'css/room_new_version_2.css',
         'css/navbar.css',
         'css/calendar_new_version_1.css',
+        'css/portrait.css'
     ];
     public $js = [
         //'js/app.js',

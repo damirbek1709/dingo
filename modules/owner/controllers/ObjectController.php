@@ -24,6 +24,7 @@ use app\models\Booking;
 use app\models\BookingSearch;
 use yii\helpers\Json;
 use Exception;
+use app\models\user\User;
 /**
  * EventController implements the CRUD actions for Event model.
  */
@@ -138,7 +139,7 @@ class ObjectController extends Controller
 
                 [
                     'allow' => true,
-                    'actions' => ['index', 'create', 'add-tariff', 'edit-tariff', 'prices', 'remove-object-image', 'remove-room-image', 'remove-file', 'send-to-moderation', 'unpublish'],
+                    'actions' => ['index', 'create', 'add-tariff', 'edit-tariff', 'prices', 'remove-object-image', 'remove-room-image', 'remove-file', 'send-to-moderation', 'unpublish', 'finances'],
                     'roles' => ['admin', 'owner'],
                 ],
             ],
@@ -1942,16 +1943,30 @@ class ObjectController extends Controller
         $searchModel = new BookingSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
         $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
+        $totalIncome = clone $dataProvider->query;
+        $income = $totalIncome->sum('sum');
+        $user_fee = Yii::$app->user->identity->fee_percent ? Yii::$app->user->identity->fee_percent : User::FIXED_FEE;
+        $comission = $income / 100 * $user_fee;
+        $payment = $income - $comission;
+        //$comission = $income - $percent;
         $active = "all_active";
 
-        $date_from = Yii::$app->request->get('date_from') ? Yii::$app->request->get('date_from') : null;
-        if ($date_from) {
+        if (Yii::$app->request->get('date_from')) {
+            $date_from = date('Y-m-d', strtotime(Yii::$app->request->get('date_from')));
             $dataProvider->query->andFilterWhere(['>=', 'date_from', $date_from]);
+            $date_from_string = Yii::$app->request->get('date_from');
+        } else {
+            $date_from = null;
+            $date_from_string = date('Y-m-d', strtotime('-1 month', strtotime(date('Y-m-d'))));
         }
 
-        $date_to = Yii::$app->request->get('date_to') ? Yii::$app->request->get('date_to') : null;
-        if ($date_to) {
-            $dataProvider->query->andFilterWhere(['<', 'date_to', $date_to]);
+        if (Yii::$app->request->get('date_to')) {
+            $date_to = date('Y-m-d', strtotime(Yii::$app->request->get('date_to')));
+            $dataProvider->query->andFilterWhere(['<=', 'date_to', $date_to]);
+            $date_to_string = Yii::$app->request->get('date_to');
+        } else {
+            $date_to = null;
+            $date_to_string = date('Y-m-d');
         }
         return $this->render('finances', [
             'searchModel' => $searchModel,
@@ -1960,6 +1975,13 @@ class ObjectController extends Controller
             'active' => $active,
             'date_from' => $date_from,
             'date_to' => $date_to,
+            'date_from_string' => $date_from_string,
+            'date_to_string' => $date_to_string,
+            'amount' => $dataProvider->getTotalCount(),
+            'income' => $income,
+            'comission' => $comission,
+            'payment' => $payment
+
         ]);
     }
 

@@ -18,7 +18,7 @@ use yii\helpers\Html;
 
     <?php echo Html::a('Бронирования', ['booking', 'object_id' => $object_id], ['class' => 'style_booking top_nav_title top_nav_title_booking']); ?>
     <?php echo Html::a('Номера и тарифы', ['room-list', 'object_id' => $object_id], ['class' => 'style_rooms style_room-list top_nav_title top_nav_title_rooms']); ?>
-    <?php //echo Html::a('Финансы', ['finances', 'object_id' => $object_id], ['class' => 'style_finance top_nav_title top_nav_title_finance']); ?>
+    <?php echo Html::a('Финансы', ['finances', 'object_id' => $object_id], ['class' => 'style_finance top_nav_title top_nav_title_finance']); ?>
 </div>
 
 <style>
