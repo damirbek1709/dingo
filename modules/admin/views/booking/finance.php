@@ -254,10 +254,10 @@ $this->params['breadcrumbs'][] = $this->title;
                                 ],
                                 [
                                     'class' => ActionColumn::className(),
-                                    'template' => '{view}',
+                                    'template' => '{refund}{view}',
                                     'header' => Yii::t('app', 'Действие'),
                                     'buttons' => [
-                                        'view' => function ($url, $model) {
+                                        'refund' => function ($url, $model) {
                                             return Html::tag('span', $model->refundStatusString()['action_string'], [
                                                 'class' => 'table_action_button payback',
                                                 'action' => $model->refundStatusString()['action']
