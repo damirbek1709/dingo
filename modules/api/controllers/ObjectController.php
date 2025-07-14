@@ -528,6 +528,12 @@ class ObjectController extends BaseController
                     }
                 }
             }
+            $type_id = $hit['type'];
+            $type_string = null;
+            $type = Vocabulary::findOne($type_id);
+            if ($type) {
+                $hit['type_string'] = [$type->title, $type->title_en, $type->title_ky];
+            }
             $hit['from_price'] = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
         }
 
@@ -941,7 +947,7 @@ class ObjectController extends BaseController
         $document = $client->index('object')->getDocument($id);
         $type_id = $document['type'];
         $type_string = Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_OBJECT, 'id' => $type_id])->one();
-        $document['type'] = [$type_string->title, $type_string->title_en, $type_string->title_ky];
+        $document['type_string'] = [$type_string->title, $type_string->title_en, $type_string->title_ky];
         return $document;
     }
 
