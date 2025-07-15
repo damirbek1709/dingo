@@ -564,6 +564,12 @@ use kartik\select2\Select2;
         background: linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent);
     }
 
+    @media (max-width: 768px) {
+        .form-input {
+            font-size: 16px;
+        }
+    }
+
     @media (max-width: 480px) {
         .time-input-container {
             margin: 0 10px;
