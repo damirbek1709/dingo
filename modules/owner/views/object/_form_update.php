@@ -497,5 +497,8 @@ $cityName = $model->city ? $model->city[0] : "";
         .form-input {
             font-size: 16px;
         }
+        .note-editable{
+            font-size:16px;
+        }
     }
 </style>

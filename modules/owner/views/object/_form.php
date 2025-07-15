@@ -568,6 +568,9 @@ use kartik\select2\Select2;
         .form-input {
             font-size: 16px;
         }
+        .note-editable{
+            font-size:16px;
+        }
     }
 
     @media (max-width: 480px) {
@@ -585,5 +588,6 @@ use kartik\select2\Select2;
             height: 35px;
             font-size: 14px;
         }
+        
     }
 </style>
