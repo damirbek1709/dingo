@@ -3,6 +3,9 @@
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
+$nikita = file_exists(__DIR__ . '/nikita-local.php') ?
+    require(__DIR__ . '/nikita-local.php') : require(__DIR__ . '/nikita.php');
+
 $config = [
     'id' => 'basic-console',
     'basePath' => dirname(__DIR__),
@@ -14,6 +17,7 @@ $config = [
         '@tests' => '@app/tests',
     ],
     'components' => [
+        'nikita' => $nikita,
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
