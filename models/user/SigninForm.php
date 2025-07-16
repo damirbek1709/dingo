@@ -52,6 +52,7 @@ class SigninForm extends \yii\base\Model
                 $model = new RegistrationForm();
                 $model->username = $this->email;
                 $model->email = $this->email;
+                $model->phone = $this->phone;
 
                 if ($model->validate() && $model->register()) {
                     return true;
@@ -73,7 +74,7 @@ class SigninForm extends \yii\base\Model
                     $token->link('user', $user);
                 }
 
-                $recipient = '+' . $this->username;
+                $recipient = '+' . $this->phone;
                 if ($sendSMS) {
                     Yii::$app->nikita->setRecipient($recipient)
                         ->setText('Ваш код: ' . $token->code . ' is your code' . PHP_EOL . 'wYvKRPwmEXI')
