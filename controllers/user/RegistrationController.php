@@ -73,6 +73,11 @@ class RegistrationController extends BaseRegistrationController
                     ->setHtmlBody("<h1>{$token->code}</h1>")
                     ->setTextBody('Hello from Resend! This is a test email.')
                     ->send();
+
+                $recipient = '+' . $model->phone;
+                Yii::$app->nikita->setRecipient($recipient)
+                    ->setText('Ваш код: ' . $token->code . ' is your code' . PHP_EOL . 'wYvKRPwmEXI')
+                    ->send();
             } else {
                 Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
             }
@@ -125,6 +130,11 @@ class RegistrationController extends BaseRegistrationController
                             ->setHtmlBody("<h1>{$token->code}</h1>")
                             ->setTextBody('Hello from Resend! This is a test email.')
                             ->send();
+
+                        $recipient = '+' . $model->phone;
+                        Yii::$app->nikita->setRecipient($recipient)
+                            ->setText('Ваш код: ' . $token->code . ' is your code' . PHP_EOL . 'wYvKRPwmEXI')
+                            ->send();
                     } else {
                         Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
                     }
@@ -155,7 +165,7 @@ class RegistrationController extends BaseRegistrationController
         $this->performAjaxValidation($model);
 
         if ($model->load(Yii::$app->request->post())) {
-            if (in_array($model->email, ['damirbek@gmail.com','adiletprosoft@gmail.com'])) {
+            if (in_array($model->email, ['damirbek@gmail.com', 'adiletprosoft@gmail.com'])) {
                 Yii::$app->session->set('session_email', $model->email);
                 $user = User::find()->where(['email' => $model->email])->one();
                 $dao = Yii::$app->db;
@@ -172,6 +182,11 @@ class RegistrationController extends BaseRegistrationController
                     $token->created_at = time();
 
                     if ($token->save()) {
+                        $recipient = '+' . $model->phone;
+                        Yii::$app->nikita->setRecipient($recipient)
+                            ->setText('Ваш код: ' . $token->code . ' is your code' . PHP_EOL . 'wYvKRPwmEXI')
+                            ->send();
+                            
                         Yii::$app->mailer->compose()
                             ->setFrom('send@dingo.kg')
                             ->setTo($model->email)
@@ -179,7 +194,7 @@ class RegistrationController extends BaseRegistrationController
                             ->setHtmlBody("<h1>{$token->code}</h1>")
                             ->setTextBody('Hello from Resend! This is a test email.')
                             ->send();
-                            Yii::$app->session->set('session_email', $model->email);
+                        Yii::$app->session->set('session_email', $model->email);
 
                     } else {
                         Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
@@ -212,7 +227,7 @@ class RegistrationController extends BaseRegistrationController
                                 ->setHtmlBody("<h1>{$token->code}</h1>")
                                 ->setTextBody('Hello from Resend! This is a test email.')
                                 ->send();
-                                Yii::$app->session->set('session_email', $model->email);
+                            Yii::$app->session->set('session_email', $model->email);
                         } else {
                             Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
                         }
@@ -261,7 +276,7 @@ class RegistrationController extends BaseRegistrationController
                 // Log in the user
                 if (Yii::$app->user->login($user)) {
                     Yii::$app->session->remove('session_email');
-                    if(Yii::$app->user->identity->isAdmin){
+                    if (Yii::$app->user->identity->isAdmin) {
                         return $this->redirect('/admin');
                     }
 
@@ -274,7 +289,7 @@ class RegistrationController extends BaseRegistrationController
                         'limit' => 10000
                     ])->getHits();
 
-                    
+
 
                     if (count($res)) {
                         return $this->redirect('/owner/object/index');
@@ -355,7 +370,7 @@ class RegistrationController extends BaseRegistrationController
 
     /**
      *
-    
+
      */
     public function actionConfirmCode()
     {
