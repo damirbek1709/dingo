@@ -22,6 +22,7 @@ use dektrium\user\models\RegistrationForm as BaseRegistrationForm;
 class RegistrationForm extends BaseRegistrationForm
 {
     public $email;
+    public $phone;
 
     /**
      * @var string Username
@@ -58,6 +59,9 @@ class RegistrationForm extends BaseRegistrationForm
             'emailTrim' => ['email', 'trim'],
             'emailRequired' => ['email', 'required'],
             'emailPattern' => ['email', 'email'],
+
+            'phoneTrim' => ['phone', 'trim'],
+            'phoneRequired' => ['phone', 'required'],
             
             // password rules
             'passwordRequired' => ['password', 'required', 'skipOnEmpty' => $this->module->enableGeneratingPassword],

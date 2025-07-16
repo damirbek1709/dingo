@@ -77,14 +77,27 @@ $this->title = Yii::t('user', 'Sign in');
         </svg>
         <?= $form->field($model, 'email')->textInput(["type" => "email", 'class' => 'input', 'placeholder' => 'mail@example.com', 'autocomplete="email"'])->label(false); ?>
     </div>
-    <div class="form-caption"><?=Yii::t('app','Мы отправим разовый пароль на вашу почту')?></div>
+
+    <div class="input-wrapper">
+        <!-- Mail SVG -->
+        <svg fill="#bcbcbe" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path
+                d="M20 4H4C2.9 4 2 4.9 2 6V18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 2v.01L12 13 4 6.01V6h16zM4 18V8.03l7.29 6.36c.39.34.98.34 1.36 0L20 8.03V18H4z" />
+        </svg>
+        <?= $form->field($model, 'phone')->textInput(["type" => "phone", 'class' => 'input', 'placeholder' => '996XXXXXXXXX', 'autocomplete="phone"'])->label(false); ?>
+
+    </div>
+
+    <div class="form-caption"><?= Yii::t('app', 'Мы отправим разовый пароль на вашу почту') ?></div>
     <div class="checkbox-row">
         <input type="checkbox" id="terms" required checked>
         <label for="terms" class="checkbox-desc">
-            <?=Yii::t('app','Я принимаю условия')?> <a href="/offer" target="_blank" rel="noopener"><?=Yii::t('app','договора оферты')?></a> <?=Yii::t('app','и подтверждаю своё согласие согласие')?>
+            <?= Yii::t('app', 'Я принимаю условия') ?> <a href="/offer" target="_blank"
+                rel="noopener"><?= Yii::t('app', 'договора оферты') ?></a>
+            <?= Yii::t('app', 'и подтверждаю своё согласие согласие') ?>
         </label>
     </div>
-    <button type="submit" class="btn-main"><?=Yii::t('app','Получить код')?></button>
-    
+    <button type="submit" class="btn-main"><?= Yii::t('app', 'Получить код') ?></button>
+
     <?php ActiveForm::end(); ?>
 </main>

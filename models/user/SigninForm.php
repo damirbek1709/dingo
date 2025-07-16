@@ -12,6 +12,7 @@ use app\models\user\RegistrationForm;
 class SigninForm extends \yii\base\Model
 {
     public $email;
+    public $phone;
 
     /**
      * {@inheritdoc}
@@ -22,6 +23,10 @@ class SigninForm extends \yii\base\Model
             ['email', 'trim'],
             ['email', 'required', 'on' => ['register', 'create', 'connect', 'update']],
             ['email', 'string', 'min' => 3, 'max' => 255],
+            
+            ['phone', 'trim'],
+            ['phone', 'required', 'on' => ['register', 'create', 'connect', 'update']],
+            ['phone', 'string', 'min' => 3, 'max' => 255],
         ];
     }
 
@@ -68,15 +73,18 @@ class SigninForm extends \yii\base\Model
                     $token->link('user', $user);
                 }
 
-
+                $recipient = '+' . $this->username;
                 if ($sendSMS) {
-                    Yii::$app->mailer->compose()
-                        ->setFrom('send@dingo.kg')
-                        ->setTo($this->email)
-                        ->setSubject("Ваш код авторизации: " . $token->code)
-                        ->setHtmlBody("<h1>{$token->code}</h1>")
-                        ->setTextBody('Hello from Resend! This is a test email.')
+                    Yii::$app->nikita->setRecipient($recipient)
+                        ->setText('Ваш код: ' . $token->code . ' is your code' . PHP_EOL . 'wYvKRPwmEXI')
                         ->send();
+                    // Yii::$app->mailer->compose()
+                    //     ->setFrom('send@dingo.kg')
+                    //     ->setTo($this->email)
+                    //     ->setSubject("Ваш код авторизации: " . $token->code)
+                    //     ->setHtmlBody("<h1>{$token->code}</h1>")
+                    //     ->setTextBody('Hello from Resend! This is a test email.')
+                    //     ->send();
                 }
 
                 return true;
