@@ -2,7 +2,7 @@
 
 return [
     'class' => 'app\components\Nikita',
-    'login' => 'Selva',
-    'password' => '33xmJ_Xy',
-    'sender' => 'Selva.kg',
+    'login' => 'sydykovm',
+    'password' => 'kUbTBg7C',
+    'sender' => 'dingo.kg',
 ];
