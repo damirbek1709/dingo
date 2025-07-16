@@ -36,6 +36,7 @@ use app\models\Objects;
                                     <?= $status['label'] ?>
                                 </div>
                             </div>
+                            
                             <div class="property-info">
                                 <h3 class="property-title"><?= $model['name'][0] ?>"</h3>
                                 <div class="property-address">

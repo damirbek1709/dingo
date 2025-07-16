@@ -280,4 +280,7 @@ use yii\widgets\ActiveForm;
         font-weight: 500;
         margin-bottom: 15px;
     }
+    .note-editable {
+            font-size: 16px;
+        }
 </style>
