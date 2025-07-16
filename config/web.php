@@ -3,6 +3,8 @@
 $params = require __DIR__ . '/params.php';
 $db = file_exists(__DIR__ . '/db-local.php') ?
     require(__DIR__ . '/db-local.php') : require(__DIR__ . '/db.php');
+$nikita = file_exists(__DIR__ . '/nikita-local.php') ?
+    require(__DIR__ . '/nikita-local.php') : require(__DIR__ . '/nikita.php');
 
 
 $config = [
@@ -125,6 +127,12 @@ $config = [
                 'encryption' => 'ssl',
             ],
         ],
+        'nikita' => $nikita,
+        'sms' => [
+            'class' => 'app\components\Sms',
+            'username' => 'sydykovm',
+            'password' => 'b0i2m3de',
+        ],
 
         'meili' => [
             'class' => 'app\components\Meili',
@@ -147,7 +155,7 @@ $config = [
             'rules' => [
                 'contact' => 'site/contact',
                 'about' => 'site/about',
-                'admin/finance'=>'admin/booking/finance',
+                'admin/finance' => 'admin/booking/finance',
                 'shipment' => 'site/shipment',
                 'return' => 'site/return',
                 'privacy' => 'site/privacy',
