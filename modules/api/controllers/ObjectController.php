@@ -947,10 +947,16 @@ class ObjectController extends BaseController
         $document = $client->index('object')->getDocument($id);
         if ($document) {
             $type_id = $document['type'];
-            $type_string = Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_OBJECT, 'id' => $type_id])->one();
 
-            $document['type_string'] = [$type_string->title, $type_string->title_en, $type_string->title_ky];
+            $type_string = Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_OBJECT, 'id' => $type_id])->one();
+            if ($type_string) {
+                $document['type_string'] = [$type_string->title, $type_string->title_en, $type_string->title_ky];
+            }
+            else{
+                $document['type_string'] = null;
+            }
             return $document;
+
         }
         return null;
     }
