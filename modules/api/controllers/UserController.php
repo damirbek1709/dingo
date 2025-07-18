@@ -251,7 +251,7 @@ class UserController extends BaseController
                 'check-confirmation-code' => ['POST'],
                 'delete-account' => ['POST'],
                 'edit-account' => ['POST'],
-                'favorites' => ['POST'],
+                'favorites' => ['GET'],
                 'add-to-favorites' => ['GET'],
             ],
         ];
