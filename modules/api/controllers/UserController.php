@@ -14,6 +14,7 @@ use app\models\user\Token;
 use app\models\user\RegistrationForm;
 use yii\web\NotFoundHttpException;
 use app\models\Favorite;
+use app\models\Vocabulary;
 
 class UserController extends BaseController
 {
@@ -158,6 +159,7 @@ class UserController extends BaseController
         $favorite->object_id = $id;
         $favorite->user_id = Yii::$app->user->id;
         if ($favorite->save()) {
+
             $response["success"] = true;
             $response["message"] = Yii::t('app', 'Объект добавлен в избранные');
         }
@@ -185,7 +187,17 @@ class UserController extends BaseController
             'limit' => 100
         ]);
 
-        return $searchResults->getHits();
+        $hits = $searchResults->getHits();
+        foreach($hits as $hit){
+            $type_id = $hit['type'];
+            $hit['type_string'] = null;
+            $type = Vocabulary::findOne($type_id);
+            if ($type) {
+                $hit['type_string'] = [$type->title, $type->title_en, $type->title_ky];
+            }
+        }
+
+        return $hits;
     }
 
 
