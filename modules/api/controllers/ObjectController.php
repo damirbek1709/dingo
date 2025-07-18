@@ -945,10 +945,14 @@ class ObjectController extends BaseController
     {
         $client = Yii::$app->meili->connect();
         $document = $client->index('object')->getDocument($id);
-        $type_id = $document['type'];
-        $type_string = Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_OBJECT, 'id' => $type_id])->one();
-        $document['type_string'] = [$type_string->title, $type_string->title_en, $type_string->title_ky];
-        return $document;
+        if ($document) {
+            $type_id = $document['type'];
+            $type_string = Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_OBJECT, 'id' => $type_id])->one();
+
+            $document['type_string'] = [$type_string->title, $type_string->title_en, $type_string->title_ky];
+            return $document;
+        }
+        return null;
     }
 
     public function actionSimilar($id)
