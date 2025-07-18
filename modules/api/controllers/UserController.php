@@ -174,26 +174,13 @@ class UserController extends BaseController
             'object_id'
         );
 
-        if (empty($fav_arr)) {
-            return [
-                'pageSize' => 10,
-                'totalCount' => 0,
-                'page' => 1,
-                'data' => [],
-            ];
-        }
-
-
-        $client = Yii::$app->meili->connect();
         $ids = array_values($fav_arr);
         $totalCount = count($ids);
         $pageSize = 10;
         $page = max(1, (int) Yii::$app->request->get('page', 1));
         $offset = ($page - 1) * $pageSize;
 
-        $paginatedIds = array_slice($ids, $offset, $pageSize);
-
-        if (empty($paginatedIds)) {
+        if (empty($ids) || $offset >= $totalCount) {
             return [
                 'pageSize' => $pageSize,
                 'totalCount' => $totalCount,
@@ -202,17 +189,19 @@ class UserController extends BaseController
             ];
         }
 
+        $paginatedIds = array_slice($ids, $offset, $pageSize);
         $idFilter = 'id IN [' . implode(', ', $paginatedIds) . ']';
 
+        $client = Yii::$app->meili->connect();
         $searchResults = $client->index('object')->search('', [
             'filter' => [$idFilter],
-            'limit' => $pageSize,
-            'offset' => 0, // always 0 now, because we're paginating in PHP
+            'limit' => $pageSize,  // not necessary but safe
+            'offset' => 0,         // since you're paginating IDs manually
         ]);
 
         $hits = $searchResults->getHits();
 
-        // Optional: preload all types to avoid query in loop
+        // Preload Vocabulary data to avoid N+1 queries
         $typeIds = array_unique(array_column($hits, 'type'));
         $types = Vocabulary::find()
             ->select(['id', 'title', 'title_en', 'title_ky'])
@@ -232,15 +221,14 @@ class UserController extends BaseController
         }
         unset($hit); // break reference
 
-        $totalCount = $searchResults->getEstimatedTotalHits();
-
         return [
             'pageSize' => $pageSize,
-            'totalCount' => $totalCount,
+            'totalCount' => $totalCount, // ✅ keep this from PHP, not Meilisearch
             'page' => $page,
             'data' => $hits,
         ];
     }
+
 
 
 
