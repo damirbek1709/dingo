@@ -183,18 +183,31 @@ class UserController extends BaseController
             ];
         }
 
-        $ids = array_values($fav_arr);
-        $idFilter = 'id IN [' . implode(', ', $ids) . ']';
 
         $client = Yii::$app->meili->connect();
-        $pageSize = 1;
+        $ids = array_values($fav_arr);
+        $totalCount = count($ids);
+        $pageSize = 10;
         $page = max(1, (int) Yii::$app->request->get('page', 1));
         $offset = ($page - 1) * $pageSize;
+
+        $paginatedIds = array_slice($ids, $offset, $pageSize);
+
+        if (empty($paginatedIds)) {
+            return [
+                'pageSize' => $pageSize,
+                'totalCount' => $totalCount,
+                'page' => $page,
+                'data' => [],
+            ];
+        }
+
+        $idFilter = 'id IN [' . implode(', ', $paginatedIds) . ']';
 
         $searchResults = $client->index('object')->search('', [
             'filter' => [$idFilter],
             'limit' => $pageSize,
-            'offset' => $offset
+            'offset' => 0, // always 0 now, because we're paginating in PHP
         ]);
 
         $hits = $searchResults->getHits();
