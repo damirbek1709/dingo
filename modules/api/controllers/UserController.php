@@ -67,7 +67,7 @@ class UserController extends BaseController
 
                 $response["success"] = true;
                 $response["message"] = "Пользователь создан";
-                if (in_array($email, ['damirbek@gmail.com','adiletprosoft@gmail.com'])) {
+                if (in_array($email, ['damirbek@gmail.com', 'adiletprosoft@gmail.com'])) {
                     $dao = Yii::$app->db;
                     $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
                     $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '000000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
@@ -151,16 +151,41 @@ class UserController extends BaseController
         return $response;
     }
 
-    public function actionAddToFavorites($id){
+    public function actionAddToFavorites($id)
+    {
         $response["success"] = false;
         $favorite = new Favorite();
         $favorite->object_id = $id;
         $favorite->user_id = Yii::$app->user->id;
-        if($favorite->save()){
+        if ($favorite->save()) {
             $response["success"] = true;
-            $response["message"] = Yii::t('app','Объект добавлен в избранные');
+            $response["message"] = Yii::t('app', 'Объект добавлен в избранные');
         }
         return $response;
+    }
+
+    public function actionFavorites()
+    {
+        $fav_arr = ArrayHelper::map(
+            Favorite::find()->where(['user_id' => Yii::$app->user->id])->all(),
+            'id',
+            'object_id'
+        );
+
+        if (empty($fav_arr)) {
+            return []; // or handle no favorites case
+        }
+
+        $ids = array_values($fav_arr); // ensure it's a flat array of object_ids
+        $idFilter = 'id IN [' . implode(', ', $ids) . ']';
+
+        $client = Yii::$app->meili->connect();
+        $searchResults = $client->index('object')->search('', [
+            'filter' => [$idFilter],
+            'limit' => 100
+        ]);
+
+        return $searchResults->getHits();
     }
 
 
@@ -185,7 +210,7 @@ class UserController extends BaseController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['delete-account', 'edit-account','add-to-favorites'],
+                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites'],
                     'roles' => ['@'],
                 ],
             ],
@@ -199,6 +224,7 @@ class UserController extends BaseController
                 'check-confirmation-code' => ['POST'],
                 'delete-account' => ['POST'],
                 'edit-account' => ['POST'],
+                'favorites' => ['POST'],
                 'add-to-favorites' => ['GET'],
             ],
         ];
