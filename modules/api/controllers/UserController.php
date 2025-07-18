@@ -182,13 +182,18 @@ class UserController extends BaseController
         $idFilter = 'id IN [' . implode(', ', $ids) . ']';
 
         $client = Yii::$app->meili->connect();
+        $pageSize = 10;
+        $page = (int) Yii::$app->request->get('page', 1);
+        $offset = ($page - 1) * $pageSize;
+
         $searchResults = $client->index('object')->search('', [
             'filter' => [$idFilter],
-            'limit' => 100
+            'limit' => $pageSize * 5,
+            'offset' => 0
         ]);
 
         $hits = $searchResults->getHits();
-        foreach($hits as $hit){
+        foreach ($hits as $hit) {
             $type_id = $hit['type'];
             $hit['type_string'] = null;
             $type = Vocabulary::findOne($type_id);
@@ -197,7 +202,17 @@ class UserController extends BaseController
             }
         }
 
-        return $hits;
+        $totalCount = count($hits);
+        $paginatedHits = array_slice($hits, $offset, $pageSize);
+
+        $arr = [
+            'pageSize' => $pageSize,
+            'totalCount' => $totalCount,
+            'page' => $page,
+            'data' => $paginatedHits,
+        ];
+
+        return $arr;
     }
 
 
