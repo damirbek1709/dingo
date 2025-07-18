@@ -150,6 +150,10 @@ class UserController extends BaseController
         return $response;
     }
 
+    public function actionAddFavorite($id){
+        
+    }
+
 
 
     public function behaviors()
