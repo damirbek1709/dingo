@@ -187,7 +187,7 @@ class UserController extends BaseController
         $idFilter = 'id IN [' . implode(', ', $ids) . ']';
 
         $client = Yii::$app->meili->connect();
-        $pageSize = 10;
+        $pageSize = 1;
         $page = max(1, (int) Yii::$app->request->get('page', 1));
         $offset = ($page - 1) * $pageSize;
 
