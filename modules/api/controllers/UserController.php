@@ -155,13 +155,33 @@ class UserController extends BaseController
     public function actionAddToFavorites($id)
     {
         $response["success"] = false;
-        $favorite = new Favorite();
-        $favorite->object_id = $id;
-        $favorite->user_id = Yii::$app->user->id;
-        if ($favorite->save()) {
-
+        $favorite = Favorite::find()->where(['object_id' => $id, 'user_id' => Yii::$app->user->id])->one();
+        if ($favorite) {
+            $favorite->delete();
             $response["success"] = true;
-            $response["message"] = Yii::t('app', 'Объект добавлен в избранные');
+            $response["message"] = Yii::t('app', 'Объект удален из избранных');
+        } else {
+            $favorite = new Favorite();
+            $favorite->object_id = $id;
+            $favorite->user_id = Yii::$app->user->id;
+            if ($favorite->save()) {
+                $response["success"] = true;
+                $response["message"] = Yii::t('app', 'Объект добавлен в избранные');
+            }
+        }
+        return $response;
+    }
+
+    public function actionRemoveFromFavorites($id)
+    {
+        $response["success"] = false;
+        $favorite = Favorite::find()->where(['object_id' => $id, 'user_id' => Yii::$app->user->id])->one();
+        if ($favorite) {
+            $favorite->delete();
+            $response["success"] = true;
+            $response["message"] = Yii::t('app', 'Объект удален из избранных');
+        } else {
+            $response["message"] = "Объект не найден";
         }
         return $response;
     }
@@ -246,30 +266,31 @@ class UserController extends BaseController
         $behaviors['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
-                [
-                    'allow' => true,
-                    'actions' => ['signup', 'register', 'check-confirmation-code'],
-                    'roles' => ['?'],
+                    [
+                        'allow' => true,
+                        'actions' => ['signup', 'register', 'check-confirmation-code'],
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites'],
+                        'roles' => ['@'],
+                    ],
                 ],
-                [
-                    'allow' => true,
-                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites'],
-                    'roles' => ['@'],
-                ],
-            ],
         ];
 
         $behaviors['verbs'] = [
             'class' => VerbFilter::className(),
             'actions' => [
-                'signup' => ['POST'],
-                'register' => ['POST'],
-                'check-confirmation-code' => ['POST'],
-                'delete-account' => ['POST'],
-                'edit-account' => ['POST'],
-                'favorites' => ['GET'],
-                'add-to-favorites' => ['GET'],
-            ],
+                    'signup' => ['POST'],
+                    'register' => ['POST'],
+                    'check-confirmation-code' => ['POST'],
+                    'delete-account' => ['POST'],
+                    'edit-account' => ['POST'],
+                    'favorites' => ['GET'],
+                    'add-to-favorites' => ['GET'],
+                    'remove-from-favorites' => ['GET'],
+                ],
         ];
 
 
