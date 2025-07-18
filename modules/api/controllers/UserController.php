@@ -175,45 +175,60 @@ class UserController extends BaseController
         );
 
         if (empty($fav_arr)) {
-            return []; // or handle no favorites case
+            return [
+                'pageSize' => 10,
+                'totalCount' => 0,
+                'page' => 1,
+                'data' => [],
+            ];
         }
 
-        $ids = array_values($fav_arr); // ensure it's a flat array of object_ids
+        $ids = array_values($fav_arr);
         $idFilter = 'id IN [' . implode(', ', $ids) . ']';
 
         $client = Yii::$app->meili->connect();
         $pageSize = 10;
-        $page = (int) Yii::$app->request->get('page', 1);
+        $page = max(1, (int) Yii::$app->request->get('page', 1));
         $offset = ($page - 1) * $pageSize;
 
         $searchResults = $client->index('object')->search('', [
             'filter' => [$idFilter],
-            'limit' => $pageSize * 5,
-            'offset' => 0
+            'limit' => $pageSize,
+            'offset' => $offset
         ]);
 
         $hits = $searchResults->getHits();
-        foreach ($hits as $hit) {
-            $type_id = $hit['type'];
-            $hit['type_string'] = null;
-            $type = Vocabulary::findOne($type_id);
-            if ($type) {
-                $hit['type_string'] = [$type->title, $type->title_en, $type->title_ky];
+
+        // Optional: preload all types to avoid query in loop
+        $typeIds = array_unique(array_column($hits, 'type'));
+        $types = Vocabulary::find()
+            ->select(['id', 'title', 'title_en', 'title_ky'])
+            ->where(['id' => $typeIds])
+            ->indexBy('id')
+            ->asArray()
+            ->all();
+
+        foreach ($hits as &$hit) {
+            $type_id = $hit['type'] ?? null;
+            if ($type_id && isset($types[$type_id])) {
+                $type = $types[$type_id];
+                $hit['type_string'] = [$type['title'], $type['title_en'], $type['title_ky']];
+            } else {
+                $hit['type_string'] = null;
             }
         }
+        unset($hit); // break reference
 
-        $totalCount = count($hits);
-        $paginatedHits = array_slice($hits, $offset, $pageSize);
+        $totalCount = $searchResults->getEstimatedTotalHits();
 
-        $arr = [
+        return [
             'pageSize' => $pageSize,
             'totalCount' => $totalCount,
             'page' => $page,
-            'data' => $paginatedHits,
+            'data' => $hits,
         ];
-
-        return $arr;
     }
+
 
 
 
