@@ -13,6 +13,7 @@ use yii\helpers\ArrayHelper;
 use app\models\user\Token;
 use app\models\user\RegistrationForm;
 use yii\web\NotFoundHttpException;
+use app\models\Favorite;
 
 class UserController extends BaseController
 {
@@ -150,8 +151,16 @@ class UserController extends BaseController
         return $response;
     }
 
-    public function actionAddFavorite($id){
-        
+    public function actionAddToFavorites($id){
+        $response["success"] = false;
+        $favorite = new Favorite();
+        $favorite->object_id = $id;
+        $favorite->user_id = Yii::$app->user->id;
+        if($favorite->save()){
+            $response["success"] = true;
+            $response["message"] = Yii::t('app','Объект добавлен в избранные');
+        }
+        return $response;
     }
 
 
@@ -176,7 +185,7 @@ class UserController extends BaseController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['delete-account', 'edit-account'],
+                    'actions' => ['delete-account', 'edit-account','add-to-favorites'],
                     'roles' => ['@'],
                 ],
             ],
@@ -190,6 +199,7 @@ class UserController extends BaseController
                 'check-confirmation-code' => ['POST'],
                 'delete-account' => ['POST'],
                 'edit-account' => ['POST'],
+                'add-to-favorites' => ['GET'],
             ],
         ];
 
