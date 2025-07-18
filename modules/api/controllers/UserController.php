@@ -176,7 +176,7 @@ class UserController extends BaseController
 
         $ids = array_values($fav_arr);
         $totalCount = count($ids);
-        $pageSize = 1;
+        $pageSize = 10;
         $page = max(1, (int) Yii::$app->request->get('page', 1));
         $offset = ($page - 1) * $pageSize;
 
