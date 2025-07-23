@@ -111,7 +111,6 @@ class UserController extends BaseController
                     ->send();
             }
         }
-
         return $response;
     }
 
@@ -266,31 +265,31 @@ class UserController extends BaseController
         $behaviors['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['signup', 'register', 'check-confirmation-code'],
-                        'roles' => ['?'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites'],
-                        'roles' => ['@'],
-                    ],
+                [
+                    'allow' => true,
+                    'actions' => ['signup', 'register', 'check-confirmation-code'],
+                    'roles' => ['?'],
                 ],
+                [
+                    'allow' => true,
+                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites'],
+                    'roles' => ['@'],
+                ],
+            ],
         ];
 
         $behaviors['verbs'] = [
             'class' => VerbFilter::className(),
             'actions' => [
-                    'signup' => ['POST'],
-                    'register' => ['POST'],
-                    'check-confirmation-code' => ['POST'],
-                    'delete-account' => ['POST'],
-                    'edit-account' => ['POST'],
-                    'favorites' => ['GET'],
-                    'add-to-favorites' => ['GET'],
-                    'remove-from-favorites' => ['GET'],
-                ],
+                'signup' => ['POST'],
+                'register' => ['POST'],
+                'check-confirmation-code' => ['POST'],
+                'delete-account' => ['POST'],
+                'edit-account' => ['POST'],
+                'favorites' => ['GET'],
+                'add-to-favorites' => ['GET'],
+                'remove-from-favorites' => ['GET'],
+            ],
         ];
 
 

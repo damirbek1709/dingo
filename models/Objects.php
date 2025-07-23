@@ -470,6 +470,47 @@ class Objects extends \yii\db\ActiveRecord
         return $result ? $result->title : "";
     }
 
+    public static function objectListMenu()
+    {
+        $lang = Yii::$app->language;
+        $item_arr = [];
+        $index = 0;
+        switch ($lang) {
+            case 'ru':
+                $index = 0;
+                break;
+            case 'en':
+                $index = 1;
+                break;
+            case 'ky':
+                $index = 2;
+                break;
+            default:
+                $index = 0;
+                break;
+        }
+        if (!Yii::$app->user->isGuest) {
+            $item_arr = [];
+            $object_id = 0;
+            if (Yii::$app->request->get('object_id')) {
+                $object_id = Yii::$app->request->get('object_id');
+            }
+            $filter_string = "user_id=" . Yii::$app->user->id;
+            $client = Yii::$app->meili->connect();
+            $res = $client->index('object')->search('', [
+                'filter' => [
+                    $filter_string
+                ],
+                'limit' => 10000
+            ])->getHits();
+
+            foreach ($res as $val) {
+                $item_arr[$val['id']] = $val['name'][$index];
+            }
+            return $item_arr;
+        }
+    }
+
     public static function objectList()
     {
         $lang = Yii::$app->language;

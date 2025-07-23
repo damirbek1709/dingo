@@ -7,6 +7,7 @@ use app\assets\AppAsset;
 use app\widgets\Alert;
 use yii\widgets\Breadcrumbs;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 
@@ -34,9 +35,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <header id="header">
         <?php
         NavBar::begin([
-            'brandLabel' => '<div class="logo"><span class="logo-blue">Din</span><span class="logo-green">go</span></div>',
+            'brandLabel' => Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']),
             'brandUrl' => Yii::$app->homeUrl,
-            'options' => ['class' => 'navbar-expand-md navbar-dark bg-dark fixed-top']
+            'options' => [
+                'class' => 'navbar-default navbar-inverse navbar-fixed-top navbar-owner',
+            ],
+            'innerContainerOptions' => ['class' => 'container-fluid'],
         ]);
         echo Nav::widget([
             'options' => ['class' => 'navbar-nav'],
