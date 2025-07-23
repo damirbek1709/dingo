@@ -176,6 +176,20 @@ class UserController extends BaseController
         return $response;
     }
 
+    public function actionFavoriteIds()
+    {
+        $response = null;
+        $fav = Favorite::find()
+            ->where(['user_id' => Yii::$app->user->id])
+            ->asArray()
+            ->all();
+        if ($fav)
+            $response = ArrayHelper::getColumn($fav, 'object_id');
+        return $response;
+    }
+
+
+
     public function actionRemoveFromFavorites($id)
     {
         $response["success"] = false;
@@ -277,7 +291,7 @@ class UserController extends BaseController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites'],
+                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids'],
                     'roles' => ['@'],
                 ],
             ],
@@ -294,6 +308,7 @@ class UserController extends BaseController
                 'favorites' => ['GET'],
                 'add-to-favorites' => ['GET'],
                 'remove-from-favorites' => ['GET'],
+                'favorite-ids' => ['GET'],
             ],
         ];
 
