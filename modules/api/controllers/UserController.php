@@ -168,7 +168,11 @@ class UserController extends BaseController
                 $response["message"] = Yii::t('app', 'Объект добавлен в избранные');
             }
         }
-        $new_fav = ArrayHelper::map(Favorite::find()->where(['user_id' => Yii::$app->user->id])->all(),'id','id');
+        $new_fav = Favorite::find()
+            ->where(['user_id' => Yii::$app->user->id])
+            ->asArray()
+            ->all();
+
         $response["data"] = $new_fav;
         return $response;
     }
