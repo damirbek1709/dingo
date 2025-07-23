@@ -172,7 +172,7 @@ class UserController extends BaseController
             ->where(['user_id' => Yii::$app->user->id])
             ->asArray()
             ->all();
-        $response["data"] = ArrayHelper::getColumn($new_fav, 'id');
+        $response["data"] = ArrayHelper::getColumn($new_fav, 'object_id');
         return $response;
     }
 
