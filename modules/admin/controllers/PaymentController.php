@@ -97,16 +97,16 @@ class PaymentController extends Controller
 
             // Prepare payout data
             $payoutData = [
-                'merchant_order_id' => $payoutId,
-                'amount' => floatval($postData['amount']),
-                'currency' => $postData['currency'],
-                'description' => $postData['description'] ?? 'Individual payout',
+                'merchant_order_id' => 111111,
+                'amount' => 1,
+                'currency' => 'KGS',
+                'description' => 'Individual payout',
                 'recipient' => [
-                    'account_number' => $postData['recipient_account'],
-                    'account_name' => $postData['recipient_name'],
-                    'bank_code' => $postData['bank_code'] ?? null,
-                    'phone' => $postData['recipient_phone'] ?? null,
-                    'email' => $postData['recipient_email'] ?? null,
+                    'account_number' => 4169585343246905,
+                    'account_name' => 'DAMIRBEK SYDYKOV',
+                    'bank_code' =>  null,
+                    'phone' => '996551170990',
+                    'email' => 'damirbek@gmail.com',
                 ],
                 'callback_url' => $postData['callback_url'] ?? Yii::$app->urlManager->createAbsoluteUrl(['payment/payout-callback']),
                 'return_url' => $postData['return_url'] ?? null,
