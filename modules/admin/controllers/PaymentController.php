@@ -190,6 +190,23 @@ class PaymentController extends Controller
         return $strings;
     }
 
+    private function formatValue($value)
+    {
+        if (is_bool($value)) {
+            return $value ? '1' : '0';
+        }
+
+        if ($value === null) {
+            return '';
+        }
+
+        if ($value === '') {
+            return '';
+        }
+
+        return (string) $value;
+    }
+
     private function generateSignature($data)
     {
         // Step 1: Remove signature parameter if it exists
