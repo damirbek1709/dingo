@@ -81,8 +81,8 @@ class PaymentController extends Controller
 
         $data = [
             "general" => [
-                "project_id" => Booking::MERCHANT_ID,
-                "payment_id" => time(),
+                "project_id" => (int)Booking::MERCHANT_ID,
+                "payment_id" => (string)time(),
                 "terminal_callback_url" => "https://yourdomain.com/callback",
                 "referrer_url" => "https://yourdomain.com",
                 "merchant_callback_url" => "https://yourdomain.com/merchant-callback",
@@ -128,9 +128,6 @@ class PaymentController extends Controller
         ];
 
         $data["general"]["signature"] = $this->generateSignature($data);
-
-
-
 
 
         $headers = [
