@@ -88,11 +88,9 @@ class SiteController extends Controller
     {
         if (Yii::$app->user->isGuest) {
             return $this->redirect(['user/signin']);
-        }
-        elseif(Yii::$app->user->identity->isAdmin){
+        } elseif (Yii::$app->user->identity->isAdmin) {
             return $this->redirect(['/admin']);
-        }
-        else {
+        } else {
             return $this->redirect(['/owner']);
         }
 
@@ -141,11 +139,11 @@ class SiteController extends Controller
                     }
 
                     $results[] = [
-                        'id' => (string)$hit['id'],
+                        'id' => (string) $hit['id'],
                         'text' => $hit['name'], // this is what Select2 expects by default
                         'display' => $hit['name'] . (!empty($hit['region']) ? ' (' . $hit['region'] . ')' : ''),
-                        'geo_data'=>$hit['geo_data']
-                        
+                        'geo_data' => $hit['geo_data']
+
                     ];
                 }
             }
@@ -174,7 +172,7 @@ class SiteController extends Controller
         echo "</pre>";
     }
 
-    
+
     public function actionPrivacy()
     {
         $this->layout = "general";
@@ -362,6 +360,29 @@ class SiteController extends Controller
         return $this->render('contact', [
             'model' => $model,
         ]);
+    }
+
+    public function actionAppleCredentials()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        return [
+            'applinks' => [
+                'apps' => [],
+                'details' => [
+                    [
+                        'appIDs' => ['9QAR57XHB4.com.dingo.dingoapplication'],
+                        'paths' => ['*'], // Use '*' to allow all paths
+                        'components' => [
+                            ['/' => '/']
+                        ]
+                    ]
+                ]
+            ],
+            'webcredentials' => [
+                'apps' => ['9QAR57XHB4.com.dingo.dingoapplication']
+            ]
+        ];
     }
 
 

@@ -160,6 +160,7 @@ $config = [
                 'return' => 'site/return',
                 'privacy' => 'site/privacy',
                 'self-pickup' => 'site/self-pickup',
+                '.well-known/apple-app-site-association' => 'site/apple-credentials',
                 'payment' => 'site/payment',
                 'atelier' => 'site/atelier',
                 'clients' => 'site/clients',
@@ -174,6 +175,7 @@ $config = [
                 'user/edit-account' => 'user/settings/edit-profile',
                 'user/view-account' => 'user/settings/profile',
                 'user/delete-account' => 'user/settings/delete-account',
+
                 // Map /object/view to the view action inside owner module
             ],
         ],
