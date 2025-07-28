@@ -101,6 +101,7 @@ class PaymentController extends Controller
             "customer" => [
                 "id" => "customer123",
                 "email" => "user@example.com",
+                "phone" => "996551170990",
                 "ip_address" => Yii::$app->request->userIP,
                 "gender" => "male",
                 // Fill other necessary fields or leave optional ones
@@ -108,7 +109,7 @@ class PaymentController extends Controller
             "sender" => [
                 "first_name" => "John",
                 "last_name" => "Doe",
-                "phone" => "+996700000000",
+                "phone" => "996700000000",
                 // ...
             ],
             "recipient" => [
