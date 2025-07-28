@@ -33,8 +33,8 @@ use yii\helpers\ArrayHelper;
 class Booking extends \yii\db\ActiveRecord
 {
 
-    const MERCHANT_ID = '144631';
-    const SECRET_KEY = '0bf1531b6df88949c9dd24115d6affc67fa04005bc4105f65ac373edbc89a42ab51943838f4552777f3b1d08278d7df144280edc80cd4613d38d4e2256a3601e';
+    const MERCHANT_ID = '147713';
+    const SECRET_KEY = '18d8c2073556c0457500bfe1e8de78a35d853e2fa4a10519f3993c84197e709e9b807b0291e7904b53762c5dd9492aa9330c4f6a72d84b9069250b529ecd28f2';
 
     const PAID_STATUS_NOT_PAID = 0;
     const PAID_STATUS_PAID = 1;
