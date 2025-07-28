@@ -2,7 +2,7 @@
 
 namespace app\modules\admin\controllers;
 
-use app\models\Booking;
+
 use Yii;
 use yii\web\Controller;
 use app\modules\admin\controllers\actions\FlashPayPayoutAction;
