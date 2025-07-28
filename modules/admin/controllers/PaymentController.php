@@ -77,7 +77,6 @@ class PaymentController extends Controller
     public function actionCardPayout()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
-
         $url = 'https://gateway.flashpay.kg/v2/payment/card/payout';
 
         $data = [
