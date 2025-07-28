@@ -268,9 +268,6 @@ class UserController extends BaseController
     }
 
 
-
-
-
     public function behaviors()
     {
         $behaviors = parent::behaviors();

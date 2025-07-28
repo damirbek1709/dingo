@@ -2,6 +2,7 @@
 
 namespace app\modules\admin\controllers;
 use app\models\Tariff;
+use app\models\Transaction;
 use Yii;
 use app\models\Booking;
 use app\models\BookingSearch;
@@ -238,6 +239,161 @@ class BookingController extends Controller
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
+
+    public function actionPayout($id)
+    {
+        $url = 'https://gateway.flashpay.kg/v2/payment/individual/payout';
+        $booking = Booking::findOne($id);
+        $user = User::findOne($booking->user_id);
+        $transaction = new Transaction();
+        $transaction->status = Transaction::STATUS_NEW;
+        $transaction->customer_id = $booking->user_id;
+
+        $comission = $booking->sum / 100 * $user->fee_percent;
+        $transaction->sum = $booking->sum - $comission;
+        $transaction->save();
+
+        $requestData = $this->prepareRefundData(
+            $transaction->id,
+            $transaction->sum,
+            'KGS',
+            "Выплата хосту",
+            Booking::MERCHANT_ID
+        );
+
+        // Generate signature
+        $signature = $this->generateSignature($requestData);
+
+
+        $data = [
+            "general" => [
+                "project_id" => Booking::MERCHANT_ID,
+                "payment_id" => $transaction->id,
+                "signature" => $signature, // You must generate this correctly
+                "terminal_callback_url" => "https://partner.dingo.kg/terminal-callback",
+                "referrer_url" => "https://partner.dingo.kg/referrer",
+                "merchant_callback_url" => "https://partner.dingo.kg/merchant-callback"
+            ],
+            "card" => [
+                "pan" => "4169585343246905",
+                "year" => 2026,
+                "month" => 7,
+                "issue_year" => 2021,
+                "issue_month" => 8,
+                "card_holder" => "DAMIRBEK SYDYKOV",
+                "cvv" => "617",
+                "save" => true,
+                "stored_card_type" => 0
+            ],
+            "sender" => [
+                "first_name" => "John",
+                "middle_name" => "Middle",
+                "last_name" => "Doe",
+                "day_of_birth" => "1990-01-01",
+                "birthplace" => "Bishkek",
+                "phone" => "+996700000000",
+                "residence" => "KG",
+                "citizenship" => "KG",
+                "person_type" => "individual",
+                "account_number" => "40817810000000000001",
+                "payment_purpose" => "Personal payment",
+                "source_of_income" => "Salary",
+                "beneficiary_relationship" => "Self",
+                "identify" => [
+                    "doc_number" => "AB123456",
+                    "doc_type" => "passport",
+                    "doc_issue_date" => "2010-01-01",
+                    "doc_issue_by" => "MVD"
+                ],
+                "billing" => [
+                    "country" => "KG",
+                    "city" => "Bishkek",
+                    "state" => "Chuy",
+                    "address" => "Some address",
+                    "postal" => "720000"
+                ],
+                "pan" => "4111111111111111",
+                "wallet_id" => "wallet001",
+                "address" => "Some address",
+                "zip" => "720000",
+                "city" => "Bishkek",
+                "country" => "KG",
+                "state" => "Chuy"
+            ],
+            "avs_data" => [
+                "avs_post_code" => "720000",
+                "avs_street_address" => "Some street 123"
+            ],
+            "payment" => [
+                "amount" => 1,
+                "currency" => "KGS",
+                "customer_amount" => 1,
+                "customer_currency" => "KGS",
+                "description" => "Payment description",
+                "end_to_end_id" => "e2eid123",
+                "extra_param" => "",
+                "best_before" => "2025-12-31T23:59:59Z",
+                "challenge_indicator" => "",
+                "challenge_window" => "",
+                "reorder" => "",
+                "preorder_purchase" => "",
+                "preorder_date" => "",
+                "gift_card" => [
+                    "amount" => 0,
+                    "currency" => "KGS",
+                    "count" => 0
+                ],
+                "local_conversion_currency" => "KGS",
+                "details" => [
+                    "document_number" => "INV-001",
+                    "document_date" => "2025-07-28"
+                ],
+                "device_channel" => "browser",
+                "is_fast" => true
+            ],
+            "return_url" => [
+                "success" => "https://partner.dingo.kg/success",
+                "decline" => "https://partner.dingo.kg/decline",
+                "return" => "https://partner.dingo.kg/return"
+            ],
+            "callback" => [
+                "delay" => 0,
+                "force_disable" => true
+            ]
+        ];
+
+        $payload = json_encode($data);
+
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Accept: application/json'
+        ]);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+
+        $response = curl_exec($ch);
+        $httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        if (curl_errno($ch)) {
+            return $this->asJson([
+                'success' => false,
+                'error' => curl_error($ch)
+            ]);
+        }
+
+        curl_close($ch);
+
+        return $this->asJson([
+            'success' => true,
+            'status' => $httpcode,
+            'response' => json_decode($response, true)
+        ]);
+    }
+
+
+
 
     public function actionRefund($id)
     {

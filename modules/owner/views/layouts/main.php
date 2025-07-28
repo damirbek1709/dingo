@@ -83,51 +83,51 @@ ModuleAsset::register($this);
         </header>
         <?php
 
-        $object_arr = Objects::objectList();
-        $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->username, 0, 1) : '';
+        // $object_arr = Objects::objectList();
+        // $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->username, 0, 1) : '';
 
-        NavBar::begin([
-            'brandLabel' => Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']),
-            'brandUrl' => ['/owner/default/index'],
-            'options' => [
-                'class' => 'navbar-default navbar-inverse navbar-fixed-top navbar-owner',
-            ],
-            'innerContainerOptions' => ['class' => 'container-fluid'],
-        ]);
-        echo Nav::widget([
-            'options' => ['class' => 'navbar-nav navbar-right'],
-            'items' => [
-                $object_arr,
-                // [
-                //     'label' => '',
-                //     'url' => '#',
-                //     'options' => ['class' => 'menu-notification-icon']
-                // ],
-                [
-                    'label' => $user_string,
-                    'options' => [
-                        'class' => 'user-link-class'
-                    ],
-                    'items' => [
-                        // ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can('moderator')],
-                        // ['label' => 'Панель управления', 'url' => ['/admin'], 'visible' => Yii::$app->user->can('admin')],
-                        [
-                            'label' => 'Аккаунт',
-                            'url' => ['/user/view-account'],
-                            'visible' => !Yii::$app->user->isGuest,
+        // NavBar::begin([
+        //     'brandLabel' => Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']),
+        //     'brandUrl' => ['/owner/default/index'],
+        //     'options' => [
+        //         'class' => 'navbar-default navbar-inverse navbar-fixed-top navbar-owner',
+        //     ],
+        //     'innerContainerOptions' => ['class' => 'container-fluid'],
+        // ]);
+        // echo Nav::widget([
+        //     'options' => ['class' => 'navbar-nav navbar-right'],
+        //     'items' => [
+        //         $object_arr,
+        //         // [
+        //         //     'label' => '',
+        //         //     'url' => '#',
+        //         //     'options' => ['class' => 'menu-notification-icon']
+        //         // ],
+        //         [
+        //             'label' => $user_string,
+        //             'options' => [
+        //                 'class' => 'user-link-class'
+        //             ],
+        //             'items' => [
+        //                 // ['label' => 'Панель модератора', 'url' => ['/moderator'], 'visible' => Yii::$app->user->can('moderator')],
+        //                 // ['label' => 'Панель управления', 'url' => ['/admin'], 'visible' => Yii::$app->user->can('admin')],
+        //                 [
+        //                     'label' => 'Аккаунт',
+        //                     'url' => ['/user/view-account'],
+        //                     'visible' => !Yii::$app->user->isGuest,
 
-                        ],
-                        [
-                            'label' => 'Выход',
-                            'url' => ['/user/logout'],
-                            'linkOptions' => ['data-method' => 'post']
-                        ],
-                    ],
-                    'visible' => !Yii::$app->user->isGuest
-                ],
-            ],
-        ]);
-        NavBar::end();
+        //                 ],
+        //                 [
+        //                     'label' => 'Выход',
+        //                     'url' => ['/user/logout'],
+        //                     'linkOptions' => ['data-method' => 'post']
+        //                 ],
+        //             ],
+        //             'visible' => !Yii::$app->user->isGuest
+        //         ],
+        //     ],
+        // ]);
+        // NavBar::end();
         ?>
 
         <div class="container-fluid gray-content">
