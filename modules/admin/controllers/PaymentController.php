@@ -160,6 +160,36 @@ class PaymentController extends Controller
         ];
     }
 
+    private function convertToParameterStrings($data, $parentPath = '')
+    {
+        $strings = [];
+
+        foreach ($data as $key => $value) {
+            $currentPath = $parentPath ? $parentPath . ':' . $key : $key;
+
+            if (is_array($value)) {
+                // Handle arrays with numeric indices
+                if (array_keys($value) === range(0, count($value) - 1)) {
+                    // Sequential array
+                    foreach ($value as $index => $item) {
+                        if (is_array($item)) {
+                            $strings = array_merge($strings, $this->convertToParameterStrings($item, $currentPath . ':' . $index));
+                        } else {
+                            $strings[] = $currentPath . ':' . $index . ':' . $this->formatValue($item);
+                        }
+                    }
+                } else {
+                    // Associative array
+                    $strings = array_merge($strings, $this->convertToParameterStrings($value, $currentPath));
+                }
+            } else {
+                $strings[] = $currentPath . ':' . $this->formatValue($value);
+            }
+        }
+
+        return $strings;
+    }
+
     private function generateSignature($data)
     {
         // Step 1: Remove signature parameter if it exists
