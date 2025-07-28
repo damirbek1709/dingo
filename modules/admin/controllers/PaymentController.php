@@ -8,6 +8,7 @@ use Yii;
 use yii\web\Controller;
 use yii\web\Response;
 use app\modules\admin\controllers\actions\FlashPayPayoutAction;
+use yii\helpers\Json;
 
 class PaymentController extends Controller
 {
