@@ -1,7 +1,6 @@
 <?php
 
 namespace app\modules\admin\controllers\actions;
-
 use Yii;
 use yii\base\Action;
 use yii\web\Response;
@@ -94,7 +93,9 @@ class FlashPayPayoutAction extends Action
         $request = Yii::$app->request;
 
         if (!$request->isPost) {
-            throw new BadRequestHttpException('Only POST method is allowed');
+            throw new BadRequestHttpException(
+                'Only POST method is allowed. Use the payment form at /payment/index or send a POST request with JSON data.'
+            );
         }
 
         $data = $request->getBodyParams();
@@ -104,7 +105,7 @@ class FlashPayPayoutAction extends Action
         }
 
         if (!is_array($data)) {
-            throw new BadRequestHttpException('Invalid request data format');
+            throw new BadRequestHttpException('Invalid request data format. Please send valid JSON data.');
         }
 
         return $data;
@@ -405,3 +406,4 @@ class FlashPayPayoutAction extends Action
         return $value;
     }
 }
+

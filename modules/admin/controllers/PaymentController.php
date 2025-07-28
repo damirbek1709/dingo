@@ -42,23 +42,23 @@ class PaymentController extends Controller
         $testData = [
             'payment_id' => 'test_payout_' . time(),
             'card' => [
-                'pan' => '4169585343246905', // Test card number
-                'year' => 2026,
-                'month' => 07,
-                'card_holder' => 'DAMIRBEK SYDYKOV',
-                'cvv' => '617'
+                'pan' => '4111111111111111', // Test card number
+                'year' => 2025,
+                'month' => 12,
+                'card_holder' => 'JOHN DOE',
+                'cvv' => '123'
             ],
             'customer' => [
                 'id' => 'customer_' . time(),
-                'first_name' => 'DAMIRBEK',
-                'last_name' => 'SYDYKOV',
-                'email' => 'damirbek@gmail.com',
-                'phone' => '996551170990',
+                'first_name' => 'John',
+                'last_name' => 'Doe',
+                'email' => 'john.doe@example.com',
+                'phone' => '996700123456',
                 'country' => 'KG',
                 'city' => 'Bishkek'
             ],
             'payment' => [
-                'amount' => 1, // 100.00 in minor units
+                'amount' => 10000, // 100.00 in minor units
                 'currency' => 'KGS',
                 'description' => 'Test payout payment'
             ]
@@ -66,6 +66,9 @@ class PaymentController extends Controller
 
         // Set request data for testing
         Yii::$app->request->setBodyParams($testData);
+
+        // Simulate POST request
+        $_SERVER['REQUEST_METHOD'] = 'POST';
 
         // Call the payout action
         return $this->runAction('flashpay-payout');
