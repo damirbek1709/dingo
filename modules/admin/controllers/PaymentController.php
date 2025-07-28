@@ -83,8 +83,7 @@ class PaymentController extends Controller
         $data = [
             "general" => [
                 "project_id" => Booking::MERCHANT_ID,
-                "payment_id" => "testpaymentqwerty-78978798",
-                "signature" => "",
+                "payment_id" => time(),
                 "terminal_callback_url" => "https://yourdomain.com/callback",
                 "referrer_url" => "https://yourdomain.com",
                 "merchant_callback_url" => "https://yourdomain.com/merchant-callback",
@@ -129,6 +128,11 @@ class PaymentController extends Controller
             // Add other optional sections if needed
         ];
 
+        $signature = $this->generateSignature($data);
+        $data['general']['signature'] = $signature;
+
+
+
         $headers = [
             "Accept: application/json",
             "Content-Type: application/json"
@@ -154,6 +158,30 @@ class PaymentController extends Controller
             'status' => $statusCode,
             'response' => Json::decode($response),
         ];
+    }
+
+    private function generateSignature($data)
+    {
+        // Step 1: Remove signature parameter if it exists
+        $signData = $data;
+        if (isset($signData['general']['signature'])) {
+            unset($signData['general']['signature']);
+        }
+
+        // Step 2: Convert to parameter strings with full path notation
+        $paramStrings = $this->convertToParameterStrings($signData);
+
+        // Step 3: Sort strings in natural order
+        sort($paramStrings, SORT_NATURAL);
+
+        // Step 4: Join with semicolons
+        $signString = implode(';', $paramStrings);
+
+        // Step 5: Calculate HMAC-SHA512
+        $hmac = hash_hmac('sha512', $signString, Booking::SECRET_KEY, true);
+
+        // Step 6: Base64 encode
+        return base64_encode($hmac);
     }
 
 }
