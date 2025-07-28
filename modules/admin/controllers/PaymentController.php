@@ -5,7 +5,7 @@ namespace app\modules\admin\controllers;
 use app\models\Booking;
 use Yii;
 use yii\web\Controller;
-use app\controllers\actions\FlashPayPayoutAction;
+use app\modules\admin\controllers\FlashPayPayoutAction;
 
 class PaymentController extends Controller
 {

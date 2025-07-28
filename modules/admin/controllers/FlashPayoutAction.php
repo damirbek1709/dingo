@@ -1,6 +1,6 @@
 <?php
 
-namespace app\controllers\actions;
+namespace app\modules\admin\controllers;
 
 use Yii;
 use yii\base\Action;
