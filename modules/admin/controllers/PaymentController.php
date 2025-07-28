@@ -86,7 +86,6 @@ class PaymentController extends Controller
                 "terminal_callback_url" => "https://yourdomain.com/callback",
                 "referrer_url" => "https://yourdomain.com",
                 "merchant_callback_url" => "https://yourdomain.com/merchant-callback",
-                "signature"=>$this->generateSignature()
             ],
             "card" => [
                 "pan" => "4169585343246905",
@@ -128,7 +127,9 @@ class PaymentController extends Controller
             // Add other optional sections if needed
         ];
 
-       
+        $data["general"]["signature"] = $this->generateSignature($data);
+
+
 
 
 
@@ -206,18 +207,9 @@ class PaymentController extends Controller
         return (string) $value;
     }
 
-    private function generateSignature()
+    private function generateSignature($data)
     {
-        $data = [
-            'general' => [
-                'project_id' => (int) Booking::MERCHANT_ID,
-                'payment_id' => (string) time(),
-            ],
-            'payment' => [
-                'currency' => 'KGS',
-                'description' => 'Выплата',
-            ]
-        ];
+       
         $signData = $data;
         if (isset($signData['general']['signature'])) {
             unset($signData['general']['signature']);
