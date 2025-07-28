@@ -427,7 +427,7 @@ class BookingController extends Controller
                 $model->transaction_number,
                 $sum,
                 'KGS',
-                $model->special_comment,
+                "Выплата хосту",
                 Booking::MERCHANT_ID
             );
 
