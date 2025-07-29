@@ -2,7 +2,9 @@
 
 namespace app\models;
 
+use app\models\user\User;
 use Yii;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "feedback".
@@ -38,7 +40,7 @@ class Feedback extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['object_id','user_id'], 'required'],
+            [['object_id', 'user_id'], 'required'],
             [['object_id'], 'integer'],
             [['general', 'cleaning', 'location', 'room', 'meal', 'hygien', 'price_quality', 'service', 'wifi'], 'integer', 'max' => 9],
             [['pos', 'cons'], 'string', 'max' => 800],
@@ -46,6 +48,19 @@ class Feedback extends \yii\db\ActiveRecord
             [['created_at'], 'default', 'value' => date('Y-m-d H:i:s')],
         ];
     }
+
+    public function fields()
+    {
+        return ['pos', 'cons', 'name'];
+    }
+
+    public function getName()
+    {
+        $user = User::findOne($this->user_id);
+        return $user->name ?? $user->email;
+    }
+
+
 
     /**
      * {@inheritdoc}

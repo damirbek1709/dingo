@@ -72,7 +72,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'search-stats','feedback-list'],
+                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'search-stats', 'feedback-list'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -963,11 +963,37 @@ class ObjectController extends BaseController
         return null;
     }
 
+    public function countedList()
+    {
+        $data = [];
+        $list = Feedback::find();
+
+        $fields = [
+            'general',
+            'cleaning',
+            'location',
+            'room',
+            'meal',
+            'hygien',
+            'price_quality',
+            'service',
+            'wifi'
+        ];
+
+        foreach ($fields as $field) {
+            $query = clone $list;
+            $query->andWhere(['not', [$field => null]]);
+            $count = $query->count();
+            $sum = $query->sum($field);
+            $data[$field] = [$count > 0 ? round($sum / $count, 2) : 0, $count];
+        }
+        return $data;
+    }
     public function actionFeedbackList($object_id, $page = 1)
     {
         $searchModel = new FeedbackSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
-        
+
         $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
 
         $pageSize = (int) Yii::$app->request->get('per-page', 10);
@@ -977,13 +1003,16 @@ class ObjectController extends BaseController
             'pageSizeLimit' => [1, 100],
         ];
 
+
+
         return [
             'pageSize' => $dataProvider->pagination->pageSize,
             'totalCount' => $dataProvider->totalCount,
             'page' => (int) $page,
-            'data' => $dataProvider
+            'common' => $this->countedList(),
+            'data' => $dataProvider,
         ];
-        
+
     }
 
     public function actionAddFeedback()
