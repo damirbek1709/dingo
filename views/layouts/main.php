@@ -43,6 +43,8 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             ?>
             <nav class="nav-right">
                 <div class="desktop-nav">
+                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']); ?>
+
                     <button class="icon-btn">
                         <svg class="bell-icon" viewBox="0 0 24 24">
                             <path
@@ -50,10 +52,34 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                         </svg>
                     </button>
 
-                    <button class="profile-btn"><?= $user_string ?></button>
+                    <div class="profile-container">
+                        <button class="profile-btn" onclick="toggleProfileDropdown()">A</button>
+
+                        <!-- Profile Dropdown Menu -->
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <div class="profile-dropdown-header">
+                                <div class="profile-avatar"><?= $user_string ?></div>
+                                <div class="profile-info">
+                                    <div class="profile-email"><?= Yii::$app->user->identity->email ?></div>
+                                </div>
+                            </div>
+                            <div class="profile-dropdown-divider"></div>
+                            <div class="profile-menu-item">
+                                <?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account'], ['class' => 'profile-menu-link']); ?>
+                            </div>
+
+                            <div class="profile-menu-item">
+                                <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mobile-nav">
+                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
+                        'class' => 'dropdown-select',
+                        'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
+                    ]); ?>
                     <button class="hamburger" onclick="toggleMobileMenu()">
                         <div class="hamburger-icon">
                             <div class="hamburger-line"></div>
@@ -120,16 +146,45 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 
         dropdown.classList.toggle('show');
         hamburger.classList.toggle('active');
+
+        // Close profile dropdown if open
+        const profileDropdown = document.getElementById('profileDropdown');
+        const profileBtn = document.querySelector('.profile-btn');
+        profileDropdown.classList.remove('show');
+        profileBtn.classList.remove('active');
     }
 
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function (event) {
-        const dropdown = document.getElementById('mobileDropdown');
-        const hamburger = document.querySelector('.hamburger');
+    function toggleProfileDropdown() {
+        const dropdown = document.getElementById('profileDropdown');
+        const profileBtn = document.querySelector('.profile-btn');
 
-        if (!hamburger.contains(event.target) && !dropdown.contains(event.target)) {
-            dropdown.classList.remove('show');
+        dropdown.classList.toggle('show');
+        profileBtn.classList.toggle('active');
+
+        // Close mobile dropdown if open
+        const mobileDropdown = document.getElementById('mobileDropdown');
+        const hamburger = document.querySelector('.hamburger');
+        mobileDropdown.classList.remove('show');
+        hamburger.classList.remove('active');
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function (event) {
+        const mobileDropdown = document.getElementById('mobileDropdown');
+        const hamburger = document.querySelector('.hamburger');
+        const profileDropdown = document.getElementById('profileDropdown');
+        const profileContainer = document.querySelector('.profile-container');
+
+        // Close mobile dropdown
+        if (!hamburger.contains(event.target) && !mobileDropdown.contains(event.target)) {
+            mobileDropdown.classList.remove('show');
             hamburger.classList.remove('active');
+        }
+
+        // Close profile dropdown
+        if (!profileContainer.contains(event.target)) {
+            profileDropdown.classList.remove('show');
+            document.querySelector('.profile-btn').classList.remove('active');
         }
     });
 
@@ -145,6 +200,17 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 </script>
 
 <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f5f5f5;
+    }
+
     .header_menu {
         background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
         padding: 12px 20px;
@@ -160,6 +226,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             padding: 12px 16px;
         }
     }
+
 
 
     .nav-right {
@@ -262,8 +329,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         transition: background-color 0.2s ease;
     }
 
-
-
     .mobile-profile-initial {
         width: 32px;
         height: 32px;
@@ -291,8 +356,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     .mobile-menu-link.logout-link {
         color: #dc3545;
     }
-
-
 
     .mobile-menu-divider {
         height: 1px;
@@ -337,10 +400,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         min-width: 200px;
     }
 
-    .dropdown-select:hover {
-        background-color: #f8f9fa;
-        transform: translateY(-1px);
-    }
+
 
     .dropdown-select:focus {
         outline: none;
@@ -392,7 +452,109 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         font-size: 16px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease;
+    }
+
+    /* Profile Container & Dropdown */
+    .profile-container {
+        position: relative;
+    }
+
+    .profile-dropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        min-width: 280px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    .profile-dropdown.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .profile-dropdown-header {
+        padding: 20px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .profile-avatar {
+        width: 48px;
+        height: 48px;
+        background-color: #4a90e2;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
         text-transform: uppercase;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+    .profile-name {
+        font-weight: 600;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 2px;
+    }
+
+    .profile-email {
+        font-size: 13px;
+        color: #666;
+    }
+
+    .profile-dropdown-divider {
+        height: 1px;
+        background-color: #e9ecef;
+        margin: 0;
+    }
+
+    .profile-menu-item {
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .profile-menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .profile-menu-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 20px;
+        color: #333;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color 0.2s ease;
+    }
+
+
+    .profile-menu-link.logout-link {
+        color: #dc3545;
+    }
+
+    .profile-menu-icon {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+        flex-shrink: 0;
     }
 </style>
 <?php $this->endPage() ?>
