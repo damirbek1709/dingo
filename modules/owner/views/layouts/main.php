@@ -46,7 +46,7 @@ ModuleAsset::register($this);
             <?php
             $object_arr = Objects::objectListMenu();
             //echo "<pre>";print_r($object_arr);echo "</pre>";die();
-            $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->name ?? Yii::$app->user->identity->email, 0, 1) : '';
+            $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
             ?>
             <nav class="nav-right">
                 <div class="desktop-nav">
