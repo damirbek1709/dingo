@@ -8,6 +8,11 @@ use kartik\editors\Summernote;
 use yii\widgets\MaskedInput;
 use yii\web\JsExpression;
 use kartik\select2\Select2;
+use yii\bootstrap\BootstrapPluginAsset;
+BootstrapPluginAsset::register($this);
+
+
+
 /** @var yii\web\View $this */
 /** @var app\models\Oblast $model */
 /** @var yii\widgets\ActiveForm $form */
@@ -207,9 +212,6 @@ use kartik\select2\Select2;
         <?php ActiveForm::end(); ?>
     </div>
 </div>
-
-
-
 
 <script>
     const dropZone = document.getElementById('drop-zone');
