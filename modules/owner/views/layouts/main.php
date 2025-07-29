@@ -41,15 +41,13 @@ ModuleAsset::register($this);
     <?php $this->beginBody() ?>
 
     <div class="wrap">
-        <header class="header">
+        <header class="header_menu">
             <div class="logo">Dingo</div>
             <?php
             $object_arr = Objects::objectListMenu();
             ?>
             <nav class="nav-right">
                 <div class="desktop-nav">
-                    
-
                     <?php echo Html::dropDownList('object_id', $object_arr, ['class' => 'dropdown-select']); ?>
 
                     <button class="icon-btn">
@@ -71,7 +69,7 @@ ModuleAsset::register($this);
                         <option value="apartment-4">Апартаменты Запад</option>
                     </select>
 
-                    <button class="hamburger">
+                    <button class="hamburger" onclick="toggleMobileMenu()">
                         <div class="hamburger-icon">
                             <div class="hamburger-line"></div>
                             <div class="hamburger-line"></div>
@@ -80,12 +78,41 @@ ModuleAsset::register($this);
                     </button>
                 </div>
             </nav>
+
+            <!-- Mobile Dropdown Menu -->
+            <div class="mobile-dropdown" id="mobileDropdown">
+                <div class="mobile-menu-item">
+                    <button class="mobile-icon-btn">
+                        <svg class="bell-icon" viewBox="0 0 24 24">
+                            <path
+                                d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                        </svg>
+                        <span>Уведомления</span>
+                    </button>
+                </div>
+                <div class="mobile-menu-item">
+                    <button class="mobile-profile-btn">
+                        <span class="mobile-profile-initial">A</span>
+                        <span>Профиль</span>
+                    </button>
+                </div>
+                <div class="mobile-menu-divider"></div>
+                <div class="mobile-menu-item">
+                    <a href="#" class="mobile-menu-link">Аккаунт</a>
+                </div>
+                <div class="mobile-menu-item">
+                    <a href="#" class="mobile-menu-link">Настройки</a>
+                </div>
+                <div class="mobile-menu-item">
+                    <a href="#" class="mobile-menu-link logout-link">Выход</a>
+                </div>
+            </div>
         </header>
         <?php
 
         // $object_arr = Objects::objectList();
         // $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->username, 0, 1) : '';
-
+        
         // NavBar::begin([
         //     'brandLabel' => Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']),
         //     'brandUrl' => ['/owner/default/index'],
@@ -115,7 +142,7 @@ ModuleAsset::register($this);
         //                     'label' => 'Аккаунт',
         //                     'url' => ['/user/view-account'],
         //                     'visible' => !Yii::$app->user->isGuest,
-
+        
         //                 ],
         //                 [
         //                     'label' => 'Выход',
@@ -147,6 +174,37 @@ ModuleAsset::register($this);
         </div>
     </footer>
 
+    <script>
+        function toggleMobileMenu() {
+            const dropdown = document.getElementById('mobileDropdown');
+            const hamburger = document.querySelector('.hamburger');
+
+            dropdown.classList.toggle('show');
+            hamburger.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const dropdown = document.getElementById('mobileDropdown');
+            const hamburger = document.querySelector('.hamburger');
+
+            if (!hamburger.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+                hamburger.classList.remove('active');
+            }
+        });
+
+        // Close dropdown when window is resized to desktop
+        window.addEventListener('resize', function () {
+            if (window.innerWidth > 768) {
+                const dropdown = document.getElementById('mobileDropdown');
+                const hamburger = document.querySelector('.hamburger');
+                dropdown.classList.remove('show');
+                hamburger.classList.remove('active');
+            }
+        });
+    </script>
+
     <?php $this->endBody() ?>
 </body>
 
@@ -163,17 +221,18 @@ ModuleAsset::register($this);
         background-color: #f5f5f5;
     }
 
-    .header {
+    .header_menu {
         background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
         padding: 12px 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
     }
 
     @media (max-width: 768px) {
-        .header {
+        .header_menu {
             padding: 12px 16px;
         }
     }
@@ -209,6 +268,8 @@ ModuleAsset::register($this);
         border: none;
         cursor: pointer;
         padding: 4px;
+        position: relative;
+        z-index: 1001;
     }
 
     .hamburger-icon {
@@ -225,7 +286,113 @@ ModuleAsset::register($this);
         height: 2px;
         background-color: white;
         border-radius: 1px;
-        transition: all 0.2s ease;
+        transition: all 0.3s ease;
+    }
+
+    .hamburger.active .hamburger-line:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .hamburger.active .hamburger-line:nth-child(2) {
+        opacity: 0;
+    }
+
+    .hamburger.active .hamburger-line:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -6px);
+    }
+
+    /* Mobile Dropdown Styles */
+    .mobile-dropdown {
+        position: absolute;
+        top: 100%;
+        right: 20px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        min-width: 220px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.3s ease;
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    .mobile-dropdown.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .mobile-menu-item {
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .mobile-menu-item:last-child {
+        border-bottom: none;
+    }
+
+    .mobile-icon-btn,
+    .mobile-profile-btn {
+        width: 100%;
+        background: none;
+        border: none;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+        transition: background-color 0.2s ease;
+    }
+
+    .mobile-icon-btn:hover,
+    .mobile-profile-btn:hover {
+        background-color: #f8f9fa;
+    }
+
+    .mobile-profile-initial {
+        width: 32px;
+        height: 32px;
+        background-color: #4a90e2;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    .mobile-menu-link {
+        display: block;
+        padding: 16px 20px;
+        color: #333;
+        text-decoration: none;
+        font-size: 14px;
+        transition: background-color 0.2s ease;
+    }
+
+    .mobile-menu-link:hover {
+        background-color: #f8f9fa;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .mobile-menu-link.logout-link {
+        color: #dc3545;
+    }
+
+    .mobile-menu-link.logout-link:hover {
+        background-color: #fff5f5;
+        color: #dc3545;
+    }
+
+    .mobile-menu-divider {
+        height: 1px;
+        background-color: #e9ecef;
+        margin: 8px 0;
     }
 
     @media (max-width: 768px) {
@@ -237,6 +404,10 @@ ModuleAsset::register($this);
             display: flex;
             align-items: center;
             gap: 12px;
+        }
+
+        .mobile-dropdown {
+            right: 16px;
         }
     }
 

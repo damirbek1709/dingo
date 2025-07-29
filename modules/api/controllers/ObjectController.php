@@ -3,6 +3,7 @@
 namespace app\modules\api\controllers;
 
 use app\models\Comfort;
+use app\models\Feedback;
 use app\models\Oblast;
 use app\models\RoomComfort;
 use app\models\user\User;
@@ -80,7 +81,7 @@ class ObjectController extends BaseController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['edit'],
+                    'actions' => ['edit','add-feedback'],
                     'roles' => ['@'],
                     //'roles' => ['updatePost'],
                     // 'roleParams' => function () {
@@ -951,14 +952,38 @@ class ObjectController extends BaseController
             $type_string = Vocabulary::find()->where(['model' => Vocabulary::MODEL_TYPE_OBJECT, 'id' => $type_id])->one();
             if ($type_string) {
                 $document['type_string'] = [$type_string->title, $type_string->title_en, $type_string->title_ky];
-            }
-            else{
+            } else {
                 $document['type_string'] = null;
             }
             return $document;
 
         }
         return null;
+    }
+
+    public function actionAddFeedback()
+    {
+        $response["success"] = false;
+        $model = new Feedback();
+        $model->object_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'object_id');
+        $model->pos = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'pos');
+        $model->cons = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cons');
+        $model->general = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'general');
+        $model->cleaning = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cleaning');
+        $model->location = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'location');
+        $model->room = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'room');
+        $model->meal = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'meal');
+        $model->service = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'service');
+        $model->hygien = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'hygien');
+        $model->price_quality = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'price_quality');
+        $model->wifi = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'wifi');
+        if ($model->save()) {
+            $response["success"] = true;
+            $response["message"] = Yii::t('app', 'Ваш отзыв добавлен');
+        } else {
+            $response["message"] = $model->errors;
+        }
+        return $response;
     }
 
     public function actionSimilar($id)
