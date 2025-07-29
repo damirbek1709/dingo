@@ -507,7 +507,7 @@ class Objects extends \yii\db\ActiveRecord
             foreach ($res as $val) {
                 $item_arr[$val['id']] = $val['name'][$index];
             }
-            return $item_arr;
+            return ['select' => $object_id, 'data' => $item_arr];
         }
     }
 
@@ -574,6 +574,45 @@ class Objects extends \yii\db\ActiveRecord
             ],
         ];
 
+    }
+
+    public static function objectListArr()
+    {
+        $lang = Yii::$app->language;
+        $item_arr = [];
+        $index = 0;
+        switch ($lang) {
+            case 'ru':
+                $index = 0;
+                break;
+            case 'en':
+                $index = 1;
+                break;
+            case 'ky':
+                $index = 2;
+                break;
+            default:
+                $index = 0;
+                break;
+        }
+
+        $label = Yii::t('app', 'Объекты');
+        if (Yii::$app->request->get('object_id')) {
+            $object_id = Yii::$app->request->get('object_id');
+        }
+        $filter_string = "user_id=" . Yii::$app->user->id;
+        $client = Yii::$app->meili->connect();
+        $res = $client->index('object')->search('', [
+            'filter' => [
+                $filter_string
+            ],
+            'limit' => 10000
+        ])->getHits();
+
+        foreach ($res as $val) {
+            $item_arr[$val['id']] = $val['name'][$index];
+        }
+        return $item_arr;
     }
 
     public static function mealList()

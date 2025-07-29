@@ -45,10 +45,12 @@ ModuleAsset::register($this);
             <div class="logo">Dingo</div>
             <?php
             $object_arr = Objects::objectListMenu();
+            //echo "<pre>";print_r($object_arr);echo "</pre>";die();
+            $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->name ?? Yii::$app->user->identity->email, 0, 1) : '';
             ?>
             <nav class="nav-right">
                 <div class="desktop-nav">
-                    <?php echo Html::dropDownList('object_id', $object_arr, ['class' => 'dropdown-select']); ?>
+                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']); ?>
 
                     <button class="icon-btn">
                         <svg class="bell-icon" viewBox="0 0 24 24">
@@ -57,18 +59,14 @@ ModuleAsset::register($this);
                         </svg>
                     </button>
 
-                    <button class="profile-btn">A</button>
+                    <button class="profile-btn"><?= $user_string ?></button>
                 </div>
 
                 <div class="mobile-nav">
-                    <select class="dropdown-select">
-                        <option value="karakol-zhai">Апартаменты Каракол-Жай</option>
-                        <option value="apartment-1">Апартаменты Центр</option>
-                        <option value="apartment-2">Апартаменты Север</option>
-                        <option value="apartment-3">Апартаменты Восток</option>
-                        <option value="apartment-4">Апартаменты Запад</option>
-                    </select>
-
+                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
+                        'class' => 'dropdown-select',
+                        'onchange' => 'window.location.href = "/owner/object/view?id=" + this.value;'
+                    ]); ?>
                     <button class="hamburger" onclick="toggleMobileMenu()">
                         <div class="hamburger-icon">
                             <div class="hamburger-line"></div>
@@ -92,19 +90,14 @@ ModuleAsset::register($this);
                 </div>
                 <div class="mobile-menu-item">
                     <button class="mobile-profile-btn">
-                        <span class="mobile-profile-initial">A</span>
-                        <span>Профиль</span>
+                        <span class="mobile-profile-initial">
+                            <?= $user_string ?>
+                        </span>
+                        <span><?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account']); ?></span>
                     </button>
                 </div>
-                <div class="mobile-menu-divider"></div>
                 <div class="mobile-menu-item">
-                    <a href="#" class="mobile-menu-link">Аккаунт</a>
-                </div>
-                <div class="mobile-menu-item">
-                    <a href="#" class="mobile-menu-link">Настройки</a>
-                </div>
-                <div class="mobile-menu-item">
-                    <a href="#" class="mobile-menu-link logout-link">Выход</a>
+                    <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
                 </div>
             </div>
         </header>
