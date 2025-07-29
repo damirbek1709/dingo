@@ -51,7 +51,7 @@ class Feedback extends \yii\db\ActiveRecord
 
     public function fields()
     {
-        return ['pos', 'cons', 'name'];
+        return ['pos', 'cons', 'name','created_at'];
     }
 
     public function getName()
