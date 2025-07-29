@@ -42,7 +42,7 @@ ModuleAsset::register($this);
 
     <div class="wrap">
         <header class="header_menu">
-            <div class="logo">Dingo</div>
+            <div class="logo"><?=Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']);?></div>
             <?php
             $object_arr = Objects::objectListMenu();
             $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
@@ -102,7 +102,7 @@ ModuleAsset::register($this);
         </header>
         <?php
 
-        // $object_arr = Objects::objectList();
+        
         // $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->username, 0, 1) : '';
         
         // NavBar::begin([
@@ -230,13 +230,6 @@ ModuleAsset::register($this);
     }
 
     .logo {
-        background-color: white;
-        padding: 8px 16px;
-        border-radius: 12px;
-        font-size: 24px;
-        font-weight: bold;
-        color: #4a90e2;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     .nav-right {
