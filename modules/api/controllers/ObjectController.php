@@ -4,6 +4,7 @@ namespace app\modules\api\controllers;
 
 use app\models\Comfort;
 use app\models\Feedback;
+use app\models\FeedbackSearch;
 use app\models\Oblast;
 use app\models\RoomComfort;
 use app\models\user\User;
@@ -61,7 +62,8 @@ class ObjectController extends BaseController
             'room-images',
             'similar',
             'exchange',
-            'search-stats'
+            'search-stats',
+            'feedback-list'
         ];
 
 
@@ -70,7 +72,7 @@ class ObjectController extends BaseController
             'rules' => [
                 [
                     'allow' => true,
-                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'search-stats'],
+                    'actions' => ['add', 'category-comfort-title', 'similar', 'room-comfort-title', 'exchange', 'search-stats','feedback-list'],
                     'roles' => ['@', '?'],
                 ],
 
@@ -81,7 +83,7 @@ class ObjectController extends BaseController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['edit','add-feedback'],
+                    'actions' => ['edit', 'add-feedback'],
                     'roles' => ['@'],
                     //'roles' => ['updatePost'],
                     // 'roleParams' => function () {
@@ -959,6 +961,29 @@ class ObjectController extends BaseController
 
         }
         return null;
+    }
+
+    public function actionFeedbackList($object_id, $page = 1)
+    {
+        $searchModel = new FeedbackSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
+        
+        $dataProvider->query->andFilterWhere(['object_id' => $object_id]);
+
+        $pageSize = (int) Yii::$app->request->get('per-page', 10);
+        $dataProvider->pagination = [
+            'page' => $page - 1, // DataProvider uses 0-based indexing
+            'pageSize' => $pageSize,
+            'pageSizeLimit' => [1, 100],
+        ];
+
+        return [
+            'pageSize' => $dataProvider->pagination->pageSize,
+            'totalCount' => $dataProvider->totalCount,
+            'page' => (int) $page,
+            'data' => $dataProvider
+        ];
+        
     }
 
     public function actionAddFeedback()

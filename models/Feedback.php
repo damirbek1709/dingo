@@ -42,6 +42,8 @@ class Feedback extends \yii\db\ActiveRecord
             [['object_id'], 'integer'],
             [['general', 'cleaning', 'location', 'room', 'meal', 'hygien', 'price_quality', 'service', 'wifi'], 'integer', 'max' => 9],
             [['pos', 'cons'], 'string', 'max' => 800],
+            [['created_at'], 'safe'],
+            [['created_at'], 'default', 'value' => date('Y-m-d H:i:s')],
         ];
     }
 
