@@ -65,7 +65,7 @@ ModuleAsset::register($this);
                 <div class="mobile-nav">
                     <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
                         'class' => 'dropdown-select',
-                        'onchange' => 'window.location.href = "/owner/object/view?id=" + this.value;'
+                        'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
                     ]); ?>
                     <button class="hamburger" onclick="toggleMobileMenu()">
                         <div class="hamburger-icon">
