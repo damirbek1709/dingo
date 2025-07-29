@@ -45,7 +45,6 @@ ModuleAsset::register($this);
             <div class="logo">Dingo</div>
             <?php
             $object_arr = Objects::objectListMenu();
-            //echo "<pre>";print_r($object_arr);echo "</pre>";die();
             $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
             ?>
             <nav class="nav-right">
@@ -151,7 +150,7 @@ ModuleAsset::register($this);
         ?>
 
         <div class="container-fluid gray-content">
-            <div style="padding-top: 70px;">
+            <div>
                 <?php /*echo Breadcrumbs::widget([
 'links' => isset($this->params['breadcrumbs']) && Yii::$app->controller->route !== 'user/security/login' ? $this->params['breadcrumbs'] : [],
 ]) */ ?>
@@ -356,6 +355,7 @@ ModuleAsset::register($this);
         justify-content: center;
         font-weight: bold;
         font-size: 14px;
+        text-transform: uppercase;
     }
 
     .mobile-menu-link {
