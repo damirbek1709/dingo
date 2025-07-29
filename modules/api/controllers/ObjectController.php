@@ -966,6 +966,7 @@ class ObjectController extends BaseController
         $response["success"] = false;
         $model = new Feedback();
         $model->object_id = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'object_id');
+        $model->user_id = Yii::$app->user->id;
         $model->pos = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'pos');
         $model->cons = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'cons');
         $model->general = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'general');

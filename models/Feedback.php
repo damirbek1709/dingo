@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $object_id
+ * @property int $user_id
  * @property int|null $general
  * @property int|null $cleaning
  * @property int|null $location
@@ -37,7 +38,7 @@ class Feedback extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['object_id'], 'required'],
+            [['object_id','user_id'], 'required'],
             [['object_id'], 'integer'],
             [['general', 'cleaning', 'location', 'room', 'meal', 'hygien', 'price_quality', 'service', 'wifi'], 'integer', 'max' => 9],
             [['pos', 'cons'], 'string', 'max' => 800],
