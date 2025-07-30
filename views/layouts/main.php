@@ -43,7 +43,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
             ?>
             <nav class="nav-right">
                 <div class="desktop-nav">
-                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']); ?>
+
+                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects) {
+                        echo Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']);
+
+                    }
+                    ?>
 
                     <button class="icon-btn">
                         <svg class="bell-icon" viewBox="0 0 24 24">

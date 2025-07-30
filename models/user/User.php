@@ -1,6 +1,7 @@
 <?php
 namespace app\models\user;
 
+use app\models\Objects;
 use dektrium\user\models\User as BaseUser;
 use dektrium\user\helpers\Password;
 use yii\data\ActiveDataProvider;
@@ -97,8 +98,7 @@ class User extends BaseUser
             if ($this->module->enableConfirmation) {
                 /** @var Token $token */
                 $token = \Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
-                $token->link('user', $this);
-
+                $token->link('user', $this);j
             }
 
             //$this->mailer->sendWelcomeMessage($this, isset($token) ? $token : null);
@@ -112,6 +112,20 @@ class User extends BaseUser
             \Yii::warning($e->getMessage());
             throw $e;
         }
+    }
+
+    public function getObjects()
+    {
+        $filter_string = "user_id=" . Yii::$app->user->id;
+        $client = Yii::$app->meili->connect();
+        $res = $client->index('object')->search('', [
+                'filter' => [$filter_string],
+                'limit' => 10000
+            ])->getHits();
+         if(count($res)>0){
+            return true; 
+         }  
+         return false;
     }
 
     public function getAuthAssignments()
