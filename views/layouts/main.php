@@ -82,7 +82,9 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                 </div>
 
                 <div class="mobile-nav">
-                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
+                    <?php 
+                    if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects) 
+                    echo Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
                         'class' => 'dropdown-select',
                         'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
                     ]); ?>
