@@ -39,85 +39,87 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         <header class="header_menu">
             <div class="logo"><?= Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']); ?></div>
             <?php
-            if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects):
-            $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
-            ?>
-            <nav class="nav-right">
-                <div class="desktop-nav">
+            if (!Yii::$app->user->isGuest):
+                $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
+                ?>
+                <nav class="nav-right">
+                    <div class="desktop-nav">
+                        <?php
+                        $dropdown = '';
+                        if (Yii::$app->user->identity->objectExists()) {
+                            $dropdown = Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
+                                'class' => 'dropdown-select',
+                                'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
+                            ]);
+                        }
+                        echo $dropdown; ?>
 
-                    <?php
-                    echo Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']);
-                    ?>
+                        <button class="icon-btn">
+                            <svg class="bell-icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                            </svg>
+                        </button>
 
-                    <button class="icon-btn">
-                        <svg class="bell-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-                        </svg>
-                    </button>
+                        <div class="profile-container">
+                            <button class="profile-btn" onclick="toggleProfileDropdown()"><?= $user_string ?></button>
 
-                    <div class="profile-container">
-                        <button class="profile-btn" onclick="toggleProfileDropdown()">A</button>
-
-                        <!-- Profile Dropdown Menu -->
-                        <div class="profile-dropdown" id="profileDropdown">
-                            <div class="profile-dropdown-header">
-                                <div class="profile-avatar"><?= $user_string ?></div>
-                                <div class="profile-info">
-                                    <div class="profile-email"><?= Yii::$app->user->identity->email ?></div>
+                            <!-- Profile Dropdown Menu -->
+                            <div class="profile-dropdown" id="profileDropdown">
+                                <div class="profile-dropdown-header">
+                                    <div class="profile-avatar"><?= $user_string ?></div>
+                                    <div class="profile-info">
+                                        <div class="profile-email"><?= Yii::$app->user->identity->email ?></div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="profile-dropdown-divider"></div>
-                            <div class="profile-menu-item">
-                                <?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account'], ['class' => 'profile-menu-link']); ?>
-                            </div>
+                                <div class="profile-dropdown-divider"></div>
+                                <div class="profile-menu-item">
+                                    <?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account'], ['class' => 'profile-menu-link']); ?>
+                                </div>
 
-                            <div class="profile-menu-item">
-                                <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
+                                <div class="profile-menu-item">
+                                    <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="mobile-nav">
-                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
-                        'class' => 'dropdown-select',
-                        'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
-                    ]); ?>
-                    <button class="hamburger" onclick="toggleMobileMenu()">
-                        <div class="hamburger-icon">
-                            <div class="hamburger-line"></div>
-                            <div class="hamburger-line"></div>
-                            <div class="hamburger-line"></div>
-                        </div>
-                    </button>
-                </div>
-            </nav>
+                    <div class="mobile-nav">
+                        <?=$dropdown;?>
+                        <button class="hamburger" onclick="toggleMobileMenu()">
+                            <div class="hamburger-icon">
+                                <div class="hamburger-line"></div>
+                                <div class="hamburger-line"></div>
+                                <div class="hamburger-line"></div>
+                            </div>
+                        </button>
+                    </div>
+                </nav>
 
-            <!-- Mobile Dropdown Menu -->
-            <div class="mobile-dropdown" id="mobileDropdown">
-                <div class="mobile-menu-item">
-                    <button class="mobile-icon-btn">
-                        <svg class="bell-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-                        </svg>
-                        <span>Уведомления</span>
-                    </button>
+                <!-- Mobile Dropdown Menu -->
+                <div class="mobile-dropdown" id="mobileDropdown">
+                    <div class="mobile-menu-item">
+                        <button class="mobile-icon-btn">
+                            <svg class="bell-icon" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
+                            </svg>
+                            <span>Уведомления</span>
+                        </button>
+                    </div>
+                    <div class="mobile-menu-item">
+                        <button class="mobile-profile-btn">
+                            <span class="mobile-profile-initial">
+                                <?= $user_string ?>
+                            </span>
+                            <span><?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account']); ?></span>
+                        </button>
+                    </div>
+                    <div class="mobile-menu-item">
+                        <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
+                    </div>
                 </div>
-                <div class="mobile-menu-item">
-                    <button class="mobile-profile-btn">
-                        <span class="mobile-profile-initial">
-                            <?= $user_string ?>
-                        </span>
-                        <span><?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account']); ?></span>
-                    </button>
-                </div>
-                <div class="mobile-menu-item">
-                    <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
-                </div>
-            </div>
-            <?php endif;?>
+            <?php endif; ?>
         </header>
 
         <main id="main" class="flex-shrink-0" role="main">
@@ -205,8 +207,6 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
 </script>
 
 <style>
-    
-
     .header_menu {
         background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
         padding: 12px 20px;
@@ -448,6 +448,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
         font-size: 16px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease;
+        text-transform: uppercase;
     }
 
     /* Profile Container & Dropdown */

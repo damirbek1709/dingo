@@ -1,6 +1,6 @@
 <?php
 namespace app\models\user;
-
+use Yii;
 use app\models\Objects;
 use dektrium\user\models\User as BaseUser;
 use dektrium\user\helpers\Password;
@@ -114,7 +114,7 @@ class User extends BaseUser
         }
     }
 
-    public function getObjects()
+    public function objectExists()
     {
         $filter_string = "user_id=" . Yii::$app->user->id;
         $client = Yii::$app->meili->connect();

@@ -49,8 +49,16 @@ ModuleAsset::register($this);
             ?>
             <nav class="nav-right">
                 <div class="desktop-nav">
-                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']); ?>
-
+                    <?php
+                    $dropdown = '';
+                    if (Yii::$app->user->identity->objectExists()) {
+                        $dropdown = Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
+                            'class' => 'dropdown-select',
+                            'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
+                        ]);
+                    }
+                    echo $dropdown;
+                    ?>
                     <button class="icon-btn">
                         <svg class="bell-icon" viewBox="0 0 24 24">
                             <path
@@ -59,14 +67,14 @@ ModuleAsset::register($this);
                     </button>
 
                     <div class="profile-container">
-                        <button class="profile-btn" onclick="toggleProfileDropdown()">A</button>
+                        <button class="profile-btn" onclick="toggleProfileDropdown()"><?=$user_string?></button>
 
                         <!-- Profile Dropdown Menu -->
                         <div class="profile-dropdown" id="profileDropdown">
                             <div class="profile-dropdown-header">
                                 <div class="profile-avatar"><?= $user_string ?></div>
                                 <div class="profile-info">
-                                    <div class="profile-email"><?=Yii::$app->user->identity->email?></div>
+                                    <div class="profile-email"><?= Yii::$app->user->identity->email ?></div>
                                 </div>
                             </div>
                             <div class="profile-dropdown-divider"></div>
@@ -82,10 +90,7 @@ ModuleAsset::register($this);
                 </div>
 
                 <div class="mobile-nav">
-                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
-                        'class' => 'dropdown-select',
-                        'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
-                    ]); ?>
+                    <?= $dropdown; ?>
                     <button class="hamburger" onclick="toggleMobileMenu()">
                         <div class="hamburger-icon">
                             <div class="hamburger-line"></div>
@@ -104,7 +109,7 @@ ModuleAsset::register($this);
                             <path
                                 d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
                         </svg>
-                        <span>Уведомления</span>
+                        <span><?=Yii::t('app','Уведомления')?></span>
                     </button>
                 </div>
                 <div class="mobile-menu-item">
@@ -329,6 +334,7 @@ ModuleAsset::register($this);
         color: #333;
         transition: background-color 0.2s ease;
     }
+
     .mobile-profile-initial {
         width: 32px;
         height: 32px;
@@ -452,6 +458,7 @@ ModuleAsset::register($this);
         font-size: 16px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         transition: all 0.2s ease;
+        text-transform: uppercase;
     }
 
     /* Profile Container & Dropdown */

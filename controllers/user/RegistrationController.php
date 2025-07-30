@@ -154,7 +154,7 @@ class RegistrationController extends BaseRegistrationController
 
     public function actionSignin()
     {
-        //$this->layout = "//general";
+        $this->layout = "//signin";
         if (!$this->module->enableRegistration) {
             throw new NotFoundHttpException();
         }
