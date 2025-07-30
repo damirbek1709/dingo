@@ -38,13 +38,15 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <div class="wrap">
         <header class="header_menu">
             <div class="logo"><?= Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']); ?></div>
-
+            <?php
+            if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects):
+            $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
+            ?>
             <nav class="nav-right">
                 <div class="desktop-nav">
 
                     <?php
-                    if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects)
-                        echo Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']);
+                    echo Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']);
                     ?>
 
                     <button class="icon-btn">
@@ -55,40 +57,33 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     </button>
 
                     <div class="profile-container">
-                        <?php
-                        if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects):
-                            $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
-                            ?>
-                            <button class="profile-btn" onclick="toggleProfileDropdown()"><?= $user_string ?></button>
+                        <button class="profile-btn" onclick="toggleProfileDropdown()">A</button>
 
-                            <!-- Profile Dropdown Menu -->
-                            <div class="profile-dropdown" id="profileDropdown">
-                                <div class="profile-dropdown-header">
-                                    <div class="profile-avatar"><?= $user_string ?></div>
-                                    <div class="profile-info">
-                                        <div class="profile-email"><?= Yii::$app->user->identity->email ?></div>
-                                    </div>
-                                </div>
-                                <div class="profile-dropdown-divider"></div>
-                                <div class="profile-menu-item">
-                                    <?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account'], ['class' => 'profile-menu-link']); ?>
-                                </div>
-
-                                <div class="profile-menu-item">
-                                    <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
+                        <!-- Profile Dropdown Menu -->
+                        <div class="profile-dropdown" id="profileDropdown">
+                            <div class="profile-dropdown-header">
+                                <div class="profile-avatar"><?= $user_string ?></div>
+                                <div class="profile-info">
+                                    <div class="profile-email"><?= Yii::$app->user->identity->email ?></div>
                                 </div>
                             </div>
-                        <?php endif; ?>
+                            <div class="profile-dropdown-divider"></div>
+                            <div class="profile-menu-item">
+                                <?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account'], ['class' => 'profile-menu-link']); ?>
+                            </div>
+
+                            <div class="profile-menu-item">
+                                <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="mobile-nav">
-                    <?php
-                    if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects)
-                        echo Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
-                            'class' => 'dropdown-select',
-                            'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
-                        ]); ?>
+                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
+                        'class' => 'dropdown-select',
+                        'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
+                    ]); ?>
                     <button class="hamburger" onclick="toggleMobileMenu()">
                         <div class="hamburger-icon">
                             <div class="hamburger-line"></div>
@@ -111,19 +106,18 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     </button>
                 </div>
                 <div class="mobile-menu-item">
-                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects):?>
                     <button class="mobile-profile-btn">
                         <span class="mobile-profile-initial">
                             <?= $user_string ?>
                         </span>
                         <span><?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account']); ?></span>
                     </button>
-                    <?php endif; ?>
                 </div>
                 <div class="mobile-menu-item">
                     <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
                 </div>
             </div>
+            <?php endif;?>
         </header>
 
         <main id="main" class="flex-shrink-0" role="main">
