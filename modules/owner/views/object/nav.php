@@ -8,19 +8,19 @@ $nav_action_class = Yii::$app->controller->action->id;
 
 <div class="owner-nav-cover row">
 
-    <div class="owner-nav-item owner-nav-item-info">
-        <?= Html::a(Yii::t('app', 'Информация'), ['view', 'object_id' => $model->id],['class'=>'nav_view']); ?>
+    <div class="owner-nav-item owner-nav-item-info cover_nav_view">
+        <?= Html::a(Yii::t('app', 'Информация'), ['view', 'object_id' => $model->id], ['class' => 'nav_view']); ?>
     </div>
-    <div class="owner-nav-item owner-nav-item-comfort">
-        <?= Html::a(Yii::t('app', 'Услуги и особенности'), ['comfort', 'object_id' => $model->id],['class'=>'nav_comfort']); ?>
-    </div>
-
-    <div class="owner-nav-item owner-nav-item-payment">
-        <?= Html::a(Yii::t('app', 'Оплата'), ['payment', 'object_id' => $model->id],['class'=>'nav_payment']); ?>
+    <div class="owner-nav-item owner-nav-item-comfort cover_nav_comfort">
+        <?= Html::a(Yii::t('app', 'Услуги и особенности'), ['comfort', 'object_id' => $model->id], ['class' => 'nav_comfort']); ?>
     </div>
 
-    <div class="owner-nav-item owner-nav-item-terms">
-        <?= Html::a(Yii::t('app', 'Условия'), ['terms', 'object_id' => $model->id],['class'=>'nav_terms']); ?>
+    <div class="owner-nav-item owner-nav-item-payment cover_nav_payment">
+        <?= Html::a(Yii::t('app', 'Оплата'), ['payment', 'object_id' => $model->id], ['class' => 'nav_payment']); ?>
+    </div>
+
+    <div class="owner-nav-item owner-nav-item-terms cover_nav_terms">
+        <?= Html::a(Yii::t('app', 'Условия'), ['terms', 'object_id' => $model->id], ['class' => 'nav_terms']); ?>
     </div>
 
     <!-- <div class="owner-nav-item owner-nav-item-crew">
@@ -40,7 +40,39 @@ $nav_action_class = Yii::$app->controller->action->id;
 ?>
 
 <style>
-.nav_<?=$nav_action_class?> {
-    color:#3676BC!important;
-}
+    /* .nav_<?//= $nav_action_class ?> {
+        color: #3676BC !important;
+    }
+
+    @media (max-width: 414px) {
+        .cover_nav_<?//= $nav_action_class ?> {
+            display: flex !important;
+            justify-content: center;
+        }
+
+        .nav_<?//= $nav_action_class ?> {
+            color: #333 !important;
+        }
+
+        .cover_nav_<?//= $nav_action_class ?>::before {
+            background-image: url(/images/site/arrow.svg);
+            width: 15px;
+            height: 15px;
+            content: '';
+            display: inline-block;
+            background-repeat: no-repeat;
+            background-position: 0 0;
+        }
+
+        .owner-nav-item {
+            display: none;
+        }
+
+        .owner-nav-cover {
+            background-color: transparent;
+            box-shadow: none;
+            text-align: center;
+        }
+    } */
 </style>
+

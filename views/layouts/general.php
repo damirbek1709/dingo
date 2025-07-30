@@ -54,8 +54,7 @@ ModuleAsset::register($this);
             ?>
             <nav class="nav-right">
                 <div class="desktop-nav">
-                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']); ?>
-
+                    
                     <button class="icon-btn">
                         <svg class="bell-icon" viewBox="0 0 24 24">
                             <path

@@ -26,6 +26,7 @@ class App
 
             case 'prices':return 'prices';break;
             case 'booking':return 'booking';break;
+            case 'index':return 'booking';break;
 
             case 'room-list':return 'rooms';break;
             case 'tariff-list':return 'rooms';break;

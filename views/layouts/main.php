@@ -46,12 +46,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     <div class="desktop-nav">
                         <?php
                         $dropdown = '';
-                        if (Yii::$app->user->identity->objectExists()) {
-                            $dropdown = Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
-                                'class' => 'dropdown-select',
-                                'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
-                            ]);
-                        }
+                        // if (Yii::$app->user->identity->objectExists()) {
+                        //     $dropdown = Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
+                        //         'class' => 'dropdown-select',
+                        //         'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
+                        //     ]);
+                        // }
                         echo $dropdown; ?>
 
                         <button class="icon-btn">

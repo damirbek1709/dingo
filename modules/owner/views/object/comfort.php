@@ -14,7 +14,7 @@ use yii\widgets\ActiveForm;
 // $this->params['breadcrumbs'][] = Yii::t('app', 'Услуги и особенности');
 ?>
 <div class="oblast-update">
-<?php echo $this->render('top_nav', ['model' => $model,'object_id'=>$object_id]); ?>
+    <?php echo $this->render('top_nav', ['model' => $model, 'object_id' => $object_id]); ?>
     <?php $form = ActiveForm::begin();
     $list_comfort = Objects::сomfortList();
     ?>
@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
                 <?= $this->render('nav', ['model' => $model]); ?>
             </div>
 
-            <div class="col-md-9">
+            <div class="col-md-9 col-mob-resp">
                 <div class="card">
                     <h3><?= Html::encode($model->name[0]) ?></h3>
                     <p><?= Yii::t('app', 'Выберите 5 и более удобств в вашем объекте размещения.') ?></p>
@@ -38,7 +38,8 @@ use yii\widgets\ActiveForm;
                                 <?php foreach ($comforts as $comfort): ?>
                                     <div class="comfort-item">
                                         <?= Html::checkbox("comforts[{$categoryId}][{$comfort->id}][selected]", isset($selectedComforts[$comfort->id]), ['value' => 1, 'id' => "comfort-{$categoryId}-{$comfort->id}"]) ?>
-                                        <label for="comfort-<?= $categoryId ?>-<?= $comfort->id ?>"><?= Html::encode($comfort->title) ?></label>
+                                        <label
+                                            for="comfort-<?= $categoryId ?>-<?= $comfort->id ?>"><?= Html::encode($comfort->title) ?></label>
 
                                         <div class="toggle-switch-container">
                                             <label class="toggle-switch">
@@ -65,6 +66,13 @@ use yii\widgets\ActiveForm;
     <?php ActiveForm::end(); ?>
 </div>
 <style>
+    @media (max-width: 414px) {
+        .col-mob-resp {
+            padding: 0;
+            margin-top: 25px;
+        }
+    }
+
     .comfort-item {
         display: grid;
         grid-template-columns: 30px 6fr 6fr;

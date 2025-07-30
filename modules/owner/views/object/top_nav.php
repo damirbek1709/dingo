@@ -25,4 +25,78 @@ use yii\helpers\Html;
     .style_<?php echo $action ?> {
         border-bottom: 2px solid #3676BC;
     }
+
+    @media (max-width: 414px) {
+        /* .owner-nav-cover {
+            display: none;
+        } */
+    }
+
+    @media (max-width: 768px) {
+        .top_nav {
+            display: flex;
+            padding-bottom: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            /* Smooth scrolling on iOS */
+            scrollbar-width: thin;
+            /* Firefox */
+            gap: 10px;
+            border-bottom: none;
+            /* Add some spacing between items */
+        }
+
+
+
+
+
+        /* Hide scrollbar for Webkit browsers */
+        .top_nav::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .top_nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .top_nav::-webkit-scrollbar-thumb {
+            background: #3676BC;
+            border-radius: 2px;
+        }
+
+        .top_nav a {
+            font-size: 16px;
+            line-height: 15px;
+            letter-spacing: 0px;
+            padding-bottom: 15px;
+            margin-top: 0;
+            white-space: nowrap;
+            flex-shrink: 0;
+            /* Prevent items from shrinking */
+            min-width: fit-content;
+            /* Ensure items maintain their natural width */
+            padding-left: 8px;
+            padding-right: 8px;
+            text-align: center;
+        }
+    }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const topNav = document.querySelector('.top_nav');
+        const activeLink = document.querySelector('.style_<?php echo $action ?>');
+
+        if (topNav && activeLink && window.innerWidth <= 768) {
+            // Calculate the position to scroll to (align active item to the left)
+            const scrollPosition = activeLink.offsetLeft - 10; // 10px offset for better visual alignment
+
+            // Smooth scroll to position
+            topNav.scrollTo({
+                left: scrollPosition,
+                behavior: 'smooth'
+            });
+        }
+    });
+</script>

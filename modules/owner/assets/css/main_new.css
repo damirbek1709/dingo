@@ -1939,7 +1939,15 @@ a.logout-button:hover {
     border-top: 1px solid #e9ecef;
 }
 
-
+@media (max-width: 768px) {
+    
+}
+@media (max-width: 768px){
+.comfort_list_grid{
+    grid-template-columns:1fr;
+    width: 100%;
+}
+}
 
 /* Responsive design */
 @media (max-width: 768px) {
@@ -1950,6 +1958,7 @@ a.logout-button:hover {
     .top_nav{
         display:grid;
         padding-bottom: 0;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
     }
     .mob_card_cover{
         margin:15px -10px 0 -15px;
@@ -1963,6 +1972,7 @@ a.logout-button:hover {
     padding-bottom: 15px;
     margin-top: 0;
     width: auto;
+    white-space: nowrap;
     }
     
     .section-title {
