@@ -186,7 +186,7 @@ class RegistrationController extends BaseRegistrationController
                         Yii::$app->nikita->setRecipient($recipient)
                             ->setText('Ваш код: ' . $token->code . ' is your code' . PHP_EOL . 'wYvKRPwmEXI')
                             ->send();
-
+                            
                         Yii::$app->mailer->compose()
                             ->setFrom('send@dingo.kg')
                             ->setTo($model->email)
@@ -263,9 +263,7 @@ class RegistrationController extends BaseRegistrationController
                 $token = Token::find()->where(['code' => $model->confirmation_code, 'type' => Token::TYPE_CONFIRMATION])->one();
                 $user = $token->user;
                 $user->confirmed_at = time();
-                if ($user->save()) {
-                    $this->saveFcm($user->id, Yii::$app->request->post());
-                }
+                $user->save();
                 $token->delete();
 
                 // Assign role to user
@@ -311,25 +309,6 @@ class RegistrationController extends BaseRegistrationController
             'module' => $this->module,
             'session_email' => $session_email
         ]);
-    }
-
-    protected function saveFcm($user_id, $post, $shouldDelete = true)
-    {
-        if (!empty($post['fcm_token']) && !empty($post['device_id'])) {
-            $fcm_token = $post['fcm_token'];
-            $device_id = $post['device_id'];
-            $dao = Yii::$app->db;
-            $sql = "SELECT * FROM `fcm_token` WHERE user_id={$user_id} AND device_id='{$device_id}' AND token='{$fcm_token}'";
-            $row = $dao->createCommand($sql)->queryOne();
-            if (!$row) {
-                if ($shouldDelete) {
-                    //delete prev
-                    $dao->createCommand()->delete('fcm_token', ['user_id' => $user_id, 'device_id' => $device_id, 'app_id' => 0])->execute();
-                }
-                $dao->createCommand()->delete('fcm_token', ['device_id' => $device_id, 'app_id' => 0])->execute();
-                $dao->createCommand()->insert('fcm_token', ['user_id' => $user_id, 'device_id' => $device_id, 'token' => $fcm_token, 'created_at' => time()])->execute();
-            }
-        }
     }
 
 

@@ -145,10 +145,29 @@ class UserController extends BaseController
             $response["message"] = 'Номер телефона подтверждён';
             $response["user"] = $user;
 
-            //$this->saveFcm($user->id, Yii::$app->request->post());
+            $this->saveFcm($user->id, Yii::$app->request->post());
         }
 
         return $response;
+    }
+
+    protected function saveFcm($user_id, $post, $shouldDelete = true)
+    {
+        if (!empty($post['fcm_token']) && !empty($post['device_id'])) {
+            $fcm_token = $post['fcm_token'];
+            $device_id = $post['device_id'];
+            $dao = Yii::$app->db;
+            $sql = "SELECT * FROM `fcm_token` WHERE user_id={$user_id} AND device_id='{$device_id}' AND token='{$fcm_token}'";
+            $row = $dao->createCommand($sql)->queryOne();
+            if (!$row) {
+                if ($shouldDelete) {
+                    //delete prev
+                    $dao->createCommand()->delete('fcm_token', ['user_id' => $user_id, 'device_id' => $device_id, 'app_id' => 0])->execute();
+                }
+                $dao->createCommand()->delete('fcm_token', ['device_id' => $device_id, 'app_id' => 0])->execute();
+                $dao->createCommand()->insert('fcm_token', ['user_id' => $user_id, 'device_id' => $device_id, 'token' => $fcm_token, 'created_at' => time()])->execute();
+            }
+        }
     }
 
     public function actionAddToFavorites($id)
