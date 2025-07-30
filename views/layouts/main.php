@@ -111,12 +111,14 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     </button>
                 </div>
                 <div class="mobile-menu-item">
+                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects):?>
                     <button class="mobile-profile-btn">
                         <span class="mobile-profile-initial">
                             <?= $user_string ?>
                         </span>
                         <span><?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account']); ?></span>
                     </button>
+                    <?php endif; ?>
                 </div>
                 <div class="mobile-menu-item">
                     <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
