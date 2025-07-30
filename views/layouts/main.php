@@ -38,16 +38,12 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
     <div class="wrap">
         <header class="header_menu">
             <div class="logo"><?= Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']); ?></div>
-            <?php
-            $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
-            ?>
+            
             <nav class="nav-right">
                 <div class="desktop-nav">
 
-                    <?php if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects) {
-                        echo Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']);
-
-                    }
+                    <?php
+                    echo Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']);
                     ?>
 
                     <button class="icon-btn">
@@ -58,7 +54,11 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                     </button>
 
                     <div class="profile-container">
-                        <button class="profile-btn" onclick="toggleProfileDropdown()">A</button>
+                        <?php
+            if (!Yii::$app->user->isGuest && Yii::$app->user->identity->objects) :
+            $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
+            ?>
+                        <button class="profile-btn" onclick="toggleProfileDropdown()"><?=$user_string?></button>
 
                         <!-- Profile Dropdown Menu -->
                         <div class="profile-dropdown" id="profileDropdown">
@@ -77,6 +77,7 @@ $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii
                                 <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
                             </div>
                         </div>
+            <?php endif ;?>
                     </div>
                 </div>
 
