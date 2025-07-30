@@ -1,145 +1,59 @@
 <?php
 
-/* @var $this \yii\web\View */
-/* @var $content string */
+/** @var yii\web\View $this */
+/** @var string $content */
 
+use app\assets\AppAsset;
 use app\widgets\Alert;
+use yii\widgets\Breadcrumbs;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
-use yii\widgets\Breadcrumbs;
-use yii\helpers\Url;
 use app\models\Objects;
-use app\modules\owner\assets\ModuleAsset;
 
-ModuleAsset::register($this);
+AppAsset::register($this);
+
+$this->registerCsrfMetaTags();
+$this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
+$this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no']);
+$this->registerLinkTag(['rel' => 'icon', 'type' => 'image/x-icon', 'href' => Yii::getAlias('@web/favicon.ico')]);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>">
+<html lang="<?= Yii::$app->language ?>" class="h-100">
 
 <head>
-    <meta charset="<?= Yii::$app->charset ?>">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?php $this->registerLinkTag(['rel' => 'apple-touch-icon', 'sizes' => '180x180', 'href' => Url::to(['/apple-touch-icon.png'])]); ?>
-    <?php $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'sizes' => '32x32', 'href' => Url::to(['/favicon-32x32.png'])]); ?>
-    <?php $this->registerLinkTag(['rel' => 'icon', 'type' => 'image/png', 'sizes' => '16x16', 'href' => Url::to(['/favicon-16x16.png'])]); ?>
-    <?php $this->registerLinkTag(['rel' => 'manifest', 'href' => Url::to(['/site.webmanifest'])]); ?>
-    <?php $this->registerCsrfMetaTags() ?>
+    <title><?= Html::encode($this->title) ?></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
         rel="stylesheet">
-
-    <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
     <?php $this->beginBody() ?>
     <div class="wrap">
-        <?php
-
-        $object_arr = Objects::objectList();
-        $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->username, 0, 1) : '';
-        ?>
-
         <header class="header_menu">
             <div class="logo"><?= Html::a(Html::img(Url::base() . "/images/site/logo.svg"), ['/']); ?></div>
-            <?php
-            $object_arr = Objects::objectListMenu();
-            $user_string = !Yii::$app->user->isGuest ? substr(Yii::$app->user->identity->email, 0, 1) : '';
-            ?>
-            <nav class="nav-right">
-                <div class="desktop-nav">
-                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], ['class' => 'dropdown-select']); ?>
-
-                    <button class="icon-btn">
-                        <svg class="bell-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-                        </svg>
-                    </button>
-
-                    <div class="profile-container">
-                        <button class="profile-btn" onclick="toggleProfileDropdown()">A</button>
-
-                        <!-- Profile Dropdown Menu -->
-                        <div class="profile-dropdown" id="profileDropdown">
-                            <div class="profile-dropdown-header">
-                                <div class="profile-avatar"><?= $user_string ?></div>
-                                <div class="profile-info">
-                                    <div class="profile-email"><?=Yii::$app->user->identity->email?></div>
-                                </div>
-                            </div>
-                            <div class="profile-dropdown-divider"></div>
-                            <div class="profile-menu-item">
-                                <?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account'], ['class' => 'profile-menu-link']); ?>
-                            </div>
-
-                            <div class="profile-menu-item">
-                                <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mobile-nav">
-                    <?= Html::dropDownList('object_id', $object_arr['select'], $object_arr['data'], [
-                        'class' => 'dropdown-select',
-                        'onchange' => 'window.location.href = "/owner/object/view?object_id=" + this.value;'
-                    ]); ?>
-                    <button class="hamburger" onclick="toggleMobileMenu()">
-                        <div class="hamburger-icon">
-                            <div class="hamburger-line"></div>
-                            <div class="hamburger-line"></div>
-                            <div class="hamburger-line"></div>
-                        </div>
-                    </button>
-                </div>
-            </nav>
-
-            <!-- Mobile Dropdown Menu -->
-            <div class="mobile-dropdown" id="mobileDropdown">
-                <div class="mobile-menu-item">
-                    <button class="mobile-icon-btn">
-                        <svg class="bell-icon" viewBox="0 0 24 24">
-                            <path
-                                d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" />
-                        </svg>
-                        <span>Уведомления</span>
-                    </button>
-                </div>
-                <div class="mobile-menu-item">
-                    <button class="mobile-profile-btn">
-                        <span class="mobile-profile-initial">
-                            <?= $user_string ?>
-                        </span>
-                        <span><?= Html::a(Yii::t('app', 'Профиль'), ['/user/view-account']); ?></span>
-                    </button>
-                </div>
-                <div class="mobile-menu-item">
-                    <?= Html::a(Yii::t('app', 'Выход'), ['/user/logout'], ['class' => 'logout-link mobile-menu-link', 'data-method' => 'POST']); ?>
-                </div>
-            </div>
         </header>
 
-        <div class="container-fluid gray-content">
-            <div>
-                <?php /*echo Breadcrumbs::widget([
-'links' => isset($this->params['breadcrumbs']) && Yii::$app->controller->route !== 'user/security/login' ? $this->params['breadcrumbs'] : [],
-]) */ ?>
+        <main id="main" class="flex-shrink-0" role="main">
+            <div class="container">
+                <?= Alert::widget() ?>
+                <?= $content ?>
             </div>
-            <?php //echo Alert::widget() ?>
-            <?= $content ?>
-        </div>
+        </main>
     </div>
 
-    <footer class="footer">
-        <div class="container-fluid">
-            <p class="pull-left">&copy; dingo.kg <?= date('Y') ?></p>
+    <footer id="footer" class="mt-auto py-3 bg-light">
+        <div class="container">
+            <div class="row text-muted">
+                <div class="col-md-6 text-md-start">&copy; dingo.kg <?= date('Y') ?></div>
+                <div class="col-md-6 text-md-end"><?= Yii::powered() ?></div>
+            </div>
         </div>
     </footer>
 
@@ -148,65 +62,6 @@ ModuleAsset::register($this);
 
 </html>
 
-<script>
-        function toggleMobileMenu() {
-            const dropdown = document.getElementById('mobileDropdown');
-            const hamburger = document.querySelector('.hamburger');
-
-            dropdown.classList.toggle('show');
-            hamburger.classList.toggle('active');
-
-            // Close profile dropdown if open
-            const profileDropdown = document.getElementById('profileDropdown');
-            const profileBtn = document.querySelector('.profile-btn');
-            profileDropdown.classList.remove('show');
-            profileBtn.classList.remove('active');
-        }
-
-        function toggleProfileDropdown() {
-            const dropdown = document.getElementById('profileDropdown');
-            const profileBtn = document.querySelector('.profile-btn');
-
-            dropdown.classList.toggle('show');
-            profileBtn.classList.toggle('active');
-
-            // Close mobile dropdown if open
-            const mobileDropdown = document.getElementById('mobileDropdown');
-            const hamburger = document.querySelector('.hamburger');
-            mobileDropdown.classList.remove('show');
-            hamburger.classList.remove('active');
-        }
-
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', function (event) {
-            const mobileDropdown = document.getElementById('mobileDropdown');
-            const hamburger = document.querySelector('.hamburger');
-            const profileDropdown = document.getElementById('profileDropdown');
-            const profileContainer = document.querySelector('.profile-container');
-
-            // Close mobile dropdown
-            if (!hamburger.contains(event.target) && !mobileDropdown.contains(event.target)) {
-                mobileDropdown.classList.remove('show');
-                hamburger.classList.remove('active');
-            }
-
-            // Close profile dropdown
-            if (!profileContainer.contains(event.target)) {
-                profileDropdown.classList.remove('show');
-                document.querySelector('.profile-btn').classList.remove('active');
-            }
-        });
-
-        // Close dropdown when window is resized to desktop
-        window.addEventListener('resize', function () {
-            if (window.innerWidth > 768) {
-                const dropdown = document.getElementById('mobileDropdown');
-                const hamburger = document.querySelector('.hamburger');
-                dropdown.classList.remove('show');
-                hamburger.classList.remove('active');
-            }
-        });
-    </script>
 
 <style>
     
@@ -328,6 +183,7 @@ ModuleAsset::register($this);
         color: #333;
         transition: background-color 0.2s ease;
     }
+
     .mobile-profile-initial {
         width: 32px;
         height: 32px;
