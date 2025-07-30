@@ -98,7 +98,7 @@ class User extends BaseUser
             if ($this->module->enableConfirmation) {
                 /** @var Token $token */
                 $token = \Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
-                $token->link('user', $this);j
+                $token->link('user', $this);
             }
 
             //$this->mailer->sendWelcomeMessage($this, isset($token) ? $token : null);
