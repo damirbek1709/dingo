@@ -61,7 +61,7 @@ class Notification extends \yii\db\ActiveRecord
     public function fields()
     {
         return [
-            'id','type','model_id','titleList','textList','status','date'
+            'id','type','model_id','title','text','status','date'
         ];
     }
 
