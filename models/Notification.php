@@ -20,7 +20,7 @@ class Notification extends \yii\db\ActiveRecord
     const TYPE_BOOKING = 2;
 
     const STATUS_READ = 1;
-    const STATUS_NOT_READ = 1;
+    const STATUS_NOT_READ = 0;
     /**
      * {@inheritdoc}
      */

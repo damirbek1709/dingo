@@ -16,7 +16,7 @@ use app\models\user\RegistrationForm;
 use yii\web\NotFoundHttpException;
 use app\models\Favorite;
 use app\models\Vocabulary;
-
+use app\models\Notification;
 class UserController extends BaseController
 {
     public $modelClass = 'app\models\UserModel';
@@ -308,7 +308,7 @@ class UserController extends BaseController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids','notification-list'],
+                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids', 'notification-list','notification-read-all','notification-read-single'],
                     'roles' => ['@'],
                 ],
             ],
@@ -327,6 +327,8 @@ class UserController extends BaseController
                 'remove-from-favorites' => ['GET'],
                 'favorite-ids' => ['GET'],
                 'notification-list' => ['GET'],
+                'notification-read-all' => ['GET'],
+                'notification-read-single' => ['GET'],
             ],
         ];
         return $behaviors;
@@ -372,7 +374,8 @@ class UserController extends BaseController
         return $response;
     }
 
-    public function actionNotificationList($page = 1){
+    public function actionNotificationList($page = 1)
+    {
         $searchModel = new NotificationSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
         $user_id = Yii::$app->user->id;
@@ -390,5 +393,31 @@ class UserController extends BaseController
             'page' => (int) $page,
             'data' => $dataProvider
         ];
+    }
+
+    public function actionNotifyReadAll()
+    {
+        $response["success"] = false;
+        if(Notification::updateAll(
+            ['status' => Notification::STATUS_READ],
+            ['user_id' => Yii::$app->user->id]
+        )){
+            $response["success"] = true;
+            $response["message"] = Yii::t("app", "Все уведомления прочитаны");
+        }
+        return $response;
+    }
+
+    public function actionNotifyReadSingle()
+    {
+        $response["success"] = false;
+        $notification = Notification::findOne(Yii::$app->request->get('id'));
+        $notification->status = Notification::STATUS_READ;
+
+        if($notification->save(false)){
+            $response["success"] = true;
+            $response["message"] = Yii::t("app", "Уведомление прочтено");
+        }
+        return $response;
     }
 }
