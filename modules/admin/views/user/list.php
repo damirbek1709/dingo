@@ -32,7 +32,7 @@ $this->params['breadcrumbs'][] = $this->title;
                         'phone',
                         [
                             'class' => ActionColumn::className(),
-                            'template' => '{switch}{view}{update}{delete}',
+                            'template' => '{switch}{update}{delete}',
                             'buttons' => [
                                 'switch' => function ($url, $model) {
 
