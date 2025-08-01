@@ -61,11 +61,11 @@ class Notification extends \yii\db\ActiveRecord
     public function fields()
     {
         return [
-            'id','type','model_id','title','text','status','date'
+            'id','type','model_id','titleList','textList','status','date'
         ];
     }
 
-    public function getTitle()  {
+    public function getTitleList()  {
         return [
             $this->title,
             $this->title_en,
@@ -73,7 +73,7 @@ class Notification extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getText()  {
+    public function getTextList()  {
         return [
             $this->text,
             $this->text_en,
