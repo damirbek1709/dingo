@@ -65,7 +65,7 @@ class Notification extends \yii\db\ActiveRecord
         ];
     }
 
-    private function getTitleList()  {
+    public function getTitleList()  {
         return [
             $this->title,
             $this->title_en,
@@ -73,7 +73,7 @@ class Notification extends \yii\db\ActiveRecord
         ];
     }
 
-    private function getTextList()  {
+    public function getTextList()  {
         return [
             $this->text,
             $this->text_en,
