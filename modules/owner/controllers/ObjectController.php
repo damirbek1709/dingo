@@ -668,6 +668,19 @@ class ObjectController extends Controller
                     }
                 }
 
+                $fin_doc_exist = false;
+                $fin_doc = is_dir(Yii::getAlias('@webroot/uploads/documents/' . $bind_model->id . '/financial'));
+                $ceo_doc = is_dir(Yii::getAlias('@webroot/uploads/documents/' . $bind_model->id . '/ceo'));
+
+                if($fin_doc && $ceo_doc && $searchResult['status']!=Objects::STATUS_PUBLISHED){
+                    $status = Objects::STATUS_READY_FOR_PUBLISH;
+
+                }
+
+                if($bind_model){}
+
+
+
                 if ($model->img) {
                     $image_id = $model->img;
                     foreach ($model->getImages() as $image) {
@@ -701,6 +714,7 @@ class ObjectController extends Controller
                     'images' => $model->getPictures(),
                     'general_room_count' => $model->general_room_count,
                     'oblast_id' => $model->oblast_id,
+                    'status'=> $status
                 ];
 
                 if (!Yii::$app->user->can('admin')) {
