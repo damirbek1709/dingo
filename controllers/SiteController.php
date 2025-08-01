@@ -362,6 +362,10 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionCreateNotification(){
+        
+    }
+
     public function actionAppleCredentials()
     {
         Yii::$app->response->format = Response::FORMAT_JSON;

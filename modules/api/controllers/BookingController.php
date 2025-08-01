@@ -6,6 +6,7 @@ use app\models\BookingSearch;
 use app\models\FlashPay;
 use app\models\Booking;
 use app\models\Comfort;
+use app\models\Notification;
 use app\models\RoomComfort;
 use app\models\Tariff;
 use app\models\user\User;
@@ -163,6 +164,10 @@ class BookingController extends BaseController
         $model->cancellation_penalty_sum = $model->sum / 100 * $tariff->penalty_sum;
 
         if ($model->save()) {
+            // $notification = new Notification();
+            // $notification->title = "Бронирование потверждено";
+            // $notification->title_en = "Your booking is approved";
+            // $notification->title_ky = "Сиздин ээлөө кабыл алынды";
             $arr = [
                 'sum' => $model->sum * 100,
                 'booking_id' => $model->id,
