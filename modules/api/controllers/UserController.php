@@ -395,7 +395,7 @@ class UserController extends BaseController
         ];
     }
 
-    public function actionNotifyReadAll()
+    public function actionNotificationReadAll()
     {
         $response["success"] = false;
         if(Notification::updateAll(
@@ -408,7 +408,7 @@ class UserController extends BaseController
         return $response;
     }
 
-    public function actionNotifyReadSingle()
+    public function actionNotificationReadSingle()
     {
         $response["success"] = false;
         $notification = Notification::findOne(Yii::$app->request->get('id'));
