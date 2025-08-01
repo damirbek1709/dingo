@@ -299,7 +299,6 @@ class Objects extends \yii\db\ActiveRecord
         $docs = 0;
         $condition_room_tariff = false;
 
-
         $client = Yii::$app->meili->connect();
         $index = $client->index('object');
         $model = new Objects();

@@ -3,6 +3,7 @@
 namespace app\modules\api\controllers;
 
 use app\models\Booking;
+use app\models\NotificationSearch;
 use app\models\user\UserStatus;
 use Yii;
 use app\models\user\SignupForm;
@@ -307,7 +308,7 @@ class UserController extends BaseController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids'],
+                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids','notification-list'],
                     'roles' => ['@'],
                 ],
             ],
@@ -325,10 +326,9 @@ class UserController extends BaseController
                 'add-to-favorites' => ['GET'],
                 'remove-from-favorites' => ['GET'],
                 'favorite-ids' => ['GET'],
+                'notification-list' => ['GET'],
             ],
         ];
-
-
         return $behaviors;
     }
 
@@ -370,5 +370,25 @@ class UserController extends BaseController
             $response["data"] = Yii::$app->user->identity;
         }
         return $response;
+    }
+
+    public function actionNotificationList($page = 1){
+        $searchModel = new NotificationSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
+        $user_id = Yii::$app->user->id;
+        $dataProvider->query->andFilterWhere(['user_id' => $user_id]);
+
+        $pageSize = (int) Yii::$app->request->get('per-page', 10);
+        $dataProvider->pagination = [
+            'page' => $page - 1, // DataProvider uses 0-based indexing
+            'pageSize' => $pageSize,
+            'pageSizeLimit' => [1, 100],
+        ];
+        return [
+            'pageSize' => $dataProvider->pagination->pageSize,
+            'totalCount' => $dataProvider->totalCount,
+            'page' => (int) $page,
+            'data' => $dataProvider
+        ];
     }
 }
