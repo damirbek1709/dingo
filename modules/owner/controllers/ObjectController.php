@@ -668,17 +668,7 @@ class ObjectController extends Controller
                     }
                 }
 
-                $fin_doc_exist = false;
-                $fin_doc = is_dir(Yii::getAlias('@webroot/uploads/documents/' . $bind_model->id . '/financial'));
-                $ceo_doc = is_dir(Yii::getAlias('@webroot/uploads/documents/' . $bind_model->id . '/ceo'));
-
-                if($fin_doc && $ceo_doc && $searchResult['status']!=Objects::STATUS_PUBLISHED){
-                    $status = Objects::STATUS_READY_FOR_PUBLISH;
-
-                }
-
-                if($bind_model){}
-
+                $status = Objects::currentStatus($model['id'], $model['status']);
 
 
                 if ($model->img) {
