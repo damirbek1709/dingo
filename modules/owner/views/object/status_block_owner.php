@@ -38,13 +38,12 @@ Modal::begin([
     <?php if ($model->deny_reason) {
         echo Html::tag('div', "<strong>" . Yii::t('app', 'Причина отклонения: ') . "</strong>" . $model->deny_reason, ['class' => 'deny_reason']);
     } ?>
-    <?php if ($model->status ==Objects::STATUS_READY_FOR_PUBLISH): ?>
-        <div class="dialog-button-cover">
-            <button style="width:100%" data-status="<?= $model->status; ?>" class="save-button moderate-button">
-                <?= $status_arr['button_text'] ?>
-            </button>
-        </div>
-    <?php endif; ?>
+
+    <div class="dialog-button-cover">
+        <button style="width:100%" data-status="<?= $model->status; ?>" class="save-button moderate-button">
+            <?= $status_arr['button_text'] ?>
+        </button>
+    </div>
 </div>
 
 <?php Modal::end();
