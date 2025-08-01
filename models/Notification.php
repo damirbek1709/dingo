@@ -58,5 +58,26 @@ class Notification extends \yii\db\ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        return [
+            'id','type','model_id','titleList','textList','status','date'
+        ];
+    }
 
+    private function getTitleList()  {
+        return [
+            $this->title,
+            $this->title_en,
+            $this->title_ky
+        ];
+    }
+
+    private function getTextList()  {
+        return [
+            $this->text,
+            $this->text_en,
+            $this->text_ky
+        ];
+    }
 }
