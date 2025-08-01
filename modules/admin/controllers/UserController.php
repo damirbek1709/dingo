@@ -100,4 +100,30 @@ class UserController extends Controller
         ]);
     }
 
+    public function actionIndex($category = 1)
+    {
+        $this->layout = "/general";
+        $searchModel = Yii::createObject(UserSearch::className());
+        $dataProvider = $searchModel->search(Yii::$app->request->get());
+        $client = Yii::$app->meili->connect();
+        $documents = $client->index('object')->search('', [
+            'limit' => 1
+        ]);
+        $userIds = [];
+        foreach ($documents as $doc) {
+            if (isset($doc['user_id'])) {
+                $userIds[] = $doc['user_id'];
+            }
+        }
+
+        // Optionally, get unique user_ids
+        // $uniqueUserIds = array_values(array_unique($userIds));
+        // $dataProvider->query->where(['id' => $uniqueUserIds]);
+
+        return $this->render('list', [
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel,
+        ]);
+    }
+
 }
