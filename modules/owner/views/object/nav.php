@@ -40,11 +40,11 @@ $nav_action_class = Yii::$app->controller->action->id;
 ?>
 
 <style>
-    /* .nav_<?//= $nav_action_class ?> {
+    .nav_<?= $nav_action_class ?> {
         color: #3676BC !important;
     }
 
-    @media (max-width: 414px) {
+    /* @media (max-width: 414px) {
         .cover_nav_<?//= $nav_action_class ?> {
             display: flex !important;
             justify-content: center;

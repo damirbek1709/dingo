@@ -26,7 +26,7 @@ use yii\widgets\ActiveForm;
                 <?php echo $this->render('nav', ['model' => $model]); ?>
             </div>
 
-            <div class="col-md-9">
+            <div class="col-md-9 mob_card_cover">
                 <div class="card">
                     <h2 class="general_title"><?= Yii::t('app', 'Условия'); ?></h2>
                     <!-- Early & Late Check-in -->

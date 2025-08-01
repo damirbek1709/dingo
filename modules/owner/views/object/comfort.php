@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
                 <?= $this->render('nav', ['model' => $model]); ?>
             </div>
 
-            <div class="col-md-9 col-mob-resp">
+            <div class="col-md-9 mob_card_cover">
                 <div class="card">
                     <h3><?= Html::encode($model->name[0]) ?></h3>
                     <p><?= Yii::t('app', 'Выберите 5 и более удобств в вашем объекте размещения.') ?></p>

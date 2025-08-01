@@ -25,7 +25,7 @@ $this->title = Yii::t('app', 'Способы оплаты в апартамен�
                 <?php echo $this->render('nav', ['model' => $model]); ?>
             </div>
 
-            <div class="col-md-9">
+            <div class="col-md-9 mob_card_cover">
                 <div class="card">
                     <h1 class="general_title"><?= Html::encode($this->title) ?></h1>
                     <div class="payment-methods-container">

@@ -91,8 +91,8 @@ class UserController extends Controller
         }
 
         // Optionally, get unique user_ids
-        $uniqueUserIds = array_values(array_unique($userIds));
-        $dataProvider->query->where(['id' => $uniqueUserIds]);
+        // $uniqueUserIds = array_values(array_unique($userIds));
+        // $dataProvider->query->where(['id' => $uniqueUserIds]);
 
         return $this->render('list', [
             'dataProvider' => $dataProvider,
