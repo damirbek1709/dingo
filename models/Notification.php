@@ -98,14 +98,28 @@ class Notification extends \yii\db\ActiveRecord
                 $notification->title_ky = "Сиздин ээлонуз кабыл алынды";
 
                 $notification->text = "Как прошла поездка в " . $name[0] . ". Ваш отзыв поможет другим путешественникам и поддержит хоста.";
-                $notification->text_en = "How was your trip to ". $name[1]  ." Your feedback will help other travelers and support the host.";
-                $notification->text_ky = $name[2] ." саякатыңыз кандай өттү? Пикириңиз башка саякатчыларга жардам берип, үй ээсине колдоо көрсөтөт";
+                $notification->text_en = "How was your trip to " . $name[1] . " Your feedback will help other travelers and support the host.";
+                $notification->text_ky = $name[2] . " саякатыңыз кандай өттү? Пикириңиз башка саякатчыларга жардам берип, үй ээсине колдоо көрсөтөт";
 
                 //$notification->model_id = $model_id;
                 $notification->category = self::CATEGORY_FEEDBACK;
                 break;
 
+            default:
+                $name = $res['name'];
+                $notification->title = "Бронирование потверждено";
+                $notification->title_en = "Your booking is approved";
+                $notification->title_ky = "Сиздин ээлонуз кабыл алынды";
+
+                $notification->text = "Вы забронировали номер в " . $name[0] . " .Готовьтесь к поездке с 2025-08-01 по 2025-08-06.";
+                $notification->text_en = "You have booked a room at " . $name[1] . " Get ready for your trip from 2025-08-01 to 2025-08-06.";
+                $notification->text_ky = "Сиз " . $name[2] . " мейманканасынан бөлмө ээлеп алдыңыз! 2025-08-01ден 2025-08-06 чейин сапарыңызга даярданыңыз.";
+                $notification->model_id = $model_id;
+                $notification->category = self::CATEGORY_BOOKING;
+                break;
         }
+
+        $notification->save();
     }
 
     public function fields()
@@ -117,7 +131,8 @@ class Notification extends \yii\db\ActiveRecord
             'titleList',
             'textList',
             'status',
-            'date'
+            'date',
+            'booking'
         ];
     }
 
@@ -165,6 +180,13 @@ class Notification extends \yii\db\ActiveRecord
     //                 'date'
     //             ];
     //     }
+    // }
+
+    // public function getBooking(){
+    //     if($this->type == self::TYPE_CHECKIN_TOMORROW){
+    //         return 
+    //     }
+    //     return null;
     // }
 
     public function getTitleList()

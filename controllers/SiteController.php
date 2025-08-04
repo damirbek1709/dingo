@@ -364,16 +364,8 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionCreateNotification($type, $model_id = Notification::TYPE_BOOKING){
-        $notification = new Notification();
-        $voc = NotificationList::findOne($type);
-        $notification->title = $voc->title;
-        $notification->title_en = $voc->title_en;
-        $notification->title_ky = $voc->title_ky;
-
-        if($model_id == NotificationList::CATEGORY_OBJECT){
-            
-        }
+    public function actionCreateNotification($type, $model_id){
+        Notification::createNotification($type);
     }
 
     public function actionAppleCredentials()
