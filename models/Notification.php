@@ -30,7 +30,6 @@ class Notification extends \yii\db\ActiveRecord
     const CATEGORY_OBJECT = 2;
     const CATEGORY_FEEDBACK = 4;
 
-    public $object_id = $this->model_id;
     /**
      * {@inheritdoc}
      */
