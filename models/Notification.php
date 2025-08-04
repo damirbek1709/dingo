@@ -200,7 +200,7 @@ class Notification extends \yii\db\ActiveRecord
     // }
 
     public function getBooking(){
-        if($this->type == self::TYPE_CHECKIN_TOMORROW){
+        if($this->type == self::TYPE_CHECKIN_TOMORROW || $this->type == self::TYPE_LEAVE_FEEDBACK){
             return Booking::findOne($this->booking_id);
         }
         return null;
