@@ -308,7 +308,7 @@ class UserController extends BaseController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids', 'notification-list','notification-read-all','notification-read-single'],
+                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids', 'notification-list', 'notification-read-all', 'notification-read-single'],
                     'roles' => ['@'],
                 ],
             ],
@@ -381,29 +381,37 @@ class UserController extends BaseController
         $user_id = Yii::$app->user->id;
 
         $dataProvider->query->andFilterWhere(['user_id' => $user_id]);
-        
+
         $pageSize = (int) Yii::$app->request->get('per-page', 10);
         $dataProvider->pagination = [
             'page' => $page - 1, // DataProvider uses 0-based indexing
             'pageSize' => $pageSize,
             'pageSizeLimit' => [1, 100],
         ];
+
+        // Create a separate query for counting unread notifications
+        $notReadCount = Notification::find()
+            ->where(['user_id' => $user_id, 'status' => Notification::STATUS_NOT_READ])
+            ->count();
+
         return [
             'pageSize' => $dataProvider->pagination->pageSize,
             'totalCount' => $dataProvider->totalCount,
             'page' => (int) $page,
             'data' => $dataProvider,
-            'not_read_count' => $dataProvider->query->andFilterWhere(['user_id' => $user_id,'status'=>Notification::STATUS_NOT_READ])->count()
+            'not_read_count' => $notReadCount
         ];
     }
 
     public function actionNotificationReadAll()
     {
         $response["success"] = false;
-        if(Notification::updateAll(
-            ['status' => Notification::STATUS_READ],
-            ['user_id' => Yii::$app->user->id]
-        )){
+        if (
+            Notification::updateAll(
+                ['status' => Notification::STATUS_READ],
+                ['user_id' => Yii::$app->user->id]
+            )
+        ) {
             $response["success"] = true;
             $response["message"] = Yii::t("app", "Все уведомления прочитаны");
         }
@@ -416,7 +424,7 @@ class UserController extends BaseController
         $notification = Notification::findOne(Yii::$app->request->get('id'));
         $notification->status = Notification::STATUS_READ;
 
-        if($notification->save(false)){
+        if ($notification->save(false)) {
             $response["success"] = true;
             $response["message"] = Yii::t("app", "Уведомление прочтено");
         }
