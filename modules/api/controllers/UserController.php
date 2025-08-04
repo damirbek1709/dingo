@@ -379,9 +379,10 @@ class UserController extends BaseController
         $searchModel = new NotificationSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
         $user_id = Yii::$app->user->id;
-        $dataProvider->query->andFilterWhere(['user_id' => $user_id]);
         $not_read_count = $dataProvider->query->andFilterWhere(['user_id' => $user_id,'status'=>Notification::STATUS_NOT_READ])->count();
 
+        $dataProvider->query->andFilterWhere(['user_id' => $user_id]);
+        
         $pageSize = (int) Yii::$app->request->get('per-page', 10);
         $dataProvider->pagination = [
             'page' => $page - 1, // DataProvider uses 0-based indexing
