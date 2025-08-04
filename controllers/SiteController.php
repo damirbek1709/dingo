@@ -364,8 +364,8 @@ class SiteController extends Controller
         ]);
     }
 
-    public function actionCreateNotification($type, $model_id){
-        Notification::createNotification($type);
+    public function actionCreateNotification($type, $model_id, $booking_id): void{
+        Notification::createNotification($type, $model_id, $booking_id);
     }
 
     public function actionAppleCredentials()

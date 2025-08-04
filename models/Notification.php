@@ -68,7 +68,7 @@ class Notification extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function createNotification($type, $model_id = null)
+    public static function createNotification($type, $model_id ,$booking_id = null)
     {
         $client = Yii::$app->meili->connect();
         $res = $client->index('object')->getDocument($model_id);
@@ -103,8 +103,24 @@ class Notification extends \yii\db\ActiveRecord
                 $notification->text_en = "How was your trip to " . $name[1] . " Your feedback will help other travelers and support the host.";
                 $notification->text_ky = $name[2] . " саякатыңыз кандай өттү? Пикириңиз башка саякатчыларга жардам берип, үй ээсине колдоо көрсөтөт";
 
-                //$notification->model_id = $model_id;
+                $notification->model_id = $model_id;
                 $notification->category = self::CATEGORY_FEEDBACK;
+                break;
+
+            case self::TYPE_CHECKIN_TOMORROW:
+                $name = $res['name'];
+
+                $notification->title = "Завтра заселение!";
+                $notification->title_en = "Tomorrow is a checking!";
+                $notification->title_ky = "Эртең катталуу!";
+
+                $notification->text = "Остался всего 1 день до поездки в ".$name[0].  ". Проверьте адрес и инструкции от хоста.";
+                $notification->text_en = "Only 1 day left until travel to ".$name[1]. ". Check the address and instructions from the host.";
+                $notification->text_ky = $name[2]."  саякатка 1 гана күн калды. Үй ээсинен даректи жана көрсөтмөлөрдү текшериңиз.";
+
+                $notification->model_id = $model_id;
+                $notification->booking_id = $booking_id;
+                $notification->category = self::CATEGORY_BOOKING;
                 break;
 
             default:
