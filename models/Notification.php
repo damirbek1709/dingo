@@ -29,6 +29,8 @@ class Notification extends \yii\db\ActiveRecord
     const CATEGORY_BOOKING = 1;
     const CATEGORY_OBJECT = 2;
     const CATEGORY_FEEDBACK = 4;
+
+    public $object_id = $this->model_id;
     /**
      * {@inheritdoc}
      */
@@ -43,8 +45,8 @@ class Notification extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['type', 'title', 'text', 'user_id', 'category', 'model_id'], 'required'],
-            [['type', 'status', 'user_id', 'category', 'model_id'], 'integer'],
+            [['type', 'title', 'text', 'user_id', 'category'], 'required'],
+            [['type', 'status', 'user_id', 'category', 'model_id','booking_id'], 'integer'],
             [['date'], 'safe'],
             [['title'], 'string', 'max' => 255],
             [['text'], 'string', 'max' => 500],
@@ -127,12 +129,12 @@ class Notification extends \yii\db\ActiveRecord
         return [
             'id',
             'type',
-            'model_id',
             'titleList',
             'textList',
             'status',
             'date',
-            'booking'
+            'booking',
+            'object'
         ];
     }
 
@@ -182,12 +184,17 @@ class Notification extends \yii\db\ActiveRecord
     //     }
     // }
 
-    // public function getBooking(){
-    //     if($this->type == self::TYPE_CHECKIN_TOMORROW){
-    //         return 
-    //     }
-    //     return null;
-    // }
+    public function getBooking(){
+        if($this->type == self::TYPE_CHECKIN_TOMORROW){
+            return Booking::findOne($this->booking_id);
+        }
+        return null;
+    }
+
+    public function getObject(){
+        $client = Yii::$app->meili->connect();
+        return $client->index('object')->getDocument($this->model_id);
+    }
 
     public function getTitleList()
     {
