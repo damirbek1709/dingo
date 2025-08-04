@@ -393,7 +393,7 @@ class UserController extends BaseController
             'totalCount' => $dataProvider->totalCount,
             'page' => (int) $page,
             'data' => $dataProvider,
-            'not_read_count' => $$dataProvider->query->andFilterWhere(['user_id' => $user_id,'status'=>Notification::STATUS_NOT_READ])->count()
+            'not_read_count' => $dataProvider->query->andFilterWhere(['user_id' => $user_id,'status'=>Notification::STATUS_NOT_READ])->count()
         ];
     }
 
