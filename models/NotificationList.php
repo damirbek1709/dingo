@@ -20,6 +20,7 @@ class NotificationList extends \yii\db\ActiveRecord
 {
     const CATEGORY_OBJECT = 1;
     const CATEGORY_BOOKING = 2;
+    const CATEGORY_FEEDBACK = 3;
     /**
      * {@inheritdoc}
      */

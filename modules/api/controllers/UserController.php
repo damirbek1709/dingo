@@ -380,6 +380,7 @@ class UserController extends BaseController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
         $user_id = Yii::$app->user->id;
         $dataProvider->query->andFilterWhere(['user_id' => $user_id]);
+        $not_read_count = $dataProvider->query->andFilterWhere(['user_id' => $user_id,'status'=>Notification::STATUS_NOT_READ])->count();
 
         $pageSize = (int) Yii::$app->request->get('per-page', 10);
         $dataProvider->pagination = [
@@ -391,7 +392,8 @@ class UserController extends BaseController
             'pageSize' => $dataProvider->pagination->pageSize,
             'totalCount' => $dataProvider->totalCount,
             'page' => (int) $page,
-            'data' => $dataProvider
+            'data' => $dataProvider,
+            'not_read_count' => $not_read_count
         ];
     }
 
