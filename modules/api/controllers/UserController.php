@@ -379,7 +379,6 @@ class UserController extends BaseController
         $searchModel = new NotificationSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams, false, true, null);
         $user_id = Yii::$app->user->id;
-        $not_read_count = $dataProvider->query->andFilterWhere(['user_id' => $user_id,'status'=>Notification::STATUS_NOT_READ])->count();
 
         $dataProvider->query->andFilterWhere(['user_id' => $user_id]);
         
@@ -394,7 +393,7 @@ class UserController extends BaseController
             'totalCount' => $dataProvider->totalCount,
             'page' => (int) $page,
             'data' => $dataProvider,
-            'not_read_count' => $not_read_count
+            'not_read_count' => $$dataProvider->query->andFilterWhere(['user_id' => $user_id,'status'=>Notification::STATUS_NOT_READ])->count()
         ];
     }
 
