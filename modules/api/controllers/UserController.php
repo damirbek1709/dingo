@@ -163,9 +163,9 @@ class UserController extends BaseController
             if (!$row) {
                 if ($shouldDelete) {
                     //delete prev
-                    $dao->createCommand()->delete('fcm_token', ['user_id' => $user_id, 'device_id' => $device_id, 'app_id' => 0])->execute();
+                    $dao->createCommand()->delete('fcm_token', ['user_id' => $user_id, 'device_id' => $device_id])->execute();
                 }
-                $dao->createCommand()->delete('fcm_token', ['device_id' => $device_id, 'app_id' => 0])->execute();
+                $dao->createCommand()->delete('fcm_token', ['device_id' => $device_id])->execute();
                 $dao->createCommand()->insert('fcm_token', ['user_id' => $user_id, 'device_id' => $device_id, 'token' => $fcm_token, 'created_at' => time()])->execute();
             }
         }
