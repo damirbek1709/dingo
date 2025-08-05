@@ -957,6 +957,8 @@ class ObjectController extends BaseController
             } else {
                 $document['type_string'] = null;
             }
+            $feedback = Feedback::findOne($id);
+            $document['rating']=$feedback->general;
             return $document;
 
         }
