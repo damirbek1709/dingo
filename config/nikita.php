@@ -2,9 +2,9 @@
 
 return [
     'class' => 'app\components\Nikita',
-    'login' => 'sydykovm',
-    'password' => 'kUbTBg7C',
-    'sender' => 'SMSPRO.KG',
+    'login' => 'Dingokg',
+    'password' => 'VjPC_Qvf',
+    'sender' => 'Dingo.kg',
 
     // 'login' => 'Selva',
     // 'password' => '33xmJ_Xy',

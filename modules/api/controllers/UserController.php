@@ -82,11 +82,12 @@ class UserController extends BaseController
                     Yii::$app->mailer->compose()
                         ->setFrom('send@dingo.kg')
                         ->setTo($email)
-                        ->setSubject("Ваш код авторизации: " . $token->code)
+                        ->setSubject("Ваш код для входа: " . $token->code)
                         ->setHtmlBody("<h1>{$token->code}</h1>")
                         ->setTextBody('Hello from Resend! This is a test email.')
                         ->send();
 
+                    
                 }
             }
         } else {
@@ -107,10 +108,11 @@ class UserController extends BaseController
                 Yii::$app->mailer->compose()
                     ->setFrom('send@dingo.kg')
                     ->setTo($email)
-                    ->setSubject("Ваш код авторизации: " . $token->code)
+                    ->setSubject("Ваш код для входа: " . $token->code)
                     ->setHtmlBody("<h1>{$token->code}</h1>")
                     ->setTextBody('Hello from Resend! This is a test email.')
                     ->send();
+                
             }
         }
         return $response;
