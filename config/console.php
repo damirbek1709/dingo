@@ -18,6 +18,9 @@ $config = [
     ],
     'components' => [
         'nikita' => $nikita,
+        'meili' => [
+            'class' => 'app\components\Meili',
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
