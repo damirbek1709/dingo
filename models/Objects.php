@@ -252,6 +252,18 @@ class Objects extends \yii\db\ActiveRecord
         return ArrayHelper::map($cities, 'id', 'name');
     }
 
+    public static function generalFeedback($object_id)
+    {
+        $feedback = Feedback::find()->where(['object_id' => $object_id]);
+        $sum = $feedback->sum('general');
+        $count = $feedback->count();
+        if ($count) {
+            $average = $sum / $count;
+            return (float) round($average, 2);
+        }
+        return 0;
+    }
+
     public function getFinancialDocs()
     {
         $file_array = [];

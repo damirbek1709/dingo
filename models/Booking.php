@@ -242,6 +242,7 @@ class Booking extends \yii\db\ActiveRecord
         $arr['city'] = $result['city'];
         $arr['totalPrice'] = (float) $this->sum;
         $arr['transaction_number'] = (int) $this->transaction_number;
+        $arr['rating'] = Objects::generalFeedback($this->object_id);
 
         $arr['email'] = $result['email'];
         $arr['check_in'] = $result['check_in'];
