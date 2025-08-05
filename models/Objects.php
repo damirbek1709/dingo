@@ -675,6 +675,13 @@ class Objects extends \yii\db\ActiveRecord
             $picture = $image->getUrl('500x');
             $original = $image->getPathToOrigin();
 
+            $server = strtolower($_SERVER['HTTP_HOST'] ?? php_uname('n'));
+
+            if (strtolower(pathinfo($filePath, PATHINFO_EXTENSION)) === 'webp') {
+                $picture = 'https://' . $server . '/uploads/images/store/' . $filePath;
+                $thumb = 'https://' . $server . '/uploads/images/store/' . $filePath;
+            }
+
             $list[] = [
                 'id' => $image->id,
                 'picture' => $picture,
