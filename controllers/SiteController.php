@@ -356,7 +356,6 @@ class SiteController extends Controller
         $model = new ContactForm();
         if ($model->load(Yii::$app->request->post()) && $model->contact(Yii::$app->params['adminEmail'])) {
             Yii::$app->session->setFlash('contactFormSubmitted');
-
             return $this->refresh();
         }
         return $this->render('contact', [
@@ -377,7 +376,7 @@ class SiteController extends Controller
                 'apps' => [],
                 'details' => [
                     [
-                        'appIDs' => ['9QAR57XHB4.com.dingo.dingoapplication'],
+                        'appIDs' => ['QJG5DAKWTN.com.dingo.dingoapplication'],
                         'paths' => ['*'], // Use '*' to allow all paths
                         'components' => [
                             ['/' => '/']
@@ -386,7 +385,7 @@ class SiteController extends Controller
                 ]
             ],
             'webcredentials' => [
-                'apps' => ['9QAR57XHB4.com.dingo.dingoapplication']
+                'apps' => ['QJG5DAKWTN.com.dingo.dingoapplication']
             ]
         ];
     }

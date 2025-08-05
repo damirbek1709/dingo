@@ -76,7 +76,6 @@ class Notification extends \yii\db\ActiveRecord
         $notification->status = self::STATUS_NOT_READ;
         $notification->user_id = Yii::$app->user->id;
 
-
         switch ($type) {
             case self::TYPE_BOOKING_APPROVED:
                 $name = $res['name'];
@@ -94,9 +93,9 @@ class Notification extends \yii\db\ActiveRecord
             case self::TYPE_LEAVE_FEEDBACK:
                 $name = $res['name'];
 
-                $notification->title = "Как прошла поездка в " . $name[0] . ". Ваш отзыв поможет другим путешественникам и поддержит хоста.";
-                $notification->title_en = "Your booking is approved";
-                $notification->title_ky = "Сиздин ээлонуз кабыл алынды";
+                $notification->title = "Оставьте отзыв";
+                $notification->title_en = "Leave a feedback";
+                $notification->title_ky = "Cын калтыргыла";
 
                 $notification->text = "Как прошла поездка в " . $name[0] . ". Ваш отзыв поможет другим путешественникам и поддержит хоста.";
                 $notification->text_en = "How was your trip to " . $name[1] . " Your feedback will help other travelers and support the host.";
@@ -199,14 +198,16 @@ class Notification extends \yii\db\ActiveRecord
     //     }
     // }
 
-    public function getBooking(){
+    public function getBooking()
+    {
         if($this->type == self::TYPE_CHECKIN_TOMORROW || $this->type == self::TYPE_LEAVE_FEEDBACK){
             return Booking::findOne($this->booking_id);
         }
         return null;
     }
 
-    public function getObject(){
+    public function getObject()
+    {
         $client = Yii::$app->meili->connect();
         return $client->index('object')->getDocument($this->model_id);
     }
