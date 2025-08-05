@@ -35,6 +35,6 @@ class NotificationController extends Controller
 
     public function actionCheckinSoon()
     {
-        Notification::createNotification(3, 7, null);
+        Notification::createNotification(3, 7, booking_id: 95);
     }
 }
