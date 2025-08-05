@@ -75,6 +75,7 @@ class Notification extends \yii\db\ActiveRecord
         $notification->type = $type;
         $notification->status = self::STATUS_NOT_READ;
         $notification->user_id = Yii::$app->user->id;
+        $notification->booking_id = $booking_id;
 
         switch ($type) {
             case self::TYPE_BOOKING_APPROVED:
