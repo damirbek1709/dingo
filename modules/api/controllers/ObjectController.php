@@ -532,12 +532,14 @@ class ObjectController extends BaseController
                 }
             }
             $type_id = $hit['type'];
+
             $type_string = null;
             $type = Vocabulary::findOne($type_id);
             if ($type) {
                 $hit['type_string'] = [$type->title, $type->title_en, $type->title_ky];
             }
             $hit['from_price'] = $minPrice === PHP_FLOAT_MAX ? null : $minPrice;
+            $hit['rating'] = $this->generalFeedback($hit['id']);
         }
 
         // Sort by from_price ascending
