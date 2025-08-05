@@ -957,11 +957,23 @@ class ObjectController extends BaseController
             } else {
                 $document['type_string'] = null;
             }
-            $document['rating'] = $this->countedList($id);
+            $document['rating'] = $this->generalFeedback($id);
             return $document;
 
         }
         return null;
+    }
+
+    public function generalFeedback($object_id)
+    {
+        $feedback = Feedback::find()->where(['object_id' => $object_id]);
+        $sum = $feedback->sum('general');
+        $count = $feedback->count();
+        if ($count) {
+            $average = $sum / $count;
+            return (float) $average;
+        }
+        return 0;
     }
 
     public function countedList($object_id)
