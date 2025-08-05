@@ -289,6 +289,7 @@ class UserController extends BaseController
             } else {
                 $hit['type_string'] = null;
             }
+            $hit['rating'] = $this->generalFeedback($hit['id']);
         }
         unset($hit); // break reference
 
