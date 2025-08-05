@@ -1157,6 +1157,7 @@ class ObjectController extends BaseController
                 $hit['from_price'] = $minPrice;
                 $similar[] = $hit;
             }
+            $hit['rating'] = $this->generalFeedback($hit['id']);
         }
 
         // Step 5: Separate cheaper and more expensive
