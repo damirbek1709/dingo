@@ -957,18 +957,17 @@ class ObjectController extends BaseController
             } else {
                 $document['type_string'] = null;
             }
-            $feedback = Feedback::findOne($id);
-            $document['rating']=$feedback->general ?? null;
+            $document['rating'] = $this->countedList($id);
             return $document;
 
         }
         return null;
     }
 
-    public function countedList()
+    public function countedList($object_id)
     {
         $data = [];
-        $list = Feedback::find();
+        $list = Feedback::find()->where(['object_id' => $object_id]);
 
         $fields = [
             'general',
@@ -1011,7 +1010,7 @@ class ObjectController extends BaseController
             'pageSize' => $dataProvider->pagination->pageSize,
             'totalCount' => $dataProvider->totalCount,
             'page' => (int) $page,
-            'common' => $this->countedList(),
+            'common' => $this->countedList($object_id),
             'data' => $dataProvider,
         ];
 
