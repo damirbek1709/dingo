@@ -971,7 +971,7 @@ class ObjectController extends BaseController
         $count = $feedback->count();
         if ($count) {
             $average = $sum / $count;
-            return (float) $average;
+            return (double) $average;
         }
         return 0;
     }
