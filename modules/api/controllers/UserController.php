@@ -17,6 +17,7 @@ use yii\web\NotFoundHttpException;
 use app\models\Favorite;
 use app\models\Vocabulary;
 use app\models\Notification;
+use app\models\Feedback;
 class UserController extends BaseController
 {
     public $modelClass = 'app\models\UserModel';
@@ -169,6 +170,18 @@ class UserController extends BaseController
                 $dao->createCommand()->insert('fcm_token', ['user_id' => $user_id, 'device_id' => $device_id, 'token' => $fcm_token, 'created_at' => time()])->execute();
             }
         }
+    }
+
+    public function generalFeedback($object_id)
+    {
+        $feedback = Feedback::find()->where(['object_id' => $object_id]);
+        $sum = $feedback->sum('general');
+        $count = $feedback->count();
+        if ($count) {
+            $average = $sum / $count;
+            return (float) round($average, 2);
+        }
+        return 0;
     }
 
     public function actionAddToFavorites($id)
