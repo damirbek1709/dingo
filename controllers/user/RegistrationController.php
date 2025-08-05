@@ -184,7 +184,7 @@ class RegistrationController extends BaseRegistrationController
                     if ($token->save()) {
                         $recipient = '+' . $model->phone;
                         Yii::$app->nikita->setRecipient($recipient)
-                            ->setText('Ваш код для входа: ' . $token->code . ' ' . PHP_EOL . 'wYvKRPwmEXI')
+                            ->setText('Ваш код для входа: ' . $token->code)
                             ->send();
 
                         Yii::$app->mailer->compose()
@@ -230,7 +230,7 @@ class RegistrationController extends BaseRegistrationController
                             Yii::$app->session->set('session_email', $model->email);
                             $recipient = '+' . $model->phone;
                             Yii::$app->nikita->setRecipient($recipient)
-                                ->setText('Ваш код для входа: ' . $token->code . ' ' . PHP_EOL . 'wYvKRPwmEXI')
+                                ->setText('Ваш код для входа: ' . $token->code)
                                 ->send();
                         } else {
                             Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
