@@ -43,7 +43,10 @@ class User extends BaseUser
         $rules['search_dataSafe'] = ['search_data', 'safe'];
         $rules['nameSafe'] = ['name', 'safe'];
         $rules['phoneSafe'] = ['phone', 'safe'];
+
+        $rules['emailSafe'] = ['email', 'safe'];
         $rules['fee_percentSafe'] = ['fee_percent', 'safe'];
+        
         $rules['objectsSafe'] = ['objects', 'safe'];
         return $rules;
     }

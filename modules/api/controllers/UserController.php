@@ -54,7 +54,7 @@ class UserController extends BaseController
         $model = Yii::createObject(RegistrationForm::className());
         $email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
         $phone = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'phone');
-        $user = User::find()->where(['email' => $email])->one();
+        $user = User::find()->where(['email' => $email])->orWhere(['phone' => $phone])->one();
 
         if (!$user) {
             $user = new User();
@@ -86,7 +86,7 @@ class UserController extends BaseController
                     Yii::$app->nikita->setRecipient($recipient)
                         ->setText('Ваш код для входа: ' . $token->code)
                         ->send();
-                        
+
                     Yii::$app->mailer->compose()
                         ->setFrom('send@dingo.kg')
                         ->setTo($email)
