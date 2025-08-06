@@ -58,7 +58,7 @@ class UserController extends BaseController
         if ($phone) {
             $user = User::find()->where(['phone' => $phone])->one();
             $username = $phone;
-            $email = time() . rand(5) . "@example.com";
+            $email = time() . rand(1000,9999) . "@example.com";
         } elseif ($email) {
             $user = User::find()->where(['email' => $email])->one();
             $username = $email;
