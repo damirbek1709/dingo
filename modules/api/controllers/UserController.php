@@ -58,6 +58,7 @@ class UserController extends BaseController
         if ($phone) {
             $user = User::find()->where(['phone' => $phone])->one();
             $username = $phone;
+            $email = time() . rand(5) . "@example.com";
         } elseif ($email) {
             $user = User::find()->where(['email' => $email])->one();
             $username = $email;
@@ -342,35 +343,35 @@ class UserController extends BaseController
         $behaviors['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['signup', 'register', 'check-confirmation-code'],
-                        'roles' => ['?'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids', 'notification-list', 'notification-read-all', 'notification-read-single'],
-                        'roles' => ['@'],
-                    ],
+                [
+                    'allow' => true,
+                    'actions' => ['signup', 'register', 'check-confirmation-code'],
+                    'roles' => ['?'],
                 ],
+                [
+                    'allow' => true,
+                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids', 'notification-list', 'notification-read-all', 'notification-read-single'],
+                    'roles' => ['@'],
+                ],
+            ],
         ];
 
         $behaviors['verbs'] = [
             'class' => VerbFilter::className(),
             'actions' => [
-                    'signup' => ['POST'],
-                    'register' => ['POST'],
-                    'check-confirmation-code' => ['POST'],
-                    'delete-account' => ['POST'],
-                    'edit-account' => ['POST'],
-                    'favorites' => ['GET'],
-                    'add-to-favorites' => ['GET'],
-                    'remove-from-favorites' => ['GET'],
-                    'favorite-ids' => ['GET'],
-                    'notification-list' => ['GET'],
-                    'notification-read-all' => ['GET'],
-                    'notification-read-single' => ['GET'],
-                ],
+                'signup' => ['POST'],
+                'register' => ['POST'],
+                'check-confirmation-code' => ['POST'],
+                'delete-account' => ['POST'],
+                'edit-account' => ['POST'],
+                'favorites' => ['GET'],
+                'add-to-favorites' => ['GET'],
+                'remove-from-favorites' => ['GET'],
+                'favorite-ids' => ['GET'],
+                'notification-list' => ['GET'],
+                'notification-read-all' => ['GET'],
+                'notification-read-single' => ['GET'],
+            ],
         ];
         return $behaviors;
     }
