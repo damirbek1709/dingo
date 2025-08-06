@@ -54,11 +54,19 @@ class UserController extends BaseController
         $model = Yii::createObject(RegistrationForm::className());
         $email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
         $phone = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'phone');
-        $user = User::find()->where(['email' => $email])->orWhere(['phone' => $phone])->one();
+        $username = "";
+        if ($phone) {
+            $user = User::find()->where(['phone' => $phone])->one();
+            $username = $phone;
+        } elseif ($email) {
+            $user = User::find()->where(['email' => $email])->one();
+            $username = $email;
+        }
+
 
         if (!$user) {
             $user = new User();
-            $user->username = $email;
+            $user->username = $username;
             $user->email = $email;
             $user->phone = $phone;
 
@@ -334,35 +342,35 @@ class UserController extends BaseController
         $behaviors['access'] = [
             'class' => AccessControl::className(),
             'rules' => [
-                [
-                    'allow' => true,
-                    'actions' => ['signup', 'register', 'check-confirmation-code'],
-                    'roles' => ['?'],
+                    [
+                        'allow' => true,
+                        'actions' => ['signup', 'register', 'check-confirmation-code'],
+                        'roles' => ['?'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids', 'notification-list', 'notification-read-all', 'notification-read-single'],
+                        'roles' => ['@'],
+                    ],
                 ],
-                [
-                    'allow' => true,
-                    'actions' => ['delete-account', 'edit-account', 'add-to-favorites', 'favorites', 'remove-from-favorites', 'favorite-ids', 'notification-list', 'notification-read-all', 'notification-read-single'],
-                    'roles' => ['@'],
-                ],
-            ],
         ];
 
         $behaviors['verbs'] = [
             'class' => VerbFilter::className(),
             'actions' => [
-                'signup' => ['POST'],
-                'register' => ['POST'],
-                'check-confirmation-code' => ['POST'],
-                'delete-account' => ['POST'],
-                'edit-account' => ['POST'],
-                'favorites' => ['GET'],
-                'add-to-favorites' => ['GET'],
-                'remove-from-favorites' => ['GET'],
-                'favorite-ids' => ['GET'],
-                'notification-list' => ['GET'],
-                'notification-read-all' => ['GET'],
-                'notification-read-single' => ['GET'],
-            ],
+                    'signup' => ['POST'],
+                    'register' => ['POST'],
+                    'check-confirmation-code' => ['POST'],
+                    'delete-account' => ['POST'],
+                    'edit-account' => ['POST'],
+                    'favorites' => ['GET'],
+                    'add-to-favorites' => ['GET'],
+                    'remove-from-favorites' => ['GET'],
+                    'favorite-ids' => ['GET'],
+                    'notification-list' => ['GET'],
+                    'notification-read-all' => ['GET'],
+                    'notification-read-single' => ['GET'],
+                ],
         ];
         return $behaviors;
     }
