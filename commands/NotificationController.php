@@ -36,6 +36,7 @@ class NotificationController extends Controller
 
     public function actionCheckinSoon()
     {
-        Notification::createNotification(3, 7,  95);
+        return "Cron is working";
+        //Notification::createNotification(3, 7,  95);
     }
 }
