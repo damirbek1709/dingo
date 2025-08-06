@@ -136,7 +136,12 @@ class Notification extends \yii\db\ActiveRecord
                 break;
         }
 
-        $notification->save();
+        if($notification->save()){
+            return "Recored";
+        }
+        else{
+            return print_r($notification->errors);
+        }
     }
 
     public function fields()
