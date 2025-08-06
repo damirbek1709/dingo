@@ -67,14 +67,14 @@ class Notification extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function createNotification($type, $model_id ,$booking_id = null)
+    public static function createNotification($type, $model_id ,$booking_id = null, $user_id)
     {
         $client = Yii::$app->meili->connect();
         $res = $client->index('object')->getDocument($model_id);
         $notification = new Notification();
         $notification->type = $type;
         $notification->status = self::STATUS_NOT_READ;
-        $notification->user_id = 34;
+        $notification->user_id = $user_id;
         $notification->booking_id = $booking_id;
 
         switch ($type) {
