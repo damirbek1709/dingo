@@ -72,7 +72,7 @@ class UserController extends BaseController
 
                 $response["success"] = true;
                 $response["message"] = "Пользователь создан";
-                if (in_array($email, ['damirbek@gmail.com', 'adiletprosoft@gmail.com'])) {
+                if (in_array($email, ['damirbek@gmail.com'])) {
                     $dao = Yii::$app->db;
                     $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
                     $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '000000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
@@ -81,6 +81,12 @@ class UserController extends BaseController
                     $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
                     $token->link('user', $user);
                     $response['code'] = $token->code;
+                    $recipient = '+' . $phone;
+
+                    Yii::$app->nikita->setRecipient($recipient)
+                        ->setText('Ваш код для входа: ' . $token->code)
+                        ->send();
+                        
                     Yii::$app->mailer->compose()
                         ->setFrom('send@dingo.kg')
                         ->setTo($email)
@@ -96,7 +102,7 @@ class UserController extends BaseController
             $sendSMS = true;
             $response["success"] = true;
             $response["message"] = "Пользователь найден";
-            if (in_array($email, ['damirbek@gmail.com', 'adiletprosoft@gmail.com'])) {
+            if (in_array($email, ['damirbek@gmail.com'])) {
                 $dao = Yii::$app->db;
                 $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
                 $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '000000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
@@ -105,22 +111,26 @@ class UserController extends BaseController
                 $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
                 $token->link('user', $user);
                 //$response['code'] = $token->code;
-            }
-            $recipient = '+' . $phone;
-            Yii::$app->nikita->setRecipient($recipient)
-                ->setText('Ваш код для входа: ' . $token->code)
-                ->send();
-                
-            if ($sendSMS) {
-                Yii::$app->mailer->compose()
-                    ->setFrom('send@dingo.kg')
-                    ->setTo($email)
-                    ->setSubject("Ваш код для входа: " . $token->code)
-                    ->setHtmlBody("<h1>{$token->code}</h1>")
-                    ->setTextBody('Hello from Resend! This is a test email.')
-                    ->send();
 
+                if ($sendSMS) {
+                    $recipient = '+' . $phone;
+                    Yii::$app->nikita->setRecipient($recipient)
+                        ->setText('Ваш код для входа: ' . $token->code)
+                        ->send();
+
+                    Yii::$app->mailer->compose()
+                        ->setFrom('send@dingo.kg')
+                        ->setTo($email)
+                        ->setSubject("Ваш код для входа: " . $token->code)
+                        ->setHtmlBody("<h1>{$token->code}</h1>")
+                        ->setTextBody('Hello from Resend! This is a test email.')
+                        ->send();
+
+                }
             }
+
+
+
         }
         return $response;
     }
