@@ -41,8 +41,19 @@ class NotificationController extends Controller
             ->where(['date_from' => date('Y-m-d', strtotime('+1 day'))])
             ->all();
         foreach ($booking as $item) {
-            Notification::createNotification(3, 7, 95, $item->user_id);
+            Notification::createNotification(Notification::TYPE_CHECKIN_TOMORROW, 7, 95, $item->user_id);
         }
-
     }
+
+    public function actionLeaveFeedback()
+    {
+        $booking = Booking::find()
+            ->where(['date_from' => date('Y-m-d', strtotime('+1 day'))])
+            ->all();
+        foreach ($booking as $item) {
+            Notification::createNotification(Notification::TYPE_CHECKIN_TOMORROW, 7, 95, $item->user_id);
+        }
+    }
+
+
 }

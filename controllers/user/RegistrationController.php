@@ -173,7 +173,13 @@ class RegistrationController extends BaseRegistrationController
                 $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '000000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
                 return $this->redirect('confirm-number');
             } else {
-                $user = User::find()->where(['email' => $model->email])->one();
+                if ($model->email) {
+                    $user = User::find()->where(['email' => $model->email])->one();
+                }
+                elseif($model->phone){
+                    $user = User::find()->where(['phone' => $model->phone])->one();
+                }
+
                 if ($user) {
                     $token = new Token();
                     $token->user_id = $user->id; // Ensure user_id is set
