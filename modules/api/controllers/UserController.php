@@ -404,6 +404,7 @@ class UserController extends BaseController
         $user->username = "deleted_user_" . $rand;
         $user->email = "deleted_user_" . $rand;
         $user->name = "Deleted User";
+        $user->phone = "Deleted User";
 
         $user->flags = User::FLAG_DELETED;
         $booking = Booking::find()->where(['user_id' => Yii::$app->user->id, 'status' => Booking::PAID_STATUS_PAID])->andWhere(['>', 'date_from', date('Y-m-d')])->one();
