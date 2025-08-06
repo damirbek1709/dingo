@@ -53,7 +53,9 @@ class UserController extends BaseController
         $model = Yii::createObject(RegistrationForm::className());
         $email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
         $phone = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'phone');
-        return $phone;
+        return $email;
+
+
         $username = "";
         $sendSMS = false;
         $sendEmail = false;
