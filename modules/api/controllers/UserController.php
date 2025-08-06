@@ -53,12 +53,14 @@ class UserController extends BaseController
 
         $model = Yii::createObject(RegistrationForm::className());
         $email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
+        $phone = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'phone');
         $user = User::find()->where(['email' => $email])->one();
 
         if (!$user) {
             $user = new User();
             $user->username = $email;
             $user->email = $email;
+            $user->phone = $phone;
 
             if ($user->register()) {
 
@@ -87,7 +89,7 @@ class UserController extends BaseController
                         ->setTextBody('Hello from Resend! This is a test email.')
                         ->send();
 
-                    
+
                 }
             }
         } else {
@@ -104,6 +106,11 @@ class UserController extends BaseController
                 $token->link('user', $user);
                 //$response['code'] = $token->code;
             }
+            $recipient = '+' . $phone;
+            Yii::$app->nikita->setRecipient($recipient)
+                ->setText('Ваш код для входа: ' . $token->code)
+                ->send();
+                
             if ($sendSMS) {
                 Yii::$app->mailer->compose()
                     ->setFrom('send@dingo.kg')
@@ -112,7 +119,7 @@ class UserController extends BaseController
                     ->setHtmlBody("<h1>{$token->code}</h1>")
                     ->setTextBody('Hello from Resend! This is a test email.')
                     ->send();
-                
+
             }
         }
         return $response;
