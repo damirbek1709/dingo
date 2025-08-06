@@ -35,33 +35,29 @@ class Meili extends Component
         $server = strtolower($_SERVER['HTTP_HOST'] ?? php_uname('n'));
 
         try {
-            if ($server === 'partner.dingo.kg') {
-                $client = new Client(
-                    'https://ms.dingo.kg',
-                    'XYgN9akmwIizAMP6Z1zRAE8qryqcjZY1XQBT-qLUG3g',
-                    new GuzzleHttpClient([
-                        'timeout' => 5,
-                        'verify' => false
-                    ])
-                );
-            } elseif ($server === 'dev.dingo.kg') {
-                $client = new Client(
-                    'https://meili.selva.kg',
-                    'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
-                    new GuzzleHttpClient([
-                        'timeout' => 5,
-                        'verify' => false
-                    ])
-                );
-            } else {
-                $client = new Client(
-                    'http://host.docker.internal:7700',
-                    'masterKey',
-                    new GuzzleHttpClient([
-                        'timeout' => 5,
-                        'verify' => false
-                    ])
-                );
+            switch (YII_ENV) {
+                case 'prod':
+                    $client = new Client(
+                        'https://ms.dingo.kg',
+                        'XYgN9akmwIizAMP6Z1zRAE8qryqcjZY1XQBT-qLUG3g',
+                        new GuzzleHttpClient(['timeout' => 5, 'verify' => false])
+                    );
+                    break;
+
+                case 'dev':
+                    $client = new Client(
+                        'https://meili.selva.kg',
+                        'NGY2YzkxZDhiZjA5MGIzODg1Y2MwNDU5',
+                        new GuzzleHttpClient(['timeout' => 5, 'verify' => false])
+                    );
+                    break;
+
+                default:
+                    $client = new Client(
+                        'http://localhost:7700',  // or '127.0.0.1'
+                        'masterKey',
+                        new GuzzleHttpClient(['timeout' => 5, 'verify' => false])
+                    );
             }
 
             return $client;
