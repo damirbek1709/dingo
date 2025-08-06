@@ -50,18 +50,21 @@ class UserController extends BaseController
     public function actionRegister()
     {
         $response["success"] = false;
-
         $model = Yii::createObject(RegistrationForm::className());
         $email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
         $phone = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'phone');
         $username = "";
+        $sendSMS = false;
+        $sendEmail = false;
         if ($phone) {
             $user = User::find()->where(['phone' => $phone])->one();
             $username = $phone;
-            $email = time() . rand(1000,9999) . "@example.com";
+            $sendSMS = true;
+            $email = time() . rand(1000, 9999) . "@example.com";
         } elseif ($email) {
             $user = User::find()->where(['email' => $email])->one();
             $username = $email;
+            $sendEmail = true;
         }
 
 
@@ -90,25 +93,28 @@ class UserController extends BaseController
                     $token = Yii::createObject(['class' => Token::className(), 'type' => Token::TYPE_CONFIRMATION]);
                     $token->link('user', $user);
                     $response['code'] = $token->code;
-                    $recipient = '+' . $phone;
 
-                    Yii::$app->nikita->setRecipient($recipient)
-                        ->setText('Ваш код для входа: ' . $token->code)
-                        ->send();
+                    if ($sendSMS) {
+                        $recipient = '+' . $phone;
+                        Yii::$app->nikita->setRecipient($recipient)
+                            ->setText('Ваш код для входа: ' . $token->code)
+                            ->send();
+                    }
 
-                    Yii::$app->mailer->compose()
-                        ->setFrom('send@dingo.kg')
-                        ->setTo($email)
-                        ->setSubject("Ваш код для входа: " . $token->code)
-                        ->setHtmlBody("<h1>{$token->code}</h1>")
-                        ->setTextBody('Hello from Resend! This is a test email.')
-                        ->send();
+                    if ($sendEmail) {
+                        Yii::$app->mailer->compose()
+                            ->setFrom('send@dingo.kg')
+                            ->setTo($email)
+                            ->setSubject("Ваш код для входа: " . $token->code)
+                            ->setHtmlBody("<h1>{$token->code}</h1>")
+                            ->setTextBody('Hello from Resend! This is a test email.')
+                            ->send();
+                    }
 
 
                 }
             }
         } else {
-            $sendSMS = true;
             $response["success"] = true;
             $response["message"] = "Пользователь найден";
             if (in_array($email, ['damirbek@gmail.com'])) {
@@ -126,7 +132,9 @@ class UserController extends BaseController
                     Yii::$app->nikita->setRecipient($recipient)
                         ->setText('Ваш код для входа: ' . $token->code)
                         ->send();
+                }
 
+                if ($sendEmail) {
                     Yii::$app->mailer->compose()
                         ->setFrom('send@dingo.kg')
                         ->setTo($email)
@@ -134,7 +142,6 @@ class UserController extends BaseController
                         ->setHtmlBody("<h1>{$token->code}</h1>")
                         ->setTextBody('Hello from Resend! This is a test email.')
                         ->send();
-
                 }
             }
 
