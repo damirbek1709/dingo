@@ -53,7 +53,7 @@ class UserController extends BaseController
         $model = Yii::createObject(RegistrationForm::className());
         $email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
         $phone = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'phone');
-        
+
         $username = "";
         $sendSMS = false;
         $sendEmail = false;
@@ -167,7 +167,13 @@ class UserController extends BaseController
 
         $code = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'code');
         $email = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'email');
-        $user = User::find()->where(['email' => $email])->one();
+        $phone = ArrayHelper::getValue(Yii::$app->request->bodyParams, 'phone');
+
+        if ($email) {
+            $user = User::find()->where(['email' => $email])->one();
+        } elseif ($phone) {
+            $user = User::find()->where(['phone' => $phone])->one();
+        }
 
         $token = Token::find()->where(['code' => $code, 'user_id' => $user->id, 'type' => Token::TYPE_CONFIRMATION])->one();
 
