@@ -60,7 +60,13 @@ class User extends BaseUser
             'emailUnique' => [
                 'email',
                 'unique',
-                'message' => Yii::t('user', 'This email address has already been taken')
+                'message' => Yii::t('user', 'This email address has already been taken'),
+            ],
+
+            'phoneUnique' => [
+                'phone',
+                'unique',
+                'message' => Yii::t('user', 'This phone number has already been taken')
             ],
 
             // password rules
