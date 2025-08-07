@@ -175,8 +175,7 @@ class RegistrationController extends BaseRegistrationController
             } else {
                 if ($model->email) {
                     $user = User::find()->where(['email' => $model->email])->one();
-                }
-                elseif($model->phone){
+                } elseif ($model->phone) {
                     $user = User::find()->where(['phone' => $model->phone])->one();
                 }
 
@@ -188,20 +187,20 @@ class RegistrationController extends BaseRegistrationController
                     $token->created_at = time();
 
                     if ($token->save()) {
-                        $recipient = '+' . $model->phone;
-                        Yii::$app->nikita->setRecipient($recipient)
-                            ->setText('Ваш код для входа: ' . $token->code)
-                            ->send();
-
-                        Yii::$app->mailer->compose()
-                            ->setFrom('send@dingo.kg')
-                            ->setTo($model->email)
-                            ->setSubject("Ваш код авторизации: " . $token->code)
-                            ->setHtmlBody("<h1>{$token->code}</h1>")
-                            ->setTextBody('Hello from Resend! This is a test email.')
-                            ->send();
-                        Yii::$app->session->set('session_email', $model->email);
-
+                        if ($model->phone) {
+                            $recipient = '+' . $model->phone;
+                            Yii::$app->nikita->setRecipient($recipient)
+                                ->setText('Ваш код для входа: ' . $token->code)
+                                ->send();
+                        } else {
+                            Yii::$app->mailer->compose()
+                                ->setFrom('send@dingo.kg')
+                                ->setTo($model->email)
+                                ->setSubject("Ваш код авторизации: " . $token->code)
+                                ->setHtmlBody("<h1>{$token->code}</h1>")
+                                ->send();
+                            Yii::$app->session->set('session_email', $model->email);
+                        }
                     } else {
                         Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
                     }
@@ -209,8 +208,10 @@ class RegistrationController extends BaseRegistrationController
 
                 } else {
                     $user = new User();
-                    $user->username = $model->email;
+
+                    $user->username = $model->email ?? $model->phone;
                     $user->email = $model->email;
+                    $user->phone = $model->phone;
 
                     if ($user->register()) {
                         $auth = Yii::$app->authManager;
@@ -226,18 +227,22 @@ class RegistrationController extends BaseRegistrationController
                         $token->created_at = time();
 
                         if ($token->save()) {
-                            Yii::$app->mailer->compose()
-                                ->setFrom('send@dingo.kg')
-                                ->setTo($model->email)
-                                ->setSubject("Ваш код авторизации: " . $token->code)
-                                ->setHtmlBody("<h1>{$token->code}</h1>")
-                                ->setTextBody('Hello from Resend! This is a test email.')
-                                ->send();
-                            Yii::$app->session->set('session_email', $model->email);
-                            $recipient = '+' . $model->phone;
-                            Yii::$app->nikita->setRecipient($recipient)
-                                ->setText('Ваш код для входа: ' . $token->code)
-                                ->send();
+                            if ($model->phone) {
+                                $recipient = '+' . $model->phone;
+                                Yii::$app->nikita->setRecipient($recipient)
+                                    ->setText('Ваш код для входа: ' . $token->code)
+                                    ->send();
+                            } else {
+                                Yii::$app->mailer->compose()
+                                    ->setFrom('send@dingo.kg')
+                                    ->setTo($model->email)
+                                    ->setSubject("Ваш код авторизации: " . $token->code)
+                                    ->setHtmlBody("<h1>{$token->code}</h1>")
+                                    ->setTextBody('Hello from Resend! This is a test email.')
+                                    ->send();
+                                Yii::$app->session->set('session_email', $model->email);
+                            }
+
                         } else {
                             Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
                         }
