@@ -165,7 +165,7 @@ class RegistrationController extends BaseRegistrationController
         $event = $this->getFormEvent($model);
         $this->performAjaxValidation($model);
 
-        if ($model->load(Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->email) {
                 $user = User::find()->where(['email' => $model->email])->one();
             } elseif ($model->phone) {
