@@ -206,7 +206,7 @@ class RegistrationController extends BaseRegistrationController
                     $user->username = $model->email;
                     $user->email = $model->email;
                 } else {
-                    $user->email = null;
+                    $user->email = time() . rand(100, 999) . "@example.com";
                 }
                 if ($model->phone) {
                     $user->phone = $model->phone;
