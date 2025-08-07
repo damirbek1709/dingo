@@ -165,21 +165,54 @@ class RegistrationController extends BaseRegistrationController
         $this->performAjaxValidation($model);
 
         if ($model->load(Yii::$app->request->post())) {
-            if (in_array($model->email, ['damirbek@gmail.com', 'adiletprosoft@gmail.com'])) {
-                Yii::$app->session->set('session_email', $model->email);
+            if ($model->email) {
                 $user = User::find()->where(['email' => $model->email])->one();
-                $dao = Yii::$app->db;
-                $dao->createCommand()->delete('token', ['user_id' => $user->id])->execute();
-                $dao->createCommand()->insert('token', ['user_id' => $user->id, 'code' => '000000', 'type' => Token::TYPE_CONFIRMATION, 'created_at' => time()])->execute();
-                return $this->redirect('confirm-number');
-            } else {
-                if ($model->email) {
-                    $user = User::find()->where(['email' => $model->email])->one();
-                } elseif ($model->phone) {
-                    $user = User::find()->where(['phone' => $model->phone])->one();
-                }
+            } elseif ($model->phone) {
+                $user = User::find()->where(['phone' => $model->phone])->one();
+            }
 
-                if ($user) {
+            if ($user) {
+                $token = new Token();
+                $token->user_id = $user->id; // Ensure user_id is set
+                $token->type = Token::TYPE_CONFIRMATION;
+                $token->code = rand(1000, 9999); // Generate a random code
+                $token->created_at = time();
+
+                if ($token->save()) {
+                    if ($model->phone) {
+                        $recipient = '+' . $model->phone;
+                        Yii::$app->nikita->setRecipient($recipient)
+                            ->setText('Ваш код для входа: ' . $token->code)
+                            ->send();
+                    } else {
+                        Yii::$app->mailer->compose()
+                            ->setFrom('send@dingo.kg')
+                            ->setTo($model->email)
+                            ->setSubject("Ваш код авторизации: " . $token->code)
+                            ->setHtmlBody("<h1>{$token->code}</h1>")
+                            ->setTextBody('Hello from Resend! This is a test email.')
+                            ->send();
+                        Yii::$app->session->set('session_email', $model->email);
+                    }
+                } else {
+                    Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
+                }
+                return $this->redirect('confirm-number');
+
+            } else {
+                $user = new User();
+
+                $user->username = $model->email ?? $model->phone;
+                $user->email = $model->email;
+                $user->phone = $model->phone;
+
+                if ($user->register()) {
+                    $auth = Yii::$app->authManager;
+                    $role = $auth->getPermission('owner'); // Make sure "owner" role exists in RBAC
+                    if ($role) {
+                        $auth->assign($role, $user->id);
+                    }
+
                     $token = new Token();
                     $token->user_id = $user->id; // Ensure user_id is set
                     $token->type = Token::TYPE_CONFIRMATION;
@@ -198,62 +231,19 @@ class RegistrationController extends BaseRegistrationController
                                 ->setTo($model->email)
                                 ->setSubject("Ваш код авторизации: " . $token->code)
                                 ->setHtmlBody("<h1>{$token->code}</h1>")
+                                ->setTextBody('Hello from Resend! This is a test email.')
                                 ->send();
                             Yii::$app->session->set('session_email', $model->email);
                         }
+
                     } else {
                         Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
                     }
+                    $this->trigger(self::EVENT_AFTER_REGISTER, $event);
                     return $this->redirect('confirm-number');
-
-                } else {
-                    $user = new User();
-
-                    $user->username = $model->email ?? $model->phone;
-                    $user->email = $model->email;
-                    $user->phone = $model->phone;
-
-                    if ($user->register()) {
-                        $auth = Yii::$app->authManager;
-                        $role = $auth->getPermission('owner'); // Make sure "owner" role exists in RBAC
-                        if ($role) {
-                            $auth->assign($role, $user->id);
-                        }
-
-                        $token = new Token();
-                        $token->user_id = $user->id; // Ensure user_id is set
-                        $token->type = Token::TYPE_CONFIRMATION;
-                        $token->code = rand(1000, 9999); // Generate a random code
-                        $token->created_at = time();
-
-                        if ($token->save()) {
-                            if ($model->phone) {
-                                $recipient = '+' . $model->phone;
-                                Yii::$app->nikita->setRecipient($recipient)
-                                    ->setText('Ваш код для входа: ' . $token->code)
-                                    ->send();
-                            } else {
-                                Yii::$app->mailer->compose()
-                                    ->setFrom('send@dingo.kg')
-                                    ->setTo($model->email)
-                                    ->setSubject("Ваш код авторизации: " . $token->code)
-                                    ->setHtmlBody("<h1>{$token->code}</h1>")
-                                    ->setTextBody('Hello from Resend! This is a test email.')
-                                    ->send();
-                                Yii::$app->session->set('session_email', $model->email);
-                            }
-
-                        } else {
-                            Yii::error('Token saving failed: ' . json_encode($token->errors), 'app');
-                        }
-                        $this->trigger(self::EVENT_AFTER_REGISTER, $event);
-                        return $this->redirect('confirm-number');
-                    }
                 }
-
             }
         }
-
         return $this->render('signin', [
             'model' => $model,
             'module' => $this->module,
