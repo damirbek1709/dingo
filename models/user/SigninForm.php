@@ -5,6 +5,7 @@ namespace app\models\user;
 use Yii;
 use app\models\user\User;
 use app\models\user\RegistrationForm;
+use app\models\user\RequireOneValidator;
 
 /**
  * @property int $phone_number Номер телефона
@@ -13,6 +14,7 @@ class SigninForm extends \yii\base\Model
 {
     public $email;
     public $phone;
+    public $dummy;
 
     /**
      * {@inheritdoc}
@@ -21,20 +23,21 @@ class SigninForm extends \yii\base\Model
     {
         return [
             [['email', 'phone'], 'trim'],
-            [['email', 'phone'], 'string', 'min' => 3, 'max' => 255],
-            ['email', 'email'], // для доп. валидации email
-
-            // Кастомное правило: хотя бы одно поле должно быть заполнено
-            [['email', 'phone'], 'validateContact'],
+            [
+                ['email', 'phone'],
+                function ($attribute, $params, $validator) {
+                    if (empty($this->email) && empty($this->phone)) {
+                        $this->addError('email', 'Either email or phone must be provided.');
+                        $this->addError('phone', 'Either email or phone must be provided.');
+                    }
+                },
+                'skipOnEmpty' => false,
+                'skipOnError' => false
+            ],
+            ['email', 'string', 'min' => 3, 'max' => 255, 'skipOnEmpty' => true],
+            ['phone', 'string', 'min' => 3, 'max' => 255, 'skipOnEmpty' => true],
+            ['email', 'email', 'skipOnEmpty' => true],
         ];
-    }
-
-    public function validateContact($attribute, $params)
-    {
-        if (empty($this->email) && empty($this->phone)) {
-            $this->addError('email', 'Укажите email или номер телефона');
-            $this->addError('phone', 'Укажите email или номер телефона');
-        }
     }
 
     /**
@@ -44,7 +47,7 @@ class SigninForm extends \yii\base\Model
     {
         return [
             'email' => 'E-mail',
-            'phone' => Yii::t('app','Телефон'),
+            'phone' => Yii::t('app', 'Телефон'),
         ];
     }
 
@@ -52,5 +55,5 @@ class SigninForm extends \yii\base\Model
      *
      * @return type
      */
-    
+
 }
