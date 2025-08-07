@@ -167,7 +167,7 @@ class RegistrationController extends BaseRegistrationController
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             if ($model->email) {
                 $user = User::find()->where(['email' => $model->email])->one();
-            } elseif ($model->phone) {
+            } if ($model->phone) {
                 $user = User::find()->where(['phone' => $model->phone])->one();
             }
 
@@ -201,8 +201,7 @@ class RegistrationController extends BaseRegistrationController
 
             } else {
                 $user = new User();
-
-                $user->username = $model->email ?? $model->phone;
+                $user->username = $model->email ? $model->email : $model->phone;
                 $user->email = $model->email;
                 $user->phone = $model->phone;
 
