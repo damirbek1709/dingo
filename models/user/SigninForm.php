@@ -25,7 +25,7 @@ class SigninForm extends \yii\base\Model
             ['email', 'email'], // для доп. валидации email
 
             // Кастомное правило: хотя бы одно поле должно быть заполнено
-            [['email', 'phone'], 'validateContact', 'on' => ['signin', 'register', 'create', 'connect', 'update']],
+            [['email', 'phone'], 'validateContact'],
         ];
     }
 
