@@ -161,6 +161,7 @@ class RegistrationController extends BaseRegistrationController
 
         /** @var RegistrationForm $model */
         $model = Yii::createObject(SigninForm::className());
+        $model->scenario = 'signin';
         $event = $this->getFormEvent($model);
         $this->performAjaxValidation($model);
 
