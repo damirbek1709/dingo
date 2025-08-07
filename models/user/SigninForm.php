@@ -20,14 +20,21 @@ class SigninForm extends \yii\base\Model
     public function rules()
     {
         return [
-            ['email', 'trim'],
-            ['email', 'required', 'on' => ['register', 'create', 'connect', 'update']],
-            ['email', 'string', 'min' => 3, 'max' => 255],
-            
-            ['phone', 'trim'],
-            ['phone', 'required', 'on' => ['register', 'create', 'connect', 'update']],
-            ['phone', 'string', 'min' => 3, 'max' => 255],
+            [['email', 'phone'], 'trim'],
+            [['email', 'phone'], 'string', 'min' => 3, 'max' => 255],
+            ['email', 'email'], // для доп. валидации email
+
+            // Кастомное правило: хотя бы одно поле должно быть заполнено
+            [['email', 'phone'], 'validateContact', 'on' => ['signin', 'register', 'create', 'connect', 'update']],
         ];
+    }
+
+    public function validateContact($attribute, $params)
+    {
+        if (empty($this->email) && empty($this->phone)) {
+            $this->addError('email', 'Укажите email или номер телефона');
+            $this->addError('phone', 'Укажите email или номер телефона');
+        }
     }
 
     /**

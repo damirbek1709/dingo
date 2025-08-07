@@ -11,6 +11,7 @@ class User extends BaseUser
 {
     const FIXED_FEE = 10;
     public $objects;
+    public static $usernameRegexp = '/^[-a-zA-Z0-9_\.@]+$/';
 
 
     const FLAG_DELETED = 1;
@@ -30,25 +31,49 @@ class User extends BaseUser
         $scenarios['update'][] = 'phone';
         $scenarios['register'][] = 'phone';
 
-       $scenarios['update'][] = 'fee_percent';
+        $scenarios['update'][] = 'fee_percent';
         return $scenarios;
     }
 
 
+
+
     public function rules()
     {
-        $rules = parent::rules();
-        // add some rules
+        return [
+            // username rules
+            'usernameTrim' => ['username', 'trim'],
+            'usernameRequired' => ['username', 'required', 'on' => ['register', 'create', 'connect', 'update']],
+            'usernameMatch' => ['username', 'match', 'pattern' => static::$usernameRegexp],
+            'usernameLength' => ['username', 'string', 'min' => 3, 'max' => 255],
+            'usernameUnique' => [
+                'username',
+                'unique',
+                'message' => \Yii::t('user', 'This username has already been taken')
+            ],
 
-        $rules['search_dataSafe'] = ['search_data', 'safe'];
-        $rules['nameSafe'] = ['name', 'safe'];
-        $rules['phoneSafe'] = ['phone', 'safe'];
+            // email rules
+            'emailTrim' => ['email', 'trim'],
+            'emailSafe' => ['email', 'safe'],
+            'emailPattern' => ['email', 'email'],
+            'emailLength' => ['email', 'string', 'max' => 255],
+            'emailUnique' => [
+                'email',
+                'unique',
+                'message' => Yii::t('user', 'This email address has already been taken')
+            ],
 
-        $rules['emailSafe'] = ['email', 'safe'];
-        $rules['fee_percentSafe'] = ['fee_percent', 'safe'];
-        
-        $rules['objectsSafe'] = ['objects', 'safe'];
-        return $rules;
+            // password rules
+            'passwordRequired' => ['password', 'required', 'on' => ['register']],
+            'passwordLength' => ['password', 'string', 'min' => 6, 'max' => 72, 'on' => ['register', 'create']],
+
+            'phoneSafe' => ['phone', 'safe'],
+            'search_dataSafe' => ['search_data', 'safe'],
+            'objectsSafe' => ['objects', 'safe'],
+            'fee_percentSafe' => ['fee_percent', 'safe'],
+            'nameSafe' => ['name', 'safe'],
+
+        ];
     }
 
     public function attributeLabels()
@@ -122,13 +147,13 @@ class User extends BaseUser
         $filter_string = "user_id=" . Yii::$app->user->id;
         $client = Yii::$app->meili->connect();
         $res = $client->index('object')->search('', [
-                'filter' => [$filter_string],
-                'limit' => 10000
-            ])->getHits();
-         if(count($res)>0){
-            return true; 
-         }  
-         return false;
+            'filter' => [$filter_string],
+            'limit' => 10000
+        ])->getHits();
+        if (count($res) > 0) {
+            return true;
+        }
+        return false;
     }
 
     public function getAuthAssignments()
